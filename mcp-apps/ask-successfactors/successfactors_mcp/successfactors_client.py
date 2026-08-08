@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import base64
+import hashlib
+import json
 import os
 import re
 from pathlib import Path
@@ -11,6 +13,7 @@ import httpx
 from dotenv import load_dotenv
 
 from .successfactors_settings import get_settings
+from .cache import AsyncTTLCache
 from shared_mcp.logger import get_logger
 
 log = get_logger("sf_hcm")
@@ -47,6 +50,11 @@ class SuccessFactorsClient:
     def __init__(self, settings=None):
         self.settings = settings or get_settings()
         self.base_url = self.settings.sf_api_url.rstrip("/")
+        self._read_cache = AsyncTTLCache[Dict[str, Any]](
+            enabled=getattr(self.settings, "cache_enabled", True),
+            ttl_seconds=getattr(self.settings, "cache_ttl_seconds", 120),
+            max_entries=getattr(self.settings, "cache_max_entries", 512),
+        )
 
     def _get_auth_header(self) -> str:
         """Construct Basic Auth header in format username@companyId:password."""
@@ -73,19 +81,18 @@ class SuccessFactorsClient:
     ) -> Dict[str, Any]:
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
         headers = self._get_headers(executive_id=executive_id)
-        queryParams = params or {}
-        if "$format" not in queryParams:
-            queryParams["$format"] = "json"
+        query_params = dict(params or {})
+        query_params.setdefault("$format", "json")
 
         log.debug("sf_request", method=method, url=url, executive_id=bool(executive_id))
 
-        try:
+        async def send_request() -> Dict[str, Any]:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 resp = await client.request(
                     method,
                     url,
                     headers=headers,
-                    params=queryParams,
+                    params=query_params,
                     json=json_data,
                 )
                 if resp.status_code >= 400:
@@ -101,6 +108,31 @@ class SuccessFactorsClient:
                 if "d" in res_data:
                     return res_data["d"]
                 return res_data
+
+        try:
+            if method.upper() == "GET":
+                key_payload = {
+                    "baseUrl": self.base_url,
+                    "executiveId": executive_id or "configured-service-account",
+                    "endpoint": endpoint,
+                    "params": query_params,
+                }
+                cache_key = hashlib.sha256(
+                    json.dumps(key_payload, sort_keys=True, separators=(",", ":"), default=str).encode()
+                ).hexdigest()
+                result, cache_info = await self._read_cache.get_or_load(
+                    cache_key,
+                    send_request,
+                    cacheable=lambda value: isinstance(value, dict) and not value.get("error"),
+                )
+                if isinstance(result, dict):
+                    result["_cache"] = cache_info.as_dict()
+                return result
+
+            result = await send_request()
+            if isinstance(result, dict) and not result.get("error"):
+                await self._read_cache.clear()
+            return result
         except Exception as exc:
             log.error("sf_client_exception", error=str(exc))
             return {
@@ -117,6 +149,7 @@ class SuccessFactorsClient:
         department: Optional[str] = None,
         business_unit: Optional[str] = None,
         job_title: Optional[str] = None,
+        as_of_date: Optional[str] = None,
         top: int = 20,
         executive_id: Optional[str] = None,
     ) -> Dict[str, Any]:
@@ -140,6 +173,8 @@ class SuccessFactorsClient:
             "endDate,location,payGrade,managerId"
         )
         params: Dict[str, Any] = {"$top": _bounded_top(top), "$select": select_fields, "$inlinecount": "allpages"}
+        if as_of_date:
+            params["asOfDate"] = as_of_date
         if filter_str:
             params["$filter"] = filter_str
 
@@ -154,7 +189,8 @@ class SuccessFactorsClient:
             "type": "EmpJob",
             "rbp_trimmed": True,
             "source": "SAP SuccessFactors · EmpJob",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": res.get("_cache", {}),
         }
 
     async def get_emp_job(self, user_id: str, seq_num: int = 1, executive_id: Optional[str] = None) -> Dict[str, Any]:
@@ -170,7 +206,8 @@ class SuccessFactorsClient:
             "record": results[0],
             "type": "EmpJob",
             "source": "SAP SuccessFactors · EmpJob",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": res.get("_cache", {}),
         }
 
     async def create_emp_job(self, emp_job_data: Dict[str, Any], executive_id: Optional[str] = None) -> Dict[str, Any]:
@@ -186,7 +223,12 @@ class SuccessFactorsClient:
 
     # ── Emiratisation Ratio KPI - Slide 4 Capability 02 (PDPL Enforced) ────────
 
-    async def get_emiratisation_kpi(self, company: Optional[str] = None, executive_id: Optional[str] = None) -> Dict[str, Any]:
+    async def get_emiratisation_kpi(
+        self,
+        company: Optional[str] = None,
+        as_of_date: Optional[str] = None,
+        executive_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Query Emiratisation ratio served as aggregate KPI only (PDPL Privacy Rule Enforced)."""
         if not self.settings.sf_emirati_filter.strip():
             return {
@@ -196,6 +238,8 @@ class SuccessFactorsClient:
 
         company_filter = f"company eq '{_escape_odata_string(company)}'" if company else ""
         total_params: Dict[str, Any] = {"$top": 1, "$select": "userId", "$inlinecount": "allpages"}
+        if as_of_date:
+            total_params["asOfDate"] = as_of_date
         if company_filter:
             total_params["$filter"] = company_filter
         total_res = await self._request("GET", "EmpJob", params=total_params, executive_id=executive_id)
@@ -207,7 +251,13 @@ class SuccessFactorsClient:
         emirati_res = await self._request(
             "GET",
             "EmpJob",
-            params={"$top": 1, "$select": "userId", "$inlinecount": "allpages", "$filter": combined_filter},
+            params={
+                "$top": 1,
+                "$select": "userId",
+                "$inlinecount": "allpages",
+                "$filter": combined_filter,
+                **({"asOfDate": as_of_date} if as_of_date else {}),
+            },
             executive_id=executive_id,
         )
         if not isinstance(emirati_res, dict) or emirati_res.get("error"):
@@ -226,9 +276,14 @@ class SuccessFactorsClient:
             "emiratisation_ratio_percent": emiratisation_rate,
             "target_percent": target,
             "target_compliance": "ON_TRACK" if emiratisation_rate >= target else "BELOW_TARGET",
+            "as_of_date": as_of_date,
             "pdpl_enforced": True,
             "source": "SAP SuccessFactors · EmpJob",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": {
+                "total": total_res.get("_cache", {}),
+                "emirati": emirati_res.get("_cache", {}),
+            },
         }
 
     # ── Employee Directory (User) ─────────────────────────────────────────────
@@ -271,7 +326,8 @@ class SuccessFactorsClient:
             "type": "User",
             "rbp_trimmed": True,
             "source": "SAP SuccessFactors · User",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": res.get("_cache", {}),
         }
 
     async def get_user(self, user_id: str, executive_id: Optional[str] = None) -> Dict[str, Any]:
@@ -287,7 +343,8 @@ class SuccessFactorsClient:
             "user": results[0],
             "type": "User",
             "source": "SAP SuccessFactors · User",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": res.get("_cache", {}),
         }
 
     async def update_user(self, user_id: str, update_data: Dict[str, Any], executive_id: Optional[str] = None) -> Dict[str, Any]:
@@ -328,7 +385,8 @@ class SuccessFactorsClient:
             "results": results,
             "type": entity_type,
             "source": f"SAP SuccessFactors · {entity_type}",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": res.get("_cache", {}),
         }
 
     # ── Universal OData Query ─────────────────────────────────────────────────
@@ -363,5 +421,6 @@ class SuccessFactorsClient:
             "results": results,
             "type": entity,
             "source": f"SAP SuccessFactors · {entity}",
-            "access_context": "configured_service_account"
+            "access_context": "configured_service_account",
+            "cache": res.get("_cache", {}),
         }

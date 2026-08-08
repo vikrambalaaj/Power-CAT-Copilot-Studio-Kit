@@ -1,0 +1,16 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Receivables aging", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA · permission-trimmed", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Company", "value": "${query.filters.CompanyCode}"},
+      {"title": "Key date", "value": "${query.period}"},
+      {"title": "Currency", "value": "${if(query.currency, query.currency, 'As returned by SAP')}"}
+    ]},
+    {"type": "TextBlock", "text": "Copilot summarizes aging buckets and material exposures returned by the approved service.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

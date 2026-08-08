@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Decision trace", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${decisionTitle}", "wrap": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Decision owner", "value": "${owner}"},
+      {"title": "Decision date", "value": "${decisionDate}"},
+      {"title": "Rule version", "value": "${ruleVersion}"},
+      {"title": "Correlation ID", "value": "${correlationId}"},
+      {"title": "Evidence", "value": "${evidenceCount} sources"}
+    ]},
+    {"type": "TextBlock", "text": "${supersessionState}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+  ]
+}

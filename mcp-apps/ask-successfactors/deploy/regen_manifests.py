@@ -47,6 +47,32 @@ async def _tool_descriptions():
     ]
 
 
+CARD_BY_TOOL = {
+    "sf__get_headcount": "headcount.json",
+    "sf__get_emiratisation_kpi": "emiratisation.json",
+    "sf__get_analytics_dashboard": "workforce-overview.json",
+}
+
+
+def _function(tool):
+    card_file = CARD_BY_TOOL.get(tool["name"], "sap-result.json")
+    return {
+        "name": tool["name"],
+        "description": tool["description"],
+        "capabilities": {
+            "response_semantics": {
+                "data_path": "$",
+                "properties": {
+                    "title": "$.cardTitle",
+                    "subtitle": "$.cardSubtitle",
+                    "template_selector": "$.adaptiveCard",
+                },
+                "static_template": {"file": f"./adaptive-cards/{card_file}"},
+            }
+        },
+    }
+
+
 def main():
     print(f"🔄 Regenerating manifests for Ask - SuccessFactors from live specs...")
 
@@ -56,7 +82,7 @@ def main():
         raise SystemExit("MCP_PLUGIN_AUTH_REFERENCE_ID is required for secured Copilot packages")
 
     tools = asyncio.run(_tool_descriptions())
-    functions = [{"name": tool["name"], "description": tool["description"]} for tool in tools]
+    functions = [_function(tool) for tool in tools]
     auth = {"type": AUTH_TYPE}
     if AUTH_TYPE != "None":
         auth["reference_id"] = AUTH_REFERENCE
@@ -64,9 +90,9 @@ def main():
     plugin_data = {
         "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
         "schema_version": "v2.4",
-        "name_for_human": "Velora HCM Agent",
-        "description_for_human": "Velora Executive HCM Assistant",
-        "description_for_model": "Use SAP SuccessFactors tools for authorized employee, job, organization, and aggregate workforce information. Never invent values when a tool reports an error or missing configuration.",
+        "name_for_human": "Velora SuccessFactors",
+        "description_for_human": "SuccessFactors workforce intelligence for the Velora Executive Agent",
+        "description_for_model": "Use these SAP SuccessFactors tools for authorized headcount, Emiratisation, employee, job, and organization facts. Keep Emiratisation aggregate and never invent values when a tool reports an error or missing configuration.",
         "namespace": "sf",
         "functions": functions,
         "runtimes": [

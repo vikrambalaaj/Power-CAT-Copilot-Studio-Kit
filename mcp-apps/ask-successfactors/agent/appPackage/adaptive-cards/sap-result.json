@@ -1,0 +1,14 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "${if(cardTitle, cardTitle, 'SAP result')}", "weight": "Bolder", "size": "Medium", "wrap": true},
+    {"type": "TextBlock", "text": "${if(cardSubtitle, cardSubtitle, 'Permission-trimmed source')}", "isSubtle": true, "wrap": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${if(total, total, 'See Copilot answer')}"},
+      {"title": "Source", "value": "${if(source, source, 'SAP')}"}
+    ]},
+    {"type": "TextBlock", "text": "Review the Copilot answer for filters, freshness, warnings, and citations.", "size": "Small", "isSubtle": true, "wrap": true}
+  ]
+}

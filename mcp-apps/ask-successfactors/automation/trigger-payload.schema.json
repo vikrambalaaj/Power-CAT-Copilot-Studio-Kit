@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Velora scheduled prompt trigger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventType", "promptId", "targetUserId", "scheduledAt", "localDate", "deduplicationKey"],
+  "properties": {
+    "eventType": {"const": "velora.scheduled-prompt"},
+    "promptId": {"enum": ["daily-plan", "midday-follow-ups", "end-of-day", "weekly-executive-brief"]},
+    "targetUserId": {"type": "string", "minLength": 1},
+    "scheduledAt": {"type": "string", "format": "date-time"},
+    "localDate": {"type": "string", "format": "date"},
+    "timeZone": {"const": "Asia/Dubai"},
+    "deduplicationKey": {"type": "string", "minLength": 1},
+    "plannerTasks": {"type": "array", "items": {"type": "object"}},
+    "toDoTasks": {"type": "array", "items": {"type": "object"}},
+    "deliveryChannel": {"const": "teams_personal_chat"}
+  }
+}

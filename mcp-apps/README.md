@@ -10,15 +10,14 @@ Ready-to-deploy MCP Copilot apps, packaged as self-contained zips.
 |---|---|---|
 | `ask-salesforce` | `ask-salesforce.zip` | Ask - Salesforce CRM Copilot |
 | `ask-servicenow` | `ask-servicenow.zip` | Ask - ServiceNow ITSM Copilot |
-| `ask-successfactors` | `ask-successfactors.zip` | Ask - SuccessFactors HCM Copilot |
+| `ask-successfactors` | Build from source | Velora Executive Agent: SuccessFactors + S/4HANA design |
+| `ask-s4hana` | Build from source | SAP S/4HANA finance MCP used by the Velora Executive Agent |
 
 ## Getting started
 
 1. Open the folder for the app you want (see the table above).
 2. Follow the `README.md` inside that folder.
 
-Each in-folder README's **Step 1 — Get the code** gives you two options:
+Each in-folder README describes its deployment and configuration model.
 
-- **Option A — Extract the `.zip`** already included in that folder (recommended here).
-- **Option B — Clone the source repo.**
-
+For the Velora Executive Agent, start with the source and architecture documents. Do not deploy an old local ZIP: packages must be rebuilt after both MCP URLs and authentication references are configured.

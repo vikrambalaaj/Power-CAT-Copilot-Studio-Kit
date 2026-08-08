@@ -1,0 +1,22 @@
+[project]
+name = "s4-finance-mcp"
+version = "1.0.0"
+description = "Read-only SAP S/4HANA finance MCP server for the Velora Executive Agent"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]==1.26.0",
+    "httpx>=0.27",
+    "uvicorn>=0.29",
+    "starlette>=0.37",
+    "pydantic-settings>=2.0.0",
+]
+
+[project.scripts]
+s4-finance-mcp = "s4hana_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["s4hana_mcp"]

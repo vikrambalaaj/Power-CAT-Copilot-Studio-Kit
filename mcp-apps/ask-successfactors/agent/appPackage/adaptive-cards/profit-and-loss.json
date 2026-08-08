@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Profit and loss", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA finance view", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Company", "value": "${query.filters.CompanyCode}"},
+      {"title": "Period", "value": "${query.period}"},
+      {"title": "Ledger", "value": "${query.filters.Ledger}"},
+      {"title": "Currency", "value": "${if(query.currency, query.currency, 'As returned by SAP')}"}
+    ]},
+    {"type": "TextBlock", "text": "Copilot explains only movements supported by returned dimensions.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

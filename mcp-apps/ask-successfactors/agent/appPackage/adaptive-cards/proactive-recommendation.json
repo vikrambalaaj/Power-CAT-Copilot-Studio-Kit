@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "KPI recommendation", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${metricName}", "weight": "Bolder"},
+    {"type": "FactSet", "facts": [
+      {"title": "Actual", "value": "${actual}"},
+      {"title": "Target", "value": "${target}"},
+      {"title": "Variance", "value": "${variance}"},
+      {"title": "Rule", "value": "${ruleVersion}"}
+    ]},
+    {"type": "TextBlock", "text": "${recommendation}", "wrap": true, "separator": true},
+    {"type": "TextBlock", "text": "Confirmation is required before any write action.", "size": "Small", "isSubtle": true, "wrap": true}
+  ]
+}

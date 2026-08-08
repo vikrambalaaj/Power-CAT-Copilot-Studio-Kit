@@ -1,46 +1,180 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
     "schema_version": "v2.4",
-    "name_for_human": "Velora HCM Agent",
-    "description_for_human": "Velora Executive HCM Assistant",
-    "description_for_model": "Use SAP SuccessFactors tools for authorized employee, job, organization, and aggregate workforce information. Never invent values when a tool reports an error or missing configuration.",
+    "name_for_human": "Velora SuccessFactors",
+    "description_for_human": "SuccessFactors workforce intelligence for the Velora Executive Agent",
+    "description_for_model": "Use these SAP SuccessFactors tools for authorized headcount, Emiratisation, employee, job, and organization facts. Keep Emiratisation aggregate and never invent values when a tool reports an error or missing configuration.",
     "namespace": "sf",
     "functions": [
         {
+            "name": "sf__get_headcount",
+            "description": "Return aggregate headcount and a department breakdown from SAP SuccessFactors EmpJob.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/headcount.json"
+                    }
+                }
+            }
+        },
+        {
             "name": "sf__get_analytics_dashboard",
-            "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors."
+            "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/workforce-overview.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_emiratisation_kpi",
-            "description": "Return an aggregate Emiratisation KPI using the tenant-specific filter configured by the administrator."
+            "description": "Return an aggregate Emiratisation KPI using the tenant-specific filter configured by the administrator.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/emiratisation.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_emp_jobs",
-            "description": "Retrieve employee job history records allowed by the configured SuccessFactors account."
+            "description": "Retrieve employee job history records allowed by the configured SuccessFactors account.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_emp_job_detail",
-            "description": "Retrieve specific employee job history entry by user_id and seq_num."
+            "description": "Retrieve specific employee job history entry by user_id and seq_num.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_users",
-            "description": "Retrieve employee directory profiles from SAP SuccessFactors. Filter by name/email/ID (query), department, or status."
+            "description": "Retrieve employee directory profiles from SAP SuccessFactors. Filter by name/email/ID (query), department, or status.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_user_detail",
-            "description": "Retrieve full profile details for a specific user ID in SuccessFactors."
+            "description": "Retrieve full profile details for a specific user ID in SuccessFactors.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_employment_info",
-            "description": "Retrieve employment details (EmpEmployment) for an employee."
+            "description": "Retrieve employment details (EmpEmployment) for an employee.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_personal_info",
-            "description": "Retrieve personal details (PerPersonal) by personIdExternal."
+            "description": "Retrieve personal details (PerPersonal) by personIdExternal.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         },
         {
             "name": "sf__get_org_units",
-            "description": "Retrieve organization foundation master data (FOCompany, FOBusinessUnit, FODepartment, FODivision)."
+            "description": "Retrieve organization foundation master data (FOCompany, FOBusinessUnit, FODepartment, FODivision).",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
         }
     ],
     "runtimes": [
@@ -50,6 +184,64 @@
                 "url": "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp",
                 "mcp_tool_description": {
                     "tools": [
+                        {
+                            "name": "sf__get_headcount",
+                            "description": "Return aggregate headcount and a department breakdown from SAP SuccessFactors EmpJob.",
+                            "inputSchema": {
+                                "properties": {
+                                    "company": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Company"
+                                    },
+                                    "department": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Department"
+                                    },
+                                    "business_unit": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Business Unit"
+                                    },
+                                    "as_of_date": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "As Of Date"
+                                    }
+                                },
+                                "title": "sf__get_headcountArguments",
+                                "type": "object"
+                            }
+                        },
                         {
                             "name": "sf__get_analytics_dashboard",
                             "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors.",
@@ -75,6 +267,18 @@
                                         ],
                                         "default": null,
                                         "title": "Company"
+                                    },
+                                    "as_of_date": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "As Of Date"
                                     }
                                 },
                                 "title": "sf__get_emiratisation_kpiArguments",
@@ -145,6 +349,18 @@
                                         ],
                                         "default": null,
                                         "title": "Job Title"
+                                    },
+                                    "as_of_date": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "As Of Date"
                                     },
                                     "top": {
                                         "default": 20,
@@ -304,6 +520,7 @@
                 }
             },
             "run_for_functions": [
+                "sf__get_headcount",
                 "sf__get_analytics_dashboard",
                 "sf__get_emiratisation_kpi",
                 "sf__get_emp_jobs",

@@ -1,6 +1,25 @@
-# Velora HCM Agent for Teams and Microsoft 365 Copilot
+# Velora Executive Agent for Teams and Microsoft 365 Copilot
 
-This project contains a secured remote MCP server for SAP SuccessFactors and a Microsoft 365 app package containing a declarative agent.
+The target solution uses all nine executive-agent capabilities and exactly two SAP MCP servers:
+
+1. **SuccessFactors MCP** for headcount and Emiratisation.
+2. **S/4HANA MCP** for receivables, payables, P&L, and budget variance.
+
+The repository implements both SAP MCP servers and connects both plugin manifests to one Copilot declarative agent. Microsoft 365 tenant integrations, an approved benchmark source, the governed agent-creation workflow, and end-to-end audit integration still require tenant configuration before all nine capabilities can be declared production-ready.
+
+## Documentation
+
+- [Capability blueprint](CAPABILITIES.md): ownership, behavior, controls, and acceptance criteria for all nine capabilities.
+- [Architecture](ARCHITECTURE.md): two-MCP topology, identity boundaries, orchestration, and data flow.
+- [MCP contracts](MCP_CONTRACTS.md): the six executive SAP queries and normalized response envelopes.
+- [Deployment](DEPLOYMENT.md): environments, configuration, release gates, and rollout sequence.
+- [Test plan](TEST_PLAN.md): functional, security, privacy, resilience, and executive acceptance tests.
+- [Copilot experience](COPILOT_EXPERIENCE.md): conversation design, response contract, cards, and failure behavior.
+- [Scheduled automation](AUTOMATION.md): versioned daily prompts, recurrence triggers, proactive Teams delivery, and safety controls.
+
+## Required user experience
+
+The executive asks one question in Microsoft 365 Copilot or Teams. The agent chooses the correct MCP server, returns a permission-trimmed answer, cites the system and business object, states freshness and confidence, and records a correlation ID for audit. Cross-domain questions may call both servers, but the answer must preserve each source separately.
 
 ## Local verification
 
@@ -46,12 +65,18 @@ python deploy/regen_manifests.py
 ## Build and upload the Teams/Copilot package
 
 ```text
+MCP_PLUGIN_AUTH_REFERENCE_ID="<successfactors-vault-reference>" \
+python deploy/regen_manifests.py
+
+S4_PLUGIN_AUTH_REFERENCE_ID="<s4hana-vault-reference>" \
+python ../ask-s4hana/deploy/generate_plugin.py
+
 python deploy/build_agent_package.py
 ```
 
-This creates `velora-hcm-agent.zip`. Upload that ZIP through Teams Admin Center for an organizational deployment, or use Microsoft 365 Agents Toolkit to provision and publish it. The ZIP contains the Teams/Microsoft 365 manifest, declarative-agent manifest, MCP plugin manifest, tool descriptions, instructions, and the required icons.
+This creates `velora-hcm-agent.zip`. Upload that ZIP through Teams Admin Center for an organizational deployment, or use Microsoft 365 Agents Toolkit to provision and publish it. The ZIP contains one Copilot declarative agent, two Remote MCP plugin manifests, tool descriptions, instructions, and the required icons.
 
-Before uploading, replace the plugin-vault reference with the value created in your tenant. The build command refuses to create a package while that placeholder remains.
+Before uploading, replace both plugin-vault references with the values created in your tenant. The build command refuses to create a package while either placeholder remains.
 
 ## Data behavior
 
@@ -60,3 +85,8 @@ Before uploading, replace the plugin-vault reference with the value created in y
 - Emiratisation requires a tenant-specific `SF_EMIRATI_FILTER` and is returned only as an aggregate.
 - File logging is off by default and redacts common personal identifiers when explicitly enabled.
 - Access to SuccessFactors uses the configured service account and its RBP permissions; the app does not claim end-user delegation.
+- Successful read queries use a bounded, permission-scoped cache by default. See [Caching](CACHE.md) for freshness, invalidation, and tuning.
+
+## Production completion rule
+
+Do not label the solution as covering all nine capabilities until every acceptance test in [TEST_PLAN.md](TEST_PLAN.md) passes and every row in [CAPABILITIES.md](CAPABILITIES.md) has an accountable owner. In particular, the current SuccessFactors service-account model is not equivalent to the executive's own SAP identity; delegated identity or a formally approved service-account authorization model must be selected and documented.

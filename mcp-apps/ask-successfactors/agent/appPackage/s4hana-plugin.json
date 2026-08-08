@@ -1,0 +1,372 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
+    "schema_version": "v2.4",
+    "name_for_human": "Velora S/4HANA Finance",
+    "description_for_human": "S/4HANA finance intelligence for the Velora Executive Agent",
+    "description_for_model": "Use these read-only SAP S/4HANA tools for receivables, payables, P&L, and budget variance. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
+    "namespace": "s4",
+    "functions": [
+        {
+            "name": "s4__get_receivables_aging",
+            "description": "Retrieve permission-trimmed accounts-receivable aging from SAP S/4HANA.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/receivables-aging.json"
+                    }
+                }
+            }
+        },
+        {
+            "name": "s4__get_payables_aging",
+            "description": "Retrieve permission-trimmed accounts-payable aging from SAP S/4HANA.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/payables-aging.json"
+                    }
+                }
+            }
+        },
+        {
+            "name": "s4__get_profit_and_loss",
+            "description": "Retrieve a sourced profit-and-loss view from SAP S/4HANA.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/profit-and-loss.json"
+                    }
+                }
+            }
+        },
+        {
+            "name": "s4__get_budget_variance",
+            "description": "Retrieve sourced budget-versus-actual variance records from SAP S/4HANA.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/budget-variance.json"
+                    }
+                }
+            }
+        }
+    ],
+    "runtimes": [
+        {
+            "type": "RemoteMCPServer",
+            "spec": {
+                "url": "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp",
+                "mcp_tool_description": {
+                    "tools": [
+                        {
+                            "name": "s4__get_receivables_aging",
+                            "description": "Retrieve permission-trimmed accounts-receivable aging from SAP S/4HANA.",
+                            "inputSchema": {
+                                "properties": {
+                                    "company_code": {
+                                        "title": "Company Code",
+                                        "type": "string"
+                                    },
+                                    "key_date": {
+                                        "title": "Key Date",
+                                        "type": "string"
+                                    },
+                                    "customer": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Customer"
+                                    },
+                                    "currency": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Currency"
+                                    },
+                                    "correlation_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Correlation Id"
+                                    },
+                                    "top": {
+                                        "default": 100,
+                                        "title": "Top",
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "company_code",
+                                    "key_date"
+                                ],
+                                "title": "s4__get_receivables_agingArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "s4__get_payables_aging",
+                            "description": "Retrieve permission-trimmed accounts-payable aging from SAP S/4HANA.",
+                            "inputSchema": {
+                                "properties": {
+                                    "company_code": {
+                                        "title": "Company Code",
+                                        "type": "string"
+                                    },
+                                    "key_date": {
+                                        "title": "Key Date",
+                                        "type": "string"
+                                    },
+                                    "supplier": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Supplier"
+                                    },
+                                    "currency": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Currency"
+                                    },
+                                    "correlation_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Correlation Id"
+                                    },
+                                    "top": {
+                                        "default": 100,
+                                        "title": "Top",
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "company_code",
+                                    "key_date"
+                                ],
+                                "title": "s4__get_payables_agingArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "s4__get_profit_and_loss",
+                            "description": "Retrieve a sourced profit-and-loss view from SAP S/4HANA.",
+                            "inputSchema": {
+                                "properties": {
+                                    "company_code": {
+                                        "title": "Company Code",
+                                        "type": "string"
+                                    },
+                                    "fiscal_year": {
+                                        "title": "Fiscal Year",
+                                        "type": "string"
+                                    },
+                                    "fiscal_period": {
+                                        "title": "Fiscal Period",
+                                        "type": "string"
+                                    },
+                                    "ledger": {
+                                        "default": "0L",
+                                        "title": "Ledger",
+                                        "type": "string"
+                                    },
+                                    "currency": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Currency"
+                                    },
+                                    "profit_center": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Profit Center"
+                                    },
+                                    "correlation_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Correlation Id"
+                                    },
+                                    "top": {
+                                        "default": 100,
+                                        "title": "Top",
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "company_code",
+                                    "fiscal_year",
+                                    "fiscal_period"
+                                ],
+                                "title": "s4__get_profit_and_lossArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "s4__get_budget_variance",
+                            "description": "Retrieve sourced budget-versus-actual variance records from SAP S/4HANA.",
+                            "inputSchema": {
+                                "properties": {
+                                    "company_code": {
+                                        "title": "Company Code",
+                                        "type": "string"
+                                    },
+                                    "fiscal_year": {
+                                        "title": "Fiscal Year",
+                                        "type": "string"
+                                    },
+                                    "fiscal_period": {
+                                        "title": "Fiscal Period",
+                                        "type": "string"
+                                    },
+                                    "plan_version": {
+                                        "title": "Plan Version",
+                                        "type": "string"
+                                    },
+                                    "currency": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Currency"
+                                    },
+                                    "cost_center": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Cost Center"
+                                    },
+                                    "correlation_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Correlation Id"
+                                    },
+                                    "top": {
+                                        "default": 100,
+                                        "title": "Top",
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "company_code",
+                                    "fiscal_year",
+                                    "fiscal_period",
+                                    "plan_version"
+                                ],
+                                "title": "s4__get_budget_varianceArguments",
+                                "type": "object"
+                            }
+                        }
+                    ]
+                }
+            },
+            "run_for_functions": [
+                "s4__get_receivables_aging",
+                "s4__get_payables_aging",
+                "s4__get_profit_and_loss",
+                "s4__get_budget_variance"
+            ],
+            "auth": {
+                "type": "ApiKeyPluginVault",
+                "reference_id": "REPLACE_WITH_S4_PLUGIN_VAULT_REFERENCE_ID"
+            }
+        }
+    ]
+}

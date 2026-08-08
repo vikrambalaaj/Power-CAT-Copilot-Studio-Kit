@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Budget variance", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA actual versus plan", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Company", "value": "${query.filters.CompanyCode}"},
+      {"title": "Period", "value": "${query.period}"},
+      {"title": "Plan version", "value": "${query.filters.PlanVersion}"},
+      {"title": "Currency", "value": "${if(query.currency, query.currency, 'As returned by SAP')}"}
+    ]},
+    {"type": "TextBlock", "text": "Driver statements are evidence-based; missing-plan and zero-budget cases are shown explicitly.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

@@ -13,3 +13,6 @@ applications:
       ALLOW_ANONYMOUS: "false"
       ENABLE_MUTATING_TOOLS: "false"
       MCP_FILE_LOG: "false"
+      CACHE_ENABLED: "true"
+      CACHE_TTL_SECONDS: "120"
+      CACHE_MAX_ENTRIES: "512"

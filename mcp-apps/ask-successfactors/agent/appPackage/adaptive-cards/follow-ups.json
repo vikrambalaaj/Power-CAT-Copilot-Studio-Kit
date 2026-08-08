@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Follow-ups requiring attention", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${localDate}", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Due today", "value": "${dueTodayCount}"},
+      {"title": "Overdue", "value": "${overdueCount}"},
+      {"title": "Blocked", "value": "${blockedCount}"},
+      {"title": "Needs decision", "value": "${decisionCount}"}
+    ]},
+    {"type": "TextBlock", "text": "${followUpSummary}", "wrap": true, "separator": true},
+    {"type": "TextBlock", "text": "Drafts are not sent automatically.", "color": "Warning", "size": "Small", "wrap": true}
+  ]
+}

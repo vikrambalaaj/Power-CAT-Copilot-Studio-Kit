@@ -1,0 +1,19 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Email snapshot preview", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "Review every field before supervised send", "isSubtle": true, "wrap": true},
+    {"type": "FactSet", "facts": [
+      {"title": "To", "value": "${toRecipients}"},
+      {"title": "Cc", "value": "${if(ccRecipients, ccRecipients, 'None')}"},
+      {"title": "Subject", "value": "${subject}"},
+      {"title": "Snapshot", "value": "${snapshotFilename}"},
+      {"title": "Delivery", "value": "${deliveryMode}"},
+      {"title": "Sensitivity", "value": "${sensitivity}"}
+    ]},
+    {"type": "TextBlock", "text": "${bodyPreview}", "wrap": true, "separator": true},
+    {"type": "TextBlock", "text": "Sending requires explicit confirmation in Copilot. Generated links can expire when the session ends.", "color": "Warning", "size": "Small", "wrap": true, "separator": true}
+  ]
+}

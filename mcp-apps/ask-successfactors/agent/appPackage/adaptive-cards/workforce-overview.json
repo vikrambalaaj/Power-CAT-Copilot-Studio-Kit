@@ -1,0 +1,14 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Workforce overview", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP SuccessFactors executive summary", "isSubtle": true},
+    {"type": "ColumnSet", "columns": [
+      {"type": "Column", "width": "stretch", "items": [{"type": "TextBlock", "text": "Headcount", "isSubtle": true}, {"type": "TextBlock", "text": "${formatNumber(total_headcount, 0)}", "weight": "Bolder", "size": "Large"}]},
+      {"type": "Column", "width": "stretch", "items": [{"type": "TextBlock", "text": "Rows evaluated", "isSubtle": true}, {"type": "TextBlock", "text": "${formatNumber(sample_size, 0)}", "weight": "Bolder", "size": "Large"}]}
+    ]},
+    {"type": "TextBlock", "text": "Copilot provides the department breakdown and sampling warning in the answer.", "size": "Small", "isSubtle": true, "wrap": true}
+  ]
+}

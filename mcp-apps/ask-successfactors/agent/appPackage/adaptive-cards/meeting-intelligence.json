@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Meeting intelligence", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${meetingTitle}", "isSubtle": true, "wrap": true},
+    {"type": "TextBlock", "text": "Decision", "weight": "Bolder", "separator": true},
+    {"type": "TextBlock", "text": "${decision}", "wrap": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Action owner", "value": "${actionOwner}"},
+      {"title": "Due date", "value": "${dueDate}"},
+      {"title": "Confirmation", "value": "${confirmationState}"}
+    ]},
+    {"type": "TextBlock", "text": "Task write-back is disabled until the user confirms.", "size": "Small", "isSubtle": true, "wrap": true}
+  ]
+}

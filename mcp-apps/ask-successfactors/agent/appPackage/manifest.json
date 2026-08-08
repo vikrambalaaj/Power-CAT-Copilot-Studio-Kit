@@ -1,7 +1,7 @@
 {
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.24/MicrosoftTeams.schema.json",
     "manifestVersion": "1.24",
-    "version": "1.0.2",
+    "version": "2.0.0",
     "id": "67957a66-57f1-473f-8250-f937b1499d2d",
     "developer": {
         "name": "Velora Enterprise AI",
@@ -14,12 +14,12 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "Velora HCM Agent",
-        "full": "Velora Executive HCM Assistant"
+        "short": "Velora Executive",
+        "full": "Velora Executive Agent"
     },
     "description": {
-        "short": "Executive HR & Headcount Intelligence for M365 Copilot",
-        "full": "Velora Executive HCM Assistant — connects to SAP SuccessFactors HCM (EmpJob, Emiratisation KPI, User profiles, Org Units) and renders interactive visual analytics and widgets directly in M365 Copilot chat."
+        "short": "SAP workforce and finance intelligence in Copilot",
+        "full": "Velora Executive Agent connects Microsoft 365 Copilot to SAP SuccessFactors and SAP S/4HANA through two secured, permission-trimmed MCP servers."
     },
     "accentColor": "#0A6ED1",
     "composeExtensions": [],
@@ -33,6 +33,7 @@
     },
     "permissions": [],
     "validDomains": [
-        "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+        "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+        "s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com"
     ]
 }

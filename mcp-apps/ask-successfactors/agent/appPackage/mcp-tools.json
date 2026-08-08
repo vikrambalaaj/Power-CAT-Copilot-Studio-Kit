@@ -1,6 +1,64 @@
 {
     "tools": [
         {
+            "name": "sf__get_headcount",
+            "description": "Return aggregate headcount and a department breakdown from SAP SuccessFactors EmpJob.",
+            "inputSchema": {
+                "properties": {
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    },
+                    "department": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Department"
+                    },
+                    "business_unit": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Business Unit"
+                    },
+                    "as_of_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "As Of Date"
+                    }
+                },
+                "title": "sf__get_headcountArguments",
+                "type": "object"
+            }
+        },
+        {
             "name": "sf__get_analytics_dashboard",
             "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors.",
             "inputSchema": {
@@ -25,6 +83,18 @@
                         ],
                         "default": null,
                         "title": "Company"
+                    },
+                    "as_of_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "As Of Date"
                     }
                 },
                 "title": "sf__get_emiratisation_kpiArguments",
@@ -95,6 +165,18 @@
                         ],
                         "default": null,
                         "title": "Job Title"
+                    },
+                    "as_of_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "As Of Date"
                     },
                     "top": {
                         "default": 20,

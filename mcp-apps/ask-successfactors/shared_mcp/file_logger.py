@@ -91,10 +91,25 @@ def _result_payload(result):
     sc = getattr(result, "structuredContent", None)
     if not isinstance(sc, dict):
         return None
-    out: dict = {}
-    for k, v in sc.items():
-        out[k] = cap_rows(v) if isinstance(v, list) else v
-    return out
+    # HCM responses can contain names, contact details, job history, and other
+    # personal data. Operational logs retain only aggregate execution metadata.
+    safe_fields = {
+        "type",
+        "status",
+        "error",
+        "message",
+        "source",
+        "access_context",
+        "total",
+        "total_headcount",
+        "sample_size",
+        "sampled",
+        "emiratisation_ratio_percent",
+        "target_percent",
+        "target_compliance",
+        "cache",
+    }
+    return {key: _trim(value) for key, value in sc.items() if key in safe_fields}
 
 
 def log_tool(name: str):

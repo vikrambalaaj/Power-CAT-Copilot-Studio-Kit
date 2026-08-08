@@ -55,7 +55,7 @@ def _payload(
 ) -> list[dict]:
     lob = tool_name.split("__")[0] if "__" in tool_name else "unknown"
     target = {
-        "sf": "salesforce-crm",
+        "sf": "successfactors-hcm",
         "sn": "servicenow-itsm",
         "sf_hcm": "successfactors-hcm",
     }.get(lob, lob)

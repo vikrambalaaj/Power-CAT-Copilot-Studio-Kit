@@ -2,6 +2,7 @@
 import hmac
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 import uvicorn
 from mcp.server.fastmcp import FastMCP
@@ -64,6 +65,7 @@ def _validate_env() -> None:
     user = settings.sf_username
     pwd = settings.sf_password
     auth_configured = bool(settings.mcp_api_key) or settings.allow_anonymous
+    parsed_api_url = urlparse(api_url)
 
     print("  ┌─ Environment (SuccessFactors) ────────────────")
     print(f"  │ SF_API_URL       {'✓ ' + api_url if api_url else '✗ MISSING'}")
@@ -74,6 +76,8 @@ def _validate_env() -> None:
 
     missing = []
     if not api_url: missing.append("SF_API_URL")
+    elif parsed_api_url.scheme != "https" or not parsed_api_url.hostname or parsed_api_url.username or parsed_api_url.password:
+        missing.append("SF_API_URL (must be HTTPS without embedded credentials)")
     if not company: missing.append("SF_COMPANY_ID")
     if not user: missing.append("SF_USERNAME")
     if not pwd: missing.append("SF_PASSWORD")

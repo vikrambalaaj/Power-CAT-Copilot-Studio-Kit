@@ -1,0 +1,15 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Workforce headcount", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP SuccessFactors · EmpJob", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Headcount", "value": "${formatNumber(total_headcount, 0)}"},
+      {"title": "Rows evaluated", "value": "${formatNumber(sample_size, 0)}"},
+      {"title": "Sampled", "value": "${if(sampled, 'Yes', 'No')}"}
+    ]},
+    {"type": "TextBlock", "text": "${if(sampled, 'Breakdowns are sample-based.', 'Returned population is complete.')}", "color": "${if(sampled, 'Warning', 'Good')}", "wrap": true}
+  ]
+}

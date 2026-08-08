@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from mcp.types import CallToolResult, TextContent
 
 from .successfactors_client import SuccessFactorsClient
+from .adaptive_cards import decorate as decorate_with_card
 from shared_mcp.logger import get_logger
 
 log = get_logger("sf_hcm")
@@ -15,6 +16,7 @@ _client = SuccessFactorsClient()
 
 def _json_response(data: Dict[str, Any]) -> Any:
     """Return both readable JSON text and MCP structured content."""
+    data = decorate_with_card(data)
     return CallToolResult(
         content=[TextContent(type="text", text=json.dumps(data, ensure_ascii=False, default=str))],
         structuredContent=data,
@@ -86,6 +88,7 @@ async def sf__get_emp_jobs(
     department: Optional[str] = None,
     business_unit: Optional[str] = None,
     job_title: Optional[str] = None,
+    as_of_date: Optional[str] = None,
     top: int = 20,
 ) -> Any:
     """Retrieve headcount and job records allowed by the configured SuccessFactors account."""
@@ -95,15 +98,59 @@ async def sf__get_emp_jobs(
         department=department,
         business_unit=business_unit,
         job_title=job_title,
+        as_of_date=as_of_date,
         top=top,
     )
     return _json_response(res)
 
 
-async def sf__get_emiratisation_kpi(company: Optional[str] = None) -> Any:
+async def sf__get_emiratisation_kpi(
+    company: Optional[str] = None,
+    as_of_date: Optional[str] = None,
+) -> Any:
     """Return an aggregate Emiratisation KPI using the configured tenant-specific filter."""
-    res = await _client.get_emiratisation_kpi(company=company)
+    res = await _client.get_emiratisation_kpi(company=company, as_of_date=as_of_date)
     return _json_response(res)
+
+
+async def sf__get_headcount(
+    company: Optional[str] = None,
+    department: Optional[str] = None,
+    business_unit: Optional[str] = None,
+    as_of_date: Optional[str] = None,
+) -> Any:
+    """Return aggregate headcount and a sample-derived department breakdown."""
+    res = await _client.list_emp_jobs(
+        company=company,
+        department=department,
+        business_unit=business_unit,
+        as_of_date=as_of_date,
+        top=1000,
+    )
+    if not isinstance(res, dict) or res.get("error"):
+        return _json_response(res if isinstance(res, dict) else {"error": True, "message": "Unexpected SuccessFactors response"})
+    rows = res.get("results", [])
+    departments: Dict[str, int] = {}
+    for row in rows:
+        name = row.get("department") or "Unassigned"
+        departments[name] = departments.get(name, 0) + 1
+    total = int(res.get("total", len(rows)))
+    return _json_response({
+        "type": "Headcount",
+        "total_headcount": total,
+        "sample_size": len(rows),
+        "department_breakdown_sample": departments,
+        "sampled": len(rows) < total,
+        "filters": {
+            "company": company,
+            "department": department,
+            "business_unit": business_unit,
+            "as_of_date": as_of_date,
+        },
+        "source": "SAP SuccessFactors · EmpJob",
+        "access_context": "configured_service_account",
+        "cache": res.get("cache", {}),
+    })
 
 
 async def sf__get_emp_job_detail(user_id: str, seq_num: int = 1) -> Any:
@@ -282,7 +329,8 @@ async def sf__get_analytics_dashboard() -> Any:
         "chart_bars": chart_bars,
         "adaptiveCard": card,
         "source": "SAP SuccessFactors · EmpJob",
-        "access_context": "configured_service_account"
+        "access_context": "configured_service_account",
+        "cache": res.get("cache", {}),
     })
 
 
@@ -307,6 +355,11 @@ async def sf__execute_odata(
 # ──────── Specifications ────────────────────────────────────────────────────────
 
 TOOL_SPECS = [
+    {
+        "name": "sf__get_headcount",
+        "description": "Return aggregate headcount and a department breakdown from SAP SuccessFactors EmpJob.",
+        "handler": sf__get_headcount,
+    },
     {
         "name": "sf__get_analytics_dashboard",
         "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors.",

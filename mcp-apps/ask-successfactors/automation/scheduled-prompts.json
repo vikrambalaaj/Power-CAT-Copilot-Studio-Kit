@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0",
+  "timeZone": "Asia/Dubai",
+  "targetUserEnvironmentVariable": "VELORA_EXECUTIVE_USER_ID",
+  "delivery": {
+    "channel": "teams_personal_chat",
+    "postAs": "copilot_studio_agent",
+    "emailMode": "draft_only_until_user_confirmation"
+  },
+  "schedules": [
+    {
+      "id": "daily-plan",
+      "enabled": true,
+      "recurrence": {"frequency": "week", "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "hour": 7, "minute": 30},
+      "promptFile": "prompts/daily-plan.md",
+      "cardTemplate": "../agent/appPackage/adaptive-cards/daily-plan.json",
+      "deduplicationKey": "daily-plan:{targetUser}:{localDate}"
+    },
+    {
+      "id": "midday-follow-ups",
+      "enabled": true,
+      "recurrence": {"frequency": "week", "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "hour": 13, "minute": 0},
+      "promptFile": "prompts/midday-follow-ups.md",
+      "cardTemplate": "../agent/appPackage/adaptive-cards/follow-ups.json",
+      "deduplicationKey": "midday-follow-ups:{targetUser}:{localDate}"
+    },
+    {
+      "id": "end-of-day",
+      "enabled": true,
+      "recurrence": {"frequency": "week", "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "hour": 17, "minute": 30},
+      "promptFile": "prompts/end-of-day.md",
+      "cardTemplate": "../agent/appPackage/adaptive-cards/end-of-day.json",
+      "deduplicationKey": "end-of-day:{targetUser}:{localDate}"
+    },
+    {
+      "id": "weekly-executive-brief",
+      "enabled": true,
+      "recurrence": {"frequency": "week", "days": ["Monday"], "hour": 8, "minute": 0},
+      "promptFile": "prompts/weekly-executive-brief.md",
+      "cardTemplate": "../agent/appPackage/adaptive-cards/executive-brief.json",
+      "deduplicationKey": "weekly-executive-brief:{targetUser}:{isoWeek}"
+    }
+  ]
+}

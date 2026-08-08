@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Peer benchmark", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${metricName}", "weight": "Bolder"},
+    {"type": "FactSet", "facts": [
+      {"title": "Internal", "value": "${internalValue}"},
+      {"title": "Peer median", "value": "${peerMedian}"},
+      {"title": "Percentile", "value": "${percentile}"},
+      {"title": "Cohort", "value": "${cohort}"},
+      {"title": "Period", "value": "${period}"}
+    ]},
+    {"type": "TextBlock", "text": "${methodology}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Emiratisation KPI", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "Aggregate measure · PDPL controls applied", "isSubtle": true, "wrap": true},
+    {"type": "TextBlock", "text": "${target_compliance}", "weight": "Bolder", "color": "Accent"},
+    {"type": "FactSet", "facts": [
+      {"title": "Current", "value": "${formatNumber(emiratisation_ratio_percent, 1)}%"},
+      {"title": "Target", "value": "${formatNumber(target_percent, 1)}%"},
+      {"title": "Eligible headcount", "value": "${formatNumber(total_headcount, 0)}"}
+    ]},
+    {"type": "TextBlock", "text": "Individual nationality data is not displayed.", "size": "Small", "isSubtle": true, "wrap": true}
+  ]
+}

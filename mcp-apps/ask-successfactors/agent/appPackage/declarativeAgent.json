@@ -1,27 +1,115 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.8/schema.json",
     "version": "v1.8",
-    "name": "Velora HCM Agent",
-    "description": "Velora Executive HCM Assistant providing real-time headcount analytics, Emiratisation compliance, and SAP SuccessFactors business intelligence.",
+    "name": "Velora Executive Agent",
+    "description": "Executive workforce and finance intelligence from SAP SuccessFactors and S/4HANA, delivered in Microsoft 365 Copilot.",
     "instructions": "$[file('instruction.txt')]",
+    "capabilities": [
+        {
+            "name": "OneDriveAndSharePoint"
+        },
+        {
+            "name": "TeamsMessages"
+        },
+        {
+            "name": "Email"
+        },
+        {
+            "name": "EmailActions"
+        },
+        {
+            "name": "People",
+            "include_related_content": false
+        },
+        {
+            "name": "Meetings"
+        },
+        {
+            "name": "CodeInterpreter"
+        }
+    ],
+    "user_overrides": [
+        {
+            "path": "$.capabilities[?(@.name == 'OneDriveAndSharePoint')]",
+            "allowed_actions": ["remove"]
+        },
+        {
+            "path": "$.capabilities[?(@.name == 'TeamsMessages')]",
+            "allowed_actions": ["remove"]
+        },
+        {
+            "path": "$.capabilities[?(@.name == 'Email')]",
+            "allowed_actions": ["remove"]
+        },
+        {
+            "path": "$.capabilities[?(@.name == 'EmailActions')]",
+            "allowed_actions": ["remove"]
+        },
+        {
+            "path": "$.capabilities[?(@.name == 'Meetings')]",
+            "allowed_actions": ["remove"]
+        }
+    ],
     "conversation_starters": [
         {
-            "title": "📊 Headcount & Staffing Overview",
-            "text": "Give me an executive summary of total headcount and department breakdown."
+            "title": "Executive morning brief",
+            "text": "Prepare a concise executive brief using the SAP facts and authorized Microsoft 365 context available to you. Separate facts, recommendations, actions, and open questions.",
+            "depends_on": [
+                {
+                    "name": "capabilities",
+                    "id": "Email"
+                }
+            ]
         },
         {
-            "title": "🇦🇪 Emiratisation KPI Status",
-            "text": "What is our current Emiratisation ratio compliance status?"
+            "title": "Workforce and Emiratisation",
+            "text": "Show current headcount and Emiratisation status, including source, as-of time, target variance, and any warnings."
         },
         {
-            "title": "🔍 Find Executive Team Member",
-            "text": "Who leads Technology & Innovation and what is their contact information?"
+            "title": "Receivables and payables",
+            "text": "Summarize receivables and payables exposure for the requested company and key date, with aging and material items."
+        },
+        {
+            "title": "P&L and budget variance",
+            "text": "Summarize P&L and budget variance for the requested fiscal period, with supported drivers and citations."
+        },
+        {
+            "title": "Meeting decisions and actions",
+            "text": "Summarize the authorized meeting context, identify decisions and proposed actions, and ask before creating any task.",
+            "depends_on": [
+                {
+                    "name": "capabilities",
+                    "id": "Meetings"
+                }
+            ]
+        },
+        {
+            "title": "Trace a decision",
+            "text": "Show the evidence, sources, rule versions, approvals, and correlation IDs available for this decision."
+        },
+        {
+            "title": "Email this snapshot",
+            "text": "Create a privacy-safe image snapshot of the current executive summary, resolve the named internal recipients, and show me the complete email for confirmation before sending.",
+            "depends_on": [
+                {
+                    "name": "capabilities",
+                    "id": "EmailActions"
+                },
+                {
+                    "name": "capabilities",
+                    "id": "CodeInterpreter"
+                }
+            ]
         }
     ],
     "actions": [
         {
-            "id": "action_1",
+            "id": "successFactorsAction",
             "file": "ai-plugin.json"
+        },
+        {
+            "id": "s4HanaAction",
+            "file": "s4hana-plugin.json"
         }
     ]
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Executive brief", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${briefingPeriod}", "isSubtle": true},
+    {"type": "TextBlock", "text": "Facts", "weight": "Bolder", "separator": true},
+    {"type": "TextBlock", "text": "${factsSummary}", "wrap": true},
+    {"type": "TextBlock", "text": "Recommendations", "weight": "Bolder", "separator": true},
+    {"type": "TextBlock", "text": "${recommendationSummary}", "wrap": true},
+    {"type": "TextBlock", "text": "${sourceSummary}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+  ]
+}

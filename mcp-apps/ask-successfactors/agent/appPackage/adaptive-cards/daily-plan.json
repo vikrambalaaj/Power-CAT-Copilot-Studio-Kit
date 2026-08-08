@@ -1,0 +1,18 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Today's executive plan", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${localDate}", "isSubtle": true},
+    {"type": "TextBlock", "text": "Top priorities", "weight": "Bolder", "separator": true},
+    {"type": "TextBlock", "text": "${prioritySummary}", "wrap": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Meetings", "value": "${meetingCount}"},
+      {"title": "Decisions due", "value": "${decisionCount}"},
+      {"title": "Follow-ups", "value": "${followUpCount}"},
+      {"title": "Conflicts", "value": "${conflictCount}"}
+    ]},
+    {"type": "TextBlock", "text": "${sourceSummary}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+  ]
+}

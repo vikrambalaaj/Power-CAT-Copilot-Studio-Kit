@@ -1,0 +1,17 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "End-of-day closure", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "${localDate}", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Completed", "value": "${completedCount}"},
+      {"title": "Carried forward", "value": "${carryForwardCount}"},
+      {"title": "Blocked", "value": "${blockedCount}"},
+      {"title": "Tomorrow meetings", "value": "${tomorrowMeetingCount}"}
+    ]},
+    {"type": "TextBlock", "text": "${closureSummary}", "wrap": true, "separator": true},
+    {"type": "TextBlock", "text": "${tomorrowPreparation}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+  ]
+}

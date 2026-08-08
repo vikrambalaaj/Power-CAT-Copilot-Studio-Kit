@@ -1,0 +1,17 @@
+applications:
+  - name: s4-finance-mcp-server
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python -m s4hana_mcp
+    env:
+      PYTHON_VERSION: 3.11.15
+      PYTHONUNBUFFERED: "1"
+      ALLOWED_HOSTS: "s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      ALLOW_ANONYMOUS: "false"
+      CACHE_ENABLED: "true"
+      CACHE_TTL_SECONDS: "60"
+      CACHE_MAX_ENTRIES: "512"
+      OAUTH_TOKEN_CACHE_SKEW_SECONDS: "30"

@@ -25,6 +25,9 @@ class SuccessFactorsSettings(BaseSettings):
     enable_mutating_tools: bool = False
     enable_widget: bool = False
     log_level: str = "INFO"
+    cache_enabled: bool = True
+    cache_ttl_seconds: int = 120
+    cache_max_entries: int = 512
 
     model_config = SettingsConfigDict(
         env_file=".env",
