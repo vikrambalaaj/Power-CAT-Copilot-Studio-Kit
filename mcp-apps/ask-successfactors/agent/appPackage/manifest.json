@@ -1,0 +1,38 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.24/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.24",
+    "version": "1.0.2",
+    "id": "67957a66-57f1-473f-8250-f937b1499d2d",
+    "developer": {
+        "name": "Velora Enterprise AI",
+        "websiteUrl": "https://www.velora.ae",
+        "privacyUrl": "https://www.velora.ae/privacy",
+        "termsOfUseUrl": "https://www.velora.ae/terms"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "Velora HCM Agent",
+        "full": "Velora Executive HCM Assistant"
+    },
+    "description": {
+        "short": "Executive HR & Headcount Intelligence for M365 Copilot",
+        "full": "Velora Executive HCM Assistant — connects to SAP SuccessFactors HCM (EmpJob, Emiratisation KPI, User profiles, Org Units) and renders interactive visual analytics and widgets directly in M365 Copilot chat."
+    },
+    "accentColor": "#0A6ED1",
+    "composeExtensions": [],
+    "copilotAgents": {
+        "declarativeAgents": [
+            {
+                "id": "declarativeAgent",
+                "file": "declarativeAgent.json"
+            }
+        ]
+    },
+    "permissions": [],
+    "validDomains": [
+        "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+    ]
+}

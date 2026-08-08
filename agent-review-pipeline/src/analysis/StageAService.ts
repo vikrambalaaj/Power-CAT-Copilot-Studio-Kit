@@ -70,6 +70,9 @@ function detectToolType(parsed: Record<string, unknown>): ToolType {
       return 'connector';
     case 'InvokeAIBuilderModelTaskAction':
       return 'prompt';
+    case 'InvokeAgentFrameworkTaskAction':
+    case 'InvokeMicrosoftAgentFrameworkTaskAction':
+      return 'agent-framework';
     default:
       return 'unknown';
   }

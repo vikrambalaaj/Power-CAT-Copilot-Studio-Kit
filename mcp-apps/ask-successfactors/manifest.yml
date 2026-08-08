@@ -1,0 +1,15 @@
+applications:
+  - name: sf-hcm-mcp-server
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python -m successfactors_mcp
+    env:
+      PYTHON_VERSION: 3.11.15
+      PYTHONUNBUFFERED: "1"
+      ALLOWED_HOSTS: "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      ALLOW_ANONYMOUS: "false"
+      ENABLE_MUTATING_TOOLS: "false"
+      MCP_FILE_LOG: "false"

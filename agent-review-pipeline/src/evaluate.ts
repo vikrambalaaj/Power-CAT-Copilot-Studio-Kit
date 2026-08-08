@@ -23,9 +23,71 @@ const { values } = parseArgs({
   },
 });
 
+function parseThreshold(value: string | undefined): number {
+  const threshold = Number(value ?? '60');
+  if (!Number.isInteger(threshold) || threshold < 0 || threshold > 100) {
+    throw new Error(`Invalid threshold "${value}". Expected an integer from 0 to 100.`);
+  }
+  return threshold;
+}
+
+function validateDataverseHost(value: string): string {
+  const host = value.trim().toLowerCase();
+  if (!/^[a-z0-9.-]+(?::\d{1,5})?$/.test(host) || host.includes('..')) {
+    throw new Error('Invalid Dataverse host. Expected a hostname without a path or protocol.');
+  }
+  return host;
+}
+
+function writeResult(result: unknown): void {
+  const output = JSON.stringify(result, null, 2);
+  if (values.output) {
+    writeFileSync(values.output, output);
+    console.error(`Evaluation result written to ${values.output}`);
+  } else {
+    console.log(output);
+  }
+}
+
 if (!values['stage-a'] || !values['dataverse-host']) {
   console.error('Usage: node dist/evaluate.js --stage-a <path> --dataverse-host <host>');
   process.exit(1);
+}
+
+let threshold: number;
+let dataverseHost: string;
+try {
+  threshold = parseThreshold(values.threshold);
+  dataverseHost = validateDataverseHost(values['dataverse-host']);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
+}
+
+// Load and validate Stage A output before acquiring credentials or calling Dataverse.
+const stageAJson = readFileSync(values['stage-a'], 'utf-8');
+const parsed: unknown = JSON.parse(stageAJson);
+const stageAOutputs: LocalStageAOutput[] = Array.isArray(parsed) ? parsed : [parsed as LocalStageAOutput];
+const validOutputs = stageAOutputs.filter(
+  (output) => output && (output.topicComponents?.length || output.agentInstructions?.trim())
+);
+
+if (validOutputs.length === 0) {
+  const emptyResult = {
+    agents: [],
+    overall: { passed: false, lowestScore: 0, threshold, agentCount: 0 },
+    scores: {
+      passed: false,
+      overallScore: 0,
+      threshold,
+      patternScore: 0,
+      instructionScore: 0,
+    },
+    reportUrl: '',
+    errors: ['No evaluatable agent content was found in the Stage A output'],
+  };
+  writeResult(emptyResult);
+  process.exit(0);
 }
 
 const { CLIENT_ID, TENANT_ID, CLIENT_SECRET } = process.env;
@@ -35,16 +97,17 @@ if (!CLIENT_ID || !TENANT_ID || !CLIENT_SECRET) {
 }
 
 // Acquire OAuth token for Dataverse
-const tokenUrl = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
+const tokenUrl = `https://login.microsoftonline.com/${encodeURIComponent(TENANT_ID)}/oauth2/v2.0/token`;
 const tokenResponse = await fetch(tokenUrl, {
   method: 'POST',
   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   body: new URLSearchParams({
     client_id: CLIENT_ID,
-    scope: `https://${values['dataverse-host']}/.default`,
+    scope: `https://${dataverseHost}/.default`,
     client_secret: CLIENT_SECRET,
     grant_type: 'client_credentials',
   }),
+  signal: AbortSignal.timeout(30_000),
 });
 
 if (!tokenResponse.ok) {
@@ -58,35 +121,13 @@ if (!tokenData.access_token) {
   process.exit(1);
 }
 
-// Load Stage A output (may be a single object or an array of results)
-const stageAJson = readFileSync(values['stage-a'], 'utf-8');
-const parsed = JSON.parse(stageAJson);
-const stageAOutputs: LocalStageAOutput[] = Array.isArray(parsed) ? parsed : [parsed];
-
-// Filter out empty/invalid entries
-const validOutputs = stageAOutputs.filter(
-  (o) => o && (o.topicComponents?.length || o.agentInstructions?.trim())
-);
-
-if (validOutputs.length === 0) {
-  console.error('Stage A output is empty or has no evaluatable content');
-  const emptyResult = {
-    agents: [],
-    overall: { passed: true, lowestScore: 100, threshold: parseInt(values.threshold ?? '60', 10), agentCount: 0 },
-    errors: ['No evaluatable content in Stage A output'],
-  };
-  console.log(JSON.stringify(emptyResult, null, 2));
-  process.exit(0);
-}
-
 // Run evaluation for each agent
-const threshold = parseInt(values.threshold ?? '60', 10);
 const agentResults = [];
 
 for (const stageAOutput of validOutputs) {
   console.log(`\n=== Evaluating: ${stageAOutput.botName} ===`);
   const result = await runEvaluation(
-    values['dataverse-host'],
+    dataverseHost,
     tokenData.access_token,
     stageAOutput,
     threshold
@@ -124,13 +165,7 @@ const finalResult = {
 };
 
 // Output result
-const jsonOutput = JSON.stringify(finalResult, null, 2);
-if (values.output) {
-  writeFileSync(values.output, jsonOutput);
-  console.error(`Evaluation result written to ${values.output}`);
-} else {
-  console.log(jsonOutput);
-}
+writeResult(finalResult);
 
 // Generate PDF report
 if (values['pdf-output']) {

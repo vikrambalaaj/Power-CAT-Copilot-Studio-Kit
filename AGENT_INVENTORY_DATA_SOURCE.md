@@ -111,6 +111,7 @@ Agents which are not accessible within the environment are added using One Inven
 | 79 | Uses Computer Use | cat_usescomputerusecode | Choice | Topic v2 `data` contains `InvokeComputerUsingAgentTaskAction` entries. | NA | V5 | Indicates whether the agent uses computer use. |
 | 80 | Agent Owning Business Unit | cat_agentowningbusinessunit | Text | Dataverse: `businessunit` table → name | | V5 | Agent Owning Business Unit. |
 | 81 | Agent Status | cat_agentstatus | Text | | From power platform resource query → `properties.isQuarantined` | V5 | Current status of the agent (e.g., Draft, Available, Blocked) |
+| 82 | Uses Agent Framework | cat_usesagentframeworkcode | Choice | Topic v2 `data` contains `InvokeAgentFrameworkTaskAction` or `InvokeMicrosoftAgentFrameworkTaskAction` entries. | NA | V5 | Indicates whether the agent uses Microsoft Agent Framework. |
 
 ---
 
@@ -200,6 +201,7 @@ Below are concise detection rules for each derived or boolean field (refer to lo
 - Uses Computer Use (`cat_usescomputerusecode`): Topic v2 `data` contains `InvokeComputerUsingAgentTaskAction` entries.
 - Agent Owning Business Unit (`cat_agentowningbusinessunit`): fetched from `businessunit` table.
 - Agent Status (`cat_agentstatus`): Indicates the agent's current status (e.g., Draft, Available, Blocked).
+- Uses Agent Framework (`cat_usesagentframeworkcode`): Topic v2 `data` contains `InvokeAgentFrameworkTaskAction` or `InvokeMicrosoftAgentFrameworkTaskAction` entries.
 
 ---
 

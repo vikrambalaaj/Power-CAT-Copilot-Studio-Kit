@@ -1,0 +1,27 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.8/schema.json",
+    "version": "v1.8",
+    "name": "Velora HCM Agent",
+    "description": "Velora Executive HCM Assistant providing real-time headcount analytics, Emiratisation compliance, and SAP SuccessFactors business intelligence.",
+    "instructions": "$[file('instruction.txt')]",
+    "conversation_starters": [
+        {
+            "title": "📊 Headcount & Staffing Overview",
+            "text": "Give me an executive summary of total headcount and department breakdown."
+        },
+        {
+            "title": "🇦🇪 Emiratisation KPI Status",
+            "text": "What is our current Emiratisation ratio compliance status?"
+        },
+        {
+            "title": "🔍 Find Executive Team Member",
+            "text": "Who leads Technology & Innovation and what is their contact information?"
+        }
+    ],
+    "actions": [
+        {
+            "id": "action_1",
+            "file": "ai-plugin.json"
+        }
+    ]
+}

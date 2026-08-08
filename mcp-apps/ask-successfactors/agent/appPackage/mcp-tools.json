@@ -1,0 +1,254 @@
+{
+    "tools": [
+        {
+            "name": "sf__get_analytics_dashboard",
+            "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors.",
+            "inputSchema": {
+                "properties": {},
+                "title": "sf__get_analytics_dashboardArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_emiratisation_kpi",
+            "description": "Return an aggregate Emiratisation KPI using the tenant-specific filter configured by the administrator.",
+            "inputSchema": {
+                "properties": {
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    }
+                },
+                "title": "sf__get_emiratisation_kpiArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_emp_jobs",
+            "description": "Retrieve employee job history records allowed by the configured SuccessFactors account.",
+            "inputSchema": {
+                "properties": {
+                    "user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "User Id"
+                    },
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    },
+                    "department": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Department"
+                    },
+                    "business_unit": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Business Unit"
+                    },
+                    "job_title": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Job Title"
+                    },
+                    "top": {
+                        "default": 20,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "sf__get_emp_jobsArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_emp_job_detail",
+            "description": "Retrieve specific employee job history entry by user_id and seq_num.",
+            "inputSchema": {
+                "properties": {
+                    "user_id": {
+                        "title": "User Id",
+                        "type": "string"
+                    },
+                    "seq_num": {
+                        "default": 1,
+                        "title": "Seq Num",
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "user_id"
+                ],
+                "title": "sf__get_emp_job_detailArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_users",
+            "description": "Retrieve employee directory profiles from SAP SuccessFactors. Filter by name/email/ID (query), department, or status.",
+            "inputSchema": {
+                "properties": {
+                    "query": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Query"
+                    },
+                    "department": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Department"
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": "active",
+                        "title": "Status"
+                    },
+                    "top": {
+                        "default": 20,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "sf__get_usersArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_user_detail",
+            "description": "Retrieve full profile details for a specific user ID in SuccessFactors.",
+            "inputSchema": {
+                "properties": {
+                    "user_id": {
+                        "title": "User Id",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "user_id"
+                ],
+                "title": "sf__get_user_detailArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_employment_info",
+            "description": "Retrieve employment details (EmpEmployment) for an employee.",
+            "inputSchema": {
+                "properties": {
+                    "user_id": {
+                        "title": "User Id",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "user_id"
+                ],
+                "title": "sf__get_employment_infoArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_personal_info",
+            "description": "Retrieve personal details (PerPersonal) by personIdExternal.",
+            "inputSchema": {
+                "properties": {
+                    "person_id_external": {
+                        "title": "Person Id External",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "person_id_external"
+                ],
+                "title": "sf__get_personal_infoArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_org_units",
+            "description": "Retrieve organization foundation master data (FOCompany, FOBusinessUnit, FODepartment, FODivision).",
+            "inputSchema": {
+                "properties": {
+                    "entity_type": {
+                        "default": "FOCompany",
+                        "title": "Entity Type",
+                        "type": "string"
+                    },
+                    "top": {
+                        "default": 20,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "sf__get_org_unitsArguments",
+                "type": "object"
+            }
+        }
+    ]
+}

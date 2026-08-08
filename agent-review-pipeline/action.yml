@@ -59,19 +59,33 @@ runs:
         CLIENT_SECRET: ${{ env.CLIENT_SECRET }}
         ARTIFACT_URL: ${{ inputs.artifact_url }}
       run: |
-        DATAVERSE_HOST=$(echo "$ARTIFACT_URL" | sed -E 's|https://([^/]+)/.*|\1|')
-        TOKEN=$(curl -s -X POST \
+        DATAVERSE_HOST=$(node -e '
+          const url = new URL(process.argv[1]);
+          if (url.protocol !== "https:" || url.username || url.password) {
+            throw new Error("artifact_url must be an HTTPS URL without embedded credentials");
+          }
+          process.stdout.write(url.host);
+        ' "$ARTIFACT_URL")
+        TOKEN=$(curl --fail-with-body --show-error --silent --retry 3 -X POST \
           "https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token" \
           -H "Content-Type: application/x-www-form-urlencoded" \
-          -d "client_id=${CLIENT_ID}&scope=https://${DATAVERSE_HOST}/.default&client_secret=${CLIENT_SECRET}&grant_type=client_credentials" \
+          --data-urlencode "client_id=${CLIENT_ID}" \
+          --data-urlencode "scope=https://${DATAVERSE_HOST}/.default" \
+          --data-urlencode "client_secret=${CLIENT_SECRET}" \
+          --data-urlencode "grant_type=client_credentials" \
           | jq -r '.access_token')
         if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
           echo "::error::Failed to acquire OAuth token"
           exit 1
         fi
-        curl -s -o "${GITHUB_WORKSPACE}/solution.zip" \
+        curl --fail-with-body --show-error --silent --location --retry 3 \
+          -o "${GITHUB_WORKSPACE}/solution.zip" \
           -H "Authorization: Bearer $TOKEN" \
           "$ARTIFACT_URL"
+        if [ ! -s "${GITHUB_WORKSPACE}/solution.zip" ]; then
+          echo "::error::Downloaded artifact is empty"
+          exit 1
+        fi
         echo "artifact_path=${GITHUB_WORKSPACE}/solution.zip" >> "$GITHUB_OUTPUT"
         echo "dataverse_host=${DATAVERSE_HOST}" >> "$GITHUB_OUTPUT"
 
@@ -95,7 +109,6 @@ runs:
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_RUN_ID: ${{ github.run_id }}
       run: |
-        echo "DEBUG: SERVER_URL=$GITHUB_SERVER_URL REPO=$GITHUB_REPOSITORY RUN_ID=$GITHUB_RUN_ID"
         node dist/evaluate.js \
           --stage-a "${{ steps.stage-a.outputs.stage_a_path }}" \
           --dataverse-host "${{ steps.download.outputs.dataverse_host }}" \
@@ -103,7 +116,6 @@ runs:
           --output "${GITHUB_WORKSPACE}/evaluation-result.json" \
           --pdf-output "${GITHUB_WORKSPACE}/agent-review-report.pdf"
         RESULT=$(cat "${GITHUB_WORKSPACE}/evaluation-result.json")
-        echo "DEBUG: reportUrl=$(echo "$RESULT" | jq -r '.reportUrl')"
         echo "result<<EOF" >> "$GITHUB_OUTPUT"
         echo "$RESULT" >> "$GITHUB_OUTPUT"
         echo "EOF" >> "$GITHUB_OUTPUT"
@@ -148,6 +160,6 @@ runs:
         if [ -n "$CALLBACK_SECRET" ]; then
           HEADERS+=(-H "X-Callback-Secret: $CALLBACK_SECRET")
         fi
-        printf '%s' "$PAYLOAD" | curl -s -X POST "$CALLBACK_URL" \
+        printf '%s' "$PAYLOAD" | curl --fail-with-body --show-error --silent --retry 3 -X POST "$CALLBACK_URL" \
           "${HEADERS[@]}" \
           --data-binary @-

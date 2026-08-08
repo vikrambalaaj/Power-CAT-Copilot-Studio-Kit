@@ -1,4 +1,4 @@
-﻿# MCP Apps
+# MCP Apps
 
 Ready-to-deploy MCP Copilot apps, packaged as self-contained zips.
 
@@ -10,6 +10,7 @@ Ready-to-deploy MCP Copilot apps, packaged as self-contained zips.
 |---|---|---|
 | `ask-salesforce` | `ask-salesforce.zip` | Ask - Salesforce CRM Copilot |
 | `ask-servicenow` | `ask-servicenow.zip` | Ask - ServiceNow ITSM Copilot |
+| `ask-successfactors` | `ask-successfactors.zip` | Ask - SuccessFactors HCM Copilot |
 
 ## Getting started
 

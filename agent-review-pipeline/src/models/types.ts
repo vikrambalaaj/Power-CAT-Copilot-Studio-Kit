@@ -53,7 +53,7 @@ export interface StageBTopicComponent {
 }
 
 /** Tool types inferred from YAML action.kind. */
-export type ToolType = 'flow' | 'mcp' | 'connector' | 'prompt' | 'unknown';
+export type ToolType = 'flow' | 'mcp' | 'connector' | 'prompt' | 'agent-framework' | 'unknown';
 
 /** Structured tool detail extracted from tool components. */
 export interface ToolDetail {

@@ -85,6 +85,8 @@ export function categorizePattern(patternDescription) {
     if (desc.includes('tool') ||
         desc.includes('action') ||
         desc.includes('connector') ||
+        desc.includes('agent-framework') ||
+        desc.includes('agentframework') ||
         desc.includes('complexity') ||
         desc.includes('architecture') ||
         desc.includes('routing gap') ||

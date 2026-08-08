@@ -4,6 +4,20 @@
  * Uses the same SPN OAuth token already acquired for artifact download.
  */
 import { AI_MODEL_IDS } from './constants.js';
+const REQUEST_TIMEOUT_MS = 60_000;
+const MAX_ERROR_BODY_LENGTH = 1_000;
+function parseModelJson(text, label) {
+    const trimmed = text.trim();
+    const withoutFence = trimmed.startsWith('```')
+        ? trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
+        : trimmed;
+    try {
+        return JSON.parse(withoutFence);
+    }
+    catch {
+        throw new Error(`${label} returned malformed JSON`);
+    }
+}
 /**
  * Call AI Builder PredictV2 unbound action on Dataverse.
  */
@@ -37,9 +51,10 @@ async function callPredictV2(dataverseHost, accessToken, modelId, requestv2) {
             'OData-Version': '4.0',
         },
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     if (!response.ok) {
-        const errorText = await response.text();
+        const errorText = (await response.text()).slice(0, MAX_ERROR_BODY_LENGTH);
         throw new Error(`PredictV2 failed (${response.status}): ${errorText}`);
     }
     const result = (await response.json());
@@ -58,7 +73,11 @@ async function callPredictV2(dataverseHost, accessToken, modelId, requestv2) {
  */
 export async function invokeStageB(dataverseHost, accessToken, botComponentsJson) {
     const textOutput = await callPredictV2(dataverseHost, accessToken, AI_MODEL_IDS.STAGE_B_PATTERN_EVAL, { botcomponents: botComponentsJson });
-    return JSON.parse(textOutput);
+    const evaluation = parseModelJson(textOutput, 'Stage B');
+    if (!Array.isArray(evaluation.Patterns)) {
+        throw new Error('Stage B response is missing the Patterns array');
+    }
+    return evaluation;
 }
 /**
  * Invoke Stage C: Instruction Compliance
@@ -69,5 +88,9 @@ export async function invokeStageB(dataverseHost, accessToken, botComponentsJson
  */
 export async function invokeStageC(dataverseHost, accessToken, agentInstructions) {
     const textOutput = await callPredictV2(dataverseHost, accessToken, AI_MODEL_IDS.STAGE_C_COMPLIANCE, { Instruction_20Input: agentInstructions });
-    return JSON.parse(textOutput);
+    const evaluation = parseModelJson(textOutput, 'Stage C');
+    if (!Array.isArray(evaluation.issues)) {
+        throw new Error('Stage C response is missing the issues array');
+    }
+    return evaluation;
 }

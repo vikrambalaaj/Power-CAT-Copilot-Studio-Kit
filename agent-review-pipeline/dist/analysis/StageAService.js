@@ -49,6 +49,9 @@ function detectToolType(parsed) {
             return 'connector';
         case 'InvokeAIBuilderModelTaskAction':
             return 'prompt';
+        case 'InvokeAgentFrameworkTaskAction':
+        case 'InvokeMicrosoftAgentFrameworkTaskAction':
+            return 'agent-framework';
         default:
             return 'unknown';
     }

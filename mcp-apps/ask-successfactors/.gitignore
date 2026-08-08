@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+agent/env/.env*
+.venv/
+dist/
+build/
+*.egg-info/
+logs/
+ask-successfactors.zip
+*-agent.zip
