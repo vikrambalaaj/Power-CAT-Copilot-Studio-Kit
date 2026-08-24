@@ -322,7 +322,23 @@ class CopilotStudioAcceptMiddleware:
 
 
 async def health(_request):
-    return JSONResponse({"status": "ok"})
+    from .connection_manager import get_connection_manager
+    mgr = get_connection_manager()
+    conns = mgr.list_connections()
+    return JSONResponse({
+        "status": "healthy",
+        "service": "sf-hcm-mcp-server",
+        "connections_managed": len(conns),
+        "connections": [
+            {
+                "id": c.connection_id,
+                "name": c.connection_name,
+                "status": c.status.value,
+                "enabled": c.enabled,
+            }
+            for c in conns
+        ],
+    })
 
 
 async def copilot_openapi(_request):
@@ -563,6 +579,58 @@ async def api_memory(request):
     return JSONResponse(res)
 
 
+async def api_connections(request):
+    """REST API for listing and registering managed enterprise connections."""
+    from .connection_admin import get_connection_admin_service
+    admin_svc = get_connection_admin_service()
+    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
+    env = request.query_params.get("environment")
+    conns = admin_svc.list_connections_for_user(user_roles=roles, environment=env)
+    return JSONResponse({"connections": conns, "total": len(conns)})
+
+
+async def api_connection_test(request):
+    """REST API for testing an enterprise connection."""
+    from .connection_admin import get_connection_admin_service
+    admin_svc = get_connection_admin_service()
+    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
+    conn_id = request.path_params.get("conn_id", "")
+    res = await admin_svc.test_connection(conn_id, user_roles=roles)
+    return JSONResponse(res)
+
+
+async def api_connection_toggle(request):
+    """REST API for toggling connection enabled/disabled status."""
+    from .connection_admin import get_connection_admin_service
+    admin_svc = get_connection_admin_service()
+    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
+    admin_email = request.headers.get("X-User-Email", "admin@velora.ae")
+    conn_id = request.path_params.get("conn_id", "")
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    enabled = bool(body.get("enabled", True))
+    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=roles)
+    return JSONResponse(res)
+
+
+async def api_connection_rotate(request):
+    """REST API for rotating secret references."""
+    from .connection_admin import get_connection_admin_service
+    admin_svc = get_connection_admin_service()
+    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
+    admin_email = request.headers.get("X-User-Email", "admin@velora.ae")
+    conn_id = request.path_params.get("conn_id", "")
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    new_secret_ref = body.get("new_secret_ref", "")
+    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=roles)
+    return JSONResponse(res)
+
+
 def create_app():
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", health, methods=["GET"]))
@@ -575,6 +643,10 @@ def create_app():
     app.routes.append(Route("/api/policies/preview", api_policy_preview, methods=["POST"]))
     app.routes.append(Route("/api/consent", api_consent, methods=["GET", "POST"]))
     app.routes.append(Route("/api/memory", api_memory, methods=["GET"]))
+    app.routes.append(Route("/api/connections", api_connections, methods=["GET"]))
+    app.routes.append(Route("/api/connections/{conn_id}/test", api_connection_test, methods=["POST"]))
+    app.routes.append(Route("/api/connections/{conn_id}/toggle", api_connection_toggle, methods=["POST"]))
+    app.routes.append(Route("/api/connections/{conn_id}/rotate", api_connection_rotate, methods=["POST"]))
     app.add_middleware(CopilotStudioAcceptMiddleware)
     app.add_middleware(ApiKeyMiddleware)
     cors_origins = [item.strip() for item in settings.cors_origins.split(",") if item.strip()]
