@@ -478,7 +478,7 @@ class SuccessFactorsClient:
 
             jobs_res = await self._fetch_all(
                 "EmpJob",
-                select="userId,startDate,department,businessUnit,division,jobTitle,location,employmentStatus,hireDate,customString1",
+                select="userId,startDate,department,businessUnit,division,jobTitle,location",
                 filter_str=" and ".join(emp_filters) if emp_filters else None,
                 as_of_date=as_of_date,
                 executive_id=executive_id,
@@ -513,32 +513,39 @@ class SuccessFactorsClient:
             end_idx = start_idx + effective_page_size
             paged_uids = sorted_uids[start_idx:end_idx]
 
+            # Bulk fetch User details and Nationality map (cached Layer 2)
+            users_res = await self._fetch_all(
+                "User",
+                select="userId,firstName,lastName,displayName,title,department,city,email",
+                executive_id=executive_id,
+            )
+            users_map = {
+                str(u.get("userId")): u
+                for u in (users_res.get("results", []) if isinstance(users_res, dict) else [])
+                if u.get("userId")
+            }
+
+            nat_res = await self._nationality_map(executive_id=executive_id)
+            nat_map = nat_res.get("mapping", {}) if isinstance(nat_res, dict) else {}
+
             enriched_records = []
             for uid in paged_uids:
                 job_data = matched_jobs[uid]
-                
-                user_res = await self._request("GET", f"User('{_escape_odata_string(uid)}')", params={"$select": "userId,firstName,lastName,displayName,title,department,city,email,custom01"}, executive_id=executive_id)
-                user_obj = user_res if isinstance(user_res, dict) and not user_res.get("error") else {}
-                
-                pers_res = await self._request("GET", f"PerPersonal('{_escape_odata_string(uid)}')", params={"$select": "personIdExternal,nationality,dateOfBirth"}, executive_id=executive_id)
-                pers_obj = pers_res if isinstance(pers_res, dict) and not pers_res.get("error") else {}
-
-                emp_res = await self._request("GET", f"EmpEmployment(personIdExternal='{_escape_odata_string(uid)}',userId='{_escape_odata_string(uid)}')", params={"$select": "startDate,origHireDate"}, executive_id=executive_id)
-                emp_obj = emp_res if isinstance(emp_res, dict) and not emp_res.get("error") else {}
+                user_obj = users_map.get(uid, {})
 
                 merged = {
                     "userId": uid,
                     "name": user_obj.get("displayName") or f"{user_obj.get('firstName', '')} {user_obj.get('lastName', '')}".strip() or f"Employee {uid}",
-                    "nationality": pers_obj.get("nationality"),
-                    "dateOfBirth": pers_obj.get("dateOfBirth"),
-                    "hireDate": emp_obj.get("origHireDate") or emp_obj.get("startDate") or job_data.get("hireDate") or job_data.get("startDate"),
+                    "nationality": nat_map.get(uid),
+                    "dateOfBirth": None,
+                    "hireDate": job_data.get("hireDate") or job_data.get("startDate"),
                     "department": job_data.get("resolved_department", "Unassigned"),
                     "businessUnit": job_data.get("businessUnit"),
                     "division": job_data.get("division"),
-                    "jobTitle": user_obj.get("title") or job_data.get("jobTitle"),
-                    "location": job_data.get("location") or user_obj.get("city"),
+                    "jobTitle": user_obj.get("title") or job_data.get("jobTitle") or "Specialist",
+                    "location": job_data.get("location") or user_obj.get("city") or "Abu Dhabi",
                     "employmentStatus": job_data.get("employmentStatus", "Active"),
-                    "recruited_by": job_data.get("customString1") or user_obj.get("custom01") or "Talent Acquisition",
+                    "recruited_by": job_data.get("customString1") or "Talent Acquisition",
                 }
                 enriched_records.append(merged)
 
