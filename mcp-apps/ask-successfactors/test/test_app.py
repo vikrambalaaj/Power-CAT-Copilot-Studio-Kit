@@ -453,7 +453,7 @@ class ManifestTests(unittest.TestCase):
             for function in plugin["functions"]:
                 semantics = function["capabilities"]["response_semantics"]
                 self.assertEqual(semantics["properties"]["template_selector"], "$.adaptiveCard")
-                self.assertTrue(semantics["static_template"]["file"].startswith("./adaptive-cards/"))
+                self.assertTrue(semantics["static_template"]["file"].startswith("adaptive-cards/") or semantics["static_template"]["file"].startswith("./adaptive-cards/"))
 
         agent = json.loads((package / "declarativeAgent.json").read_text())
         self.assertEqual(

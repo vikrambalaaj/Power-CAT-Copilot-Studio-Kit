@@ -53,13 +53,7 @@
     "conversation_starters": [
         {
             "title": "Executive morning brief",
-            "text": "Prepare a concise executive brief using the SAP facts and authorized Microsoft 365 context available to you. Separate facts, recommendations, actions, and open questions.",
-            "depends_on": [
-                {
-                    "name": "capabilities",
-                    "id": "Email"
-                }
-            ]
+            "text": "Prepare a concise executive brief using the SAP facts and authorized Microsoft 365 context available to you. Separate facts, recommendations, actions, and open questions."
         },
         {
             "title": "Workforce and Emiratisation",
@@ -75,13 +69,7 @@
         },
         {
             "title": "Meeting decisions and actions",
-            "text": "Summarize the authorized meeting context, identify decisions and proposed actions, and ask before creating any task.",
-            "depends_on": [
-                {
-                    "name": "capabilities",
-                    "id": "Meetings"
-                }
-            ]
+            "text": "Summarize the authorized meeting context, identify decisions and proposed actions, and ask before creating any task."
         },
         {
             "title": "Trace a decision",
@@ -89,17 +77,7 @@
         },
         {
             "title": "Email this snapshot",
-            "text": "Create a privacy-safe image snapshot of the current executive summary, resolve the named internal recipients, and show me the complete email for confirmation before sending.",
-            "depends_on": [
-                {
-                    "name": "capabilities",
-                    "id": "EmailActions"
-                },
-                {
-                    "name": "capabilities",
-                    "id": "CodeInterpreter"
-                }
-            ]
+            "text": "Create a privacy-safe image snapshot of the current executive summary, resolve the named internal recipients, and show me the complete email for confirmation before sending."
         },
         {
             "title": "Corporate KPIs and SAC stories",

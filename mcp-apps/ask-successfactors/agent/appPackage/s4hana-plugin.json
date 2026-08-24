@@ -1,7 +1,7 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
     "schema_version": "v2.4",
-    "name_for_human": "Velora S/4HANA Finance",
+    "name_for_human": "Velora S/4HANA",
     "description_for_human": "S/4HANA finance intelligence for the Velora Executive Agent",
     "description_for_model": "Use these read-only SAP S/4HANA tools for receivables, payables, P&L, and budget variance. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
     "namespace": "s4",
@@ -18,7 +18,7 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "./adaptive-cards/receivables-aging.json"
+                        "file": "adaptive-cards/receivables-aging.json"
                     }
                 }
             }
@@ -35,7 +35,7 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "./adaptive-cards/payables-aging.json"
+                        "file": "adaptive-cards/payables-aging.json"
                     }
                 }
             }
@@ -52,7 +52,7 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "./adaptive-cards/profit-and-loss.json"
+                        "file": "adaptive-cards/profit-and-loss.json"
                     }
                 }
             }
@@ -69,7 +69,7 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "./adaptive-cards/budget-variance.json"
+                        "file": "adaptive-cards/budget-variance.json"
                     }
                 }
             }

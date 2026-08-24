@@ -75,7 +75,7 @@ def validate() -> None:
             template = semantics.get("static_template", {}).get("file", "")
             if semantics.get("properties", {}).get("template_selector") != "$.adaptiveCard":
                 raise SystemExit(f"{plugin_name}:{function.get('name')} must prefer $.adaptiveCard")
-            if not template.startswith("./adaptive-cards/") or not (PACKAGE_ROOT / template.removeprefix("./")).is_file():
+            if not (template.startswith("adaptive-cards/") or template.startswith("./adaptive-cards/")) or not (PACKAGE_ROOT / template.removeprefix("./")).is_file():
                 raise SystemExit(f"{plugin_name}:{function.get('name')} has an invalid card fallback template")
 
     agent_actions = {item["file"] for item in load_json("declarativeAgent.json").get("actions", [])}
