@@ -1,0 +1,100 @@
+{
+    "schema_version": "v2.1",
+    "name_for_human": "SAP Analytics Cloud (SAC) Plugin",
+    "name_for_model": "sapAnalyticsCloudPlugin",
+    "description_for_human": "Delivers executive financial, KPI, and BI story insights from SAP Analytics Cloud.",
+    "description_for_model": "Query enterprise KPIs, executive performance dashboards, and analytical models live from SAP Analytics Cloud (SAC).",
+    "auth": {
+        "type": "None",
+        "reference_id": null
+    },
+    "functions": [
+        {
+            "name": "get_sac_kpis",
+            "description": "Retrieve executive financial, operational, and strategic KPIs from SAP Analytics Cloud (SAC).",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"},
+                    "static_template": {"file": "./adaptive-cards/executive-brief.json"}
+                }
+            },
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "domain": {
+                        "type": "string",
+                        "description": "Domain of interest (e.g. FINANCE, OPERATIONS, WORKFORCE, STRATEGY). Default is FINANCE."
+                    }
+                }
+            }
+        },
+        {
+            "name": "get_sac_story_analytics",
+            "description": "Fetch high-level business intelligence story insights, charts, and variances from SAP Analytics Cloud.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"},
+                    "static_template": {"file": "./adaptive-cards/executive-brief.json"}
+                }
+            },
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "story_id": {
+                        "type": "string",
+                        "description": "Identifier of the SAC Story (e.g. VELORA_CORP_PERF_2026)."
+                    }
+                }
+            }
+        },
+        {
+            "name": "get_sac_model_data",
+            "description": "Query data export model structures and aggregated metric values directly from SAP Analytics Cloud models.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"},
+                    "static_template": {"file": "./adaptive-cards/sap-result.json"}
+                }
+            },
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "model_id": {
+                        "type": "string",
+                        "description": "Model ID in SAP Analytics Cloud."
+                    },
+                    "measures": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of measure field names to query."
+                    }
+                },
+                "required": [
+                    "model_id"
+                ]
+            }
+        }
+    ],
+    "runtimes": [
+        {
+            "type": "RemoteMcp",
+            "auth": {
+                "type": "None",
+                "reference_id": null
+            },
+            "spec": {
+                "url": "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp"
+            },
+            "run_for_functions": [
+                "get_sac_kpis",
+                "get_sac_story_analytics",
+                "get_sac_model_data"
+            ]
+        }
+    ]
+}

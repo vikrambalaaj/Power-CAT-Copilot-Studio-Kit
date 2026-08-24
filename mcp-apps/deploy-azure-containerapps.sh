@@ -1,0 +1,158 @@
+#!/bin/bash
+set -e
+
+# ==============================================================================
+# Azure Container Apps Deployment Script for Velora Copilot Studio MCP Servers
+# Services:
+#   1. SF (SuccessFactors MCP)      -> Port 8082
+#   2. SAP S/4HANA (Finance MCP)    -> Port 8083
+#   3. SAC (Analytics Cloud MCP)    -> Port 8084
+#   4. Facilitator MCP              -> Port 8080
+# ==============================================================================
+
+# Configuration variables (customize or export as env variables)
+RESOURCE_GROUP="${RESOURCE_GROUP:-rg-copilot-studio-mcp}"
+LOCATION="${LOCATION:-eastus}"
+ENVIRONMENT_NAME="${ENVIRONMENT_NAME:-cae-copilot-studio}"
+ACR_NAME="${ACR_NAME:-}"
+TAG="${TAG:-latest}"
+
+if [ -z "$ACR_NAME" ]; then
+    echo "ERROR: Please specify your Azure Container Registry name via ACR_NAME."
+    echo "Usage: ACR_NAME=<your_acr_name> ./deploy-azure-containerapps.sh"
+    exit 1
+fi
+
+ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
+
+echo "=========================================================="
+echo "Deploying to Azure Container Apps"
+echo "Resource Group: $RESOURCE_GROUP"
+echo "Location:       $LOCATION"
+echo "Environment:    $ENVIRONMENT_NAME"
+echo "Registry:       $ACR_LOGIN_SERVER"
+echo "Tag:            $TAG"
+echo "=========================================================="
+
+# 1. Create Resource Group if not exists
+echo ""
+echo "--> [Step 1] Ensuring Resource Group exists..."
+az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output table
+
+# 2. Create Container Apps Environment if not exists
+echo ""
+echo "--> [Step 2] Ensuring Container Apps Managed Environment exists..."
+az containerapp env create \
+    --name "$ENVIRONMENT_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --location "$LOCATION" \
+    --output table || true
+
+# 3. Deploy SF (SuccessFactors) Container App
+echo ""
+echo "--> [Step 3] Deploying SuccessFactors MCP Container App..."
+az containerapp create \
+    --name "velora-mcp-sf" \
+    --resource-group "$RESOURCE_GROUP" \
+    --environment "$ENVIRONMENT_NAME" \
+    --image "${ACR_LOGIN_SERVER}/velora-mcp-sf:${TAG}" \
+    --registry-server "$ACR_LOGIN_SERVER" \
+    --target-port 8082 \
+    --ingress external \
+    --cpu 0.5 --memory 1.0Gi \
+    --min-replicas 1 --max-replicas 3 \
+    --env-vars \
+        ALLOWED_HOSTS="*" \
+        ALLOW_ANONYMOUS="true" \
+        CORS_ORIGINS="*" \
+        PORT="8082" \
+    --output table
+
+# 4. Deploy SAP S/4HANA Container App
+echo ""
+echo "--> [Step 4] Deploying SAP S/4HANA MCP Container App..."
+az containerapp create \
+    --name "velora-mcp-s4hana" \
+    --resource-group "$RESOURCE_GROUP" \
+    --environment "$ENVIRONMENT_NAME" \
+    --image "${ACR_LOGIN_SERVER}/velora-mcp-s4hana:${TAG}" \
+    --registry-server "$ACR_LOGIN_SERVER" \
+    --target-port 8083 \
+    --ingress external \
+    --cpu 0.5 --memory 1.0Gi \
+    --min-replicas 1 --max-replicas 3 \
+    --env-vars \
+        ALLOWED_HOSTS="*" \
+        ALLOW_ANONYMOUS="true" \
+        CORS_ORIGINS="*" \
+        PORT="8083" \
+    --output table
+
+# 5. Deploy SAC (SAP Analytics Cloud) Container App
+echo ""
+echo "--> [Step 5] Deploying SAP Analytics Cloud (SAC) MCP Container App..."
+az containerapp create \
+    --name "velora-mcp-sac" \
+    --resource-group "$RESOURCE_GROUP" \
+    --environment "$ENVIRONMENT_NAME" \
+    --image "${ACR_LOGIN_SERVER}/velora-mcp-sac:${TAG}" \
+    --registry-server "$ACR_LOGIN_SERVER" \
+    --target-port 8084 \
+    --ingress external \
+    --cpu 0.5 --memory 1.0Gi \
+    --min-replicas 1 --max-replicas 3 \
+    --env-vars \
+        ALLOWED_HOSTS="*" \
+        ALLOW_ANONYMOUS="true" \
+        CORS_ORIGINS="*" \
+        PORT="8084" \
+    --output table
+
+# 6. Deploy Facilitator Container App
+echo ""
+echo "--> [Step 6] Deploying Facilitator MCP Container App..."
+az containerapp create \
+    --name "velora-mcp-facilitator" \
+    --resource-group "$RESOURCE_GROUP" \
+    --environment "$ENVIRONMENT_NAME" \
+    --image "${ACR_LOGIN_SERVER}/velora-mcp-facilitator:${TAG}" \
+    --registry-server "$ACR_LOGIN_SERVER" \
+    --target-port 8080 \
+    --ingress external \
+    --cpu 0.5 --memory 1.0Gi \
+    --min-replicas 1 --max-replicas 3 \
+    --env-vars \
+        ALLOWED_HOSTS="*" \
+        ALLOW_ANONYMOUS="true" \
+        CORS_ORIGINS="*" \
+        PORT="8080" \
+    --output table
+
+# 7. Deploy Dynamic Adaptive Card Service
+echo ""
+echo "--> [Step 7] Deploying Dynamic Adaptive Card Service Container App..."
+az containerapp create \
+    --name "velora-mcp-card-service" \
+    --resource-group "$RESOURCE_GROUP" \
+    --environment "$ENVIRONMENT_NAME" \
+    --image "${ACR_LOGIN_SERVER}/velora-mcp-card-service:${TAG}" \
+    --registry-server "$ACR_LOGIN_SERVER" \
+    --target-port 8080 \
+    --ingress external \
+    --cpu 0.5 --memory 1.0Gi \
+    --min-replicas 1 --max-replicas 3 \
+    --env-vars \
+        PORT="8080" \
+        NODE_ENV="production" \
+    --output table
+
+echo ""
+echo "=========================================================="
+echo "Deployment Complete! Retrieval of FQDNs:"
+echo "=========================================================="
+echo "SF Ingress URL:          https://$(az containerapp show -n velora-mcp-sf -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
+echo "S/4HANA Ingress URL:     https://$(az containerapp show -n velora-mcp-s4hana -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
+echo "SAC Ingress URL:         https://$(az containerapp show -n velora-mcp-sac -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
+echo "Facilitator Ingress URL: https://$(az containerapp show -n velora-mcp-facilitator -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
+echo "Card Service Ingress:    https://$(az containerapp show -n velora-mcp-card-service -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
+

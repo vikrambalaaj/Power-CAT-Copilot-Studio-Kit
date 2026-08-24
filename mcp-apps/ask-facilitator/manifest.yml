@@ -1,0 +1,18 @@
+applications:
+  - name: facilitator-mcp-server
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python -m facilitator_mcp
+    env:
+      PYTHON_VERSION: 3.11.15
+      PYTHONUNBUFFERED: "1"
+      ALLOWED_HOSTS: "facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      ALLOWED_ORIGINS: "https://copilotstudio.microsoft.com,https://make.powerapps.com"
+      ALLOW_ANONYMOUS: "true"
+      PUBLIC_BASE_URL: "https://facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      ENTRA_TENANT_ID: "7d167021-f5e9-4331-9b75-d44d55a1ce9b"
+      ENTRA_CLIENT_ID: "5d178cb2-251e-436c-b2ec-5f36021d2cf8"
+      SVC_SENDER_EMAIL: "svc_aiagent@velora.ae"

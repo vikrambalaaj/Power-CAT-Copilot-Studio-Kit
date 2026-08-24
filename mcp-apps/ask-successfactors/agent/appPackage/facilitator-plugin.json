@@ -1,0 +1,222 @@
+{
+    "schema_version": "v2.1",
+    "name_for_human": "Velora Facilitator Copilot Plugin",
+    "name_for_model": "veloraFacilitatorPlugin",
+    "description_for_human": "Calendar-driven meeting facilitation, pre-meeting briefing synthesis, Dataverse user log memory feedback, auto-send email dispatch, and institutional memory storage.",
+    "description_for_model": "Retrieve calendar meetings, feed back user-specific Dataverse audit history, generate cross-system pre-meeting briefing digests, dispatch automated executive emails via Microsoft Graph, and persist notes in Microsoft Loop and OneNote.",
+    "auth": {
+        "type": "None",
+        "reference_id": null
+    },
+    "functions": [
+        {
+            "name": "query_user_history_from_dataverse",
+            "description": "Query and filter Dataverse audit logs (cre2f_veloraagentauditlog) strictly for the specific authenticated user.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/decision-trace.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "user_email": {
+                        "type": "string",
+                        "description": "Email address of the executive / user to filter logs for."
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of historical records to return."
+                    },
+                    "filter_operation": {
+                        "type": "string",
+                        "description": "Optional operation filter (e.g. READ_WORKFORCE_HEADCOUNT, READ_FINANCIAL_METRICS)."
+                    }
+                },
+                "required": ["user_email"]
+            }
+        },
+        {
+            "name": "sync_dataverse_logs_to_memory",
+            "description": "Sync the specific user's Dataverse audit history into the active Knowledge Graph / Memory Base for personalized context recall.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/decision-trace.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "user_email": {
+                        "type": "string",
+                        "description": "Email address of the executive / user."
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Number of records to sync into memory."
+                    }
+                },
+                "required": ["user_email"]
+            }
+        },
+        {
+            "name": "get_calendar_meetings",
+            "description": "Fetch scheduled and concluded meetings directly from the executive Outlook / Teams calendar.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/meeting-intelligence.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "timeframe": {
+                        "type": "string",
+                        "description": "Timeframe for calendar query (e.g. today, upcoming, this_week)."
+                    },
+                    "filter_subject": {
+                        "type": "string",
+                        "description": "Optional keyword to filter meeting subjects."
+                    }
+                }
+            }
+        },
+        {
+            "name": "process_calendar_meeting_workflow",
+            "description": "Automatically process calendar meetings: synthesize pre-meeting briefs or auto-dispatch post-meeting email summaries to calendar attendees.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/meeting-intelligence.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "meeting_subject": {
+                        "type": "string",
+                        "description": "Subject of the meeting from the calendar."
+                    },
+                    "phase": {
+                        "type": "string",
+                        "description": "Workflow phase: 'PRE_MEETING' for briefing synthesis or 'POST_MEETING' for automatic summary dispatch."
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "Discussion notes or transcript highlights."
+                    },
+                    "key_decisions": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "List of key decisions made."
+                    },
+                    "action_items": {
+                        "type": "array",
+                        "items": { "type": "object" },
+                        "description": "Action items with tasks, owners, and due dates."
+                    }
+                }
+            }
+        },
+        {
+            "name": "get_facilitator_guide",
+            "description": "Retrieve the complete step-by-step setup and architecture guide for Facilitator auto-send emails.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/executive-brief.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        },
+        {
+            "name": "generate_pre_meeting_briefing",
+            "description": "Synthesize cross-system SAP data (SuccessFactors, S/4HANA, SAC) into pre-meeting briefs ahead of scheduled executive meetings.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/executive-brief.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "meeting_title": {
+                        "type": "string",
+                        "description": "Title or topic of the scheduled meeting."
+                    },
+                    "attendees": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "List of attendee email addresses."
+                    },
+                    "meeting_date": {
+                        "type": "string",
+                        "description": "Date of meeting in YYYY-MM-DD format."
+                    }
+                },
+                "required": ["meeting_title", "attendees"]
+            }
+        },
+        {
+            "name": "draft_meeting_summary_email",
+            "description": "Generate a structured HTML executive meeting summary email ready for auto-dispatch.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/email-snapshot.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "topic": { "type": "string", "description": "Meeting topic or name." },
+                    "attendees": { "type": "array", "items": { "type": "string" }, "description": "List of attendee emails." },
+                    "key_decisions": { "type": "array", "items": { "type": "string" }, "description": "Key decisions made during meeting." },
+                    "action_items": { "type": "array", "items": { "type": "object" }, "description": "Action items with tasks, owners, and due dates." }
+                },
+                "required": ["topic", "attendees", "key_decisions", "action_items"]
+            }
+        },
+        {
+            "name": "send_executive_email_via_graph",
+            "description": "Automatically send executive meeting summaries or briefs via Microsoft Graph API using the service account.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/email-snapshot.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "to_recipients": { "type": "array", "items": { "type": "string" }, "description": "List of recipient email addresses." },
+                    "subject": { "type": "string", "description": "Email subject." },
+                    "body_html": { "type": "string", "description": "HTML body content." },
+                    "cc_recipients": { "type": "array", "items": { "type": "string" }, "description": "Optional list of CC email addresses." }
+                },
+                "required": ["to_recipients", "subject", "body_html"]
+            }
+        },
+        {
+            "name": "export_meeting_to_loop_notebook",
+            "description": "Export meeting notes, decisions, and action items to Microsoft Loop components and OneNote Notebooks for institutional memory.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/meeting-intelligence.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "meeting_title": { "type": "string", "description": "Title of the meeting." },
+                    "attendees": { "type": "array", "items": { "type": "string" }, "description": "Attendees." },
+                    "summary": { "type": "string", "description": "Executive summary text." },
+                    "key_decisions": { "type": "array", "items": { "type": "string" }, "description": "List of key decisions." },
+                    "action_items": { "type": "array", "items": { "type": "object" }, "description": "Action items list." }
+                },
+                "required": ["meeting_title", "attendees", "summary", "key_decisions", "action_items"]
+            }
+        },
+        {
+            "name": "ingest_chat_to_knowledge_graph",
+            "description": "Ingest chat queries and responses into the Institutional Memory Knowledge Graph / Knowledge Base.",
+            "capabilities": {"response_semantics": {"data_path": "$", "properties": {"title": "$.cardTitle", "subtitle": "$.cardSubtitle", "template_selector": "$.adaptiveCard"}, "static_template": {"file": "./adaptive-cards/decision-trace.json"}}},
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "chat_id": { "type": "string", "description": "Unique chat session identifier." },
+                    "user_query": { "type": "string", "description": "User question or prompt." },
+                    "agent_response": { "type": "string", "description": "Agent answer." }
+                },
+                "required": ["chat_id", "user_query", "agent_response"]
+            }
+        }
+    ],
+    "runtimes": [
+        {
+            "type": "RemoteMcp",
+            "auth": {
+                "type": "None",
+                "reference_id": null
+            },
+            "spec": {
+                "url": "https://facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp"
+            },
+            "run_for_functions": [
+                "query_user_history_from_dataverse",
+                "sync_dataverse_logs_to_memory",
+                "get_calendar_meetings",
+                "process_calendar_meeting_workflow",
+                "get_facilitator_guide",
+                "generate_pre_meeting_briefing",
+                "draft_meeting_summary_email",
+                "send_executive_email_via_graph",
+                "export_meeting_to_loop_notebook",
+                "ingest_chat_to_knowledge_graph"
+            ]
+        }
+    ]
+}

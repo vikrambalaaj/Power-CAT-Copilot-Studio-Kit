@@ -1,0 +1,95 @@
+{
+  "$schema": "http://adaptivecards.microsoft.com/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${cardTitle}",
+              "size": "Medium",
+              "weight": "Bolder",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "${subtitle}",
+              "isSubtle": true,
+              "spacing": "None",
+              "wrap": true
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "$when": "${$root.badge != null}",
+          "items": [
+            {
+              "type": "Container",
+              "style": "${badge.style}",
+              "bleed": true,
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${badge.text}",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "horizontalAlignment": "Center"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "${summary}",
+      "wrap": true,
+      "spacing": "Medium"
+    },
+    {
+      "type": "FactSet",
+      "facts": "${facts}",
+      "$when": "${count(facts) > 0}",
+      "spacing": "Medium"
+    },
+    {
+      "type": "Input.Text",
+      "id": "comments",
+      "label": "Review Comments / Notes",
+      "isMultiline": true,
+      "placeholder": "Enter any optional justifications or comments...",
+      "spacing": "Medium"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Approve",
+      "style": "positive",
+      "data": {
+        "actionSubmitId": "${actionIdPrefix}_approve",
+        "actionVerb": "APPROVE",
+        "ticketToken": "${ticketToken}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Reject",
+      "style": "destructive",
+      "data": {
+        "actionSubmitId": "${actionIdPrefix}_reject",
+        "actionVerb": "REJECT",
+        "ticketToken": "${ticketToken}"
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.24/MicrosoftTeams.schema.json",
     "manifestVersion": "1.24",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "id": "67957a66-57f1-473f-8250-f937b1499d2d",
     "developer": {
         "name": "Velora Enterprise AI",

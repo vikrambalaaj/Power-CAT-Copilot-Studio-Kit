@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Dynamic Adaptive Card Service",
+    "description": "Enterprise Adaptive Card dynamic generation and submission validation service for Copilot Studio Agents.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://card-service.azurecontainerapps.io"
+    }
+  ],
+  "paths": {
+    "/render-card": {
+      "post": {
+        "summary": "Render Dynamic Adaptive Card",
+        "description": "Generates a schema v1.5 sanitized Adaptive Card JSON from AI data with signed idempotency token and fallback text.",
+        "operationId": "RenderCard",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "templateId": {
+                    "type": "string",
+                    "description": "Template key (approval-card, fact-grid-card, input-form-card, metrics-card)",
+                    "example": "approval-card"
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "description": "Conversation / session identifier"
+                  },
+                  "data": {
+                    "type": "object",
+                    "description": "Structured AI output data"
+                  }
+                },
+                "required": ["data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Card rendered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "templateUsed": { "type": "string" },
+                    "latencyMs": { "type": "integer" },
+                    "ticketToken": { "type": "string" },
+                    "adaptiveCard": { "type": "object" },
+                    "fallback": {
+                      "type": "object",
+                      "properties": {
+                        "markdownText": { "type": "string" },
+                        "plainText": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate-submission": {
+      "post": {
+        "summary": "Validate Card Submission",
+        "description": "Validates ticket token authenticity and prevents duplicate/stale clicks.",
+        "operationId": "ValidateSubmission",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ticketToken": { "type": "string" },
+                  "submittedData": { "type": "object" }
+                },
+                "required": ["ticketToken"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submission valid and token consumed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token invalid, expired, or already consumed"
+          }
+        }
+      }
+    }
+  }
+}

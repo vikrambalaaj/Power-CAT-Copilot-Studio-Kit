@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Velora SuccessFactors Workforce Cards",
+    "description": "Returns verified aggregate SuccessFactors workforce metrics with Adaptive Card and text fallback output.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com" }
+  ],
+  "paths": {
+    "/copilot/workforce-card": {
+      "post": {
+        "operationId": "GetWorkforceAdaptiveCard",
+        "summary": "Get a verified workforce metric as an Adaptive Card",
+        "description": "Use for aggregate headcount, Emiratisation, joiners, leavers, attrition, joiner-leaver trends, or the workforce dashboard. Prefer the Adaptive Card response; use fallbackText when the channel cannot render the card.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["metric"],
+                "properties": {
+                  "metric": { "type": "string", "enum": ["headcount", "emiratisation", "joiners", "leavers", "attrition", "trend", "dashboard"] },
+                  "start_date": { "type": "string", "format": "date", "description": "Inclusive reporting start date." },
+                  "end_date": { "type": "string", "format": "date", "description": "Inclusive reporting end date." },
+                  "as_of_date": { "type": "string", "format": "date", "description": "Effective date for point-in-time metrics." },
+                  "group_by": { "type": "string", "enum": ["month", "department"] },
+                  "granularity": { "type": "string", "enum": ["month", "week"] },
+                  "company": { "type": "string" },
+                  "department": { "type": "string" },
+                  "business_unit": { "type": "string" },
+                  "reason_type": { "type": "string", "enum": ["all", "voluntary", "involuntary"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Adaptive Card presentation and readable fallback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "metric": { "type": "string" },
+                    "cardTitle": { "type": "string" },
+                    "cardSubtitle": { "type": "string" },
+                    "cardStatus": { "type": "string" },
+                    "cardNote": { "type": "string" },
+                    "fallbackText": { "type": "string" },
+                    "adaptiveCard": { "type": "object", "additionalProperties": true },
+                    "adaptiveCardJson": { "type": "string" },
+                    "presentationPreference": { "type": "string" },
+                    "fallbackPresentation": { "type": "string" },
+                    "fact1Title": { "type": "string" }, "fact1Value": { "type": "string" },
+                    "fact2Title": { "type": "string" }, "fact2Value": { "type": "string" },
+                    "fact3Title": { "type": "string" }, "fact3Value": { "type": "string" },
+                    "fact4Title": { "type": "string" }, "fact4Value": { "type": "string" },
+                    "fact5Title": { "type": "string" }, "fact5Value": { "type": "string" },
+                    "fact6Title": { "type": "string" }, "fact6Value": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

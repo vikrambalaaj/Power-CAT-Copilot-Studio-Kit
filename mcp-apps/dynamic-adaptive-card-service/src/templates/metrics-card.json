@@ -1,0 +1,75 @@
+{
+  "$schema": "http://adaptivecards.microsoft.com/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${cardTitle}",
+      "size": "Medium",
+      "weight": "Bolder",
+      "wrap": true
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${primaryMetric.label}",
+              "size": "Small",
+              "isSubtle": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "${primaryMetric.value}",
+              "size": "ExtraLarge",
+              "weight": "Bolder",
+              "color": "${primaryMetric.color}"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "$when": "${$root.secondaryMetric != null}",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${secondaryMetric.label}",
+              "size": "Small",
+              "isSubtle": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "${secondaryMetric.value}",
+              "size": "ExtraLarge",
+              "weight": "Bolder",
+              "color": "${secondaryMetric.color}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "${summary}",
+      "wrap": true,
+      "spacing": "Medium"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "View Details",
+      "data": {
+        "actionSubmitId": "${actionIdPrefix}_view_details",
+        "actionVerb": "VIEW_DETAILS",
+        "ticketToken": "${ticketToken}"
+      }
+    }
+  ]
+}

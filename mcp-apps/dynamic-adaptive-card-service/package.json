@@ -1,0 +1,25 @@
+{
+  "name": "dynamic-adaptive-card-service",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Enterprise Dynamic Adaptive Card Rendering & Validation Service for Copilot Studio and AI Agents",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "adaptivecards": "^3.0.2",
+    "adaptivecards-templating": "^2.3.1",
+    "fastify": "^4.28.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.2",
+    "vitest": "^1.6.0"
+  }
+}

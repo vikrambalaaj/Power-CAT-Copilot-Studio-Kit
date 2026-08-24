@@ -6,10 +6,13 @@ Both SAP MCP servers include an optional, bounded in-process cache for successfu
 
 | Server | Default TTL | Default entries | Additional cache |
 |---|---:|---:|---|
-| SuccessFactors | 120 seconds | 512 | Successful writes clear all local HCM entries |
+| SuccessFactors OData pages | 120 seconds | 512 | Successful writes clear all local HCM entries |
+| SuccessFactors aggregates | 900 seconds | 128 | Headcount and joiner results; permission/filter/date scoped |
 | S/4HANA | 60 seconds | 512 | OAuth access token reused until 30 seconds before expiry |
 
 Set `CACHE_ENABLED=false` to bypass result caching. `CACHE_TTL_SECONDS=0` or `CACHE_MAX_ENTRIES=0` also disables it. Tune `CACHE_TTL_SECONDS` and `CACHE_MAX_ENTRIES` independently for each deployment. `OAUTH_TOKEN_CACHE_SKEW_SECONDS` applies only to S/4HANA OAuth authentication.
+
+For SuccessFactors, `AGGREGATE_CACHE_TTL_SECONDS` and `AGGREGATE_CACHE_MAX_ENTRIES` control the whole-result cache used by expensive paginated headcount and new-hire aggregations. The deployed recommendation is 15 minutes, while underlying OData pages remain cached for two minutes.
 
 ## Correctness and isolation
 

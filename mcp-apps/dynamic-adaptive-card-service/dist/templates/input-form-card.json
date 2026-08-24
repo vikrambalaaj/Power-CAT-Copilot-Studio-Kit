@@ -1,0 +1,42 @@
+{
+  "$schema": "http://adaptivecards.microsoft.com/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${cardTitle}",
+      "size": "Medium",
+      "weight": "Bolder",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "${instructions}",
+      "wrap": true,
+      "spacing": "Small"
+    },
+    {
+      "type": "Input.Text",
+      "id": "textResponse",
+      "label": "${inputLabel}",
+      "isRequired": true,
+      "errorMessage": "This field is required.",
+      "placeholder": "${placeholder}",
+      "isMultiline": true,
+      "spacing": "Medium"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Submit Response",
+      "style": "positive",
+      "data": {
+        "actionSubmitId": "${actionIdPrefix}_form_submit",
+        "actionVerb": "FORM_SUBMIT",
+        "ticketToken": "${ticketToken}"
+      }
+    }
+  ]
+}

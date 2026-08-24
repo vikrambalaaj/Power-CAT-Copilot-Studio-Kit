@@ -1,0 +1,18 @@
+applications:
+  - name: sac-analytics-mcp-server
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python -m sac_mcp
+    env:
+      PYTHON_VERSION: 3.11.15
+      PYTHONUNBUFFERED: "1"
+      ALLOWED_HOSTS: "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      ALLOW_ANONYMOUS: "true"
+      CACHE_ENABLED: "true"
+      CACHE_TTL_SECONDS: "120"
+      CACHE_MAX_ENTRIES: "512"
+      OAUTH_TOKEN_CACHE_SKEW_SECONDS: "30"
+      PUBLIC_BASE_URL: "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com"

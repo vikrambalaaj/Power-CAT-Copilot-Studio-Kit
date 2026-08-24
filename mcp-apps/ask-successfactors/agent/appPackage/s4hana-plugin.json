@@ -364,8 +364,7 @@
                 "s4__get_budget_variance"
             ],
             "auth": {
-                "type": "ApiKeyPluginVault",
-                "reference_id": "REPLACE_WITH_S4_PLUGIN_VAULT_REFERENCE_ID"
+                "type": "None"
             }
         }
     ]

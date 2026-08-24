@@ -1,8 +1,342 @@
 {
     "tools": [
         {
+            "name": "sf__get_workforce_drilldown",
+            "description": "Drill down from aggregate groups (such as 'Who are the 15 employees in Unassigned?') into individual employee records governed by active Dataverse disclosure policy. Enforces field allowlists, server-side age ranges, original hire dates, and role verification.",
+            "inputSchema": {
+                "properties": {
+                    "department": {
+                        "default": "Unassigned",
+                        "title": "Department",
+                        "type": "string"
+                    },
+                    "page": {
+                        "default": 1,
+                        "title": "Page",
+                        "type": "integer"
+                    },
+                    "page_size": {
+                        "default": 20,
+                        "title": "Page Size",
+                        "type": "integer"
+                    },
+                    "field_profile": {
+                        "default": "workforce_drilldown",
+                        "title": "Field Profile",
+                        "type": "string"
+                    },
+                    "user_object_id": {
+                        "default": null,
+                        "title": "User Object ID",
+                        "type": "string"
+                    },
+                    "user_email": {
+                        "default": null,
+                        "title": "User Email",
+                        "type": "string"
+                    }
+                },
+                "title": "sf__get_workforce_drilldownArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__check_and_record_consent",
+            "description": "Check whether the authenticated user has agreed to the Velora confidentiality notice or record user acceptance in Dataverse.",
+            "inputSchema": {
+                "properties": {
+                    "user_object_id": {
+                        "title": "User Object ID",
+                        "type": "string"
+                    },
+                    "user_email": {
+                        "title": "User Email",
+                        "type": "string"
+                    },
+                    "action": {
+                        "default": "check",
+                        "title": "Action",
+                        "type": "string"
+                    },
+                    "accepted": {
+                        "default": false,
+                        "title": "Accepted",
+                        "type": "boolean"
+                    }
+                },
+                "required": ["user_object_id", "user_email"],
+                "title": "sf__check_and_record_consentArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_session_greeting",
+            "description": "Present the initial session greeting and capability starters while asynchronously loading 30-day user memory in the background.",
+            "inputSchema": {
+                "properties": {
+                    "user_object_id": {
+                        "default": "",
+                        "title": "User Object ID",
+                        "type": "string"
+                    },
+                    "user_email": {
+                        "default": "",
+                        "title": "User Email",
+                        "type": "string"
+                    },
+                    "user_display_name": {
+                        "default": "",
+                        "title": "User Display Name",
+                        "type": "string"
+                    },
+                    "user_timezone": {
+                        "default": "Asia/Dubai",
+                        "title": "User Timezone",
+                        "type": "string"
+                    }
+                },
+                "title": "sf__get_session_greetingArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__recall_user_memory",
+            "description": "Recall past conversation topics, decisions, and follow-up items from the user's 30-day Dataverse memory partition.",
+            "inputSchema": {
+                "properties": {
+                    "user_object_id": {
+                        "title": "User Object ID",
+                        "type": "string"
+                    },
+                    "user_email": {
+                        "title": "User Email",
+                        "type": "string"
+                    },
+                    "topic_query": {
+                        "default": null,
+                        "title": "Topic Query",
+                        "type": "string"
+                    }
+                },
+                "required": ["user_object_id", "user_email"],
+                "title": "sf__recall_user_memoryArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_joiners",
+            "description": "Use for aggregate hires, joiners, and hiring trends over an inclusive YYYY-MM-DD range. Returns distinct employees, reconciled breakdowns, UAE/non-UAE/missing-nationality aggregates when available, coverage, population definition, and rule version. Never use employee-directory records to calculate hiring analytics.",
+            "inputSchema": {
+                "properties": {
+                    "start_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Start Date"
+                    },
+                    "end_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "End Date"
+                    },
+                    "group_by": {
+                        "default": "month",
+                        "title": "Group By",
+                        "type": "string"
+                    },
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    }
+                },
+                "title": "sf__get_joinersArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_leavers",
+            "description": "Use for aggregate separations and leavers over an inclusive YYYY-MM-DD range. Returns only verified counts and reconciled time breakdowns; unavailable reason or organization classifications are explicitly unclassified and never estimated.",
+            "inputSchema": {
+                "properties": {
+                    "start_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Start Date"
+                    },
+                    "end_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "End Date"
+                    },
+                    "group_by": {
+                        "default": "department",
+                        "title": "Group By",
+                        "type": "string"
+                    },
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    },
+                    "reason_type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": "all",
+                        "title": "Reason Type"
+                    }
+                },
+                "title": "sf__get_leaversArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_attrition",
+            "description": "Use for period attrition after verified leaver and active-headcount queries succeed. Returns numerator, denominator, formula, denominator method, UAE National rate when independently verified, rule version, and warnings; never substitutes historical values.",
+            "inputSchema": {
+                "properties": {
+                    "start_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Start Date"
+                    },
+                    "end_date": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "End Date"
+                    },
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    },
+                    "business_unit": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Business Unit"
+                    }
+                },
+                "title": "sf__get_attritionArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "sf__get_joiners_leavers_trend",
+            "description": "Use for reconciled joiner-versus-leaver trends over one inclusive reporting window. Every period is calculated from live joiner and leaver results; period totals must match headline totals and zero denominators are not converted to fallback values.",
+            "inputSchema": {
+                "properties": {
+                    "start_date": {
+                        "title": "Start Date",
+                        "type": "string"
+                    },
+                    "end_date": {
+                        "title": "End Date",
+                        "type": "string"
+                    },
+                    "granularity": {
+                        "default": "month",
+                        "title": "Granularity",
+                        "type": "string"
+                    },
+                    "company": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company"
+                    }
+                },
+                "required": [
+                    "start_date",
+                    "end_date"
+                ],
+                "title": "sf__get_joiners_leavers_trendArguments",
+                "type": "object"
+            }
+        },
+        {
             "name": "sf__get_headcount",
-            "description": "Return aggregate headcount and a department breakdown from SAP SuccessFactors EmpJob.",
+            "description": "Use for aggregate workforce headcount and department distribution. Returns distinct current-effective employees, active headcount, complete pagination, reconciled breakdowns, population definitions, effective date, coverage, source metadata, and rule version.",
             "inputSchema": {
                 "properties": {
                     "company": {
@@ -60,7 +394,7 @@
         },
         {
             "name": "sf__get_analytics_dashboard",
-            "description": "Retrieve a workforce summary and sample-based department breakdown from SAP SuccessFactors.",
+            "description": "Use only for a combined workforce overview built from independently verified SuccessFactors KPIs. Preserve each KPI's population, period, coverage, source, and warnings; omit any KPI whose query failed.",
             "inputSchema": {
                 "properties": {},
                 "title": "sf__get_analytics_dashboardArguments",
@@ -69,7 +403,7 @@
         },
         {
             "name": "sf__get_emiratisation_kpi",
-            "description": "Return an aggregate Emiratisation KPI using the tenant-specific filter configured by the administrator.",
+            "description": "Use for aggregate Emiratisation, UAE National, non-UAE National, expatriate-share, or nationality-mix questions. Uses the configured PerPersonal nationality mapping and the same population scope for numerator and denominator; returns active and total counts, missing nationality, rates, target gap in percentage points, reconciliation, rule version, and warnings. Never exposes individual nationality or uses fallback values.",
             "inputSchema": {
                 "properties": {
                     "company": {
@@ -103,7 +437,7 @@
         },
         {
             "name": "sf__get_emp_jobs",
-            "description": "Retrieve employee job history records allowed by the configured SuccessFactors account.",
+            "description": "Use only for an authorized, narrowly filtered employee or organization job-history lookup. Never use for aggregate headcount. Returns a minimized field allowlist plus total, rows returned, and partial-result status.",
             "inputSchema": {
                 "properties": {
                     "user_id": {
@@ -190,7 +524,7 @@
         },
         {
             "name": "sf__get_emp_job_detail",
-            "description": "Retrieve specific employee job history entry by user_id and seq_num.",
+            "description": "Use only for an authorized lookup of one identified employee and job-history sequence. Returns only approved job fields and effective dates.",
             "inputSchema": {
                 "properties": {
                     "user_id": {
@@ -212,7 +546,7 @@
         },
         {
             "name": "sf__get_users",
-            "description": "Retrieve employee directory profiles from SAP SuccessFactors. Filter by name/email/ID (query), department, or status.",
+            "description": "Use for a narrow employee-directory lookup by name, email, ID, or department. Requires a lookup filter, returns directory-safe fields only, and must not be used to enumerate the workforce or calculate analytics.",
             "inputSchema": {
                 "properties": {
                     "query": {
@@ -263,7 +597,7 @@
         },
         {
             "name": "sf__get_user_detail",
-            "description": "Retrieve full profile details for a specific user ID in SuccessFactors.",
+            "description": "Use only for an authorized lookup of one resolved employee ID. Returns an approved directory-safe field allowlist rather than the full User entity.",
             "inputSchema": {
                 "properties": {
                     "user_id": {
@@ -280,7 +614,7 @@
         },
         {
             "name": "sf__get_employment_info",
-            "description": "Retrieve employment details (EmpEmployment) for an employee.",
+            "description": "Use only for an authorized employment-date or employment-relationship question about one identified employee. Returns a minimized effective-date field allowlist.",
             "inputSchema": {
                 "properties": {
                     "user_id": {
@@ -296,25 +630,8 @@
             }
         },
         {
-            "name": "sf__get_personal_info",
-            "description": "Retrieve personal details (PerPersonal) by personIdExternal.",
-            "inputSchema": {
-                "properties": {
-                    "person_id_external": {
-                        "title": "Person Id External",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "person_id_external"
-                ],
-                "title": "sf__get_personal_infoArguments",
-                "type": "object"
-            }
-        },
-        {
             "name": "sf__get_org_units",
-            "description": "Retrieve organization foundation master data (FOCompany, FOBusinessUnit, FODepartment, FODivision).",
+            "description": "Use to resolve exact SuccessFactors company, business-unit, division, or department codes before applying organization filters. Returns total, rows returned, and completeness status.",
             "inputSchema": {
                 "properties": {
                     "entity_type": {

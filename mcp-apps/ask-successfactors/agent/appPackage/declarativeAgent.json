@@ -100,6 +100,10 @@
                     "id": "CodeInterpreter"
                 }
             ]
+        },
+        {
+            "title": "Corporate KPIs and SAC stories",
+            "text": "Show executive operating margin, EBITDA, and strategic story insights from SAP Analytics Cloud (SAC)."
         }
     ],
     "actions": [
@@ -110,6 +114,14 @@
         {
             "id": "s4HanaAction",
             "file": "s4hana-plugin.json"
+        },
+        {
+            "id": "sacAction",
+            "file": "sac-plugin.json"
+        },
+        {
+            "id": "facilitatorAction",
+            "file": "facilitator-plugin.json"
         }
     ]
 }

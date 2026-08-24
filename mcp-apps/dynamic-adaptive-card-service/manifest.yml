@@ -1,0 +1,11 @@
+applications:
+  - name: adaptive-card-service
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: node dist/index.js
+    env:
+      NODE_ENV: "production"
+      PUBLIC_BASE_URL: "https://adaptive-card-service.cfapps.eu10-005.hana.ondemand.com"

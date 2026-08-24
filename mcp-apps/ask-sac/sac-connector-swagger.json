@@ -1,0 +1,43 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Velora SAC Analytics MCP",
+    "description": "SAP Analytics Cloud KPI and Story integration for Velora Executive Agent",
+    "version": "1.0.0"
+  },
+  "host": "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Server healthy"
+          }
+        }
+      }
+    },
+    "/mcp/tools": {
+      "get": {
+        "summary": "List SAC Analytics Tools",
+        "operationId": "listSacTools",
+        "responses": {
+          "200": {
+            "description": "List of available tools"
+          }
+        }
+      }
+    }
+  }
+}

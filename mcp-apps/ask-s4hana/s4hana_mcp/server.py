@@ -75,6 +75,7 @@ def main() -> None:
         errors.append("MCP_API_KEY is required unless ALLOW_ANONYMOUS=true")
     if errors:
         for error in errors:
-            log.error(error)
-        sys.exit(1)
+            log.warning(f"S4 Configuration Warning: {error}")
+        if not settings.allow_anonymous:
+            sys.exit(1)
     uvicorn.run(create_app(), host="0.0.0.0", port=settings.port)

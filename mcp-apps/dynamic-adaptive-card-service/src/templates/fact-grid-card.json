@@ -1,0 +1,37 @@
+{
+  "$schema": "http://adaptivecards.microsoft.com/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${cardTitle}",
+      "size": "Medium",
+      "weight": "Bolder",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "${summary}",
+      "wrap": true,
+      "spacing": "Small"
+    },
+    {
+      "type": "FactSet",
+      "facts": "${facts}",
+      "spacing": "Medium"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Acknowledge",
+      "style": "positive",
+      "data": {
+        "actionSubmitId": "${actionIdPrefix}_ack",
+        "actionVerb": "ACKNOWLEDGE",
+        "ticketToken": "${ticketToken}"
+      }
+    }
+  ]
+}

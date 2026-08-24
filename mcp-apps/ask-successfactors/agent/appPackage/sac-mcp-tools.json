@@ -1,0 +1,53 @@
+{
+    "tools": [
+        {
+            "name": "get_sac_kpis",
+            "description": "Retrieve executive financial, operational, and strategic KPIs from SAP Analytics Cloud (SAC).",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "domain": {
+                        "type": "string",
+                        "description": "Domain of interest (e.g. FINANCE, OPERATIONS, WORKFORCE, STRATEGY). Default is FINANCE."
+                    }
+                }
+            }
+        },
+        {
+            "name": "get_sac_story_analytics",
+            "description": "Fetch high-level business intelligence story insights, charts, and variances from SAP Analytics Cloud.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "story_id": {
+                        "type": "string",
+                        "description": "Identifier of the SAC Story (e.g. VELORA_CORP_PERF_2026)."
+                    }
+                }
+            }
+        },
+        {
+            "name": "get_sac_model_data",
+            "description": "Query data export model structures and aggregated metric values directly from SAP Analytics Cloud models.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "model_id": {
+                        "type": "string",
+                        "description": "Model ID in SAP Analytics Cloud."
+                    },
+                    "measures": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of measure field names to query."
+                    }
+                },
+                "required": [
+                    "model_id"
+                ]
+            }
+        }
+    ]
+}
