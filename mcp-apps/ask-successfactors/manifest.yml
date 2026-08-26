@@ -9,8 +9,9 @@ applications:
     env:
       PYTHON_VERSION: 3.11.15
       PYTHONUNBUFFERED: "1"
-      ALLOWED_HOSTS: "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      ALLOWED_HOSTS: "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost:*,127.0.0.1:*,*"
       ALLOW_ANONYMOUS: "true"
+      CORS_ORIGINS: "*"
       ENABLE_MUTATING_TOOLS: "false"
       ENABLE_WIDGET: "false"
       MCP_FILE_LOG: "false"
@@ -19,6 +20,11 @@ applications:
       CACHE_MAX_ENTRIES: "512"
       AGGREGATE_CACHE_TTL_SECONDS: "900"
       AGGREGATE_CACHE_MAX_ENTRIES: "128"
+      SF_API_URL: "https://api22.sapsf.com/odata/v2"
+      SF_COMPANY_ID: "etihadairp"
+      SF_USERNAME: "SFAI"
+      SF_PASSWORD: "Userpassword@2026"
+      SF_EMIRATI_FILTER: ""
       SF_NATIONALITY_ENTITY: "PerPersonal"
       SF_NATIONALITY_PERSON_ID_FIELD: "personIdExternal"
       SF_NATIONALITY_FIELD: "nationality"

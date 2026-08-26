@@ -228,6 +228,16 @@ class MultiLayerCache:
             log.warning("prewarming_common_aggregates_failed", error=str(exc))
 
 
+    async def purge_all(self) -> None:
+        """Purge all in-process cache tiers."""
+        await self.policy_cache.clear()
+        await self.odata_cache.clear()
+        await self.aggregate_cache.clear()
+        await self.drilldown_cache.clear()
+        await self.memory_cache.clear()
+        log.info("multi_layer_cache_purged_all")
+
+
 _global_cache = MultiLayerCache()
 
 

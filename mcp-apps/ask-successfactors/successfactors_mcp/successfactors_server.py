@@ -631,6 +631,14 @@ async def api_connection_rotate(request):
     return JSONResponse(res)
 
 
+async def api_cache_purge(request):
+    """REST API for purging all in-process cache tiers."""
+    from .cache import get_multi_layer_cache
+    cache_mgr = get_multi_layer_cache()
+    await cache_mgr.purge_all()
+    return JSONResponse({"status": "SUCCESS", "message": "All cache tiers purged successfully."})
+
+
 def create_app():
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", health, methods=["GET"]))
@@ -643,6 +651,7 @@ def create_app():
     app.routes.append(Route("/api/policies/preview", api_policy_preview, methods=["POST"]))
     app.routes.append(Route("/api/consent", api_consent, methods=["GET", "POST"]))
     app.routes.append(Route("/api/memory", api_memory, methods=["GET"]))
+    app.routes.append(Route("/api/cache/purge", api_cache_purge, methods=["POST"]))
     app.routes.append(Route("/api/connections", api_connections, methods=["GET"]))
     app.routes.append(Route("/api/connections/{conn_id}/test", api_connection_test, methods=["POST"]))
     app.routes.append(Route("/api/connections/{conn_id}/toggle", api_connection_toggle, methods=["POST"]))
