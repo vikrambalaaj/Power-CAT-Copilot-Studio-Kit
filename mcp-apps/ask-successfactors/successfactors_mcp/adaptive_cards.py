@@ -346,6 +346,17 @@ def decorate(data: dict[str, Any]) -> dict[str, Any]:
         title = "SuccessFactors data unavailable"
         subtitle = "The requested workforce result could not be verified."
         card = _card(title, subtitle, [], status="Action required", status_color="Attention", note=str(result.get("message", "Check the configured data source.")))
+    elif result.get("type") == "ConsentCheck" and result.get("is_consented") is True:
+        result.update({
+            "cardTitle": "Consent Verified",
+            "cardSubtitle": "Velora Enterprise Confidentiality Policy",
+            "visualizationSpec": {"template": "none"},
+            "adaptiveCard": None,
+            "adaptiveCardJson": "",
+            "cardDeliveryMode": "copilot_response_semantics",
+            "cardRenderingInstruction": "Do not render an adaptive card.",
+        })
+        return result
     elif result.get("adaptiveCard"):
         # Pre-built card (e.g. SessionGreeting or ConsentGate)
         card = result.get("adaptiveCard")

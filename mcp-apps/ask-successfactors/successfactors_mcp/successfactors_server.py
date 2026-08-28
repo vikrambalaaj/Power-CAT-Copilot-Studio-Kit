@@ -20,8 +20,11 @@ from .chart_images import get_chart
 from shared_mcp.logger import get_logger
 from shared_mcp.telemetry import wrap_specs
 from shared_mcp.file_logger import wrap_specs_logging
+from .consent_gate import wrap_specs_consent
 
-TOOL_SPECS = wrap_specs_logging(wrap_specs(TOOL_SPECS))
+# Consent is the innermost gate: telemetry and file logging still observe the
+# call, but the handler only runs once the notice has been accepted.
+TOOL_SPECS = wrap_specs_logging(wrap_specs(wrap_specs_consent(TOOL_SPECS)))
 
 log = get_logger("sf_hcm")
 settings = get_settings()

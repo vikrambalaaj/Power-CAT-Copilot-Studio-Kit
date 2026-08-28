@@ -41,6 +41,9 @@ class SuccessFactorsSettings(BaseSettings):
     enable_mutating_tools: bool = False
     enable_personal_info_tool: bool = False
     enable_widget: bool = False
+    # Enforce the confidentiality consent gate inside the server, not just in
+    # the agent instructions, so employee data cannot be reached without consent.
+    enforce_consent_gate: bool = True
     log_level: str = "INFO"
     cache_enabled: bool = True
     cache_ttl_seconds: int = 120

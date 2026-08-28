@@ -49,3 +49,32 @@ Maintain a runbook containing service owners, support hours, escalation contacts
 ## Package rule
 
 Do not reuse local ZIP artifacts. Generate the package only after production URLs and vault references are injected, scan its contents for secrets, verify that both plugin manifests are present, and archive its checksum with the release approval.
+
+## Consent store (required)
+
+The confidentiality consent gate is the first screen of every session. A decision
+is written to `cre2f_veloraagentauditlog` with `cre2f_recordtype = CONSENT`, and
+every later session reads it back so the user is asked exactly once per notice
+version.
+
+That read/write needs an app registration with `Dataverse user_impersonation`
+(or a Dataverse application user) and these four values:
+
+| Variable | Purpose |
+| --- | --- |
+| `DATAVERSE_URL` | e.g. `https://velora.crm4.dynamics.com` |
+| `AZURE_TENANT_ID` | Entra tenant of the Dataverse environment |
+| `AZURE_CLIENT_ID` | App registration / application user |
+| `AZURE_CLIENT_SECRET` | Client secret — set with `cf set-env`, never in `manifest.yml` |
+
+Optional: `DATAVERSE_AUDIT_ENTITY_SET` (default `cre2f_veloraagentauditlogs`) if
+the table's OData collection name was customised, and
+`DATAVERSE_CONSENT_CACHE_SECONDS` (default `300`) for the positive-lookup cache.
+
+Behaviour without them: the server still runs and still gates, but consent lives
+only in the process buffer, so every restart and every additional instance
+re-prompts. Treat all four as a release gate.
+
+Failure semantics are fail-closed: a consent write that Dataverse rejects returns
+`status: FAILED` and the user stays blocked; an unreadable consent table
+re-prompts rather than assuming consent.

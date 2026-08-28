@@ -16,14 +16,24 @@ import hmac
 import json
 import os
 import time
-import urllib.error
-import urllib.request
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Set, Tuple
+
+import httpx
 
 from shared_mcp.logger import get_logger
 
 log = get_logger("dataverse_audit")
+
+# --- Dataverse Web API wiring (Section 3.1) -----------------------------------
+# Logical table `cre2f_veloraagentauditlog`; the OData collection is the plural
+# entity set name, overridable for tenants that customised it.
+AUDIT_ENTITY_SET = os.getenv("DATAVERSE_AUDIT_ENTITY_SET", "cre2f_veloraagentauditlogs")
+DATAVERSE_API_VERSION = os.getenv("DATAVERSE_API_VERSION", "v9.2")
+DATAVERSE_TIMEOUT_SECONDS = float(os.getenv("DATAVERSE_TIMEOUT_SECONDS", "10"))
+# Consent must survive process restarts, so its lookup is never served from the
+# in-memory buffer while a live connection is configured.
+CONSENT_QUERY_CACHE_SECONDS = float(os.getenv("DATAVERSE_CONSENT_CACHE_SECONDS", "300"))
 
 # --- Standard Record Type Discriminators (Section 3.3) ---
 RECORD_TYPE_AGENT_DELEGATION_START = "AGENT_DELEGATION_START"
@@ -84,6 +94,11 @@ HMAC_SECRET = os.getenv("VELORA_APPROVAL_HMAC_SECRET", "velora-prod-executive-se
 def sanitize_email(email: Optional[str]) -> str:
     """Normalize email for consistent identity indexing and partitioning."""
     return (email or "").strip().lower()
+
+
+def _odata_escape(value: str) -> str:
+    """Escape a value for safe inlining into an OData string literal."""
+    return (value or "").replace("'", "''")
 
 
 def compute_content_hash(text: str) -> str:
@@ -374,6 +389,12 @@ class DataverseClient:
         self.client_secret = client_secret or os.getenv("AZURE_CLIENT_SECRET", "")
         self.simulate_down = False
 
+        # Cached client-credentials token for the Dataverse Web API
+        self._access_token: str = ""
+        self._token_expires_at: float = 0.0
+        # Short-lived positive cache for consent lookups (keyed by identity+version)
+        self._consent_cache: Dict[str, Tuple[float, Dict[str, Any]]] = {}
+
         # In-memory store for high-performance indexing, verification, and tests
         self._audit_store: List[Dict[str, Any]] = []
         self._policy_store: List[Dict[str, Any]] = []
@@ -419,6 +440,78 @@ class DataverseClient:
             "cre2f_modifiedon": now_iso,
         }
         self._policy_store.append(default_policy)
+
+    # ── Dataverse Web API transport ────────────────────────────────────────────
+
+    @property
+    def is_live(self) -> bool:
+        """True when full client-credentials configuration for Dataverse is present."""
+        return bool(self.base_url and self.tenant_id and self.client_id and self.client_secret)
+
+    async def _get_access_token(self) -> str:
+        """Acquire and cache an app-only bearer token for the Dataverse Web API."""
+        now = time.time()
+        if self._access_token and now < self._token_expires_at:
+            return self._access_token
+
+        token_url = f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
+        form = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "scope": f"{self.base_url}/.default",
+            "grant_type": "client_credentials",
+        }
+        async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+            resp = await client.post(token_url, data=form)
+            resp.raise_for_status()
+            body = resp.json()
+
+        self._access_token = body["access_token"]
+        # Refresh 60s early so a token never expires mid-request.
+        self._token_expires_at = now + max(int(body.get("expires_in", 3600)) - 60, 60)
+        return self._access_token
+
+    async def _request(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_body: Optional[Dict[str, Any]] = None,
+        params: Optional[Dict[str, str]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Issue an authenticated Dataverse Web API request."""
+        token = await self._get_access_token()
+        url = f"{self.base_url}/api/data/{DATAVERSE_API_VERSION}/{path.lstrip('/')}"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json",
+            "OData-MaxVersion": "4.0",
+            "OData-Version": "4.0",
+            "Content-Type": "application/json; charset=utf-8",
+        }
+        if method.upper() == "POST":
+            # Ask Dataverse to echo the created row so the caller gets the real GUID.
+            headers["Prefer"] = "return=representation"
+
+        async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+            resp = await client.request(method, url, headers=headers, json=json_body, params=params)
+            resp.raise_for_status()
+            if resp.status_code == 204 or not resp.content:
+                return None
+            return resp.json()
+
+    async def _create_row(self, payload: Dict[str, Any]) -> Optional[str]:
+        """Insert one audit row into `cre2f_veloraagentauditlog`; returns the Dataverse GUID."""
+        # Dataverse rejects unknown/None columns, and assigns the primary key itself.
+        body = {
+            key: value
+            for key, value in payload.items()
+            if value is not None and key != "cre2f_veloraagentauditlogid"
+        }
+        created = await self._request("POST", AUDIT_ENTITY_SET, json_body=body)
+        if isinstance(created, dict):
+            return created.get("cre2f_veloraagentauditlogid")
+        return None
 
     def check_alternate_key_exists(self, invocation_id: str, record_type: str) -> bool:
         """Check Section 3.4 alternate key: cre2f_invocationid + cre2f_recordtype."""
@@ -466,8 +559,38 @@ class DataverseClient:
         log_id = f"AUD-{int(time.time() * 1000)}-{len(self._audit_store) + 1}"
         payload["cre2f_veloraagentauditlogid"] = log_id
         payload["cre2f_loggingstatus"] = "PERSISTED"
-        
+
+        # Durable write to `cre2f_veloraagentauditlog`. Consent is the one record
+        # type that must fail closed: if it cannot be stored, the user would be
+        # re-prompted forever, so the caller has to know the write failed.
+        if self.is_live:
+            try:
+                remote_id = await self._create_row(payload)
+                if remote_id:
+                    log_id = remote_id
+                    payload["cre2f_veloraagentauditlogid"] = remote_id
+            except Exception as exc:
+                if rec_type == RECORD_TYPE_CONSENT:
+                    log.error(
+                        "dataverse_consent_write_failed",
+                        error=str(exc),
+                        exc_type=type(exc).__name__,
+                    )
+                    raise ConnectionError(
+                        f"Consent could not be persisted to Dataverse: {exc}"
+                    ) from exc
+                payload["cre2f_loggingstatus"] = "BUFFERED"
+                log.warning(
+                    "dataverse_write_buffered",
+                    record_type=rec_type,
+                    error=str(exc),
+                    exc_type=type(exc).__name__,
+                )
+
         self._audit_store.append(payload)
+        if rec_type == RECORD_TYPE_CONSENT:
+            # A new decision supersedes any cached lookup for this identity.
+            self._consent_cache.clear()
         if inv_id:
             self._alternate_keys_index.add((inv_id, rec_type))
         if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
@@ -606,20 +729,85 @@ class DataverseClient:
         )
         return await self.create_audit_record(rec)
 
-    async def query_user_consent(self, user_object_id: str, user_email: str, notice_version: str) -> Optional[Dict[str, Any]]:
-        """Query for valid active consent in `cre2f_veloraagentauditlog`."""
+    def _match_consent_in_buffer(
+        self, user_object_id: str, user_email: str, notice_version: str
+    ) -> Optional[Dict[str, Any]]:
+        """Scan the in-memory buffer for an accepted consent row."""
         sanitized = sanitize_email(user_email)
         for record in reversed(self._audit_store):
-            if record.get("cre2f_recordtype") == RECORD_TYPE_CONSENT:
-                uid = record.get("cre2f_userobjectid", "")
-                email = sanitize_email(record.get("cre2f_useremail", record.get("cre2f_newcolumn", "")))
-                ver = record.get("cre2f_consentversion", "")
-                status = record.get("cre2f_consentstatus", "")
-                
-                matches_user = (user_object_id and uid == user_object_id) or (email == sanitized)
-                if matches_user and ver == notice_version and status == "ACCEPTED":
-                    return record
+            if record.get("cre2f_recordtype") != RECORD_TYPE_CONSENT:
+                continue
+            uid = record.get("cre2f_userobjectid", "")
+            email = sanitize_email(record.get("cre2f_useremail", record.get("cre2f_newcolumn", "")))
+            ver = record.get("cre2f_consentversion", "")
+            status = record.get("cre2f_consentstatus", "")
+
+            # An identity match requires a non-empty identifier on both sides,
+            # otherwise two anonymous rows would satisfy each other.
+            matches_user = bool(
+                (user_object_id and uid == user_object_id)
+                or (sanitized and email == sanitized)
+            )
+            if matches_user and ver == notice_version and status == "ACCEPTED":
+                return record
         return None
+
+    async def query_user_consent(self, user_object_id: str, user_email: str, notice_version: str) -> Optional[Dict[str, Any]]:
+        """Query for valid active consent in `cre2f_veloraagentauditlog`.
+
+        Reads live Dataverse when configured so a consent accepted in an earlier
+        session (or on another replica) is honoured and the user is not re-asked.
+        Falls back to the in-memory buffer for tests and offline operation.
+        """
+        sanitized = sanitize_email(user_email)
+        cache_key = f"{user_object_id}|{sanitized}|{notice_version}"
+
+        if not self.is_live:
+            return self._match_consent_in_buffer(user_object_id, user_email, notice_version)
+
+        cached = self._consent_cache.get(cache_key)
+        if cached and time.time() < cached[0]:
+            return cached[1]
+
+        clauses = []
+        if user_object_id:
+            clauses.append(f"cre2f_userobjectid eq '{_odata_escape(user_object_id)}'")
+        if sanitized:
+            clauses.append(f"tolower(cre2f_useremail) eq '{_odata_escape(sanitized)}'")
+        if not clauses:
+            return None
+
+        filter_expr = (
+            f"cre2f_recordtype eq '{RECORD_TYPE_CONSENT}'"
+            f" and cre2f_consentstatus eq 'ACCEPTED'"
+            f" and cre2f_consentversion eq '{_odata_escape(notice_version)}'"
+            f" and ({' or '.join(clauses)})"
+        )
+        params = {
+            "$filter": filter_expr,
+            "$orderby": "createdon desc",
+            "$top": "1",
+            "$select": "cre2f_veloraagentauditlogid,cre2f_userobjectid,cre2f_useremail,"
+                       "cre2f_consentversion,cre2f_consentstatus,cre2f_eventtime",
+        }
+
+        try:
+            body = await self._request("GET", AUDIT_ENTITY_SET, params=params)
+        except Exception as exc:
+            # Fail closed: an unreadable consent table must re-prompt, never
+            # silently grant access to employee data.
+            log.error(
+                "dataverse_consent_query_failed",
+                error=str(exc),
+                exc_type=type(exc).__name__,
+            )
+            return None
+
+        rows = (body or {}).get("value") or []
+        record = rows[0] if rows else None
+        if record:
+            self._consent_cache[cache_key] = (time.time() + CONSENT_QUERY_CACHE_SECONDS, record)
+        return record
 
     async def query_user_30_day_memory(
         self,
@@ -719,6 +907,7 @@ class DataverseClient:
         self._policy_store.clear()
         self._alternate_keys_index.clear()
         self._idempotency_index.clear()
+        self._consent_cache.clear()
         self.simulate_down = False
         self._seed_default_policies()
 

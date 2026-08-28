@@ -152,12 +152,30 @@ class ConsentService:
             message_summary=f"User {status.lower()} confidentiality consent notice v{notice_version}",
             content_classification="INTERNAL_AUDIT",
         )
-        res = await self.client.create_audit_record(record)
+        try:
+            res = await self.client.create_audit_record(record)
+        except Exception as exc:
+            # Fail closed: never tell the user consent was stored when it was not,
+            # otherwise the next session silently re-prompts with no audit trail.
+            log.error("consent_persist_failed", user_email=user_email, error=str(exc))
+            return {
+                "status": "FAILED",
+                "consent_status": status,
+                "consent_version": notice_version,
+                "error": True,
+                "message": (
+                    "Consent could not be stored in the Dataverse audit table. "
+                    "Please retry; workforce data stays blocked until it is recorded."
+                ),
+            }
+
+        log.info("consent_recorded", user_email=user_email, consent_status=status, version=notice_version)
         return {
             "status": "RECORDED",
             "consent_status": status,
             "consent_version": notice_version,
             "audit_id": res.get("id"),
+            "persisted_to": "cre2f_veloraagentauditlog",
         }
 
 

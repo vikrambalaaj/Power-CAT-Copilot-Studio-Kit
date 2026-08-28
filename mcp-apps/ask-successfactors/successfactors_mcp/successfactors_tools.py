@@ -32,6 +32,8 @@ def _safe_result(data: Dict[str, Any]) -> Dict[str, Any]:
 
 def _card_fallback_text(card: Dict[str, Any]) -> str:
     """Build concise readable fallback text without serializing card JSON."""
+    if not isinstance(card, dict):
+        return "Operation completed."
     lines: list[str] = []
     fact_seen = False
     for element in card.get("body", []):
@@ -502,7 +504,6 @@ async def sf__check_and_record_consent(
         )
         return _json_response({
             "type": "ConsentRecorded",
-            "status": "SUCCESS",
             "message": "Consent successfully recorded.",
             **res,
         })
@@ -512,12 +513,13 @@ async def sf__check_and_record_consent(
             user_email=user_email,
             notice_version=notice_version,
         )
-        return _json_response({
+        payload = {
             "type": "ConsentCheck",
             "is_consented": is_consented,
             "adaptiveCard": card if not is_consented else None,
             "message": "User consent verified." if is_consented else "Consent agreement required before proceeding.",
-        })
+        }
+        return _json_response(payload)
 
 
 async def sf__get_session_greeting(
