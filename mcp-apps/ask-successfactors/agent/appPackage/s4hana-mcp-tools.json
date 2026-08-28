@@ -6,12 +6,28 @@
             "inputSchema": {
                 "properties": {
                     "company_code": {
-                        "title": "Company Code",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company Code"
                     },
                     "key_date": {
-                        "title": "Key Date",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Key Date"
                     },
                     "customer": {
                         "anyOf": [
@@ -55,10 +71,6 @@
                         "type": "integer"
                     }
                 },
-                "required": [
-                    "company_code",
-                    "key_date"
-                ],
                 "title": "s4__get_receivables_agingArguments",
                 "type": "object"
             }
@@ -69,12 +81,28 @@
             "inputSchema": {
                 "properties": {
                     "company_code": {
-                        "title": "Company Code",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company Code"
                     },
                     "key_date": {
-                        "title": "Key Date",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Key Date"
                     },
                     "supplier": {
                         "anyOf": [
@@ -118,10 +146,6 @@
                         "type": "integer"
                     }
                 },
-                "required": [
-                    "company_code",
-                    "key_date"
-                ],
                 "title": "s4__get_payables_agingArguments",
                 "type": "object"
             }
@@ -132,16 +156,40 @@
             "inputSchema": {
                 "properties": {
                     "company_code": {
-                        "title": "Company Code",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company Code"
                     },
                     "fiscal_year": {
-                        "title": "Fiscal Year",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Fiscal Year"
                     },
                     "fiscal_period": {
-                        "title": "Fiscal Period",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Fiscal Period"
                     },
                     "ledger": {
                         "default": "0L",
@@ -190,11 +238,6 @@
                         "type": "integer"
                     }
                 },
-                "required": [
-                    "company_code",
-                    "fiscal_year",
-                    "fiscal_period"
-                ],
                 "title": "s4__get_profit_and_lossArguments",
                 "type": "object"
             }
@@ -205,20 +248,52 @@
             "inputSchema": {
                 "properties": {
                     "company_code": {
-                        "title": "Company Code",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company Code"
                     },
                     "fiscal_year": {
-                        "title": "Fiscal Year",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Fiscal Year"
                     },
                     "fiscal_period": {
-                        "title": "Fiscal Period",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Fiscal Period"
                     },
                     "plan_version": {
-                        "title": "Plan Version",
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Plan Version"
                     },
                     "currency": {
                         "anyOf": [
@@ -262,12 +337,6 @@
                         "type": "integer"
                     }
                 },
-                "required": [
-                    "company_code",
-                    "fiscal_year",
-                    "fiscal_period",
-                    "plan_version"
-                ],
                 "title": "s4__get_budget_varianceArguments",
                 "type": "object"
             }

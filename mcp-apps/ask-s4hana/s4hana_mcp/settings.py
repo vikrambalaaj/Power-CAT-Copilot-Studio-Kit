@@ -25,9 +25,11 @@ class Settings(BaseSettings):
     s4_ar_entity: str = "ARageingData"
     s4_ap_entity: str = "APageingData"
     s4_budget_api_url: str = "https://fioriqas.velora.ae/sap/opu/odata4/sap/zfi_sbn_budget_consm_srv/srvd_a2x/sap/zfi_sdf_budget_consm/0001"
-    s4_budget_entity: str = "BudgetConsumption"
-    s4_pl_api_url: str = ""
-    s4_pl_entity: str = ""
+    s4_budget_entity: str = "BudgetConsumReport"
+    s4_pl_api_url: str = "https://fioriqas.velora.ae/sap/opu/odata/sap/C_FINANCIALSTATEMENTKPI_CDS"
+    s4_pl_entity: str = "C_FINANCIALSTATEMENTKPI"
+    s4_pl_gl_account_hierarchy: str = "ZVOP"
+    s4_pl_planning_category: str = "ACT01"
     port: int = 8083
     mcp_api_key: str = ""
     allow_anonymous: bool = False

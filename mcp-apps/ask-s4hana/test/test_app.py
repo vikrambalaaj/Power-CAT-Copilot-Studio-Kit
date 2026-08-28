@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 from types import SimpleNamespace
 
 from mcp.types import CallToolResult
@@ -19,7 +20,13 @@ class FakeSettings:
     s4_ar_entity = "AR_SRV/Set"
     s4_ap_entity = "AP_SRV/Set"
     s4_pl_entity = "PL_SRV/Set"
+    s4_pl_api_url = "https://s4.example.invalid/sap/opu/odata/pl"
+    s4_pl_gl_account_hierarchy = "ZVOP"
+    s4_pl_planning_category = "ACT01"
+    s4_budget_api_url = "https://s4.example.invalid/sap/opu/odata/budget"
     s4_budget_entity = "BUDGET_SRV/Set"
+    executing_identity = "velora-s4-finance-test-reader"
+    authorization_model = "MAKER_SERVICE_CREDENTIAL"
 
 
 class CapturingClient(S4Client):
@@ -41,6 +48,8 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(validate_relative_entity("SERVICE/EntitySet"), "SERVICE/EntitySet")
         with self.assertRaises(ValueError):
             validate_relative_entity("../private")
+        with self.assertRaises(ValueError):
+            validate_relative_entity("https://attacker.example/collect")
 
     def test_escaping_and_bounds(self):
         self.assertEqual(escape_odata("O'Reilly"), "O''Reilly")
@@ -75,17 +84,53 @@ class ToolTests(unittest.IsolatedAsyncioTestCase):
             },
         )
 
+    async def test_tool_schemas_do_not_require_variadic_kwargs(self):
+        exposed = await server.mcp.list_tools()
+        for tool in exposed:
+            self.assertNotIn("kwargs", tool.inputSchema.get("properties", {}))
+            self.assertNotIn("kwargs", tool.inputSchema.get("required", []))
+
     async def test_tool_returns_structured_content(self):
         original = tools.client
         fake = CapturingClient()
         tools.client = fake
         try:
-            result = await tools.s4__get_receivables_aging("1000", "2026-08-08")
+            result = await tools.s4__get_receivables_aging("1000", date.today().isoformat())
             self.assertIsInstance(result, CallToolResult)
             self.assertFalse(result.isError)
             self.assertEqual(result.structuredContent["type"], "ReceivablesAging")
             self.assertEqual(result.structuredContent["adaptiveCard"]["type"], "AdaptiveCard")
             self.assertEqual(result.structuredContent["adaptiveCard"]["version"], "1.5")
+        finally:
+            tools.client = original
+
+    async def test_upstream_error_is_reported_as_mcp_error(self):
+        result = tools.response({"status": "error", "code": "S4_UPSTREAM_ERROR", "message": "failed"})
+        self.assertTrue(result.isError)
+
+    async def test_historical_aging_date_fails_closed(self):
+        result = await tools.s4__get_receivables_aging("1000", "2020-01-01")
+        self.assertTrue(result.isError)
+        self.assertEqual(result.structuredContent["code"], "HISTORICAL_AGING_UNAVAILABLE")
+
+    async def test_invalid_finance_periods_return_structured_errors(self):
+        pl_result = await tools.s4__get_profit_and_loss(fiscal_year="20x6", fiscal_period="abc")
+        budget_result = await tools.s4__get_budget_variance(fiscal_period="17")
+        self.assertTrue(pl_result.isError)
+        self.assertEqual(pl_result.structuredContent["code"], "INVALID_FISCAL_PERIOD")
+        self.assertTrue(budget_result.isError)
+        self.assertEqual(budget_result.structuredContent["code"], "INVALID_FISCAL_PERIOD")
+
+    async def test_budget_uses_live_service_field_names(self):
+        original = tools.client
+        fake = CapturingClient()
+        tools.client = fake
+        try:
+            await tools.s4__get_budget_variance("1000", "2026", "008", "0")
+            filters = fake.call[1]["$filter"]
+            self.assertIn("FinMgmtAreaFiscalYear eq '2026'", filters)
+            self.assertIn("FinMgmtAreaPeriod eq '8'", filters)
+            self.assertNotIn("PlanVersion", filters)
         finally:
             tools.client = original
 
@@ -120,6 +165,16 @@ class MiddlewareTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(called)
         finally:
             server.settings = original
+
+
+class AppRouteTests(unittest.TestCase):
+    def test_native_mcp_and_legacy_rest_routes_are_available(self):
+        app = server.create_app()
+        route_paths = {getattr(route, "path", "") for route in app.routes}
+        self.assertIn("/mcp/tools", route_paths)
+        self.assertIn("/s4__get_payables_aging", route_paths)
+        self.assertIn("/tools/s4__get_payables_aging", route_paths)
+        self.assertIn("/", route_paths)
 
 
 if __name__ == "__main__":

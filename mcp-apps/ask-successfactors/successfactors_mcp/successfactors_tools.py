@@ -136,6 +136,7 @@ async def sf__get_emp_jobs(
     department: Optional[str] = None,
     business_unit: Optional[str] = None,
     job_title: Optional[str] = None,
+    job_code: Optional[str] = None,
     as_of_date: Optional[str] = None,
     top: int = 20,
 ) -> Any:
@@ -146,6 +147,7 @@ async def sf__get_emp_jobs(
         department=department,
         business_unit=business_unit,
         job_title=job_title,
+        job_code=job_code,
         as_of_date=as_of_date,
         top=top,
     )
@@ -721,4 +723,3 @@ TOOL_SPECS = [
 ]
 
 PROMPT_SPECS = []
-

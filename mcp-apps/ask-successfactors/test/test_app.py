@@ -115,6 +115,11 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("startDate=datetime'2026-08-01T00:00:00'", client.calls[2][1])
         self.assertIn("seqNumber=2L", client.calls[2][1])
 
+    async def test_emp_job_query_supports_exact_job_code_filter(self):
+        client = CapturingClient()
+        await client.list_emp_jobs(job_code="AV-ENG-04")
+        self.assertIn("jobCode eq 'AV-ENG-04'", client.calls[0][2]["$filter"])
+
     async def test_headcount_aggregation_pages_all_rows_and_uses_department_names(self):
         client = CapturingClient([
             {"results": [

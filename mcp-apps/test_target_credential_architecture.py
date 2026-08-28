@@ -70,14 +70,16 @@ async def test_req5_s4_error_safety_and_no_upstream_leakage():
     s4_s = S4Settings(_env_file=None, s4_api_url="https://fioriqas.velora.ae/sap/odata", s4_username="user", s4_password="pwd")
     client = S4Client(settings=s4_s)
 
-    res = await client._request("APageingData", {}, base_url="https://invalid-sap-host-12345.velora.ae")
-    assert res.get("status") == "error"
-    assert "upstream_body" not in res
-    assert "upstream_url" not in res
-    assert "upstream_params" not in res
-    assert res.get("code") in ("S4_CONNECTION_ERROR", "S4_UPSTREAM_ERROR")
-    assert res.get("message") == "S/4HANA request failed"
-    print("    [PASS] S/4HANA returns sanitized error responses without leaking internal URLs or bodies.")
+    try:
+        await client._request(
+            "APageingData",
+            {},
+            base_url="https://invalid-sap-host-12345.velora.ae",
+        )
+        assert False, "Unallowlisted SAP hosts must be rejected before a request is sent"
+    except ValueError as exc:
+        assert "not allowlisted" in str(exc)
+    print("    [PASS] S/4HANA rejects unallowlisted hosts before credentials or requests leave the service.")
 
 
 async def test_req6_sac_demo_mode_tagging_and_runtime_error():

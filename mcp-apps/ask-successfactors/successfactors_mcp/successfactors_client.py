@@ -328,12 +328,13 @@ class SuccessFactorsClient:
         department: Optional[str] = None,
         business_unit: Optional[str] = None,
         job_title: Optional[str] = None,
+        job_code: Optional[str] = None,
         as_of_date: Optional[str] = None,
         top: int = 20,
         executive_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Query headcount & position count (EmpJob), trimmed by SuccessFactors Role-Based Permissions (RBP)."""
-        if not any((user_id, company, department, business_unit, job_title)):
+        if not any((user_id, company, department, business_unit, job_title, job_code)):
             return {
                 "error": True,
                 "error_category": "validation",
@@ -350,6 +351,8 @@ class SuccessFactorsClient:
             filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
         if job_title:
             filters.append(f"substringof('{_escape_odata_string(job_title)}', jobTitle)")
+        if job_code:
+            filters.append(f"jobCode eq '{_escape_odata_string(job_code)}'")
 
         filter_str = " and ".join(filters) if filters else None
         select_fields = (

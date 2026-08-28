@@ -62,7 +62,7 @@ class ApiKeyMiddleware:
 
 
 async def health(_request):
-    return JSONResponse({"status": "ok", "service": "s4-finance-mcp-server", "version": "1.0.0"})
+    return JSONResponse({"status": "ok", "service": "s4-finance-mcp-server", "version": "1.1.6"})
 
 
 async def list_tools_endpoint(_request):
@@ -253,20 +253,24 @@ async def handle_mcp_endpoint(request):
 
 def create_app():
     from starlette.applications import Starlette
-    app = Starlette()
-    app.routes.append(Route("/", health, methods=["GET", "HEAD"]))
-    app.routes.append(Route("/health", health, methods=["GET", "HEAD"]))
-    app.routes.append(Route("/mcp", handle_mcp_endpoint, methods=["GET", "POST", "OPTIONS"]))
-    app.routes.append(Route("/mcp/", handle_mcp_endpoint, methods=["GET", "POST", "OPTIONS"]))
-    app.routes.append(Route("/mcp/tools", list_tools_endpoint, methods=["GET"]))
+    from starlette.routing import Mount
+
+    mcp_app = mcp.streamable_http_app()
+    routes = [
+        Route("/", health, methods=["GET", "HEAD"]),
+        Route("/health", health, methods=["GET", "HEAD"]),
+        Route("/mcp/tools", list_tools_endpoint, methods=["GET"]),
+    ]
     for name, _, _ in TOOL_SPECS:
-        app.routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
-        app.routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
-        # Also alias camelCase operationIds from swagger
+        routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
+        routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
         camel = "".join(part.capitalize() for part in name.replace("s4__", "").split("_"))
-        camel_op = "get" + camel.replace("Get", "")
-        if camel_op:
-            app.routes.append(Route(f"/{camel_op}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
+        routes.append(Route(f"/get{camel.replace('Get', '')}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
+    routes.append(Mount("/", app=mcp_app))
+    app = Starlette(
+        routes=routes,
+        lifespan=mcp_app.router.lifespan_context,
+    )
     app.add_middleware(ApiKeyMiddleware)
     origins = [value.strip() for value in settings.cors_origins.split(",") if value.strip()]
     if origins:

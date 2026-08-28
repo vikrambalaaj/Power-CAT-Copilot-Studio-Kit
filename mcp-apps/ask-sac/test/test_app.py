@@ -1,9 +1,20 @@
 import asyncio
 import unittest
 from sac_mcp.tools import get_sac_kpis, get_sac_story_analytics, get_sac_model_data
+from sac_mcp.cache import cache
+from sac_mcp.settings import settings
 
 
 class TestSACServer(unittest.TestCase):
+    def setUp(self):
+        self.original_demo_mode = settings.demo_mode
+        settings.demo_mode = True
+        cache.clear()
+
+    def tearDown(self):
+        cache.clear()
+        settings.demo_mode = self.original_demo_mode
+
     def test_get_sac_kpis(self):
         res = asyncio.run(get_sac_kpis(domain="FINANCE"))
         self.assertIn("structuredContent", res)

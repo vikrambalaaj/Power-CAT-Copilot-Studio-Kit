@@ -27,8 +27,6 @@ def bounded_top(value: int) -> int:
 
 def validate_relative_entity(value: str) -> str:
     entity = value.strip()
-    if entity.startswith("https://") or entity.startswith("http://"):
-        return entity
     entity = entity.strip("/")
     if not entity or not re.fullmatch(r"[A-Za-z0-9_./-]+", entity) or ".." in entity:
         raise ValueError("Configured S/4HANA entity path is invalid")
@@ -47,6 +45,28 @@ class S4Client:
         self._oauth_token = ""
         self._oauth_token_expires_at = 0.0
         self._oauth_lock = asyncio.Lock()
+
+    def _validated_base_url(self, value: str | None = None) -> str:
+        requested = (value or self.base_url).rstrip("/")
+        parsed = urlparse(requested)
+        configured = {
+            candidate.rstrip("/")
+            for candidate in (
+                self.base_url,
+                getattr(self.settings, "s4_budget_api_url", ""),
+                getattr(self.settings, "s4_pl_api_url", ""),
+            )
+            if candidate
+        }
+        if (
+            parsed.scheme != "https"
+            or not parsed.hostname
+            or parsed.username
+            or parsed.password
+            or requested not in configured
+        ):
+            raise ValueError("S/4HANA base URL is not allowlisted")
+        return requested
 
     def validate(self) -> list[str]:
         errors: list[str] = []
@@ -115,22 +135,14 @@ class S4Client:
 
     async def _request(self, entity: str, params: dict[str, Any], base_url: str | None = None) -> dict[str, Any]:
         if entity == "$metadata":
-            url = f"{(base_url or self.base_url).rstrip('/')}/$metadata"
+            url = f"{self._validated_base_url(base_url)}/$metadata"
             params = {}
         elif entity:
             path = validate_relative_entity(entity)
-            if path.startswith("https://") or path.startswith("http://"):
-                parsed_p = urlparse(path)
-                url = f"{parsed_p.scheme}://{parsed_p.netloc}{parsed_p.path.rstrip('/')}"
-            elif path.startswith("/"):
-                effective_base = (base_url or self.base_url).rstrip("/")
-                parsed_b = urlparse(effective_base)
-                url = f"{parsed_b.scheme}://{parsed_b.netloc}{path}"
-            else:
-                effective_base = (base_url or self.base_url).rstrip("/")
-                url = f"{effective_base}/{path}"
+            effective_base = self._validated_base_url(base_url)
+            url = f"{effective_base}/{path}"
         else:
-            url = (base_url or self.base_url).rstrip("/")
+            url = self._validated_base_url(base_url)
             params = {}
         safe_params = dict(params)
         if getattr(self.settings, "s4_sap_client", ""):
@@ -181,7 +193,130 @@ class S4Client:
                 rows = []
                 count = 0
             return {"rows": rows, "count": count}
-        except (httpx.HTTPError, ValueError, RuntimeError) as error:
+        except (httpx.HTTPError, ValueError, RuntimeError, json.JSONDecodeError) as error:
+            return {
+                "status": "error",
+                "code": "S4_CONNECTION_ERROR",
+                "message": "S/4HANA request failed",
+                "retryable": isinstance(error, httpx.HTTPError),
+            }
+
+    async def query_profit_and_loss(
+        self,
+        *,
+        company_code: str,
+        fiscal_year: str,
+        fiscal_period: str,
+        ledger: str,
+        profit_center: str | None = None,
+        correlation_id: str | None = None,
+        top: int = 100,
+    ) -> dict[str, Any]:
+        """Query the allowlisted SAP financial-statement KPI analytical service."""
+        if not re.fullmatch(r"\d{4}", fiscal_year):
+            raise ValueError("Fiscal year must contain four digits")
+        period_number = int(fiscal_period)
+        if period_number < 1 or period_number > 16:
+            raise ValueError("Fiscal period must be between 1 and 16")
+
+        base_url = self._validated_base_url(self.settings.s4_pl_api_url)
+        entity = validate_relative_entity(self.settings.s4_pl_entity)
+        planning_category = escape_odata(self.settings.s4_pl_planning_category)
+        path = (
+            f"{entity}(P_ToFiscalPeriod='{period_number}',"
+            f"P_PlanningCategory='{planning_category}')/Results"
+        )
+        filters: dict[str, str | None] = {
+            "CompanyCode": company_code,
+            "Ledger": ledger,
+            "LedgerFiscalYear": fiscal_year,
+            "GLAccountHierarchy": self.settings.s4_pl_gl_account_hierarchy,
+            "ProfitCenter": profit_center,
+        }
+        clauses = [f"{key} eq '{escape_odata(value)}'" for key, value in filters.items() if value]
+        params: dict[str, Any] = {
+            "$top": bounded_top(top),
+            "$inlinecount": "allpages",
+            "$format": "json",
+            "$filter": " and ".join(clauses),
+        }
+        cache_key = hashlib.sha256(
+            json.dumps({"baseUrl": base_url, "path": path, "params": params}, sort_keys=True).encode()
+        ).hexdigest()
+        result, cache_info = await self._read_cache.get_or_load(
+            cache_key,
+            lambda: self._request_parameterized(path, params, base_url),
+            cacheable=lambda value: value.get("status") != "error",
+        )
+        if result.get("status") == "error":
+            result["correlationId"] = correlation_id or ""
+            result["audit"] = {
+                "correlationId": correlation_id or "",
+                "executingIdentity": self.settings.executing_identity,
+                "authorizationModel": self.settings.authorization_model,
+            }
+            result["cache"] = cache_info.as_dict()
+            return result
+        return {
+            "status": "success",
+            "data": {"records": result["rows"], "total": result["count"]},
+            "source": {
+                "system": "SAP S/4HANA",
+                "object": entity,
+                "asOf": cache_info.stored_at or datetime.now(timezone.utc).isoformat(),
+            },
+            "query": {
+                "filters": {key: value for key, value in filters.items() if value},
+                "period": f"{fiscal_year}-{period_number:03d}",
+            },
+            "quality": {
+                "complete": len(result["rows"]) >= result["count"],
+                "sampled": len(result["rows"]) < result["count"],
+                "confidence": "high",
+                "warnings": [],
+            },
+            "audit": {
+                "correlationId": correlation_id or "",
+                "executingIdentity": self.settings.executing_identity,
+                "authorizationModel": self.settings.authorization_model,
+            },
+            "cache": cache_info.as_dict(),
+            "type": "ProfitAndLoss",
+        }
+
+    async def _request_parameterized(
+        self,
+        path: str,
+        params: dict[str, Any],
+        base_url: str,
+    ) -> dict[str, Any]:
+        """Execute a server-constructed analytical path against an allowlisted SAP service."""
+        if not path.startswith(f"{validate_relative_entity(self.settings.s4_pl_entity)}(") or not path.endswith(")/Results"):
+            raise ValueError("Parameterized S/4HANA path is invalid")
+        url = f"{self._validated_base_url(base_url)}/{path}"
+        try:
+            authorization = await self._authorization()
+            verify_opt = self.settings.s4_ca_bundle if self.settings.s4_ca_bundle else self.settings.s4_verify_tls
+            safe_params = dict(params)
+            if self.settings.s4_sap_client:
+                safe_params.setdefault("sap-client", self.settings.s4_sap_client)
+            async with httpx.AsyncClient(timeout=60.0, verify=verify_opt) as client:
+                response = await client.get(
+                    url,
+                    params=safe_params,
+                    headers={"Authorization": authorization, "Accept": "application/json"},
+                )
+            if response.status_code >= 400:
+                return {
+                    "status": "error",
+                    "code": "S4_UPSTREAM_ERROR",
+                    "message": "S/4HANA request failed",
+                    "retryable": response.status_code in {408, 429, 500, 502, 503, 504},
+                }
+            payload = response.json().get("d", {})
+            rows = payload.get("results", [])
+            return {"rows": rows, "count": int(payload.get("__count", len(rows)))}
+        except (httpx.HTTPError, ValueError, RuntimeError, json.JSONDecodeError) as error:
             return {
                 "status": "error",
                 "code": "S4_CONNECTION_ERROR",
@@ -204,7 +339,7 @@ class S4Client:
         params: dict[str, Any] = {"$top": bounded_top(top), "$count": "true"}
         if clauses:
             params["$filter"] = " and ".join(clauses)
-        effective_base = (override_base_url or self.base_url).rstrip("/")
+        effective_base = self._validated_base_url(override_base_url)
         key_payload = {
             "baseUrl": effective_base,
             "authMode": self.settings.s4_auth_mode,
@@ -246,5 +381,3 @@ class S4Client:
             "cache": cache_info.as_dict(),
             "type": capability,
         }
-
-

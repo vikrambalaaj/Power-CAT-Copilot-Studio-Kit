@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from typing import Any
 
 from mcp.types import CallToolResult, TextContent
@@ -115,8 +116,24 @@ def response(data: dict[str, Any]) -> CallToolResult:
     return CallToolResult(
         content=[TextContent(type="text", text=text_summary)],
         structuredContent=data,
-        isError=False,
+        isError=data.get("status") == "error",
     )
+
+
+def live_key_date_error(key_date: str | None) -> dict[str, Any] | None:
+    if not key_date:
+        return None
+    try:
+        requested = date.fromisoformat(key_date)
+    except ValueError:
+        return {"status": "error", "code": "INVALID_KEY_DATE", "message": "Key date must use YYYY-MM-DD."}
+    if requested != date.today():
+        return {
+            "status": "error",
+            "code": "HISTORICAL_AGING_UNAVAILABLE",
+            "message": "This SAP aging service supports only the current live key date.",
+        }
+    return None
 
 
 async def s4__get_receivables_aging(
@@ -126,13 +143,14 @@ async def s4__get_receivables_aging(
     currency: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
-    **kwargs: Any,
 ) -> Any:
     """Return allowlisted S/4HANA receivables-aging records for an executive summary."""
-    comp = company_code or kwargs.get("companyCode") or "1000"
-    cust = customer or kwargs.get("customerName") or kwargs.get("Customer")
-    curr = currency or kwargs.get("Currency")
-    date_val = key_date or kwargs.get("keyDate") or kwargs.get("period")
+    comp = company_code or "1000"
+    cust = customer
+    curr = currency
+    date_val = key_date
+    if key_date_error := live_key_date_error(date_val):
+        return response(key_date_error)
     
     filters = {"CompanyCode": str(comp)}
     if cust:
@@ -145,7 +163,7 @@ async def s4__get_receivables_aging(
         filters,
         period=date_val,
         currency=curr,
-        correlation_id=correlation_id or kwargs.get("correlationId"),
+        correlation_id=correlation_id,
         top=top,
     ))
 
@@ -157,13 +175,14 @@ async def s4__get_payables_aging(
     currency: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
-    **kwargs: Any,
 ) -> Any:
     """Return allowlisted S/4HANA payables-aging records for an executive summary."""
-    comp = company_code or kwargs.get("companyCode") or "1000"
-    supp = supplier or kwargs.get("supplierName") or kwargs.get("Supplier")
-    curr = currency or kwargs.get("Currency")
-    date_val = key_date or kwargs.get("keyDate") or kwargs.get("period")
+    comp = company_code or "1000"
+    supp = supplier
+    curr = currency
+    date_val = key_date
+    if key_date_error := live_key_date_error(date_val):
+        return response(key_date_error)
     
     filters = {"CompanyCode": str(comp)}
     if supp:
@@ -176,36 +195,43 @@ async def s4__get_payables_aging(
         filters,
         period=date_val,
         currency=curr,
-        correlation_id=correlation_id or kwargs.get("correlationId"),
+        correlation_id=correlation_id,
         top=top,
     ))
 
 
 async def s4__get_profit_and_loss(
-    company_code: str = "1000",
-    fiscal_year: str = "2026",
-    fiscal_period: str = "006",
+    company_code: str | None = None,
+    fiscal_year: str | None = None,
+    fiscal_period: str | None = None,
     ledger: str = "0L",
     currency: str | None = None,
     profit_center: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
-    **kwargs: Any,
 ) -> Any:
     """Return an allowlisted S/4HANA profit-and-loss view for the requested period."""
-    comp = company_code or kwargs.get("companyCode") or "1000"
-    year = fiscal_year or kwargs.get("fiscalYear") or "2026"
-    period_val = fiscal_period or kwargs.get("fiscalPeriod") or "006"
-    period = f"{year}-{period_val}"
-    return response(await client.query(
-        client.settings.s4_pl_entity,
-        "ProfitAndLoss",
-        {"CompanyCode": comp, "FiscalYear": year, "FiscalPeriod": period_val, "Ledger": ledger, "Currency": currency, "ProfitCenter": profit_center},
-        period=period,
-        currency=currency,
-        correlation_id=correlation_id or kwargs.get("correlationId"),
-        top=top,
-    ))
+    comp = company_code or "1000"
+    today = date.today()
+    year = fiscal_year or str(today.year)
+    period_val = fiscal_period or f"{today.month:03d}"
+    try:
+        result = await client.query_profit_and_loss(
+            company_code=comp,
+            fiscal_year=year,
+            fiscal_period=period_val,
+            ledger=ledger,
+            profit_center=profit_center,
+            correlation_id=correlation_id,
+            top=top,
+        )
+    except (TypeError, ValueError):
+        result = {
+            "status": "error",
+            "code": "INVALID_FISCAL_PERIOD",
+            "message": "Fiscal year must contain four digits and fiscal period must be between 1 and 16.",
+        }
+    return response(result)
 
 
 async def s4__get_budget_variance(
@@ -217,33 +243,51 @@ async def s4__get_budget_variance(
     cost_center: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
-    entity: str | None = None,
-    **kwargs: Any,
 ) -> Any:
     """Return allowlisted S/4HANA budget-versus-actual records for the requested period."""
-    comp = company_code or kwargs.get("companyCode") or "1000"
-    year = fiscal_year or kwargs.get("fiscalYear") or "2026"
-    period_val = fiscal_period or kwargs.get("fiscalPeriod")
-    period = f"{year}-{period_val or ''}".strip("-") or None
+    comp = company_code or "1000"
+    today = date.today()
+    year = fiscal_year or str(today.year)
+    period_val = fiscal_period or f"{today.month:03d}"
+    period = f"{year}-{period_val}"
+    if len(year) != 4 or not year.isdigit():
+        return response({
+            "status": "error",
+            "code": "INVALID_FISCAL_YEAR",
+            "message": "Fiscal year must contain four digits.",
+        })
+    try:
+        period_number = int(period_val)
+    except (TypeError, ValueError):
+        return response({
+            "status": "error",
+            "code": "INVALID_FISCAL_PERIOD",
+            "message": "Fiscal period must be between 1 and 16.",
+        })
+    if period_number < 1 or period_number > 16:
+        return response({
+            "status": "error",
+            "code": "INVALID_FISCAL_PERIOD",
+            "message": "Fiscal period must be between 1 and 16.",
+        })
     filters = {"CompanyCode": str(comp)}
     if year:
-        filters["FiscalYear"] = str(year)
+        filters["FinMgmtAreaFiscalYear"] = str(year)
     if period_val:
-        filters["FiscalPeriod"] = str(period_val)
-    if plan_version:
-        filters["PlanVersion"] = plan_version
+        filters["FinMgmtAreaPeriod"] = str(period_number)
+    if plan_version and plan_version != "0":
+        filters["BudgetVersion"] = plan_version
     if cost_center:
         filters["CostCenter"] = cost_center
     if currency:
         filters["Currency"] = currency
-    target_entity = entity or client.settings.s4_budget_entity or "BudgetConsmData"
     return response(await client.query(
-        target_entity,
+        client.settings.s4_budget_entity,
         "BudgetVariance",
         filters,
         period=period,
         currency=currency,
-        correlation_id=correlation_id or kwargs.get("correlationId"),
+        correlation_id=correlation_id,
         top=top,
         override_base_url=client.settings.s4_budget_api_url or None,
     ))
