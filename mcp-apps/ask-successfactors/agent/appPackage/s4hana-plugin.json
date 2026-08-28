@@ -21,6 +21,17 @@
                         "file": "adaptive-cards/receivables-aging.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing receivables aging parameters, key date, and currency..."
+                },
+                "executing": {
+                    "description": "[SAP S/4HANA Finance MCP] Querying general ledger to calculate overdue aging buckets..."
+                },
+                "responding": {
+                    "description": "Synthesizing aging exposures and rendering Accounts Receivable Card..."
+                }
             }
         },
         {
@@ -37,6 +48,17 @@
                     "static_template": {
                         "file": "adaptive-cards/payables-aging.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing accounts payable parameters and vendor liability filters..."
+                },
+                "executing": {
+                    "description": "[SAP S/4HANA Finance MCP] Querying Accounts Payable general ledger..."
+                },
+                "responding": {
+                    "description": "Synthesizing supplier liabilities and rendering Accounts Payable Card..."
                 }
             }
         },
@@ -55,6 +77,17 @@
                         "file": "adaptive-cards/profit-and-loss.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Resolving fiscal year, accounting period, and general ledger..."
+                },
+                "executing": {
+                    "description": "[SAP S/4HANA Finance MCP] Querying General Ledger for revenues, COGS, and operating profit..."
+                },
+                "responding": {
+                    "description": "Synthesizing P&L statement and rendering Financial Summary Card..."
+                }
             }
         },
         {
@@ -71,6 +104,17 @@
                     "static_template": {
                         "file": "adaptive-cards/budget-variance.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Comparing budget plan version against actual ledger postings..."
+                },
+                "executing": {
+                    "description": "[SAP S/4HANA Finance MCP] Calculating budget utilization and variance percentages..."
+                },
+                "responding": {
+                    "description": "Rendering Budget vs. Actual Variance Analysis Card..."
                 }
             }
         }

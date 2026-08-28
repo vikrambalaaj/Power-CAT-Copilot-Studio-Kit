@@ -38,6 +38,156 @@
           }
         }
       }
+    },
+    "/s4__get_receivables_aging": {
+      "post": {
+        "summary": "Retrieve accounts receivable aging from SAP S/4HANA",
+        "operationId": "getReceivablesAging",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "company_code": {
+                  "type": "string",
+                  "description": "Company code, e.g. 1000"
+                },
+                "key_date": {
+                  "type": "string",
+                  "description": "Key date YYYY-MM-DD"
+                },
+                "customer": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string",
+                  "default": "AED"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Receivables aging dataset with Adaptive Card"
+          }
+        }
+      }
+    },
+    "/s4__get_payables_aging": {
+      "post": {
+        "summary": "Retrieve accounts payable aging from SAP S/4HANA",
+        "operationId": "getPayablesAging",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "company_code": {
+                  "type": "string"
+                },
+                "key_date": {
+                  "type": "string"
+                },
+                "supplier": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string",
+                  "default": "AED"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payables aging dataset with Adaptive Card"
+          }
+        }
+      }
+    },
+    "/s4__get_profit_and_loss": {
+      "post": {
+        "summary": "Retrieve Profit and Loss statement from SAP S/4HANA",
+        "operationId": "getProfitAndLoss",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "company_code": {
+                  "type": "string"
+                },
+                "fiscal_year": {
+                  "type": "string"
+                },
+                "fiscal_period": {
+                  "type": "string"
+                },
+                "ledger": {
+                  "type": "string",
+                  "default": "0L"
+                },
+                "currency": {
+                  "type": "string",
+                  "default": "AED"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "P&L statement summary with Adaptive Card"
+          }
+        }
+      }
+    },
+    "/s4__get_budget_variance": {
+      "post": {
+        "summary": "Retrieve budget versus actuals variance from SAP S/4HANA",
+        "operationId": "getBudgetVariance",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "company_code": {
+                  "type": "string"
+                },
+                "fiscal_year": {
+                  "type": "string"
+                },
+                "fiscal_period": {
+                  "type": "string"
+                },
+                "plan_version": {
+                  "type": "string",
+                  "default": "0"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Budget variance analysis"
+          }
+        }
+      }
     }
   }
 }

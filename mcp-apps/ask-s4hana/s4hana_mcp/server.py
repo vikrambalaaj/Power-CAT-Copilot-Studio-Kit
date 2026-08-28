@@ -51,12 +51,58 @@ class ApiKeyMiddleware:
 
 
 async def health(_request):
-    return JSONResponse({"status": "ok"})
+    return JSONResponse({"status": "ok", "service": "s4-finance-mcp-server", "version": "1.0.0"})
+
+
+async def list_tools_endpoint(_request):
+    tools = [
+        {"name": name, "description": desc, "parameters": {}}
+        for name, desc, _ in TOOL_SPECS
+    ]
+    return JSONResponse({"tools": tools})
+
+
+def _extract_args(request):
+    pass
+
+
+async def handle_tool_rest(request):
+    path = request.url.path.strip("/").split("/")[-1]
+    tool_entry = next((item for item in TOOL_SPECS if item[0] == path), None)
+    if not tool_entry:
+        return JSONResponse({"error": f"Tool '{path}' not found"}, status_code=404)
+    _, _, handler = tool_entry
+
+    # Extract args from query or body
+    args = dict(request.query_params)
+    if request.method == "POST":
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                args.update(body.get("arguments", body.get("params", body)))
+        except Exception:
+            pass
+
+    try:
+        res = await handler(**args)
+        if hasattr(res, "structuredContent") and res.structuredContent:
+            return JSONResponse(res.structuredContent)
+        elif hasattr(res, "content") and res.content:
+            import json
+            return JSONResponse(json.loads(res.content[0].text))
+        return JSONResponse({"result": res, "status": "success"})
+    except Exception as ex:
+        log.error(f"Error executing tool {path}: {ex}", exc_info=True)
+        return JSONResponse({"error": str(ex), "status": "error"}, status_code=500)
 
 
 def create_app():
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", health, methods=["GET"]))
+    app.routes.append(Route("/mcp/tools", list_tools_endpoint, methods=["GET"]))
+    for name, _, _ in TOOL_SPECS:
+        app.routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST"]))
+        app.routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST"]))
     app.add_middleware(ApiKeyMiddleware)
     origins = [value.strip() for value in settings.cors_origins.split(",") if value.strip()]
     if origins:

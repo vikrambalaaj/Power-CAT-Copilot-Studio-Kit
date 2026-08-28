@@ -88,7 +88,7 @@ async def s4__get_budget_variance(
     company_code: str,
     fiscal_year: str,
     fiscal_period: str,
-    plan_version: str,
+    plan_version: str = "0",
     currency: str | None = None,
     cost_center: str | None = None,
     correlation_id: str | None = None,
@@ -97,14 +97,16 @@ async def s4__get_budget_variance(
     """Return allowlisted S/4HANA budget-versus-actual records for the requested period."""
     period = f"{fiscal_year}-{fiscal_period}"
     return response(await client.query(
-        client.settings.s4_budget_entity,
+        client.settings.s4_budget_entity or "BudgetConsumption",
         "BudgetVariance",
         {"CompanyCode": company_code, "FiscalYear": fiscal_year, "FiscalPeriod": fiscal_period, "PlanVersion": plan_version, "Currency": currency, "CostCenter": cost_center},
         period=period,
         currency=currency,
         correlation_id=correlation_id,
         top=top,
+        override_base_url=client.settings.s4_budget_api_url or None,
     ))
+
 
 
 TOOL_SPECS = [

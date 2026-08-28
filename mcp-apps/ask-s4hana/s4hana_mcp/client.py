@@ -26,7 +26,10 @@ def bounded_top(value: int) -> int:
 
 
 def validate_relative_entity(value: str) -> str:
-    entity = value.strip().strip("/")
+    entity = value.strip()
+    if entity.startswith("https://") or entity.startswith("http://"):
+        return entity
+    entity = entity.strip("/")
     if not entity or not re.fullmatch(r"[A-Za-z0-9_./-]+", entity) or ".." in entity:
         raise ValueError("Configured S/4HANA entity path is invalid")
     return entity
@@ -62,11 +65,22 @@ class S4Client:
             not self.settings.s4_username or not self.settings.s4_password
         ):
             errors.append("S4_USERNAME and S4_PASSWORD are required for basic mode")
-        for name in ("s4_ar_entity", "s4_ap_entity", "s4_pl_entity", "s4_budget_entity"):
-            try:
-                validate_relative_entity(getattr(self.settings, name))
-            except ValueError:
-                errors.append(f"{name.upper()} is missing or invalid")
+        for name in ("s4_ar_entity", "s4_ap_entity"):
+            val = getattr(self.settings, name, "")
+            if val:
+                try:
+                    validate_relative_entity(val)
+                except ValueError:
+                    errors.append(f"{name.upper()} is invalid")
+            else:
+                errors.append(f"{name.upper()} is missing")
+        for name in ("s4_pl_entity", "s4_budget_entity"):
+            val = getattr(self.settings, name, "")
+            if val:
+                try:
+                    validate_relative_entity(val)
+                except ValueError:
+                    errors.append(f"{name.upper()} is invalid")
         return errors
 
     async def _authorization(self) -> str:
@@ -99,18 +113,33 @@ class S4Client:
             self._oauth_token_expires_at = monotonic() + max(1, expires_in - skew)
             return f"Bearer {token}"
 
-    async def _request(self, entity: str, params: dict[str, Any]) -> dict[str, Any]:
+    async def _request(self, entity: str, params: dict[str, Any], base_url: str | None = None) -> dict[str, Any]:
         path = validate_relative_entity(entity)
-        url = f"{self.base_url}/{path}"
+        if path.startswith("https://") or path.startswith("http://"):
+            parsed_p = urlparse(path)
+            url = f"{parsed_p.scheme}://{parsed_p.netloc}{parsed_p.path.rstrip('/')}"
+        elif path.startswith("/"):
+            effective_base = (base_url or self.base_url).rstrip("/")
+            parsed_b = urlparse(effective_base)
+            url = f"{parsed_b.scheme}://{parsed_b.netloc}{path}"
+        else:
+            effective_base = (base_url or self.base_url).rstrip("/")
+            url = f"{effective_base}/{path}"
         safe_params = dict(params)
+        if getattr(self.settings, "s4_sap_client", ""):
+            safe_params.setdefault("sap-client", self.settings.s4_sap_client)
         safe_params.setdefault("$format", "json")
         try:
             authorization = await self._authorization()
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
                 response = await client.get(
                     url,
                     params=safe_params,
-                    headers={"Authorization": authorization, "Accept": "application/json"},
+                    headers={
+                        "Authorization": authorization,
+                        "Accept": "application/json",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) VeloraS4MCP/1.0",
+                    },
                 )
             if response.status_code >= 400:
                 return {
@@ -120,9 +149,31 @@ class S4Client:
                     "retryable": response.status_code in {408, 429, 500, 502, 503, 504},
                 }
             payload = response.json()
-            data = payload.get("d", payload)
-            rows = data.get("results", []) if isinstance(data, dict) else []
-            return {"rows": rows, "count": int(data.get("__count", len(rows))) if isinstance(data, dict) else 0}
+            if isinstance(payload, dict):
+                if "value" in payload and isinstance(payload["value"], list):
+                    rows = payload["value"]
+                    count = int(payload.get("@odata.count", len(rows)))
+                elif "d" in payload:
+                    data = payload["d"]
+                    if isinstance(data, dict):
+                        rows = data.get("results", [])
+                        count = int(data.get("__count", len(rows)))
+                    elif isinstance(data, list):
+                        rows = data
+                        count = len(rows)
+                    else:
+                        rows = []
+                        count = 0
+                else:
+                    rows = payload.get("results", [])
+                    count = int(payload.get("__count", len(rows)))
+            elif isinstance(payload, list):
+                rows = payload
+                count = len(rows)
+            else:
+                rows = []
+                count = 0
+            return {"rows": rows, "count": count}
         except (httpx.HTTPError, ValueError, RuntimeError) as error:
             return {
                 "status": "error",
@@ -140,13 +191,15 @@ class S4Client:
         currency: str | None = None,
         correlation_id: str | None = None,
         top: int = 100,
+        override_base_url: str | None = None,
     ) -> dict[str, Any]:
         clauses = [f"{key} eq '{escape_odata(value)}'" for key, value in filters.items() if value]
         params: dict[str, Any] = {"$top": bounded_top(top), "$inlinecount": "allpages"}
         if clauses:
             params["$filter"] = " and ".join(clauses)
+        effective_base = (override_base_url or self.base_url).rstrip("/")
         key_payload = {
-            "baseUrl": self.base_url,
+            "baseUrl": effective_base,
             "authMode": self.settings.s4_auth_mode,
             "entity": entity,
             "params": params,
@@ -156,7 +209,7 @@ class S4Client:
         ).hexdigest()
         result, cache_info = await self._read_cache.get_or_load(
             cache_key,
-            lambda: self._request(entity, params),
+            lambda: self._request(entity, params, base_url=effective_base),
             cacheable=lambda value: value.get("status") != "error",
         )
         if result.get("status") == "error":
@@ -180,3 +233,4 @@ class S4Client:
             "cache": cache_info.as_dict(),
             "type": capability,
         }
+

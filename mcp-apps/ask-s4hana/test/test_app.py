@@ -28,10 +28,11 @@ class CapturingClient(S4Client):
         self.call = None
         self.call_count = 0
 
-    async def _request(self, entity, params):
+    async def _request(self, entity, params, base_url=None):
         self.call_count += 1
         self.call = (entity, params)
         return {"rows": [{"Amount": 10}], "count": 1}
+
 
 
 class ClientTests(unittest.IsolatedAsyncioTestCase):
