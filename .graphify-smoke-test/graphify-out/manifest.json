@@ -1,0 +1,14 @@
+{
+  "app.js": {
+    "mtime": 1787901977.5226157,
+    "seen": 1787901992.20401,
+    "ast_hash": "2baa651af8d886311a5035b43357dcbe",
+    "semantic_hash": ""
+  },
+  "service.js": {
+    "mtime": 1787901977.52078,
+    "seen": 1787901992.2040162,
+    "ast_hash": "3ce3364cafab33313a298e8e1d4611f3",
+    "semantic_hash": ""
+  }
+}

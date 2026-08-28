@@ -1,0 +1,115 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "id": "app_customersummary",
+      "label": "customerSummary()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "customersummary()",
+      "source_file": "app.js",
+      "source_location": "L3"
+    },
+    {
+      "id": "service_loadcustomer",
+      "label": "loadCustomer()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "loadcustomer()",
+      "source_file": "service.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "app",
+      "label": "app.js",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "app.js",
+      "source_file": "app.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "service",
+      "label": "service.js",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "service.js",
+      "source_file": "service.js",
+      "source_location": "L1"
+    }
+  ],
+  "links": [
+    {
+      "source": "app_customersummary",
+      "target": "service_loadcustomer",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app.js",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "service_loadcustomer",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "service",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "app.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_customersummary",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.js",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "service",
+      "target": "service_loadcustomer",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "service.js",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "5d8ce0cea45ed98151a2bc4334d9b7de4f8b964b"
+}

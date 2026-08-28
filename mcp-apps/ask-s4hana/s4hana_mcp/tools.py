@@ -12,10 +12,106 @@ from .adaptive_cards import decorate as decorate_with_card
 client = S4Client()
 
 
+def build_text_summary(data: dict[str, Any]) -> str:
+    if data.get("status") == "error":
+        return f"SAP S/4HANA Error: {data.get('message', 'Unable to retrieve records.')}"
+    
+    result_type = data.get("type", "")
+    records = data.get("data", {}).get("records", [])
+    total_count = data.get("data", {}).get("total", len(records))
+    filters = data.get("query", {}).get("filters", {})
+    comp_code = filters.get("CompanyCode", "1000")
+    
+    if result_type == "PayablesAging":
+        total_open = 0.0
+        b0_30 = 0.0
+        b31_90 = 0.0
+        b91_180 = 0.0
+        b180_plus = 0.0
+        supplier_totals: dict[str, float] = {}
+        
+        for r in records:
+            amt = abs(float(r.get("OpenAmount") or 0.0))
+            total_open += amt
+            days = int(r.get("DaysOverdue") or 0)
+            if days <= 30:
+                b0_30 += amt
+            elif days <= 90:
+                b31_90 += amt
+            elif days <= 180:
+                b91_180 += amt
+            else:
+                b180_plus += amt
+            
+            sup_name = r.get("SupplierName") or r.get("Supplier") or "Unknown Supplier"
+            supplier_totals[sup_name] = supplier_totals.get(sup_name, 0.0) + amt
+            
+        top_suppliers = sorted(supplier_totals.items(), key=lambda x: x[1], reverse=True)[:5]
+        top_sup_str = "\n".join([f"  • {name}: AED {amt:,.2f}" for name, amt in top_suppliers]) or "  • None reported"
+        
+        return (
+            f"### SAP S/4HANA Accounts Payable Aging Summary\n"
+            f"• **Company Code**: {comp_code}\n"
+            f"• **Total Open Records**: {total_count:,}\n"
+            f"• **Sampled Open Balance**: AED {total_open:,.2f}\n\n"
+            f"**Aging Buckets**:\n"
+            f"  • Current (0–30 days): AED {b0_30:,.2f}\n"
+            f"  • 31–90 days: AED {b31_90:,.2f}\n"
+            f"  • 91–180 days: AED {b91_180:,.2f}\n"
+            f"  • Over 180 days: AED {b180_plus:,.2f}\n\n"
+            f"**Top Suppliers by Open Balance**:\n{top_sup_str}\n\n"
+            f"*Source: SAP S/4HANA*"
+        )
+    
+    if result_type == "ReceivablesAging":
+        total_open = 0.0
+        b0_30 = 0.0
+        b31_90 = 0.0
+        b91_180 = 0.0
+        b180_plus = 0.0
+        cust_totals: dict[str, float] = {}
+        
+        for r in records:
+            amt = abs(float(r.get("OpenAmount") or 0.0))
+            total_open += amt
+            days = int(r.get("DaysOverdue") or 0)
+            if days <= 30:
+                b0_30 += amt
+            elif days <= 90:
+                b31_90 += amt
+            elif days <= 180:
+                b91_180 += amt
+            else:
+                b180_plus += amt
+            
+            cust_name = r.get("CustomerName") or r.get("Customer") or "Unknown Customer"
+            cust_totals[cust_name] = cust_totals.get(cust_name, 0.0) + amt
+            
+        top_customers = sorted(cust_totals.items(), key=lambda x: x[1], reverse=True)[:5]
+        top_cust_str = "\n".join([f"  • {name}: AED {amt:,.2f}" for name, amt in top_customers]) or "  • None reported"
+        
+        return (
+            f"### SAP S/4HANA Accounts Receivable Aging Summary\n"
+            f"• **Company Code**: {comp_code}\n"
+            f"• **Total Open Records**: {total_count:,}\n"
+            f"• **Sampled Open Balance**: AED {total_open:,.2f}\n\n"
+            f"**Aging Buckets**:\n"
+            f"  • Current (0–30 days): AED {b0_30:,.2f}\n"
+            f"  • 31–90 days: AED {b31_90:,.2f}\n"
+            f"  • 91–180 days: AED {b91_180:,.2f}\n"
+            f"  • Over 180 days: AED {b180_plus:,.2f}\n\n"
+            f"**Top Customers by Balance**:\n{top_cust_str}\n\n"
+            f"*Source: SAP S/4HANA*"
+        )
+        
+    return json.dumps(data, ensure_ascii=False, default=str)
+
+
 def response(data: dict[str, Any]) -> CallToolResult:
     data = decorate_with_card(data)
+    text_summary = build_text_summary(data)
     return CallToolResult(
-        content=[TextContent(type="text", text=json.dumps(data, ensure_ascii=False, default=str))],
+        content=[TextContent(type="text", text=text_summary)],
         structuredContent=data,
         isError=data.get("status") == "error",
     )

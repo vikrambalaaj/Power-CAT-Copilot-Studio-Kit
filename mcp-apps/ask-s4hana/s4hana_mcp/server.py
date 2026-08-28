@@ -94,10 +94,154 @@ async def handle_tool_rest(request):
         return JSONResponse({"error": str(ex), "status": "error"}, status_code=500)
 
 
+MCP_TOOLS = [
+    {
+        "name": "s4__get_receivables_aging",
+        "description": "Retrieve permission-trimmed accounts-receivable aging from SAP S/4HANA.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
+                "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
+                "customer": {"type": "string", "description": "Customer number or name"},
+                "currency": {"type": "string", "description": "Currency, default AED"},
+            },
+        },
+    },
+    {
+        "name": "s4__get_payables_aging",
+        "description": "Retrieve permission-trimmed accounts-payable aging from SAP S/4HANA.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
+                "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
+                "supplier": {"type": "string", "description": "Supplier number or name"},
+                "currency": {"type": "string", "description": "Currency, default AED"},
+            },
+        },
+    },
+    {
+        "name": "s4__get_profit_and_loss",
+        "description": "Retrieve a sourced profit-and-loss view from SAP S/4HANA.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
+                "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
+                "fiscal_period": {"type": "string", "description": "Fiscal period, e.g. 008"},
+                "ledger": {"type": "string", "description": "Ledger, default 0L"},
+                "currency": {"type": "string", "description": "Currency, default AED"},
+            },
+        },
+    },
+    {
+        "name": "s4__get_budget_variance",
+        "description": "Retrieve sourced budget-versus-actual variance records from SAP S/4HANA.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
+                "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
+                "fiscal_period": {"type": "string", "description": "Fiscal period, e.g. 008"},
+                "plan_version": {"type": "string", "description": "Plan version, default 0"},
+            },
+        },
+    },
+]
+
+
+async def handle_mcp_endpoint(request):
+    if request.method == "GET":
+        return JSONResponse({"tools": MCP_TOOLS})
+    
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+    
+    req_id = body.get("id")
+    method = body.get("method", "")
+    
+    if method == "initialize":
+        return JSONResponse({
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {
+                    "tools": {"listChanged": False},
+                    "resources": {"subscribe": False, "listChanged": False},
+                    "prompts": {"listChanged": False},
+                },
+                "serverInfo": {"name": "velora-s4-finance", "version": "1.0.0"},
+            },
+        })
+    
+    if method in ("notifications/initialized", "initialized"):
+        return JSONResponse({"jsonrpc": "2.0"})
+    
+    if method == "ping":
+        return JSONResponse({"jsonrpc": "2.0", "id": req_id, "result": {}})
+    
+    if method in ("tools/list", "tools"):
+        return JSONResponse({
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {"tools": MCP_TOOLS},
+        })
+    
+    if method == "tools/call":
+        params = body.get("params", {})
+        tool_name = params.get("name", "")
+        tool_args = params.get("arguments", {})
+        tool_entry = next((item for item in TOOL_SPECS if item[0] == tool_name), None)
+        if not tool_entry:
+            return JSONResponse({
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "error": {"code": -32601, "message": f"Tool '{tool_name}' not found"},
+            })
+        _, _, handler = tool_entry
+        try:
+            res = await handler(**tool_args)
+            import json as _json
+            if hasattr(res, "content") and res.content:
+                content_list = [{"type": "text", "text": c.text} for c in res.content]
+            elif isinstance(res, dict):
+                content_list = [{"type": "text", "text": _json.dumps(res, ensure_ascii=False, default=str)}]
+            else:
+                content_list = [{"type": "text", "text": str(res)}]
+            return JSONResponse({
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": content_list,
+                    "isError": False,
+                },
+            })
+        except Exception as ex:
+            log.error(f"Error in tools/call {tool_name}: {ex}", exc_info=True)
+            return JSONResponse({
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "error": {"code": -32000, "message": str(ex)},
+            })
+    
+    return JSONResponse({
+        "jsonrpc": "2.0",
+        "id": req_id,
+        "error": {"code": -32601, "message": f"Method '{method}' not implemented"},
+    })
+
+
 def create_app():
-    app = mcp.streamable_http_app()
+    from starlette.applications import Starlette
+    app = Starlette()
     app.routes.append(Route("/", health, methods=["GET", "HEAD"]))
     app.routes.append(Route("/health", health, methods=["GET", "HEAD"]))
+    app.routes.append(Route("/mcp", handle_mcp_endpoint, methods=["GET", "POST", "OPTIONS"]))
+    app.routes.append(Route("/mcp/", handle_mcp_endpoint, methods=["GET", "POST", "OPTIONS"]))
     app.routes.append(Route("/mcp/tools", list_tools_endpoint, methods=["GET"]))
     for name, _, _ in TOOL_SPECS:
         app.routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
@@ -114,7 +258,7 @@ def create_app():
             CORSMiddleware,
             allow_origins=origins,
             allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
-            allow_headers=["Content-Type", "Authorization", "X-API-Key", "mcp-session-id"],
+            allow_headers=["Content-Type", "Authorization", "X-API-Key", "mcp-session-id", "Accept"],
         )
     return app
 
