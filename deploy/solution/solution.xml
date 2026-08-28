@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.0.0" SolutionPackageVersion="9.2" languagecode="1033" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SolutionManifest>
+    <UniqueName>cre2f_VeloraExecutiveAgentPlatform</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Velora Executive Agent Platform" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Parent executive orchestration across SAP SuccessFactors, S/4HANA, SAC, and Connected Child Velora Productivity Agent for Microsoft 365, Mail, Calendar, Teams, Planner, and Fail-Closed Dataverse Audit." languagecode="1033" />
+    </Descriptions>
+    <Version>1.0.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>cre2f_velorapublisher</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="Velora Aviation Holding" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions>
+        <Description description="Velora Enterprise AI &amp; Digital Transformation Publisher" languagecode="1033" />
+      </Descriptions>
+      <EMailAddress>ciso@velora.ae</EMailAddress>
+      <SupportingWebsiteUrl>https://velora.ae</SupportingWebsiteUrl>
+      <CustomizationPrefix>cre2f</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>10000</CustomizationOptionValuePrefix>
+    </Publisher>
+    <RootComponents>
+      <!-- Dataverse Audit Table -->
+      <RootComponent type="1" schemaName="cre2f_veloraagentauditlog" behavior="0" />
+      <RootComponent type="1" schemaName="cre2f_veloradatadisclosurepolicy" behavior="0" />
+      
+      <!-- Security Roles -->
+      <RootComponent type="20" id="{8F1A7E11-3D50-4F8A-A21E-111111111111}" behavior="0" />
+      <RootComponent type="20" id="{8F1A7E11-3D50-4F8A-A21E-222222222222}" behavior="0" />
+      <RootComponent type="20" id="{8F1A7E11-3D50-4F8A-A21E-333333333333}" behavior="0" />
+      <RootComponent type="20" id="{8F1A7E11-3D50-4F8A-A21E-444444444444}" behavior="0" />
+
+      <!-- Environment Variables -->
+      <RootComponent type="380" schemaName="cre2f_VeloraEnvironmentName" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraParentAgentId" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraProductivityAgentId" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraAuditTableName" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraAuditEnabled" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraWriteActionsEnabled" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraExternalEmailEnabled" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraConfirmationExpiryMinutes" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraPlannerAllowedPlans" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraTeamsAllowedDestinations" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraAuditRetentionDays" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraWorkIQEndpoint" behavior="0" />
+      <RootComponent type="380" schemaName="cre2f_VeloraAgentVersion" behavior="0" />
+
+      <!-- Cloud Flows -->
+      <RootComponent type="29" id="{A1B2C3D4-E5F6-7A8B-9C0D-111111111111}" behavior="0" />
+      <RootComponent type="29" id="{A1B2C3D4-E5F6-7A8B-9C0D-222222222222}" behavior="0" />
+      <RootComponent type="29" id="{A1B2C3D4-E5F6-7A8B-9C0D-333333333333}" behavior="0" />
+
+      <!-- Connection References (Connection Managers) -->
+      <RootComponent type="10081" schemaName="cre2f_cr_office365" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_teams" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_planner" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_dataverse" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_successfactors" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_s4hana" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_sac" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_productivity" behavior="0" />
+      <RootComponent type="10081" schemaName="cre2f_cr_facilitator" behavior="0" />
+    </RootComponents>
+  </SolutionManifest>
+</ImportExportXml>

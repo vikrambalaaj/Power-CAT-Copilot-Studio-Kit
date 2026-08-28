@@ -30,6 +30,17 @@
                         "description": "Domain of interest (e.g. FINANCE, OPERATIONS, WORKFORCE, STRATEGY). Default is FINANCE."
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Identifying strategic domain performance indicators..."
+                },
+                "executing": {
+                    "description": "[SAP Analytics Cloud MCP] Retrieving corporate EBITDA and operating margins..."
+                },
+                "responding": {
+                    "description": "Synthesizing corporate metrics and rendering Executive Performance Card..."
+                }
             }
         },
         {
@@ -55,6 +66,17 @@
                         "type": "string",
                         "description": "Identifier of the SAC Story (e.g. VELORA_CORP_PERF_2026)."
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Loading SAC Story BI dimensions and variance drivers..."
+                },
+                "executing": {
+                    "description": "[SAP Analytics Cloud MCP] Retrieving verified SAC Story analytics and commentary..."
+                },
+                "responding": {
+                    "description": "Rendering Strategic Story Analytics Card..."
                 }
             }
         },
@@ -92,6 +114,17 @@
                 "required": [
                     "model_id"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Resolving SAC analytical model ID and requested measures..."
+                },
+                "executing": {
+                    "description": "[SAP Analytics Cloud MCP] Querying raw measure datasets from model..."
+                },
+                "responding": {
+                    "description": "Formatting analytical model data table..."
+                }
             }
         }
     ],

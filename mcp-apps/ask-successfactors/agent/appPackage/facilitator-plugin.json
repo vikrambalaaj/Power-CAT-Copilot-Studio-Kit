@@ -41,6 +41,17 @@
                 "required": [
                     "user_email"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for query_user_history_from_dataverse..."
+                },
+                "executing": {
+                    "description": "Executing query_user_history_from_dataverse across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for query_user_history_from_dataverse..."
+                }
             }
         },
         {
@@ -74,6 +85,17 @@
                 "required": [
                     "user_email"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for sync_dataverse_logs_to_memory..."
+                },
+                "executing": {
+                    "description": "Executing sync_dataverse_logs_to_memory across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for sync_dataverse_logs_to_memory..."
+                }
             }
         },
         {
@@ -103,6 +125,17 @@
                         "type": "string",
                         "description": "Optional keyword to filter meeting subjects."
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Scanning Outlook and Teams calendars for upcoming executive meetings..."
+                },
+                "executing": {
+                    "description": "[Velora Facilitator MCP] Connecting to Microsoft Graph to retrieve scheduled meetings..."
+                },
+                "responding": {
+                    "description": "Formatting scheduled meeting roster..."
                 }
             }
         },
@@ -152,6 +185,17 @@
                         "description": "Action items with tasks, owners, and due dates."
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing meeting agenda, attendees, and historical context..."
+                },
+                "executing": {
+                    "description": "[Velora Facilitator MCP] Synthesizing cross-system SAP intelligence and institutional notes..."
+                },
+                "responding": {
+                    "description": "Delivering Executive Meeting Briefing packet..."
+                }
             }
         },
         {
@@ -173,6 +217,17 @@
             "parameters": {
                 "type": "object",
                 "properties": {}
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for get_facilitator_guide..."
+                },
+                "executing": {
+                    "description": "Executing get_facilitator_guide across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for get_facilitator_guide..."
+                }
             }
         },
         {
@@ -214,6 +269,17 @@
                     "meeting_title",
                     "attendees"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Compiling executive briefing for scheduled attendees..."
+                },
+                "executing": {
+                    "description": "[Velora Facilitator MCP] Querying SAP workforce, S/4HANA financials, and Dataverse history..."
+                },
+                "responding": {
+                    "description": "Rendering Pre-Meeting Executive Briefing..."
+                }
             }
         },
         {
@@ -267,6 +333,17 @@
                     "key_decisions",
                     "action_items"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for draft_meeting_summary_email..."
+                },
+                "executing": {
+                    "description": "Executing draft_meeting_summary_email across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for draft_meeting_summary_email..."
+                }
             }
         },
         {
@@ -316,6 +393,17 @@
                     "subject",
                     "body_html"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for send_executive_email_via_graph..."
+                },
+                "executing": {
+                    "description": "Executing send_executive_email_via_graph across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for send_executive_email_via_graph..."
+                }
             }
         },
         {
@@ -374,6 +462,17 @@
                     "key_decisions",
                     "action_items"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for export_meeting_to_loop_notebook..."
+                },
+                "executing": {
+                    "description": "Executing export_meeting_to_loop_notebook across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for export_meeting_to_loop_notebook..."
+                }
             }
         },
         {
@@ -413,6 +512,17 @@
                     "user_query",
                     "agent_response"
                 ]
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for ingest_chat_to_knowledge_graph..."
+                },
+                "executing": {
+                    "description": "Executing ingest_chat_to_knowledge_graph across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for ingest_chat_to_knowledge_graph..."
+                }
             }
         }
     ],

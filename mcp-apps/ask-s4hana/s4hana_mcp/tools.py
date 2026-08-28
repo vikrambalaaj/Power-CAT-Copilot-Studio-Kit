@@ -22,18 +22,25 @@ def response(data: dict[str, Any]) -> CallToolResult:
 
 
 async def s4__get_receivables_aging(
-    company_code: str,
-    key_date: str,
+    company_code: str | None = None,
+    key_date: str | None = None,
     customer: str | None = None,
     currency: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
 ) -> Any:
     """Return allowlisted S/4HANA receivables-aging records for an executive summary."""
+    filters = {}
+    if company_code:
+        filters["CompanyCode"] = company_code
+    if customer:
+        filters["Customer"] = customer
+    if currency:
+        filters["Currency"] = currency
     return response(await client.query(
         client.settings.s4_ar_entity,
         "ReceivablesAging",
-        {"CompanyCode": company_code, "KeyDate": key_date, "Customer": customer, "Currency": currency},
+        filters,
         period=key_date,
         currency=currency,
         correlation_id=correlation_id,
@@ -42,18 +49,25 @@ async def s4__get_receivables_aging(
 
 
 async def s4__get_payables_aging(
-    company_code: str,
-    key_date: str,
+    company_code: str | None = None,
+    key_date: str | None = None,
     supplier: str | None = None,
     currency: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
 ) -> Any:
     """Return allowlisted S/4HANA payables-aging records for an executive summary."""
+    filters = {}
+    if company_code:
+        filters["CompanyCode"] = company_code
+    if supplier:
+        filters["Supplier"] = supplier
+    if currency:
+        filters["Currency"] = currency
     return response(await client.query(
         client.settings.s4_ap_entity,
         "PayablesAging",
-        {"CompanyCode": company_code, "KeyDate": key_date, "Supplier": supplier, "Currency": currency},
+        filters,
         period=key_date,
         currency=currency,
         correlation_id=correlation_id,
@@ -85,27 +99,43 @@ async def s4__get_profit_and_loss(
 
 
 async def s4__get_budget_variance(
-    company_code: str,
-    fiscal_year: str,
-    fiscal_period: str,
-    plan_version: str = "0",
+    company_code: str | None = None,
+    fiscal_year: str | None = None,
+    fiscal_period: str | None = None,
+    plan_version: str | None = None,
     currency: str | None = None,
     cost_center: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
+    entity: str | None = None,
 ) -> Any:
     """Return allowlisted S/4HANA budget-versus-actual records for the requested period."""
-    period = f"{fiscal_year}-{fiscal_period}"
+    period = f"{fiscal_year or ''}-{fiscal_period or ''}".strip("-") or None
+    filters = {}
+    if company_code:
+        filters["CompanyCode"] = company_code
+    if fiscal_year:
+        filters["FiscalYear"] = fiscal_year
+    if fiscal_period:
+        filters["FiscalPeriod"] = fiscal_period
+    if plan_version:
+        filters["PlanVersion"] = plan_version
+    if cost_center:
+        filters["CostCenter"] = cost_center
+    if currency:
+        filters["Currency"] = currency
+    target_entity = entity or client.settings.s4_budget_entity or "BudgetConsmData"
     return response(await client.query(
-        client.settings.s4_budget_entity or "BudgetConsumption",
+        target_entity,
         "BudgetVariance",
-        {"CompanyCode": company_code, "FiscalYear": fiscal_year, "FiscalPeriod": fiscal_period, "PlanVersion": plan_version, "Currency": currency, "CostCenter": cost_center},
+        filters,
         period=period,
         currency=currency,
         correlation_id=correlation_id,
         top=top,
         override_base_url=client.settings.s4_budget_api_url or None,
     ))
+
 
 
 

@@ -1,0 +1,23 @@
+applications:
+  - name: productivity-mcp-server
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python run_server.py
+    routes:
+      - route: productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com
+    env:
+      PYTHONUNBUFFERED: "1"
+      VeloraEnvironmentName: Velora-AgenticAD-Dev
+      VeloraAuditTableName: cre2f_veloraagentauditlog
+      VeloraAuditEnabled: "true"
+      VeloraWriteActionsEnabled: "true"
+      VeloraExternalEmailEnabled: "true"
+      VeloraConfirmationExpiryMinutes: "15"
+      VeloraAuditRetentionDays: "90"
+      VeloraAgentVersion: "1.0.0"
+      ALLOWED_HOSTS: "productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost:*,127.0.0.1:*,*"
+      ALLOW_ANONYMOUS: "true"
+      CORS_ORIGINS: "*"

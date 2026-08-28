@@ -54,6 +54,47 @@ async def call_mcp(req: Request, authorization: Optional[str] = Header(None), x_
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.api_route("/get_sac_kpis", methods=["GET", "POST"])
+@app.api_route("/tools/get_sac_kpis", methods=["GET", "POST"])
+async def rest_get_sac_kpis(domain: str = "FINANCE", req: Optional[Request] = None):
+    if req and req.method == "POST":
+        try:
+            b = await req.json()
+            domain = b.get("domain", domain)
+        except Exception:
+            pass
+    tool = next(t for t in ALL_TOOLS if t["name"] == "get_sac_kpis")
+    return await tool["handler"](domain=domain)
+
+
+@app.api_route("/get_sac_story_analytics", methods=["GET", "POST"])
+@app.api_route("/tools/get_sac_story_analytics", methods=["GET", "POST"])
+async def rest_get_sac_story(story_id: str = "VELORA_CORP_PERF_2026", req: Optional[Request] = None):
+    if req and req.method == "POST":
+        try:
+            b = await req.json()
+            story_id = b.get("story_id", story_id)
+        except Exception:
+            pass
+    tool = next(t for t in ALL_TOOLS if t["name"] == "get_sac_story_analytics")
+    return await tool["handler"](story_id=story_id)
+
+
+@app.api_route("/get_sac_model_data", methods=["GET", "POST"])
+@app.api_route("/tools/get_sac_model_data", methods=["GET", "POST"])
+async def rest_get_sac_model(model_id: str = "", req: Optional[Request] = None):
+    measures = None
+    if req and req.method == "POST":
+        try:
+            b = await req.json()
+            model_id = b.get("model_id", model_id)
+            measures = b.get("measures")
+        except Exception:
+            pass
+    tool = next(t for t in ALL_TOOLS if t["name"] == "get_sac_model_data")
+    return await tool["handler"](model_id=model_id, measures=measures)
+
+
 def main():
     uvicorn.run(app, host="0.0.0.0", port=settings.port, log_level=settings.log_level.lower())
 

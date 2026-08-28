@@ -1,0 +1,140 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Velora Facilitator MCP",
+    "description": "Executive Meeting Synthesis, Calendar Automation & Institutional Memory",
+    "version": "1.0.0"
+  },
+  "host": "facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Server healthy"
+          }
+        }
+      }
+    },
+    "/guide": {
+      "get": {
+        "summary": "Facilitator Auto-Send Guide",
+        "operationId": "getGuide",
+        "responses": {
+          "200": {
+            "description": "Setup guide text"
+          }
+        }
+      }
+    },
+    "/get_calendar_meetings": {
+      "post": {
+        "summary": "Fetch meetings from Outlook/Teams Calendar",
+        "operationId": "getCalendarMeetings",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_email": {
+                  "type": "string"
+                },
+                "timeframe": {
+                  "type": "string",
+                  "default": "today"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Calendar meetings"
+          }
+        }
+      }
+    },
+    "/process_calendar_meeting_workflow": {
+      "post": {
+        "summary": "Process Pre or Post Meeting Synthesis",
+        "operationId": "processCalendarMeetingWorkflow",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meeting_subject": {
+                  "type": "string"
+                },
+                "phase": {
+                  "type": "string",
+                  "default": "POST_MEETING"
+                },
+                "notes": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workflow execution summary"
+          }
+        }
+      }
+    },
+    "/generate_pre_meeting_briefing": {
+      "post": {
+        "summary": "Synthesize SAP Cross-Connector Meeting Briefing",
+        "operationId": "generatePreMeetingBriefing",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "meeting_title",
+                "attendees"
+              ],
+              "properties": {
+                "meeting_title": {
+                  "type": "string"
+                },
+                "attendees": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Briefing packet"
+          }
+        }
+      }
+    }
+  }
+}

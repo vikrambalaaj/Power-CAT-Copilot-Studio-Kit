@@ -1,0 +1,565 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.1/schema.json",
+    "schema_version": "v2.1",
+    "name_for_human": "Velora Productivity Tools",
+    "name_for_model": "velora_productivity_plugin",
+    "description_for_human": "Executive Microsoft 365, Mail, Calendar, Teams, and Planner tools.",
+    "description_for_model": "Plugin for executing authorized Microsoft 365 Work IQ reads and governed two-step writes for email, calendar, Teams, and Planner tasks.",
+    "functions": [
+        {
+            "name": "SearchMail",
+            "description": "Search user's Outlook emails.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SearchMail..."
+                },
+                "executing": {
+                    "description": "Executing SearchMail across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SearchMail..."
+                }
+            }
+        },
+        {
+            "name": "GetMailThread",
+            "description": "Get complete email conversation thread.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for GetMailThread..."
+                },
+                "executing": {
+                    "description": "Executing GetMailThread across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for GetMailThread..."
+                }
+            }
+        },
+        {
+            "name": "SummarizePriorityMail",
+            "description": "Summarize priority/executive messages.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SummarizePriorityMail..."
+                },
+                "executing": {
+                    "description": "Executing SummarizePriorityMail across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SummarizePriorityMail..."
+                }
+            }
+        },
+        {
+            "name": "FindMailFollowUps",
+            "description": "Find emails flagged for follow-up.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for FindMailFollowUps..."
+                },
+                "executing": {
+                    "description": "Executing FindMailFollowUps across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for FindMailFollowUps..."
+                }
+            }
+        },
+        {
+            "name": "ListCalendarEvents",
+            "description": "List calendar events.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for ListCalendarEvents..."
+                },
+                "executing": {
+                    "description": "Executing ListCalendarEvents across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for ListCalendarEvents..."
+                }
+            }
+        },
+        {
+            "name": "GetMeetingDetails",
+            "description": "Get detailed meeting metadata.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for GetMeetingDetails..."
+                },
+                "executing": {
+                    "description": "Executing GetMeetingDetails across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for GetMeetingDetails..."
+                }
+            }
+        },
+        {
+            "name": "CheckAvailability",
+            "description": "Check attendee availability and conflicts.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for CheckAvailability..."
+                },
+                "executing": {
+                    "description": "Executing CheckAvailability across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for CheckAvailability..."
+                }
+            }
+        },
+        {
+            "name": "GetMeetingContext",
+            "description": "Retrieve meeting agenda/context.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for GetMeetingContext..."
+                },
+                "executing": {
+                    "description": "Executing GetMeetingContext across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for GetMeetingContext..."
+                }
+            }
+        },
+        {
+            "name": "SearchTeamsMessages",
+            "description": "Search Teams chats and channels.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SearchTeamsMessages..."
+                },
+                "executing": {
+                    "description": "Executing SearchTeamsMessages across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SearchTeamsMessages..."
+                }
+            }
+        },
+        {
+            "name": "GetChannelContext",
+            "description": "Get recent posts from a Teams channel.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for GetChannelContext..."
+                },
+                "executing": {
+                    "description": "Executing GetChannelContext across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for GetChannelContext..."
+                }
+            }
+        },
+        {
+            "name": "GetChatContext",
+            "description": "Get recent messages from a chat.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for GetChatContext..."
+                },
+                "executing": {
+                    "description": "Executing GetChatContext across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for GetChatContext..."
+                }
+            }
+        },
+        {
+            "name": "FindTeamsFollowUps",
+            "description": "Find Teams mentions and action items.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for FindTeamsFollowUps..."
+                },
+                "executing": {
+                    "description": "Executing FindTeamsFollowUps across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for FindTeamsFollowUps..."
+                }
+            }
+        },
+        {
+            "name": "ListMyPlannerTasks",
+            "description": "List tasks assigned to current user.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for ListMyPlannerTasks..."
+                },
+                "executing": {
+                    "description": "Executing ListMyPlannerTasks across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for ListMyPlannerTasks..."
+                }
+            }
+        },
+        {
+            "name": "ListPlanTasks",
+            "description": "List tasks in a Planner plan.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for ListPlanTasks..."
+                },
+                "executing": {
+                    "description": "Executing ListPlanTasks across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for ListPlanTasks..."
+                }
+            }
+        },
+        {
+            "name": "GetPlannerTask",
+            "description": "Get Planner task details.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for GetPlannerTask..."
+                },
+                "executing": {
+                    "description": "Executing GetPlannerTask across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for GetPlannerTask..."
+                }
+            }
+        },
+        {
+            "name": "FindOverdueTasks",
+            "description": "Find overdue Planner tasks.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for FindOverdueTasks..."
+                },
+                "executing": {
+                    "description": "Executing FindOverdueTasks across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for FindOverdueTasks..."
+                }
+            }
+        },
+        {
+            "name": "PrepareEmail",
+            "description": "Stage A: Prepare email preview and approval token.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareEmail..."
+                },
+                "executing": {
+                    "description": "Executing PrepareEmail across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareEmail..."
+                }
+            }
+        },
+        {
+            "name": "SendApprovedEmail",
+            "description": "Stage B: Send email with approved token.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SendApprovedEmail..."
+                },
+                "executing": {
+                    "description": "Executing SendApprovedEmail across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SendApprovedEmail..."
+                }
+            }
+        },
+        {
+            "name": "PrepareEmailReply",
+            "description": "Stage A: Prepare reply preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareEmailReply..."
+                },
+                "executing": {
+                    "description": "Executing PrepareEmailReply across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareEmailReply..."
+                }
+            }
+        },
+        {
+            "name": "SendApprovedEmailReply",
+            "description": "Stage B: Send approved reply.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SendApprovedEmailReply..."
+                },
+                "executing": {
+                    "description": "Executing SendApprovedEmailReply across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SendApprovedEmailReply..."
+                }
+            }
+        },
+        {
+            "name": "PrepareMeetingCreation",
+            "description": "Stage A: Prepare meeting preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareMeetingCreation..."
+                },
+                "executing": {
+                    "description": "Executing PrepareMeetingCreation across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareMeetingCreation..."
+                }
+            }
+        },
+        {
+            "name": "CreateApprovedMeeting",
+            "description": "Stage B: Create approved meeting.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for CreateApprovedMeeting..."
+                },
+                "executing": {
+                    "description": "Executing CreateApprovedMeeting across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for CreateApprovedMeeting..."
+                }
+            }
+        },
+        {
+            "name": "PrepareMeetingUpdate",
+            "description": "Stage A: Prepare meeting update preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareMeetingUpdate..."
+                },
+                "executing": {
+                    "description": "Executing PrepareMeetingUpdate across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareMeetingUpdate..."
+                }
+            }
+        },
+        {
+            "name": "UpdateApprovedMeeting",
+            "description": "Stage B: Update approved meeting.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for UpdateApprovedMeeting..."
+                },
+                "executing": {
+                    "description": "Executing UpdateApprovedMeeting across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for UpdateApprovedMeeting..."
+                }
+            }
+        },
+        {
+            "name": "PrepareMeetingCancellation",
+            "description": "Stage A: Prepare cancellation preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareMeetingCancellation..."
+                },
+                "executing": {
+                    "description": "Executing PrepareMeetingCancellation across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareMeetingCancellation..."
+                }
+            }
+        },
+        {
+            "name": "CancelApprovedMeeting",
+            "description": "Stage B: Cancel approved meeting.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for CancelApprovedMeeting..."
+                },
+                "executing": {
+                    "description": "Executing CancelApprovedMeeting across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for CancelApprovedMeeting..."
+                }
+            }
+        },
+        {
+            "name": "PrepareTeamsChatMessage",
+            "description": "Stage A: Prepare chat message preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareTeamsChatMessage..."
+                },
+                "executing": {
+                    "description": "Executing PrepareTeamsChatMessage across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareTeamsChatMessage..."
+                }
+            }
+        },
+        {
+            "name": "SendApprovedTeamsChatMessage",
+            "description": "Stage B: Send approved chat message.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SendApprovedTeamsChatMessage..."
+                },
+                "executing": {
+                    "description": "Executing SendApprovedTeamsChatMessage across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SendApprovedTeamsChatMessage..."
+                }
+            }
+        },
+        {
+            "name": "PrepareTeamsChannelPost",
+            "description": "Stage A: Prepare channel post preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PrepareTeamsChannelPost..."
+                },
+                "executing": {
+                    "description": "Executing PrepareTeamsChannelPost across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PrepareTeamsChannelPost..."
+                }
+            }
+        },
+        {
+            "name": "SendApprovedTeamsChannelPost",
+            "description": "Stage B: Send approved channel post.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for SendApprovedTeamsChannelPost..."
+                },
+                "executing": {
+                    "description": "Executing SendApprovedTeamsChannelPost across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for SendApprovedTeamsChannelPost..."
+                }
+            }
+        },
+        {
+            "name": "PreparePlannerTask",
+            "description": "Stage A: Prepare Planner task preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PreparePlannerTask..."
+                },
+                "executing": {
+                    "description": "Executing PreparePlannerTask across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PreparePlannerTask..."
+                }
+            }
+        },
+        {
+            "name": "CreateApprovedPlannerTask",
+            "description": "Stage B: Create approved task.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for CreateApprovedPlannerTask..."
+                },
+                "executing": {
+                    "description": "Executing CreateApprovedPlannerTask across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for CreateApprovedPlannerTask..."
+                }
+            }
+        },
+        {
+            "name": "PreparePlannerTaskUpdate",
+            "description": "Stage A: Prepare task update preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PreparePlannerTaskUpdate..."
+                },
+                "executing": {
+                    "description": "Executing PreparePlannerTaskUpdate across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PreparePlannerTaskUpdate..."
+                }
+            }
+        },
+        {
+            "name": "UpdateApprovedPlannerTask",
+            "description": "Stage B: Update approved task.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for UpdateApprovedPlannerTask..."
+                },
+                "executing": {
+                    "description": "Executing UpdateApprovedPlannerTask across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for UpdateApprovedPlannerTask..."
+                }
+            }
+        },
+        {
+            "name": "PreparePlannerCompletion",
+            "description": "Stage A: Prepare task completion preview.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for PreparePlannerCompletion..."
+                },
+                "executing": {
+                    "description": "Executing PreparePlannerCompletion across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for PreparePlannerCompletion..."
+                }
+            }
+        },
+        {
+            "name": "CompleteApprovedPlannerTask",
+            "description": "Stage B: Complete approved task.",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for CompleteApprovedPlannerTask..."
+                },
+                "executing": {
+                    "description": "Executing CompleteApprovedPlannerTask across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for CompleteApprovedPlannerTask..."
+                }
+            }
+        }
+    ],
+    "runtimes": [
+        {
+            "type": "OpenAPI",
+            "auth": {
+                "type": "OAuth2ClientCredentials"
+            },
+            "spec": {
+                "url": "https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com/swagger.json"
+            }
+        }
+    ],
+    "capabilities": {
+        "localization": {},
+        "conversation_starters": []
+    }
+}

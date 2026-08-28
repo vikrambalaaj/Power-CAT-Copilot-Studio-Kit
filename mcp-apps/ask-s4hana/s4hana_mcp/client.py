@@ -114,21 +114,27 @@ class S4Client:
             return f"Bearer {token}"
 
     async def _request(self, entity: str, params: dict[str, Any], base_url: str | None = None) -> dict[str, Any]:
-        path = validate_relative_entity(entity)
-        if path.startswith("https://") or path.startswith("http://"):
-            parsed_p = urlparse(path)
-            url = f"{parsed_p.scheme}://{parsed_p.netloc}{parsed_p.path.rstrip('/')}"
-        elif path.startswith("/"):
-            effective_base = (base_url or self.base_url).rstrip("/")
-            parsed_b = urlparse(effective_base)
-            url = f"{parsed_b.scheme}://{parsed_b.netloc}{path}"
+        if entity == "$metadata":
+            url = f"{(base_url or self.base_url).rstrip('/')}/$metadata"
+            params = {}
+        elif entity:
+            path = validate_relative_entity(entity)
+            if path.startswith("https://") or path.startswith("http://"):
+                parsed_p = urlparse(path)
+                url = f"{parsed_p.scheme}://{parsed_p.netloc}{parsed_p.path.rstrip('/')}"
+            elif path.startswith("/"):
+                effective_base = (base_url or self.base_url).rstrip("/")
+                parsed_b = urlparse(effective_base)
+                url = f"{parsed_b.scheme}://{parsed_b.netloc}{path}"
+            else:
+                effective_base = (base_url or self.base_url).rstrip("/")
+                url = f"{effective_base}/{path}"
         else:
-            effective_base = (base_url or self.base_url).rstrip("/")
-            url = f"{effective_base}/{path}"
+            url = (base_url or self.base_url).rstrip("/")
+            params = {}
         safe_params = dict(params)
         if getattr(self.settings, "s4_sap_client", ""):
             safe_params.setdefault("sap-client", self.settings.s4_sap_client)
-        safe_params.setdefault("$format", "json")
         try:
             authorization = await self._authorization()
             async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
@@ -141,11 +147,31 @@ class S4Client:
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) VeloraS4MCP/1.0",
                     },
                 )
+            print(f"[S4Client] GET {url} params={safe_params} -> {response.status_code}: {response.text[:300]}", flush=True)
             if response.status_code >= 400:
+                error_msg = f"S/4HANA request failed with status {response.status_code}"
+                try:
+                    err_json = response.json()
+                    if isinstance(err_json, dict) and "error" in err_json:
+                        err_obj = err_json["error"]
+                        err_detail = ""
+                        if isinstance(err_obj, dict):
+                            msg_val = err_obj.get("message")
+                            if isinstance(msg_val, dict):
+                                err_detail = msg_val.get("value", "")
+                            elif isinstance(msg_val, str):
+                                err_detail = msg_val
+                        if err_detail:
+                            error_msg = f"{error_msg}: {err_detail}"
+                except Exception:
+                    pass
                 return {
                     "status": "error",
                     "code": "S4_UPSTREAM_ERROR",
-                    "message": f"S/4HANA request failed with status {response.status_code}",
+                    "message": error_msg,
+                    "upstream_url": url,
+                    "upstream_params": safe_params,
+                    "upstream_body": response.text[:400],
                     "retryable": response.status_code in {408, 429, 500, 502, 503, 504},
                 }
             payload = response.json()
@@ -194,7 +220,7 @@ class S4Client:
         override_base_url: str | None = None,
     ) -> dict[str, Any]:
         clauses = [f"{key} eq '{escape_odata(value)}'" for key, value in filters.items() if value]
-        params: dict[str, Any] = {"$top": bounded_top(top), "$inlinecount": "allpages"}
+        params: dict[str, Any] = {"$top": bounded_top(top), "$count": "true"}
         if clauses:
             params["$filter"] = " and ".join(clauses)
         effective_base = (override_base_url or self.base_url).rstrip("/")

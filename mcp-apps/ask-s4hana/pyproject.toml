@@ -1,6 +1,6 @@
 [project]
 name = "s4-finance-mcp"
-version = "1.0.0"
+version = "1.0.4"
 description = "Read-only SAP S/4HANA finance MCP server for the Velora Executive Agent"
 requires-python = ">=3.11"
 dependencies = [

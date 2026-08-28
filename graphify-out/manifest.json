@@ -1,0 +1,872 @@
+{
+  "AgentReviewTool/SolutionPackage/src/Workflows/AgentReviewerFlow-3B131928-8094-F011-B41C-6045BDEF4136.json": {
+    "mtime": 1785040578.5617852,
+    "seen": 1787455082.415797,
+    "ast_hash": "5e51f551f27a071684469280c8687a2d",
+    "semantic_hash": "5e51f551f27a071684469280c8687a2d"
+  },
+  "AgentReviewTool/SolutionPackage/src/bots/cr306_agentReviewer/configuration.json": {
+    "mtime": 1785040578.5731392,
+    "seen": 1787455082.415802,
+    "ast_hash": "e54c0a561e155338aa57ef45bbe6b3f1",
+    "semantic_hash": "e54c0a561e155338aa57ef45bbe6b3f1"
+  },
+  "AgentReviewTool/config/Prod/customDeploymentSettings.json": {
+    "mtime": 1785040578.5768797,
+    "seen": 1787455082.4158049,
+    "ast_hash": "665ee3b239dbf1ef2ea8acdb3a75112b",
+    "semantic_hash": "665ee3b239dbf1ef2ea8acdb3a75112b"
+  },
+  "AgentReviewTool/config/Prod/deploymentSettings.json": {
+    "mtime": 1785040578.5771224,
+    "seen": 1787455082.415808,
+    "ast_hash": "fbbbb31498ee7c5d8050830791b6d4c3",
+    "semantic_hash": "fbbbb31498ee7c5d8050830791b6d4c3"
+  },
+  "AgentReviewTool/config/Test/customDeploymentSettings.json": {
+    "mtime": 1785040578.5773988,
+    "seen": 1787455082.41581,
+    "ast_hash": "665ee3b239dbf1ef2ea8acdb3a75112b",
+    "semantic_hash": "665ee3b239dbf1ef2ea8acdb3a75112b"
+  },
+  "AgentReviewTool/config/Test/deploymentSettings.json": {
+    "mtime": 1785040578.577703,
+    "seen": 1787455082.4158132,
+    "ast_hash": "fbbbb31498ee7c5d8050830791b6d4c3",
+    "semantic_hash": "fbbbb31498ee7c5d8050830791b6d4c3"
+  },
+  "AgentReviewTool/config/Validation/customDeploymentSettings.json": {
+    "mtime": 1785040578.5779743,
+    "seen": 1787455082.4158158,
+    "ast_hash": "665ee3b239dbf1ef2ea8acdb3a75112b",
+    "semantic_hash": "665ee3b239dbf1ef2ea8acdb3a75112b"
+  },
+  "AgentReviewTool/config/Validation/deploymentSettings.json": {
+    "mtime": 1785040578.5786343,
+    "seen": 1787455082.415829,
+    "ast_hash": "fbbbb31498ee7c5d8050830791b6d4c3",
+    "semantic_hash": "fbbbb31498ee7c5d8050830791b6d4c3"
+  },
+  "CopilotStudioAccelerator/config/Prod/customDeploymentSettings.json": {
+    "mtime": 1785040578.5824013,
+    "seen": 1787455082.415833,
+    "ast_hash": "f991b372e4be17140c99a3483f7e5ea9",
+    "semantic_hash": "f991b372e4be17140c99a3483f7e5ea9"
+  },
+  "CopilotStudioAccelerator/config/Prod/deploymentSettings.json": {
+    "mtime": 1785040578.5826187,
+    "seen": 1787455082.415835,
+    "ast_hash": "29f022bbe3e1ad509649f591806fa730",
+    "semantic_hash": "29f022bbe3e1ad509649f591806fa730"
+  },
+  "CopilotStudioAccelerator/config/Test/customDeploymentSettings.json": {
+    "mtime": 1785040578.5829422,
+    "seen": 1787455082.4158368,
+    "ast_hash": "f991b372e4be17140c99a3483f7e5ea9",
+    "semantic_hash": "f991b372e4be17140c99a3483f7e5ea9"
+  },
+  "CopilotStudioAccelerator/config/Test/deploymentSettings.json": {
+    "mtime": 1785040578.583305,
+    "seen": 1787455082.41584,
+    "ast_hash": "29f022bbe3e1ad509649f591806fa730",
+    "semantic_hash": "29f022bbe3e1ad509649f591806fa730"
+  },
+  "CopilotStudioAccelerator/config/Validation/customDeploymentSettings.json": {
+    "mtime": 1785040578.5836098,
+    "seen": 1787455082.415842,
+    "ast_hash": "f991b372e4be17140c99a3483f7e5ea9",
+    "semantic_hash": "f991b372e4be17140c99a3483f7e5ea9"
+  },
+  "CopilotStudioAccelerator/config/Validation/deploymentSettings.json": {
+    "mtime": 1785040578.5838716,
+    "seen": 1787455082.4158442,
+    "ast_hash": "29f022bbe3e1ad509649f591806fa730",
+    "semantic_hash": "29f022bbe3e1ad509649f591806fa730"
+  },
+  "PowerCAT.PackageDeployer.Package/Models/FlowConfigurationItem.cs": {
+    "mtime": 1785040578.5968084,
+    "seen": 1787455082.4158459,
+    "ast_hash": "15c4dcbb3fccbb305627e711a2503e91",
+    "semantic_hash": "15c4dcbb3fccbb305627e711a2503e91"
+  },
+  "PowerCAT.PackageDeployer.Package/PackageImportExtension.cs": {
+    "mtime": 1785040578.596979,
+    "seen": 1787455082.415848,
+    "ast_hash": "7f8e5776b6017c28a4edbe34fbf7016d",
+    "semantic_hash": "7f8e5776b6017c28a4edbe34fbf7016d"
+  },
+  "PowerCAT.PackageDeployer.Package/PkgAssets/manifest.ppkg.json": {
+    "mtime": 1785040578.597573,
+    "seen": 1787455082.415849,
+    "ast_hash": "916ada5246d132d63fb49f843e339d3a",
+    "semantic_hash": "916ada5246d132d63fb49f843e339d3a"
+  },
+  "PowerCAT.PackageDeployer.Package/PowerCAT.Package.Settings.json": {
+    "mtime": 1785040578.5978837,
+    "seen": 1787455082.415851,
+    "ast_hash": "34d3666d12593751bf985793e67cfdad",
+    "semantic_hash": "34d3666d12593751bf985793e67cfdad"
+  },
+  "PowerCAT.PackageDeployer.Package/PowerCAT.PackageDeployer.Package.csproj": {
+    "mtime": 1785040578.5981433,
+    "seen": 1787455082.415853,
+    "ast_hash": "b7711054a51455a233b16af29de412ef",
+    "semantic_hash": "b7711054a51455a233b16af29de412ef"
+  },
+  "PowerCAT.PackageDeployer.Package/PowerCAT.PackageDeployer.Package.sln": {
+    "mtime": 1785040578.5982704,
+    "seen": 1787455082.415854,
+    "ast_hash": "8dbc70f49d5aa551e3b60127a55fd1f5",
+    "semantic_hash": "8dbc70f49d5aa551e3b60127a55fd1f5"
+  },
+  "PowerCAT.PackageDeployer.Package/Resources/ConfigSettings.Designer.cs": {
+    "mtime": 1785040578.598606,
+    "seen": 1787455082.4158561,
+    "ast_hash": "cdf36a07c273f68c073c0d63c092f875",
+    "semantic_hash": "cdf36a07c273f68c073c0d63c092f875"
+  },
+  "PowerCAT.PackageDeployer.Package/Utils/JsonUtility.cs": {
+    "mtime": 1785040578.5990555,
+    "seen": 1787455082.415858,
+    "ast_hash": "f68cce674feaadf5401d37890c8fbac2",
+    "semantic_hash": "f68cce674feaadf5401d37890c8fbac2"
+  },
+  "PowerCAT.PackageDeployer.Package/Utils/OrganizationSettingsUpdater.cs": {
+    "mtime": 1785040578.5993385,
+    "seen": 1787455082.415861,
+    "ast_hash": "df56f0081a4bae5e8c17893dcf5f48d2",
+    "semantic_hash": "df56f0081a4bae5e8c17893dcf5f48d2"
+  },
+  "PowerCAT.PackageDeployer.Package/obj/Debug/net472/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs": {
+    "mtime": 1785040578.5998583,
+    "seen": 1787455082.415863,
+    "ast_hash": "87571eb12a0f860f21329ad438ee673c",
+    "semantic_hash": "87571eb12a0f860f21329ad438ee673c"
+  },
+  "PowerCAT.PackageDeployer.Package/obj/Debug/net472/PowerCAT.PackageDeployer.Package.AssemblyInfo.cs": {
+    "mtime": 1785040578.6001115,
+    "seen": 1787455082.4158652,
+    "ast_hash": "ba1d22b713c5038d676ae17ea6aa8f9f",
+    "semantic_hash": "ba1d22b713c5038d676ae17ea6aa8f9f"
+  },
+  "PowerCAT.PackageDeployer.Package/obj/Debug/net472/manifest.ppkg.g.json": {
+    "mtime": 1785040578.6012976,
+    "seen": 1787455082.4158661,
+    "ast_hash": "3076202cd80ed35d2f4c910badb15240",
+    "semantic_hash": "3076202cd80ed35d2f4c910badb15240"
+  },
+  "PowerCAT.PackageDeployer.Package/obj/PowerCAT.PackageDeployer.Package.csproj.nuget.dgspec.json": {
+    "mtime": 1785040578.6015036,
+    "seen": 1787455082.4158678,
+    "ast_hash": "cfef054f51dd10be2694e5af06eb59f4",
+    "semantic_hash": "cfef054f51dd10be2694e5af06eb59f4"
+  },
+  "PowerCAT.PackageDeployer.Package/obj/project.assets.json": {
+    "mtime": 1785040578.602078,
+    "seen": 1787455082.41587,
+    "ast_hash": "3ff4cb4e98db00eb20563a15b8149f6a",
+    "semantic_hash": "3ff4cb4e98db00eb20563a15b8149f6a"
+  },
+  "agent-review-pipeline/package.json": {
+    "mtime": 1786044535.8528743,
+    "seen": 1787455082.415871,
+    "ast_hash": "e716adbe9ddc2f81e45629733e317caa",
+    "semantic_hash": "e716adbe9ddc2f81e45629733e317caa"
+  },
+  "agent-review-pipeline/src/analysis/StageAService.ts": {
+    "mtime": 1785128759.8805938,
+    "seen": 1787455082.415873,
+    "ast_hash": "d7065cfe2baa94c5732015fc8f78b262",
+    "semantic_hash": "d7065cfe2baa94c5732015fc8f78b262"
+  },
+  "agent-review-pipeline/src/analysis/patternUtils.ts": {
+    "mtime": 1785128765.027424,
+    "seen": 1787455082.415875,
+    "ast_hash": "0c7d7bcec203a620ea7faf765411e573",
+    "semantic_hash": "0c7d7bcec203a620ea7faf765411e573"
+  },
+  "agent-review-pipeline/src/evaluate.ts": {
+    "mtime": 1786044535.8026397,
+    "seen": 1787455082.4158819,
+    "ast_hash": "7acd64a7808d4137f198b9900e1716c6",
+    "semantic_hash": "7acd64a7808d4137f198b9900e1716c6"
+  },
+  "agent-review-pipeline/src/evaluation/constants.ts": {
+    "mtime": 1785040578.6368666,
+    "seen": 1787455082.415884,
+    "ast_hash": "a0f1d9cb43e1caad0d4838fe0c260eb9",
+    "semantic_hash": "a0f1d9cb43e1caad0d4838fe0c260eb9"
+  },
+  "agent-review-pipeline/src/evaluation/evaluationOrchestrator.ts": {
+    "mtime": 1785040578.6370041,
+    "seen": 1787455082.415885,
+    "ast_hash": "13eded3ceaada0079822115a27cc0d10",
+    "semantic_hash": "13eded3ceaada0079822115a27cc0d10"
+  },
+  "agent-review-pipeline/src/evaluation/predictV2Client.ts": {
+    "mtime": 1786044535.8470187,
+    "seen": 1787455082.415887,
+    "ast_hash": "87da6d0f7e027d76ba4e934c7326c2f3",
+    "semantic_hash": "87da6d0f7e027d76ba4e934c7326c2f3"
+  },
+  "agent-review-pipeline/src/evaluation/scoreCalculator.ts": {
+    "mtime": 1785040578.6373758,
+    "seen": 1787455082.4158888,
+    "ast_hash": "81a7d0bacb665b373bebfb1449bc83c3",
+    "semantic_hash": "81a7d0bacb665b373bebfb1449bc83c3"
+  },
+  "agent-review-pipeline/src/index.ts": {
+    "mtime": 1785040578.6375132,
+    "seen": 1787455082.41589,
+    "ast_hash": "d5aaf155cb720a2b03ab1bd07581d25c",
+    "semantic_hash": "d5aaf155cb720a2b03ab1bd07581d25c"
+  },
+  "agent-review-pipeline/src/models/types.ts": {
+    "mtime": 1785128754.2227998,
+    "seen": 1787455082.415892,
+    "ast_hash": "469cea6502d33fdf3b1c088ac47ab2d7",
+    "semantic_hash": "469cea6502d33fdf3b1c088ac47ab2d7"
+  },
+  "agent-review-pipeline/src/parser/csZipParser.ts": {
+    "mtime": 1785040578.6380517,
+    "seen": 1787455082.415894,
+    "ast_hash": "ed0c4b7c96b8680bae2549ea5bc8824d",
+    "semantic_hash": "ed0c4b7c96b8680bae2549ea5bc8824d"
+  },
+  "agent-review-pipeline/src/parser/yamlUtils.ts": {
+    "mtime": 1785040578.638178,
+    "seen": 1787455082.415895,
+    "ast_hash": "491c28ff36daf833a761d713c9ca6855",
+    "semantic_hash": "491c28ff36daf833a761d713c9ca6855"
+  },
+  "agent-review-pipeline/src/report/pdfReport.ts": {
+    "mtime": 1785040578.6384141,
+    "seen": 1787455082.4158971,
+    "ast_hash": "58e3a9649c06cbbd1a69487cdbfacd43",
+    "semantic_hash": "58e3a9649c06cbbd1a69487cdbfacd43"
+  },
+  "agent-review-pipeline/test/scoreCalculator.test.js": {
+    "mtime": 1786044535.8541873,
+    "seen": 1787455082.415925,
+    "ast_hash": "3076641782e107452867d23f6c0c7097",
+    "semantic_hash": "3076641782e107452867d23f6c0c7097"
+  },
+  "agent-review-pipeline/tsconfig.json": {
+    "mtime": 1785040578.638552,
+    "seen": 1787455082.4159281,
+    "ast_hash": "232a53df426b11294613d8f42062bb36",
+    "semantic_hash": "232a53df426b11294613d8f42062bb36"
+  },
+  "deploy/generate_connectors_swagger.py": {
+    "mtime": 1786787840.8491452,
+    "seen": 1787455082.415932,
+    "ast_hash": "7bab4b14dc5b48d988819b0d82c8c63d",
+    "semantic_hash": "7bab4b14dc5b48d988819b0d82c8c63d"
+  },
+  "deploy/test_all_live_systems_and_audit.py": {
+    "mtime": 1786812159.7515392,
+    "seen": 1787455082.4159338,
+    "ast_hash": "0404479b472cb6cb5df472587efa8c0d",
+    "semantic_hash": "0404479b472cb6cb5df472587efa8c0d"
+  },
+  "docs/assets/index.js": {
+    "mtime": 1785040578.639999,
+    "seen": 1787455082.415936,
+    "ast_hash": "cbe57dd2649b9723f7e9b9c6c7f4da2b",
+    "semantic_hash": "cbe57dd2649b9723f7e9b9c6c7f4da2b"
+  },
+  "mcp-apps/ask-facilitator/facilitator_mcp/__init__.py": {
+    "mtime": 1786797510.1509318,
+    "seen": 1787455082.4159381,
+    "ast_hash": "6fdd73ad0d20ce20baa31ab49a8827d3",
+    "semantic_hash": "6fdd73ad0d20ce20baa31ab49a8827d3"
+  },
+  "mcp-apps/ask-facilitator/facilitator_mcp/__main__.py": {
+    "mtime": 1786798158.094005,
+    "seen": 1787455082.41594,
+    "ast_hash": "3d92a4b2b1eca72f64e9440f3d0ac1e9",
+    "semantic_hash": "3d92a4b2b1eca72f64e9440f3d0ac1e9"
+  },
+  "mcp-apps/ask-facilitator/facilitator_mcp/server.py": {
+    "mtime": 1787453005.6638625,
+    "seen": 1787455082.415942,
+    "ast_hash": "957d288df2aab633c320f23fb8deacb2",
+    "semantic_hash": "957d288df2aab633c320f23fb8deacb2"
+  },
+  "mcp-apps/ask-facilitator/facilitator_mcp/tools.py": {
+    "mtime": 1787207403.968714,
+    "seen": 1787455082.415943,
+    "ast_hash": "6b326eec0d90dc6d59e8d30ce0636164",
+    "semantic_hash": "6b326eec0d90dc6d59e8d30ce0636164"
+  },
+  "mcp-apps/ask-facilitator/run_server.py": {
+    "mtime": 1786797651.8246336,
+    "seen": 1787455082.4159439,
+    "ast_hash": "4bb4e28f251a9ae6a920e18eae2b5e06",
+    "semantic_hash": "4bb4e28f251a9ae6a920e18eae2b5e06"
+  },
+  "mcp-apps/ask-facilitator/test/test_app.py": {
+    "mtime": 1787046403.1831107,
+    "seen": 1787455082.415946,
+    "ast_hash": "36d2ae593edf186a22b34b9f24cd8610",
+    "semantic_hash": "36d2ae593edf186a22b34b9f24cd8610"
+  },
+  "mcp-apps/ask-s4hana/deploy/generate_plugin.py": {
+    "mtime": 1786219743.0549903,
+    "seen": 1787455082.415948,
+    "ast_hash": "e8262e8d6d0d8c96f7e64671e764c87f",
+    "semantic_hash": "e8262e8d6d0d8c96f7e64671e764c87f"
+  },
+  "mcp-apps/ask-s4hana/pyproject.toml": {
+    "mtime": 1786218836.6816423,
+    "seen": 1787455082.415949,
+    "ast_hash": "b032fb2faa06474769f5ab30d97e329b",
+    "semantic_hash": "b032fb2faa06474769f5ab30d97e329b"
+  },
+  "mcp-apps/ask-s4hana/s4-connector-swagger.json": {
+    "mtime": 1786787883.9883716,
+    "seen": 1787455082.415951,
+    "ast_hash": "321b708e8f21c84f9b07db8e59ae6ceb",
+    "semantic_hash": "321b708e8f21c84f9b07db8e59ae6ceb"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/__init__.py": {
+    "mtime": 1786218836.6843448,
+    "seen": 1787455082.415952,
+    "ast_hash": "b8c6c627587ae142922d6f7fd0e4fce5",
+    "semantic_hash": "b8c6c627587ae142922d6f7fd0e4fce5"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/__main__.py": {
+    "mtime": 1786218836.6849442,
+    "seen": 1787455082.4159539,
+    "ast_hash": "19f82b153dc0f233c8106bb016ed316f",
+    "semantic_hash": "19f82b153dc0f233c8106bb016ed316f"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py": {
+    "mtime": 1786219557.8846977,
+    "seen": 1787455082.4159548,
+    "ast_hash": "83c6530da35bf2d84cf3de92143dcf56",
+    "semantic_hash": "83c6530da35bf2d84cf3de92143dcf56"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/cache.py": {
+    "mtime": 1786220409.9986289,
+    "seen": 1787455082.415957,
+    "ast_hash": "28de0436b581c2c3623f4b9ef24114fb",
+    "semantic_hash": "28de0436b581c2c3623f4b9ef24114fb"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/client.py": {
+    "mtime": 1786220381.7949011,
+    "seen": 1787455082.415958,
+    "ast_hash": "85dd41d30972f38e7602538be7734873",
+    "semantic_hash": "85dd41d30972f38e7602538be7734873"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/server.py": {
+    "mtime": 1786786296.0930088,
+    "seen": 1787455082.4159591,
+    "ast_hash": "fcbf64f8e0d83c7593d1e2b840966723",
+    "semantic_hash": "fcbf64f8e0d83c7593d1e2b840966723"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/settings.py": {
+    "mtime": 1786220271.0657544,
+    "seen": 1787455082.415961,
+    "ast_hash": "db10963ee0230ce2ec415d87f22b0e3f",
+    "semantic_hash": "db10963ee0230ce2ec415d87f22b0e3f"
+  },
+  "mcp-apps/ask-s4hana/s4hana_mcp/tools.py": {
+    "mtime": 1786219557.8858755,
+    "seen": 1787455082.415963,
+    "ast_hash": "ca0a730ddef3e54ba10b28c045c0f430",
+    "semantic_hash": "ca0a730ddef3e54ba10b28c045c0f430"
+  },
+  "mcp-apps/ask-s4hana/test/test_app.py": {
+    "mtime": 1786220410.0003552,
+    "seen": 1787455082.415964,
+    "ast_hash": "8c8ed322954047eefd04e39651818d5d",
+    "semantic_hash": "8c8ed322954047eefd04e39651818d5d"
+  },
+  "mcp-apps/ask-sac/deploy/generate_plugin.py": {
+    "mtime": 1786781467.862979,
+    "seen": 1787455082.415967,
+    "ast_hash": "970cc8b61a4a9b929633f7c4d52a2235",
+    "semantic_hash": "970cc8b61a4a9b929633f7c4d52a2235"
+  },
+  "mcp-apps/ask-sac/pyproject.toml": {
+    "mtime": 1786781208.8960495,
+    "seen": 1787455082.415968,
+    "ast_hash": "189735f77b88a0b1e0870b872e2ac994",
+    "semantic_hash": "189735f77b88a0b1e0870b872e2ac994"
+  },
+  "mcp-apps/ask-sac/sac-connector-swagger.json": {
+    "mtime": 1786787883.989197,
+    "seen": 1787455082.41597,
+    "ast_hash": "6dae8678db324b3fa94c2a543c56e9a7",
+    "semantic_hash": "6dae8678db324b3fa94c2a543c56e9a7"
+  },
+  "mcp-apps/ask-sac/sac_mcp/__init__.py": {
+    "mtime": 1786781278.2321365,
+    "seen": 1787455082.415971,
+    "ast_hash": "2efd451950ab31fd8ed61d63683cce7d",
+    "semantic_hash": "2efd451950ab31fd8ed61d63683cce7d"
+  },
+  "mcp-apps/ask-sac/sac_mcp/__main__.py": {
+    "mtime": 1786781302.5252028,
+    "seen": 1787455082.4159732,
+    "ast_hash": "6754613b82d088a6ae5755745bffe6ce",
+    "semantic_hash": "6754613b82d088a6ae5755745bffe6ce"
+  },
+  "mcp-apps/ask-sac/sac_mcp/adaptive_cards.py": {
+    "mtime": 1786781399.0718513,
+    "seen": 1787455082.4159749,
+    "ast_hash": "3177a916d5b84ae1a94945159a29e09e",
+    "semantic_hash": "3177a916d5b84ae1a94945159a29e09e"
+  },
+  "mcp-apps/ask-sac/sac_mcp/cache.py": {
+    "mtime": 1786781344.9560635,
+    "seen": 1787455082.415976,
+    "ast_hash": "71e6f10c65f88d86b0ee214f28d27258",
+    "semantic_hash": "71e6f10c65f88d86b0ee214f28d27258"
+  },
+  "mcp-apps/ask-sac/sac_mcp/client.py": {
+    "mtime": 1786781376.6023107,
+    "seen": 1787455082.415978,
+    "ast_hash": "88bc8a5cc726ea4647d484726826068d",
+    "semantic_hash": "88bc8a5cc726ea4647d484726826068d"
+  },
+  "mcp-apps/ask-sac/sac_mcp/server.py": {
+    "mtime": 1786781445.1735868,
+    "seen": 1787455082.415979,
+    "ast_hash": "2331537b1a9bbd843d136abb2c2eb320",
+    "semantic_hash": "2331537b1a9bbd843d136abb2c2eb320"
+  },
+  "mcp-apps/ask-sac/sac_mcp/settings.py": {
+    "mtime": 1786781322.47242,
+    "seen": 1787455082.415981,
+    "ast_hash": "347c3e05f680e810bcb1c3cb41513152",
+    "semantic_hash": "347c3e05f680e810bcb1c3cb41513152"
+  },
+  "mcp-apps/ask-sac/sac_mcp/tools.py": {
+    "mtime": 1786781422.7985451,
+    "seen": 1787455082.415982,
+    "ast_hash": "56cd1ffa7cff5479f69992cc1eb9d35f",
+    "semantic_hash": "56cd1ffa7cff5479f69992cc1eb9d35f"
+  },
+  "mcp-apps/ask-sac/test/test_app.py": {
+    "mtime": 1786781932.1118467,
+    "seen": 1787455082.4159842,
+    "ast_hash": "fd2a84812894ee1f11af325820f996e8",
+    "semantic_hash": "fd2a84812894ee1f11af325820f996e8"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-variance.json": {
+    "mtime": 1786219671.6283033,
+    "seen": 1787455082.4159849,
+    "ast_hash": "471d75dd2357e5627883e593de1f6822",
+    "semantic_hash": "471d75dd2357e5627883e593de1f6822"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/daily-plan.json": {
+    "mtime": 1786220060.668157,
+    "seen": 1787455082.415987,
+    "ast_hash": "dd308807248f13eda75a55648e42f847",
+    "semantic_hash": "dd308807248f13eda75a55648e42f847"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/decision-trace.json": {
+    "mtime": 1786219671.6296859,
+    "seen": 1787455082.415988,
+    "ast_hash": "2ce66601caaaa02156e806ded211b5c1",
+    "semantic_hash": "2ce66601caaaa02156e806ded211b5c1"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/email-snapshot.json": {
+    "mtime": 1786219886.8371623,
+    "seen": 1787455082.41599,
+    "ast_hash": "00428ef056ac3017773aa36b8e3215e5",
+    "semantic_hash": "00428ef056ac3017773aa36b8e3215e5"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/emiratisation.json": {
+    "mtime": 1786219671.626611,
+    "seen": 1787455082.415992,
+    "ast_hash": "9431289cf48ffc1857c4e4fba588a3f1",
+    "semantic_hash": "9431289cf48ffc1857c4e4fba588a3f1"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/end-of-day.json": {
+    "mtime": 1786220060.6685355,
+    "seen": 1787455082.415993,
+    "ast_hash": "6759b1f2faf51d287d10da8409b70955",
+    "semantic_hash": "6759b1f2faf51d287d10da8409b70955"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/executive-brief.json": {
+    "mtime": 1786219671.628512,
+    "seen": 1787455082.415995,
+    "ast_hash": "7495ecc0190af7c6d1b16edc9f3e50e6",
+    "semantic_hash": "7495ecc0190af7c6d1b16edc9f3e50e6"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/follow-ups.json": {
+    "mtime": 1786220060.668349,
+    "seen": 1787455082.415997,
+    "ast_hash": "abc214b8c47993b29a78d9e8c423fe60",
+    "semantic_hash": "abc214b8c47993b29a78d9e8c423fe60"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/headcount.json": {
+    "mtime": 1786219671.6262982,
+    "seen": 1787455082.415998,
+    "ast_hash": "e3150d1c6d1312da7858a7ab6ede3b9b",
+    "semantic_hash": "e3150d1c6d1312da7858a7ab6ede3b9b"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/meeting-intelligence.json": {
+    "mtime": 1786219671.6289477,
+    "seen": 1787455082.416,
+    "ast_hash": "ff5a31a6d131b7165f0ef6fdc208e3c7",
+    "semantic_hash": "ff5a31a6d131b7165f0ef6fdc208e3c7"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/payables-aging.json": {
+    "mtime": 1786219671.6278255,
+    "seen": 1787455082.4160042,
+    "ast_hash": "b1a9e2bf4bccd0ed3e13316024183837",
+    "semantic_hash": "b1a9e2bf4bccd0ed3e13316024183837"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/peer-benchmark.json": {
+    "mtime": 1786219671.6292543,
+    "seen": 1787455082.4160058,
+    "ast_hash": "06db43f69d806ef04c1e02ecafaab5a1",
+    "semantic_hash": "06db43f69d806ef04c1e02ecafaab5a1"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/proactive-recommendation.json": {
+    "mtime": 1786219671.628696,
+    "seen": 1787455082.4160068,
+    "ast_hash": "6914c40e59aed4c31e2ae49b4cfc74e8",
+    "semantic_hash": "6914c40e59aed4c31e2ae49b4cfc74e8"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/profit-and-loss.json": {
+    "mtime": 1786219671.6280794,
+    "seen": 1787455082.416009,
+    "ast_hash": "d3e0c2377d22d5a890e6e2797701d134",
+    "semantic_hash": "d3e0c2377d22d5a890e6e2797701d134"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/receivables-aging.json": {
+    "mtime": 1786219671.6275718,
+    "seen": 1787455082.416011,
+    "ast_hash": "edbebe62d6df1b1f5c96616f572cf09e",
+    "semantic_hash": "edbebe62d6df1b1f5c96616f572cf09e"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/sap-result.json": {
+    "mtime": 1786219671.6259973,
+    "seen": 1787455082.416012,
+    "ast_hash": "7df7f2ccd7db1ea14fee0661e1ac168f",
+    "semantic_hash": "7df7f2ccd7db1ea14fee0661e1ac168f"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/workforce-overview.json": {
+    "mtime": 1786219671.626999,
+    "seen": 1787455082.4160142,
+    "ast_hash": "63a9ff367c9ef80ea1143064e8a02b7b",
+    "semantic_hash": "63a9ff367c9ef80ea1143064e8a02b7b"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/ai-plugin.json": {
+    "mtime": 1786786696.7814505,
+    "seen": 1787455082.4160151,
+    "ast_hash": "3f32b1d1e4f0228e5d516212399eb485",
+    "semantic_hash": "3f32b1d1e4f0228e5d516212399eb485"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/declarativeAgent.json": {
+    "mtime": 1787045122.269133,
+    "seen": 1787455082.4160159,
+    "ast_hash": "071be09d8306e0f7c87fba34db315b80",
+    "semantic_hash": "071be09d8306e0f7c87fba34db315b80"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/facilitator-plugin.json": {
+    "mtime": 1787046362.1946657,
+    "seen": 1787455082.416018,
+    "ast_hash": "2005092dcb1e07eb4c062f06898e0630",
+    "semantic_hash": "2005092dcb1e07eb4c062f06898e0630"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/manifest.json": {
+    "mtime": 1786219005.8740134,
+    "seen": 1787455082.41602,
+    "ast_hash": "af62f65db373ff37e310836803f6efbc",
+    "semantic_hash": "af62f65db373ff37e310836803f6efbc"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/mcp-tools.json": {
+    "mtime": 1786786696.7822285,
+    "seen": 1787455082.416021,
+    "ast_hash": "88d55a1e93be91573dbc1f78316b5f36",
+    "semantic_hash": "88d55a1e93be91573dbc1f78316b5f36"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/s4hana-mcp-tools.json": {
+    "mtime": 1786786697.533564,
+    "seen": 1787455082.416022,
+    "ast_hash": "0451ab667f6abf4f0db6263f165e9dd2",
+    "semantic_hash": "0451ab667f6abf4f0db6263f165e9dd2"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/s4hana-plugin.json": {
+    "mtime": 1786786697.53301,
+    "seen": 1787455082.416024,
+    "ast_hash": "fa66c7de7a751fde30f45d6162a281b1",
+    "semantic_hash": "fa66c7de7a751fde30f45d6162a281b1"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/sac-mcp-tools.json": {
+    "mtime": 1786786697.6618793,
+    "seen": 1787455082.4160252,
+    "ast_hash": "d02025670f42cd071471059ef25545dd",
+    "semantic_hash": "d02025670f42cd071471059ef25545dd"
+  },
+  "mcp-apps/ask-successfactors/agent/appPackage/sac-plugin.json": {
+    "mtime": 1786786697.6623938,
+    "seen": 1787455082.4160268,
+    "ast_hash": "900ef1a3a5e41dd93070e26ff9ab2585",
+    "semantic_hash": "900ef1a3a5e41dd93070e26ff9ab2585"
+  },
+  "mcp-apps/ask-successfactors/automation/scheduled-prompts.json": {
+    "mtime": 1786220060.6665592,
+    "seen": 1787455082.416028,
+    "ast_hash": "697a2b714c8a1b89ece0dd7c9a63fe13",
+    "semantic_hash": "697a2b714c8a1b89ece0dd7c9a63fe13"
+  },
+  "mcp-apps/ask-successfactors/automation/trigger-payload.schema.json": {
+    "mtime": 1786220060.6668324,
+    "seen": 1787455082.41603,
+    "ast_hash": "99a966a0cf55923774177b7a0113e85e",
+    "semantic_hash": "99a966a0cf55923774177b7a0113e85e"
+  },
+  "mcp-apps/ask-successfactors/deploy/LocalDeploy.ps1": {
+    "mtime": 1786034413.2564256,
+    "seen": 1787455082.416031,
+    "ast_hash": "e48256d73c987c1d748fe34c8ded47da",
+    "semantic_hash": "e48256d73c987c1d748fe34c8ded47da"
+  },
+  "mcp-apps/ask-successfactors/deploy/build_agent_package.py": {
+    "mtime": 1786781642.1484349,
+    "seen": 1787455082.416032,
+    "ast_hash": "bc130c65cc3650d7812f8778ba69a2c1",
+    "semantic_hash": "bc130c65cc3650d7812f8778ba69a2c1"
+  },
+  "mcp-apps/ask-successfactors/deploy/deploy.sh": {
+    "mtime": 1786034407.5117767,
+    "seen": 1787455082.416034,
+    "ast_hash": "1538a332e49f5204ec5e283fc7c92981",
+    "semantic_hash": "1538a332e49f5204ec5e283fc7c92981"
+  },
+  "mcp-apps/ask-successfactors/deploy/regen_manifests.py": {
+    "mtime": 1786219743.054093,
+    "seen": 1787455082.4160352,
+    "ast_hash": "e8a01ed97a03ddeff4147f6ac91998a2",
+    "semantic_hash": "e8a01ed97a03ddeff4147f6ac91998a2"
+  },
+  "mcp-apps/ask-successfactors/pyproject.toml": {
+    "mtime": 1787398624.1719723,
+    "seen": 1787455082.416037,
+    "ast_hash": "15a5e4e1fb4d72185c44386356e377cb",
+    "semantic_hash": "15a5e4e1fb4d72185c44386356e377cb"
+  },
+  "mcp-apps/ask-successfactors/shared_mcp/__init__.py": {
+    "mtime": 1786034173.1750662,
+    "seen": 1787455082.4160378,
+    "ast_hash": "3d592cee91481cf1b2e6ac0554c88530",
+    "semantic_hash": "3d592cee91481cf1b2e6ac0554c88530"
+  },
+  "mcp-apps/ask-successfactors/shared_mcp/auth.py": {
+    "mtime": 1786034182.5056858,
+    "seen": 1787455082.41604,
+    "ast_hash": "9beef7bdc4e6fd7ce4b3dc0fd8b18aa3",
+    "semantic_hash": "9beef7bdc4e6fd7ce4b3dc0fd8b18aa3"
+  },
+  "mcp-apps/ask-successfactors/shared_mcp/file_logger.py": {
+    "mtime": 1786220518.1638658,
+    "seen": 1787455082.416041,
+    "ast_hash": "f246c7be47d0eae83567a5703f8677ed",
+    "semantic_hash": "f246c7be47d0eae83567a5703f8677ed"
+  },
+  "mcp-apps/ask-successfactors/shared_mcp/http.py": {
+    "mtime": 1786034187.5335176,
+    "seen": 1787455082.416043,
+    "ast_hash": "3c713ee380b133f3e8291ae4793bbaf8",
+    "semantic_hash": "3c713ee380b133f3e8291ae4793bbaf8"
+  },
+  "mcp-apps/ask-successfactors/shared_mcp/logger.py": {
+    "mtime": 1786217343.8714657,
+    "seen": 1787455082.416044,
+    "ast_hash": "091a058efd2882564816ae9d0e255769",
+    "semantic_hash": "091a058efd2882564816ae9d0e255769"
+  },
+  "mcp-apps/ask-successfactors/shared_mcp/telemetry.py": {
+    "mtime": 1786219293.6119952,
+    "seen": 1787455082.416045,
+    "ast_hash": "4d39a19a9d01a43ac26ec2cd6fa7a4bc",
+    "semantic_hash": "4d39a19a9d01a43ac26ec2cd6fa7a4bc"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/__init__.py": {
+    "mtime": 1786034204.5236816,
+    "seen": 1787455082.4160461,
+    "ast_hash": "080b9f212c9f8625ee6a29b5e6adea12",
+    "semantic_hash": "080b9f212c9f8625ee6a29b5e6adea12"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/__main__.py": {
+    "mtime": 1786034209.4601917,
+    "seen": 1787455082.416048,
+    "ast_hash": "99e39d971d3ceb21fed293abbb555d55",
+    "semantic_hash": "99e39d971d3ceb21fed293abbb555d55"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py": {
+    "mtime": 1787398586.913094,
+    "seen": 1787455082.416049,
+    "ast_hash": "57a4260c8666d669fa8152d9f1f274c7",
+    "semantic_hash": "57a4260c8666d669fa8152d9f1f274c7"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/cache.py": {
+    "mtime": 1786220409.998138,
+    "seen": 1787455082.416051,
+    "ast_hash": "28de0436b581c2c3623f4b9ef24114fb",
+    "semantic_hash": "28de0436b581c2c3623f4b9ef24114fb"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py": {
+    "mtime": 1786781800.4260998,
+    "seen": 1787455082.4160519,
+    "ast_hash": "68cbc13dedbb07c813a46e2a0621a627",
+    "semantic_hash": "68cbc13dedbb07c813a46e2a0621a627"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py": {
+    "mtime": 1787406874.1258397,
+    "seen": 1787455082.416054,
+    "ast_hash": "baab39061726b1747e9fbd18271bfe89",
+    "semantic_hash": "baab39061726b1747e9fbd18271bfe89"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py": {
+    "mtime": 1787409498.9414964,
+    "seen": 1787455082.416055,
+    "ast_hash": "e2cb4d4b2e0f4f5cb4ca8403fe4ef4e9",
+    "semantic_hash": "e2cb4d4b2e0f4f5cb4ca8403fe4ef4e9"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py": {
+    "mtime": 1786648749.2057571,
+    "seen": 1787455082.4160562,
+    "ast_hash": "055e10c7511b04830eb8a35d661acd53",
+    "semantic_hash": "055e10c7511b04830eb8a35d661acd53"
+  },
+  "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py": {
+    "mtime": 1787406753.3843842,
+    "seen": 1787455082.416058,
+    "ast_hash": "e26aae343090be2d68cc418b0a636197",
+    "semantic_hash": "e26aae343090be2d68cc418b0a636197"
+  },
+  "mcp-apps/ask-successfactors/test/test_app.py": {
+    "mtime": 1787405794.671777,
+    "seen": 1787455082.4160588,
+    "ast_hash": "e641a97bd0facc49464dfbbc6e1aa112",
+    "semantic_hash": "e641a97bd0facc49464dfbbc6e1aa112"
+  },
+  "mcp-apps/ask-successfactors/test/test_leavers_attrition_trend.py": {
+    "mtime": 1787398602.2802598,
+    "seen": 1787455082.416061,
+    "ast_hash": "e05200d9a0fe61ecbc702261f9992213",
+    "semantic_hash": "e05200d9a0fe61ecbc702261f9992213"
+  },
+  "mcp-apps/ask-successfactors/test/test_validate_against_headcount_report.py": {
+    "mtime": 1787028637.042708,
+    "seen": 1787455082.4160619,
+    "ast_hash": "e2197d07e6a741e801df51d8f43fd328",
+    "semantic_hash": "e2197d07e6a741e801df51d8f43fd328"
+  },
+  "mcp-apps/build_all_images.sh": {
+    "mtime": 1787197991.7250843,
+    "seen": 1787455082.416063,
+    "ast_hash": "8d00644765d31a3c742435180f8ac936",
+    "semantic_hash": "8d00644765d31a3c742435180f8ac936"
+  },
+  "mcp-apps/deploy-azure-containerapps.sh": {
+    "mtime": 1787197999.154208,
+    "seen": 1787455082.416065,
+    "ast_hash": "0ad56f73e34e3da329823e227e4f02dd",
+    "semantic_hash": "0ad56f73e34e3da329823e227e4f02dd"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/copilot-studio/openapi-schema.json": {
+    "mtime": 1787197541.710904,
+    "seen": 1787455082.416066,
+    "ast_hash": "ccc7d82bb065eeaefb498c758bc2742e",
+    "semantic_hash": "ccc7d82bb065eeaefb498c758bc2742e"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/package.json": {
+    "mtime": 1787197781.5307164,
+    "seen": 1787455082.416068,
+    "ast_hash": "fe7f61aaef076a3a4072d9268a6f60d2",
+    "semantic_hash": "fe7f61aaef076a3a4072d9268a6f60d2"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/engine/fallback-generator.ts": {
+    "mtime": 1787197488.8284907,
+    "seen": 1787455082.416069,
+    "ast_hash": "dacff69feea22b2ca2919944fb6488fb",
+    "semantic_hash": "dacff69feea22b2ca2919944fb6488fb"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/engine/template-evaluator.ts": {
+    "mtime": 1787197736.708689,
+    "seen": 1787455082.41607,
+    "ast_hash": "18934563d7a3ee3e354803f835bd6d26",
+    "semantic_hash": "18934563d7a3ee3e354803f835bd6d26"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/engine/template-registry.ts": {
+    "mtime": 1787197692.6091383,
+    "seen": 1787455082.416072,
+    "ast_hash": "9f63ca6874557d308c5d3365e5aeb9eb",
+    "semantic_hash": "9f63ca6874557d308c5d3365e5aeb9eb"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/engine/validator-sanitizer.ts": {
+    "mtime": 1787197482.142917,
+    "seen": 1787455082.4160728,
+    "ast_hash": "03fcb6205894af581b934a72b80241eb",
+    "semantic_hash": "03fcb6205894af581b934a72b80241eb"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/index.ts": {
+    "mtime": 1787197514.580081,
+    "seen": 1787455082.416075,
+    "ast_hash": "c0dc614a037ae44072f60a11845f46f1",
+    "semantic_hash": "c0dc614a037ae44072f60a11845f46f1"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/security/idempotency-signer.ts": {
+    "mtime": 1787197475.125754,
+    "seen": 1787455082.416076,
+    "ast_hash": "bf5f94f382b08484fab9d01bb855433c",
+    "semantic_hash": "bf5f94f382b08484fab9d01bb855433c"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/templates/approval-card.json": {
+    "mtime": 1787197450.544887,
+    "seen": 1787455082.416078,
+    "ast_hash": "2250e84fd553767a52d4902d15bef87f",
+    "semantic_hash": "2250e84fd553767a52d4902d15bef87f"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/templates/fact-grid-card.json": {
+    "mtime": 1787197455.865358,
+    "seen": 1787455082.416079,
+    "ast_hash": "2fc8baa937484c2c53b5059823dff309",
+    "semantic_hash": "2fc8baa937484c2c53b5059823dff309"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/templates/input-form-card.json": {
+    "mtime": 1787197461.5321085,
+    "seen": 1787455082.416081,
+    "ast_hash": "be5c64e4f0dface85f815e81401d8390",
+    "semantic_hash": "be5c64e4f0dface85f815e81401d8390"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/src/templates/metrics-card.json": {
+    "mtime": 1787197466.6007085,
+    "seen": 1787455082.416082,
+    "ast_hash": "632b5eea8fec7436ceae121df91a501a",
+    "semantic_hash": "632b5eea8fec7436ceae121df91a501a"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/test/card-service.test.ts": {
+    "mtime": 1787197702.630664,
+    "seen": 1787455082.416084,
+    "ast_hash": "a19a0dd16bdacc72d99bf3a3971bdd99",
+    "semantic_hash": "a19a0dd16bdacc72d99bf3a3971bdd99"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/tsconfig.json": {
+    "mtime": 1787197441.9518034,
+    "seen": 1787455082.416085,
+    "ast_hash": "d6707d4100a863c96e63c93b0ee2f1b1",
+    "semantic_hash": "d6707d4100a863c96e63c93b0ee2f1b1"
+  },
+  "mcp-apps/dynamic-adaptive-card-service/webchat-client/card-guard-middleware.ts": {
+    "mtime": 1787197522.9807105,
+    "seen": 1787455082.416086,
+    "ast_hash": "0f039e6b39598a6a337d897dd0db79de",
+    "semantic_hash": "0f039e6b39598a6a337d897dd0db79de"
+  },
+  "skills-lock.json": {
+    "mtime": 1787392695.9472866,
+    "seen": 1787455082.416088,
+    "ast_hash": "6a4811759567043a6c24fa439b311e0a",
+    "semantic_hash": "6a4811759567043a6c24fa439b311e0a"
+  }
+}

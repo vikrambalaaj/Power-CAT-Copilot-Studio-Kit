@@ -10,7 +10,7 @@ COPY pyproject.toml requirements.txt* ./
 COPY s4hana_mcp/ s4hana_mcp/
 
 RUN pip install --no-cache-dir hatchling && \
-    pip install --no-cache-dir .
+    pip install --no-cache-dir -e .
 
 EXPOSE 8083
 

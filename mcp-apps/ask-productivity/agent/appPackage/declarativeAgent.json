@@ -1,0 +1,31 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.8/schema.json",
+    "version": "v1.8",
+    "name": "Velora Productivity Agent",
+    "description": "Handles authorized Microsoft 365 work for Velora, including email, calendar, meetings, Teams messages, Planner tasks and Work IQ retrieval. Use this agent for Microsoft 365 context or actions. It must preview and obtain explicit approval before performing any external write, and it records all operations in the Velora Dataverse audit log.",
+    "instructions": "$[file('instruction.txt')]",
+    "capabilities": [
+        {
+            "name": "OneDriveAndSharePoint"
+        },
+        {
+            "name": "TeamsMessages"
+        },
+        {
+            "name": "Email"
+        },
+        {
+            "name": "People",
+            "include_related_content": false
+        },
+        {
+            "name": "Meetings"
+        }
+    ],
+    "actions": [
+        {
+            "id": "productivityAction",
+            "file": "productivity-plugin.json"
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.17",
+    "version": "1.0.0",
+    "id": "cre2f-velora-productivity-agent",
+    "packageName": "ae.velora.productivityagent",
+    "developer": {
+        "name": "Velora Aviation Holding",
+        "websiteUrl": "https://velora.ae",
+        "privacyUrl": "https://velora.ae/privacy",
+        "termsOfUseUrl": "https://velora.ae/terms"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "Velora Productivity Agent",
+        "full": "Velora Connected Productivity Agent"
+    },
+    "description": {
+        "short": "Authorized Microsoft 365, Mail, Calendar, Teams, and Planner Connected Agent.",
+        "full": "Handles authorized Microsoft 365 work for Velora, including email, calendar, meetings, Teams messages, Planner tasks and Work IQ retrieval. Use this agent for Microsoft 365 context or actions. It must preview and obtain explicit approval before performing any external write, and it records all operations in the Velora Dataverse audit log."
+    },
+    "accentColor": "#002B49",
+    "copilotAgents": {
+        "declarativeAgents": [
+            {
+                "id": "veloraProductivityAgent",
+                "file": "declarativeAgent.json"
+            }
+        ]
+    },
+    "permissions": ["identity", "messageTeamMembers"],
+    "validDomains": ["velora.ae", "etihad.ae", "holding.ae"]
+}

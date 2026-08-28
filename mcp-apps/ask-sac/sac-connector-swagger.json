@@ -38,6 +38,95 @@
           }
         }
       }
+    },
+    "/get_sac_kpis": {
+      "post": {
+        "summary": "Retrieve executive KPIs from SAP Analytics Cloud",
+        "operationId": "getSacKpis",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "domain": {
+                  "type": "string",
+                  "default": "FINANCE"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Executive SAC KPIs with Adaptive Card"
+          }
+        }
+      }
+    },
+    "/get_sac_story_analytics": {
+      "post": {
+        "summary": "Fetch SAC Story BI Insights and Variances",
+        "operationId": "getSacStoryAnalytics",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "story_id": {
+                  "type": "string",
+                  "default": "VELORA_CORP_PERF_2026"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SAC Story BI insights with Adaptive Card"
+          }
+        }
+      }
+    },
+    "/get_sac_model_data": {
+      "post": {
+        "summary": "Query SAC model measure data",
+        "operationId": "getSacModelData",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "model_id"
+              ],
+              "properties": {
+                "model_id": {
+                  "type": "string"
+                },
+                "measures": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw model measure values"
+          }
+        }
+      }
     }
   }
 }

@@ -1,0 +1,36 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.1/schema.json",
+    "schema_version": "v2.1",
+    "name_for_human": "Velora Productivity Connected Agent",
+    "name_for_model": "velora_productivity_agent",
+    "description_for_human": "Connected child agent for Microsoft 365, Mail, Calendar, Teams, and Planner operations.",
+    "description_for_model": "Use this connected agent exclusively for Microsoft 365 email, Outlook calendar, meetings, Teams messages, people, files, Work IQ and Planner. Use it for both retrieval and action preparation. Never use it for SAP workforce, finance or SAC questions. All Microsoft 365 writes require a preview and explicit user approval.",
+    "functions": [
+        {
+            "name": "HandleParentHandoff",
+            "description": "Parent-to-child executive task delegation router",
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing parameters for HandleParentHandoff..."
+                },
+                "executing": {
+                    "description": "Executing HandleParentHandoff across authorized enterprise systems..."
+                },
+                "responding": {
+                    "description": "Formatting response for HandleParentHandoff..."
+                }
+            }
+        }
+    ],
+    "runtimes": [
+        {
+            "type": "OpenAPI",
+            "auth": {
+                "type": "OAuth2ClientCredentials"
+            },
+            "spec": {
+                "url": "https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com/productivity-connector-swagger.json"
+            }
+        }
+    ]
+}

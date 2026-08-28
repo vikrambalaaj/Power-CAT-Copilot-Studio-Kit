@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.8/schema.json",
     "version": "v1.8",
     "name": "Velora Executive Agent",
-    "description": "Executive workforce and finance intelligence from SAP SuccessFactors and S/4HANA, delivered in Microsoft 365 Copilot.",
+    "description": "Executive workforce and finance intelligence from SAP SuccessFactors, S/4HANA, SAC, and Connected Productivity Agent for Microsoft 365.",
     "instructions": "$[file('instruction.txt')]",
     "capabilities": [
         {
@@ -52,16 +52,24 @@
     ],
     "conversation_starters": [
         {
-            "title": "Executive morning brief",
-            "text": "Prepare a concise executive brief using the SAP facts and authorized Microsoft 365 context available to you. Separate facts, recommendations, actions, and open questions."
+            "title": "Executive daily briefing",
+            "text": "Prepare my comprehensive executive daily briefing covering today's calendar meetings, high-priority tasks to do, Teams chat follow-ups, and upcoming approvals."
+        },
+        {
+            "title": "Send daily briefing email",
+            "text": "Compile my complete daily executive briefing into a formatted summary email and dispatch it to my inbox."
+        },
+        {
+            "title": "Things to do & approvals",
+            "text": "Show all things to do, active Planner deliverables, overdue tasks, and upcoming approvals requiring my sign-off today."
         },
         {
             "title": "Workforce and Emiratisation",
-            "text": "Show current headcount and Emiratisation status, including source, as-of time, target variance, and any warnings."
+            "text": "Show current headcount and Emiratisation status from SuccessFactors, including target variance and warnings."
         },
         {
             "title": "Receivables and payables",
-            "text": "Summarize receivables and payables exposure for the requested company and key date, with aging and material items."
+            "text": "Summarize receivables and payables exposure from S/4HANA for the requested company and key date."
         },
         {
             "title": "P&L and budget variance",
@@ -70,14 +78,6 @@
         {
             "title": "Meeting decisions and actions",
             "text": "Summarize the authorized meeting context, identify decisions and proposed actions, and ask before creating any task."
-        },
-        {
-            "title": "Trace a decision",
-            "text": "Show the evidence, sources, rule versions, approvals, and correlation IDs available for this decision."
-        },
-        {
-            "title": "Email this snapshot",
-            "text": "Create a privacy-safe image snapshot of the current executive summary, resolve the named internal recipients, and show me the complete email for confirmation before sending."
         },
         {
             "title": "Corporate KPIs and SAC stories",
@@ -100,6 +100,10 @@
         {
             "id": "facilitatorAction",
             "file": "facilitator-plugin.json"
+        },
+        {
+            "id": "productivityAction",
+            "file": "productivity-plugin.json"
         }
     ]
 }

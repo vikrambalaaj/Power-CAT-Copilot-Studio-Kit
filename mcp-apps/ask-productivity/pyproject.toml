@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "productivity_mcp"
+version = "1.0.0"
+description = "Velora Productivity Connected Agent MCP for Microsoft 365, Work IQ, and Dataverse Audit"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "mcp>=1.0.0",
+    "structlog>=24.1.0",
+    "rich>=13.7.0"
+]

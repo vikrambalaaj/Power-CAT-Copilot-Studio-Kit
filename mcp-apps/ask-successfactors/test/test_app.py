@@ -458,7 +458,7 @@ class ManifestTests(unittest.TestCase):
         agent = json.loads((package / "declarativeAgent.json").read_text())
         self.assertEqual(
             {action["file"] for action in agent["actions"]},
-            {"ai-plugin.json", "s4hana-plugin.json", "sac-plugin.json", "facilitator-plugin.json"},
+            {"ai-plugin.json", "s4hana-plugin.json", "sac-plugin.json", "facilitator-plugin.json", "productivity-plugin.json"},
         )
         self.assertEqual(
             {capability["name"] for capability in agent["capabilities"]},

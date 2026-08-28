@@ -19,7 +19,10 @@ class ConsentAndGreetingTests(unittest.IsolatedAsyncioTestCase):
         self.dv_client.clear_all_for_testing()
         self.consent_service = ConsentService(dataverse_client=self.dv_client)
         self.memory_service = MemoryService(dataverse_client=self.dv_client)
-        self.greeting_service = GreetingService(memory_service=self.memory_service)
+        self.greeting_service = GreetingService(
+            memory_service=self.memory_service,
+            consent_service=self.consent_service,
+        )
 
     async def test_first_use_consent_gate_blocks_until_accepted(self):
         # 1. First-time check -> should return False and blocking card
@@ -72,20 +75,36 @@ class ConsentAndGreetingTests(unittest.IsolatedAsyncioTestCase):
         salutation = get_time_aware_salutation("Asia/Dubai")
         self.assertIn(salutation, ["Good morning", "Good afternoon", "Good evening", "Welcome"])
 
-        # Capabilities card has all 6 core starters
+        # Clean greeting card simply greets and says hi without capability prompt clutter
         card = build_capabilities_card(user_display_name="Vikram Bala", user_timezone="Asia/Dubai")
         self.assertEqual(card["type"], "AdaptiveCard")
         self.assertIn("Vikram", card["body"][0]["text"])
-        self.assertGreaterEqual(len(card["actions"]), 3)
+        self.assertIn("Hi", card["body"][0]["text"])
 
     async def test_session_greeting_triggers_memory_prewarm(self):
+        # 1. Unconsented user receives consent gate on greeting
+        greeting_gate = await self.greeting_service.get_session_greeting(
+            user_object_id="entra-u12",
+            user_email="user12@velora.ae",
+            user_display_name="Sarah Al Zaabi",
+        )
+        self.assertEqual(greeting_gate["type"], "ConsentRequired")
+        self.assertFalse(greeting_gate["is_consented"])
+        self.assertIsNotNone(greeting_gate.get("adaptiveCard"))
+
+        # 2. After user consents, greeting returns clean session greeting
+        await self.consent_service.record_user_consent(
+            user_object_id="entra-u12",
+            user_email="user12@velora.ae",
+            accepted=True,
+        )
         greeting_res = await self.greeting_service.get_session_greeting(
             user_object_id="entra-u12",
             user_email="user12@velora.ae",
             user_display_name="Sarah Al Zaabi",
         )
-
         self.assertEqual(greeting_res["type"], "SessionGreeting")
+        self.assertTrue(greeting_res["is_consented"])
         self.assertIn("Sarah", greeting_res["fallback_text"])
         self.assertIsNotNone(greeting_res.get("adaptiveCard"))
 

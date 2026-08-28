@@ -149,6 +149,18 @@ class ConnectionManagerTests(unittest.IsolatedAsyncioTestCase):
         graph_msg = self.mgr.get_user_facing_failure_message(ConnectionType.GRAPH_SERVICE_MAILBOX)
         self.assertEqual(graph_msg, "Notification Services is temporarily unavailable because the managed enterprise connection needs administrator attention.")
 
+        s4_msg = self.mgr.get_user_facing_failure_message(ConnectionType.SAP_S4HANA)
+        self.assertEqual(s4_msg, "SAP S/4HANA is temporarily unavailable because the managed enterprise connection needs administrator attention.")
+
+        sac_msg = self.mgr.get_user_facing_failure_message(ConnectionType.SAP_SAC)
+        self.assertEqual(sac_msg, "SAP Analytics Cloud is temporarily unavailable because the managed enterprise connection needs administrator attention.")
+
+        prod_msg = self.mgr.get_user_facing_failure_message(ConnectionType.PRODUCTIVITY_AGENT)
+        self.assertEqual(prod_msg, "Velora Productivity Services is temporarily unavailable because the managed enterprise connection needs administrator attention.")
+
+        fac_msg = self.mgr.get_user_facing_failure_message(ConnectionType.FACILITATOR_AGENT)
+        self.assertEqual(fac_msg, "Velora Meeting Facilitator is temporarily unavailable because the managed enterprise connection needs administrator attention.")
+
     async def test_background_health_probe_lifecycle(self):
         """0.9: Verify background health probe execution and status updating."""
         probe_called = False

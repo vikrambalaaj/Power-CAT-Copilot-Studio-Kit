@@ -28,6 +28,8 @@ class ConnectionType(str, enum.Enum):
     DATAVERSE_ADMIN = "DATAVERSE_ADMIN"
     GRAPH_SERVICE_MAILBOX = "GRAPH_SERVICE_MAILBOX"
     GRAPH_USER_DELEGATED = "GRAPH_USER_DELEGATED"
+    PRODUCTIVITY_AGENT = "PRODUCTIVITY_AGENT"
+    FACILITATOR_AGENT = "FACILITATOR_AGENT"
 
 
 class ReadWriteClassification(str, enum.Enum):
@@ -251,6 +253,94 @@ class ConnectionManager:
         )
         self.register_connection(graph_conn, logical_reference="Velora Service Mailbox Connection")
 
+        # 5. SAP S/4HANA Finance Connection
+        s4_conn = EnterpriseConnection(
+            connection_id="CONN-S4-001",
+            connection_name="Velora S4HANA Finance Connection",
+            connection_type=ConnectionType.SAP_S4HANA,
+            environment=self.default_environment,
+            data_source_url=os.getenv("S4HANA_API_URL", "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com"),
+            connection_owner="admin.finance@velora.ae",
+            client_id=os.getenv("S4HANA_CLIENT_ID", "sp-s4-finance"),
+            tenant_id=os.getenv("S4HANA_TENANT_ID", "velora-tenant-id"),
+            dataverse_connection_reference="cre2f_cr_s4hana",
+            secret_store_reference="S4HANA_PASSWORD_REF",
+            auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
+            granted_scopes=["Finance.Receivables.Read", "Finance.Payables.Read", "Finance.GL.Read"],
+            read_write_classification=ReadWriteClassification.READ_ONLY,
+            agent_assignments=["velora-executive-agent"],
+            status=ConnectionHealthStatus.HEALTHY,
+            enabled=True,
+            health_check_interval_seconds=300,
+        )
+        self.register_connection(s4_conn, logical_reference="Velora S4HANA Finance Connection")
+
+        # 6. SAP Analytics Cloud (SAC) Connection
+        sac_conn = EnterpriseConnection(
+            connection_id="CONN-SAC-001",
+            connection_name="Velora SAC Analytics Connection",
+            connection_type=ConnectionType.SAP_SAC,
+            environment=self.default_environment,
+            data_source_url=os.getenv("SAC_API_URL", "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com"),
+            connection_owner="admin.bi@velora.ae",
+            client_id=os.getenv("SAC_CLIENT_ID", "sp-sac-analytics"),
+            tenant_id=os.getenv("SAC_TENANT_ID", "velora-tenant-id"),
+            dataverse_connection_reference="cre2f_cr_sac",
+            secret_store_reference="SAC_PASSWORD_REF",
+            auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
+            granted_scopes=["Story.Read", "Model.Read", "KPI.Read"],
+            read_write_classification=ReadWriteClassification.READ_ONLY,
+            agent_assignments=["velora-executive-agent"],
+            status=ConnectionHealthStatus.HEALTHY,
+            enabled=True,
+            health_check_interval_seconds=300,
+        )
+        self.register_connection(sac_conn, logical_reference="Velora SAC Analytics Connection")
+
+        # 7. Velora Productivity Agent Connection (Connected Child Agent)
+        prod_conn = EnterpriseConnection(
+            connection_id="CONN-PROD-001",
+            connection_name="Velora Productivity Agent Connection",
+            connection_type=ConnectionType.PRODUCTIVITY_AGENT,
+            environment=self.default_environment,
+            data_source_url=os.getenv("PRODUCTIVITY_AGENT_URL", "https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com"),
+            connection_owner="admin.it@velora.ae",
+            client_id=os.getenv("PRODUCTIVITY_CLIENT_ID", "sp-velora-productivity"),
+            tenant_id=os.getenv("PRODUCTIVITY_TENANT_ID", "velora-tenant-id"),
+            dataverse_connection_reference="cre2f_cr_productivity",
+            secret_store_reference="GRAPH_CLIENT_SECRET_REF",
+            auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
+            granted_scopes=["Mail.ReadWrite", "Calendars.ReadWrite", "Teams.ReadWrite", "Tasks.ReadWrite"],
+            read_write_classification=ReadWriteClassification.USER_CONTEXT,
+            agent_assignments=["velora-executive-agent", "velora-productivity-agent"],
+            status=ConnectionHealthStatus.HEALTHY,
+            enabled=True,
+            health_check_interval_seconds=300,
+        )
+        self.register_connection(prod_conn, logical_reference="Velora Productivity Agent Connection")
+
+        # 8. Velora Facilitator Connection
+        facilitator_conn = EnterpriseConnection(
+            connection_id="CONN-FACILITATOR-001",
+            connection_name="Velora Facilitator Connection",
+            connection_type=ConnectionType.FACILITATOR_AGENT,
+            environment=self.default_environment,
+            data_source_url=os.getenv("FACILITATOR_URL", "https://facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com"),
+            connection_owner="admin.it@velora.ae",
+            client_id=os.getenv("FACILITATOR_CLIENT_ID", "sp-velora-facilitator"),
+            tenant_id=os.getenv("FACILITATOR_TENANT_ID", "velora-tenant-id"),
+            dataverse_connection_reference="cre2f_cr_facilitator",
+            secret_store_reference="GRAPH_CLIENT_SECRET_REF",
+            auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
+            granted_scopes=["Meetings.Facilitate", "KnowledgeGraph.Sync"],
+            read_write_classification=ReadWriteClassification.NOTIFICATION_WRITE,
+            agent_assignments=["velora-executive-agent"],
+            status=ConnectionHealthStatus.HEALTHY,
+            enabled=True,
+            health_check_interval_seconds=300,
+        )
+        self.register_connection(facilitator_conn, logical_reference="Velora Facilitator Connection")
+
     def register_connection(self, conn: EnterpriseConnection, logical_reference: Optional[str] = None) -> None:
         """Register or update a managed enterprise connection."""
         self._connections[conn.connection_id] = conn
@@ -381,6 +471,9 @@ class ConnectionManager:
             ConnectionType.DATAVERSE_SHARED: "Velora Data Services",
             ConnectionType.DATAVERSE_ADMIN: "Governance Services",
             ConnectionType.GRAPH_SERVICE_MAILBOX: "Notification Services",
+            ConnectionType.GRAPH_USER_DELEGATED: "Microsoft 365 User Services",
+            ConnectionType.PRODUCTIVITY_AGENT: "Velora Productivity Services",
+            ConnectionType.FACILITATOR_AGENT: "Velora Meeting Facilitator",
         }
         name = system_names.get(conn_type, "The enterprise data service")
         return f"{name} is temporarily unavailable because the managed enterprise connection needs administrator attention."

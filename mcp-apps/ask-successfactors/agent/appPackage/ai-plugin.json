@@ -1,8 +1,8 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
     "schema_version": "v2.4",
-    "name_for_human": "Velora HCM",
-    "description_for_human": "SuccessFactors workforce intelligence for the Velora Executive Agent",
+    "name_for_human": "Velora Executive AI Agent",
+    "description_for_human": "Velora Executive AI Agent for executive workforce, finance, corporate analytics, and productivity orchestration",
     "description_for_model": "Use these SAP SuccessFactors tools for authorized headcount, Emiratisation, employee, job, and organization facts. Keep Emiratisation aggregate and never invent values when a tool reports an error or missing configuration.",
     "namespace": "sf",
     "functions": [
@@ -21,6 +21,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Verifying user authorization and Dataverse disclosure policy..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP + Dataverse] Filtering employee roster with strict PII & banking privacy masking..."
+                },
+                "responding": {
+                    "description": "Rendering governed employee roster drilldown..."
+                }
             }
         },
         {
@@ -37,6 +48,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Evaluating confidentiality notice version compliance..."
+                },
+                "executing": {
+                    "description": "[Dataverse MCP] Persisting consent audit log in Microsoft Dataverse..."
+                },
+                "responding": {
+                    "description": "Confirming data access authorization..."
                 }
             }
         },
@@ -55,6 +77,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Validating user session and confidentiality consent..."
+                },
+                "executing": {
+                    "description": "[Dataverse MCP] Checking governance audit & consent records..."
+                },
+                "responding": {
+                    "description": "Delivering personalized executive greeting..."
+                }
             }
         },
         {
@@ -71,6 +104,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Retrieving 30-day institutional memory snapshot..."
+                },
+                "executing": {
+                    "description": "[Dataverse MCP] Loading contextual session history from Microsoft Dataverse..."
+                },
+                "responding": {
+                    "description": "Applying historical context to conversation..."
                 }
             }
         },
@@ -89,6 +133,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Identifying reporting period and new-hire filters..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying onboarding and new-hire records..."
+                },
+                "responding": {
+                    "description": "Formatting verified joiners summary..."
+                }
             }
         },
         {
@@ -105,6 +160,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Resolving exit reason classifications and departure periods..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Retrieving voluntary and involuntary exit records..."
+                },
+                "responding": {
+                    "description": "Formatting verified leavers analytics..."
                 }
             }
         },
@@ -123,6 +189,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Evaluating workforce departure parameters and calculation window..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Calculating annualized attrition and turnover rates..."
+                },
+                "responding": {
+                    "description": "Synthesizing attrition intelligence and trend data..."
+                }
             }
         },
         {
@@ -139,6 +216,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Compiling multi-period workforce movement timeline..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Calculating net headcount growth and turnover trends..."
+                },
+                "responding": {
+                    "description": "Rendering workforce movement trend visualization..."
                 }
             }
         },
@@ -157,6 +245,17 @@
                         "file": "adaptive-cards/headcount.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Analyzing workforce headcount query and department filters..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Connecting to HCM & calculating live department headcount..."
+                },
+                "responding": {
+                    "description": "Synthesizing workforce analytics and rendering Executive Headcount Card..."
+                }
             }
         },
         {
@@ -173,6 +272,17 @@
                     "static_template": {
                         "file": "adaptive-cards/workforce-overview.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Aggregating multi-KPI workforce health indicators..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying executive headcount, Emiratisation, and retention..."
+                },
+                "responding": {
+                    "description": "Rendering Executive Workforce Health Dashboard..."
                 }
             }
         },
@@ -191,6 +301,17 @@
                         "file": "adaptive-cards/emiratisation.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Identifying nationalization metrics and compliance targets..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Connecting to HCM & evaluating UAE Emiratisation ratios..."
+                },
+                "responding": {
+                    "description": "Synthesizing Emiratisation KPI and rendering compliance card..."
+                }
             }
         },
         {
@@ -207,6 +328,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Resolving employee position and job classification filters..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying EmpJob position records..."
+                },
+                "responding": {
+                    "description": "Formatting job assignment details..."
                 }
             }
         },
@@ -225,6 +357,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Retrieving detailed position attributes and organizational unit..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying single-record EmpJob entity..."
+                },
+                "responding": {
+                    "description": "Formatting verified job detail record..."
+                }
             }
         },
         {
@@ -241,6 +384,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Querying user profile directory in SAP SuccessFactors..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Retrieving active user profile metadata..."
+                },
+                "responding": {
+                    "description": "Formatting user profile results..."
                 }
             }
         },
@@ -259,6 +413,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Resolving specific user profile attributes..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying User entity in SAP SuccessFactors..."
+                },
+                "responding": {
+                    "description": "Formatting verified user profile..."
+                }
             }
         },
         {
@@ -276,6 +441,17 @@
                         "file": "adaptive-cards/sap-result.json"
                     }
                 }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Checking employment dates, service length, and status..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying EmpEmployment in SAP SuccessFactors..."
+                },
+                "responding": {
+                    "description": "Formatting employment service record..."
+                }
             }
         },
         {
@@ -292,6 +468,17 @@
                     "static_template": {
                         "file": "adaptive-cards/sap-result.json"
                     }
+                }
+            },
+            "states": {
+                "reasoning": {
+                    "description": "Mapping corporate organizational hierarchy..."
+                },
+                "executing": {
+                    "description": "[SAP SuccessFactors MCP] Querying FODepartment and FOCompany organizational entities..."
+                },
+                "responding": {
+                    "description": "Formatting organizational structure view..."
                 }
             }
         }
@@ -367,7 +554,10 @@
                                         "type": "boolean"
                                     }
                                 },
-                                "required": ["user_object_id", "user_email"],
+                                "required": [
+                                    "user_object_id",
+                                    "user_email"
+                                ],
                                 "title": "sf__check_and_record_consentArguments",
                                 "type": "object"
                             }
@@ -421,7 +611,10 @@
                                         "type": "string"
                                     }
                                 },
-                                "required": ["user_object_id", "user_email"],
+                                "required": [
+                                    "user_object_id",
+                                    "user_email"
+                                ],
                                 "title": "sf__recall_user_memoryArguments",
                                 "type": "object"
                             }

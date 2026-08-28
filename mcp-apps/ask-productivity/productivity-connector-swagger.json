@@ -1,0 +1,83 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Velora Productivity Agent Connector",
+    "description": "Microsoft 365, Mail, Calendar, Teams, Planner, and Fail-Closed Dataverse Audit Connector for Velora Executive Agent Platform.",
+    "version": "1.0.0"
+  },
+  "host": "productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+  "basePath": "/",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "HealthCheck",
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          }
+        }
+      }
+    },
+    "/handoff": {
+      "post": {
+        "summary": "Parent-to-child agent handoff router",
+        "operationId": "HandleParentHandoff",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/HandoffRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Handoff response envelope",
+            "schema": {
+              "$ref": "#/definitions/HandoffResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "HandoffRequest": {
+      "type": "object",
+      "required": ["task", "operation", "rootCorrelationId"],
+      "properties": {
+        "task": {"type": "string"},
+        "operation": {"type": "string"},
+        "rootCorrelationId": {"type": "string"},
+        "conversationId": {"type": "string"},
+        "turnId": {"type": "string"},
+        "userObjectId": {"type": "string"},
+        "userEmail": {"type": "string"},
+        "userTimezone": {"type": "string"},
+        "channel": {"type": "string"},
+        "dataClassification": {"type": "string"},
+        "parameters": {"type": "object"}
+      }
+    },
+    "HandoffResponse": {
+      "type": "object",
+      "properties": {
+        "status": {"type": "string"},
+        "approvalRequired": {"type": "boolean"},
+        "resultSummary": {"type": "string"},
+        "confirmationToken": {"type": "string"},
+        "correlationId": {"type": "string"},
+        "auditStatus": {"type": "string"},
+        "warnings": {"type": "array", "items": {"type": "string"}},
+        "previewDetails": {"type": "object"},
+        "structuredResult": {"type": "object"}
+      }
+    }
+  }
+}

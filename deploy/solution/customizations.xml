@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Entities>
+    <Entity>
+      <Name LocalizedName="Velora Agent Audit Log" OriginalName="cre2f_veloraagentauditlog">cre2f_veloraagentauditlog</Name>
+      <EntityInfo>
+        <entity Name="cre2f_veloraagentauditlog">
+          <LocalizedNames>
+            <LocalizedName description="Velora Agent Audit Log" languagecode="1033" />
+          </LocalizedNames>
+          <Descriptions>
+            <Description description="Unified enterprise audit log for Velora Parent Executive Agent, Child Productivity Agent, and SAP MCP tools." languagecode="1033" />
+          </Descriptions>
+          <attributes>
+            <!-- Primary Key -->
+            <attribute PhysicalName="cre2f_veloraagentauditlogid">
+              <Type>primarykey</Type>
+              <Name>cre2f_veloraagentauditlogid</Name>
+            </attribute>
+
+            <!-- Correlation Columns (Section 3.2) -->
+            <attribute PhysicalName="cre2f_rootcorrelationid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_conversationid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_sessionid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_turnid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_parentinvocationid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_invocationid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_idempotencykey"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_correlationid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_parentturnid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_turnsequence"><Type>int</Type></attribute>
+
+            <!-- Agent Identity Columns (Section 3.2) -->
+            <attribute PhysicalName="cre2f_callingagent"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_executingagent"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_agentname"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_agentversion"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_environment"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_channel"><Type>nvarchar</Type><Length>50</Length></attribute>
+
+            <!-- User Identity Columns (Section 3.2) -->
+            <attribute PhysicalName="cre2f_userobjectid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_useremail"><Type>nvarchar</Type><Length>200</Length></attribute>
+            <attribute PhysicalName="cre2f_userdisplayname"><Type>nvarchar</Type><Length>200</Length></attribute>
+            <attribute PhysicalName="cre2f_usergroups"><Type>nvarchar</Type><Length>4000</Length></attribute>
+            <attribute PhysicalName="cre2f_newcolumn"><Type>nvarchar</Type><Length>200</Length></attribute>
+
+            <!-- Transaction Columns (Section 3.2) -->
+            <attribute PhysicalName="cre2f_recordtype"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_capability"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_operation"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_transactiontype"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_sourcesystem"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_approvalstatus"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_approvalexpireson"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_approvaltokenhash"><Type>nvarchar</Type><Length>200</Length></attribute>
+            <attribute PhysicalName="cre2f_externalobjectid"><Type>nvarchar</Type><Length>200</Length></attribute>
+            <attribute PhysicalName="cre2f_evidencelink"><Type>nvarchar</Type><Length>1000</Length></attribute>
+            <attribute PhysicalName="cre2f_toolname"><Type>nvarchar</Type><Length>100</Length></attribute>
+
+            <!-- Outcome Columns (Section 3.2) -->
+            <attribute PhysicalName="cre2f_outcome"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_eventtime"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_starttime"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_endtime"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_latencymilliseconds"><Type>int</Type></attribute>
+            <attribute PhysicalName="cre2f_resultcount"><Type>int</Type></attribute>
+            <attribute PhysicalName="cre2f_errorcategory"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_errormessagesafe"><Type>nvarchar</Type><Length>2000</Length></attribute>
+            <attribute PhysicalName="cre2f_sourceasof"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_cachehit"><Type>bit</Type></attribute>
+            <attribute PhysicalName="cre2f_cacheage"><Type>float</Type></attribute>
+            <attribute PhysicalName="cre2f_demodata"><Type>bit</Type></attribute>
+
+            <!-- Content Governance Columns (Section 3.2) -->
+            <attribute PhysicalName="cre2f_auditdetail"><Type>nvarchar</Type><Length>4000</Length></attribute>
+            <attribute PhysicalName="cre2f_messagesummary"><Type>nvarchar</Type><Length>2000</Length></attribute>
+            <attribute PhysicalName="cre2f_contenthash"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_dataclassification"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_requestfiltersafe"><Type>nvarchar</Type><Length>2000</Length></attribute>
+            <attribute PhysicalName="cre2f_targetsummarysafe"><Type>nvarchar</Type><Length>2000</Length></attribute>
+            <attribute PhysicalName="cre2f_messagerole"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_usermessage"><Type>nvarchar</Type><Length>4000</Length></attribute>
+            <attribute PhysicalName="cre2f_assistantmessage"><Type>nvarchar</Type><Length>4000</Length></attribute>
+
+            <!-- Memory & Policy -->
+            <attribute PhysicalName="cre2f_policyid"><Type>nvarchar</Type><Length>100</Length></attribute>
+            <attribute PhysicalName="cre2f_policyversion"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_policydecision"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_releasedfields"><Type>nvarchar</Type><Length>4000</Length></attribute>
+            <attribute PhysicalName="cre2f_consentversion"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_consentstatus"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_memoryeligible"><Type>bit</Type></attribute>
+            <attribute PhysicalName="cre2f_memorysummary"><Type>nvarchar</Type><Length>4000</Length></attribute>
+            <attribute PhysicalName="cre2f_memorytopics"><Type>nvarchar</Type><Length>1000</Length></attribute>
+            <attribute PhysicalName="cre2f_memoryvalidfrom"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_memoryexpireson"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_memorysuperseded"><Type>bit</Type></attribute>
+            <attribute PhysicalName="cre2f_memorylastused"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_memoryimportance"><Type>int</Type></attribute>
+            <attribute PhysicalName="cre2f_loggingstatus"><Type>nvarchar</Type><Length>50</Length></attribute>
+            <attribute PhysicalName="cre2f_retrycount"><Type>int</Type></attribute>
+            <attribute PhysicalName="cre2f_reconciled"><Type>bit</Type></attribute>
+          </attributes>
+          <!-- Alternate Keys (Section 3.4) -->
+          <EntityKeys>
+            <EntityKey>
+              <Name>cre2f_key_invocation_recordtype</Name>
+              <LocalizedNames><LocalizedName description="Alternate Key Invocation RecordType" languagecode="1033" /></LocalizedNames>
+              <Attributes>
+                <Attribute>cre2f_invocationid</Attribute>
+                <Attribute>cre2f_recordtype</Attribute>
+              </Attributes>
+            </EntityKey>
+            <EntityKey>
+              <Name>cre2f_key_idempotency_operation</Name>
+              <LocalizedNames><LocalizedName description="Alternate Key Idempotency Operation" languagecode="1033" /></LocalizedNames>
+              <Attributes>
+                <Attribute>cre2f_idempotencykey</Attribute>
+                <Attribute>cre2f_operation</Attribute>
+              </Attributes>
+            </EntityKey>
+          </EntityKeys>
+        </entity>
+      </EntityInfo>
+    </Entity>
+  </Entities>
+
+  <!-- Security Roles (Section 16) -->
+  <Roles>
+    <Role id="{8F1A7E11-3D50-4F8A-A21E-111111111111}" name="Velora Agent User">
+      <Description>Standard user role allowing execution of parent agent and user-partitioned context memory recall.</Description>
+    </Role>
+    <Role id="{8F1A7E11-3D50-4F8A-A21E-222222222222}" name="Velora Audit Writer">
+      <Description>Service principal and agent worker role with Append/Create privileges on cre2f_veloraagentauditlog.</Description>
+    </Role>
+    <Role id="{8F1A7E11-3D50-4F8A-A21E-333333333333}" name="Velora Audit Reader">
+      <Description>Role allowing read-only access to user-partitioned audit trails and conversation timelines.</Description>
+    </Role>
+    <Role id="{8F1A7E11-3D50-4F8A-A21E-444444444444}" name="Velora Audit Administrator">
+      <Description>Full administrative access to all enterprise audit logs, unredacted error categories, and disclosure policies.</Description>
+    </Role>
+  </Roles>
+
+  <!-- Environment Variables (Section 2.3) -->
+  <EnvironmentVariableDefinitions>
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraEnvironmentName" Type="String" DefaultValue="Development" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraParentAgentId" Type="String" DefaultValue="velora-executive-parent-agent" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraProductivityAgentId" Type="String" DefaultValue="velora-productivity-child-agent" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraAuditTableName" Type="String" DefaultValue="cre2f_veloraagentauditlog" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraAuditEnabled" Type="Boolean" DefaultValue="true" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraWriteActionsEnabled" Type="Boolean" DefaultValue="true" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraExternalEmailEnabled" Type="Boolean" DefaultValue="true" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraConfirmationExpiryMinutes" Type="Integer" DefaultValue="15" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraPlannerAllowedPlans" Type="String" DefaultValue="Executive Strategic Initiatives,Q3 Ground Ops Plan,Finance Transformation 2026,Emiratisation Taskforce" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraTeamsAllowedDestinations" Type="String" DefaultValue="Executive Leadership Team,Finance Operations,Ground Operations,Workforce Committee" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraAuditRetentionDays" Type="Integer" DefaultValue="90" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraWorkIQEndpoint" Type="String" DefaultValue="https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com" />
+    <EnvironmentVariableDefinition SchemaName="cre2f_VeloraAgentVersion" Type="String" DefaultValue="1.0.0" />
+  </EnvironmentVariableDefinitions>
+
+  <!-- Connection References (Connection Managers) -->
+  <connectionreferences>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_dataverse">
+      <connectionreferencedisplayname>Velora Dataverse Connection Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps</connectorid>
+      <description>Managed Dataverse audit, governance, and policy connection reference.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_office365">
+      <connectionreferencedisplayname>Velora Office 365 Outlook Connection Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_office365</connectorid>
+      <description>Office 365 Outlook connection reference for governed Executive Mail operations.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_teams">
+      <connectionreferencedisplayname>Velora Microsoft Teams Connection Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_teams</connectorid>
+      <description>Microsoft Teams connection reference for executive channel and chat operations.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_planner">
+      <connectionreferencedisplayname>Velora Planner Connection Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_planner</connectorid>
+      <description>Microsoft Planner connection reference for strategic initiatives and task management.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_successfactors">
+      <connectionreferencedisplayname>Velora SAP SuccessFactors Connector Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/cre2f_VeloraSuccessFactorsConnector</connectorid>
+      <description>SAP SuccessFactors HCM workforce and organizational intelligence connector.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_s4hana">
+      <connectionreferencedisplayname>Velora SAP S4HANA Connector Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/cre2f_VeloraS4HANAConnector</connectorid>
+      <description>SAP S/4HANA Finance receivables, payables, and P&amp;L connector.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_sac">
+      <connectionreferencedisplayname>Velora SAP Analytics Cloud Connector Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/cre2f_VeloraSACConnector</connectorid>
+      <description>SAP Analytics Cloud corporate performance KPI and stories connector.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_productivity">
+      <connectionreferencedisplayname>Velora Productivity Agent Connector Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/cre2f_VeloraProductivityConnector</connectorid>
+      <description>Velora Productivity Connected Agent for Microsoft 365, Mail, Calendar, Teams, and Planner.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="cre2f_cr_facilitator">
+      <connectionreferencedisplayname>Velora Facilitator Connector Reference</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/cre2f_VeloraFacilitatorConnector</connectorid>
+      <description>Velora Executive Meeting Facilitator and Institutional Memory Connector.</description>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+  </connectionreferences>
+</ImportExportXml>

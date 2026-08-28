@@ -40,83 +40,46 @@ def build_capabilities_card(
     user_display_name: Optional[str] = None,
     user_timezone: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Build a rich Adaptive Card v1.5 with personalized greeting and starter prompts."""
+    """Build a clean greeting card that simply greets the user and says hi without listing capabilities."""
     salutation = get_time_aware_salutation(user_timezone)
-    name = (user_display_name or "").split()[0] if user_display_name else "there"
-    greeting_text = f"{salutation}, {name}! How can I help you today?"
-
-    capabilities = [
-        {"title": "👥 Workforce Headcount", "desc": "Current verified active headcount & department breakdowns"},
-        {"title": "🔍 Group Drill-Down", "desc": "Who are the 15 employees in the Unassigned department?"},
-        {"title": "🇦🇪 Emiratisation KPI", "desc": "Nationalization ratio, target compliance, and nationality aggregates"},
-        {"title": "📈 Joiners & Attrition", "desc": "Period new-hires, departures, and annual attrition trends"},
-        {"title": "💼 Executive Dashboard", "desc": "Comprehensive multi-KPI workforce health overview"},
-        {"title": "🧠 30-Day Memory", "desc": "Recall previous discussion topics, decisions, and follow-up items"},
-    ]
-
-    body: List[Dict[str, Any]] = [
-        {
-            "type": "TextBlock",
-            "text": greeting_text,
-            "weight": "Bolder",
-            "size": "Medium",
-            "color": "Accent",
-            "wrap": True,
-        },
-        {
-            "type": "TextBlock",
-            "text": "I am your Velora HCM AI Assistant, connected directly to SAP SuccessFactors and enterprise Dataverse governance.",
-            "isSubtle": True,
-            "wrap": True,
-            "spacing": "Small",
-        },
-        {
-            "type": "TextBlock",
-            "text": "💡 **Quick Starters**",
-            "weight": "Bolder",
-            "size": "Small",
-            "spacing": "Medium",
-        },
-    ]
-
-    for item in capabilities:
-        body.append({
-            "type": "TextBlock",
-            "text": f"• **{item['title']}**: {item['desc']}",
-            "wrap": True,
-            "spacing": "Small",
-        })
+    name = (user_display_name or "").split()[0] if user_display_name else ""
+    
+    if name:
+        greeting_text = f"Hi, {name}! {salutation}."
+    else:
+        greeting_text = f"Hi! {salutation}."
 
     return {
         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
         "type": "AdaptiveCard",
         "version": "1.5",
-        "body": body,
-        "actions": [
+        "body": [
             {
-                "type": "Action.Submit",
-                "title": "Headcount Overview",
-                "data": {"query": "What is our current total headcount and department breakdown?"},
-            },
-            {
-                "type": "Action.Submit",
-                "title": "Unassigned Drill-Down",
-                "data": {"query": "There are 15 employees in the Unassigned department. Who are they?"},
-            },
-            {
-                "type": "Action.Submit",
-                "title": "Emiratisation Ratio",
-                "data": {"query": "Show me our Emiratisation KPI and nationality distribution"},
-            },
+                "type": "TextBlock",
+                "text": greeting_text,
+                "weight": "Bolder",
+                "size": "Medium",
+                "color": "Accent",
+                "wrap": True,
+            }
         ],
     }
+
+
+def build_greeting_card(
+    user_display_name: Optional[str] = None,
+    user_timezone: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Alias for build_capabilities_card returning a concise, friendly greeting card."""
+    return build_capabilities_card(user_display_name=user_display_name, user_timezone=user_timezone)
 
 
 class GreetingService:
     """Manages session greeting generation and asynchronous background pre-warming."""
 
-    def __init__(self, memory_service=None):
+    def __init__(self, memory_service=None, consent_service=None):
         self._memory_service = memory_service
+        self._consent_service = consent_service
 
     def _get_memory_service(self):
         if self._memory_service is None:
@@ -124,8 +87,17 @@ class GreetingService:
             self._memory_service = get_memory_service()
         return self._memory_service
 
+    def _get_consent_service(self):
+        if self._consent_service is None:
+            from .consent_service import get_consent_service
+            self._consent_service = get_consent_service()
+        return self._consent_service
+
     def set_memory_service(self, memory_service) -> None:
         self._memory_service = memory_service
+
+    def set_consent_service(self, consent_service) -> None:
+        self._consent_service = consent_service
 
     async def get_session_greeting(
         self,
@@ -135,7 +107,24 @@ class GreetingService:
         user_timezone: str = FALLBACK_TIMEZONE,
     ) -> Dict[str, Any]:
         """Generate greeting card immediately and spawn background memory pre-load."""
-        # 1. Spawn non-blocking background 30-day memory load
+        # 1. Check user confidentiality consent gate
+        consent_svc = self._get_consent_service()
+        is_consented, consent_card = await consent_svc.verify_user_consent(
+            user_object_id=user_object_id,
+            user_email=user_email,
+        )
+
+        if not is_consented and consent_card:
+            return {
+                "type": "ConsentRequired",
+                "is_consented": False,
+                "salutation": get_time_aware_salutation(user_timezone),
+                "user_display_name": user_display_name,
+                "fallback_text": "Please review and accept the Velora Enterprise Confidentiality & Acceptable Use Consent to proceed.",
+                "adaptiveCard": consent_card,
+            }
+
+        # 2. Spawn non-blocking background 30-day memory load
         mem_svc = self._get_memory_service()
         if mem_svc:
             try:
@@ -148,17 +137,18 @@ class GreetingService:
             except Exception as exc:
                 log.debug("memory_prewarm_task_failed", error=str(exc))
 
-        # 2. Build greeting immediately
+        # 3. Build clean greeting immediately
         card = build_capabilities_card(
             user_display_name=user_display_name,
             user_timezone=user_timezone,
         )
         salutation = get_time_aware_salutation(user_timezone)
-        name = (user_display_name or "").split()[0] if user_display_name else "there"
-        fallback = f"{salutation}, {name}! How can I assist you with Velora workforce intelligence today?"
+        name = (user_display_name or "").split()[0] if user_display_name else ""
+        fallback = f"Hi, {name}! {salutation}." if name else f"Hi! {salutation}."
 
         return {
             "type": "SessionGreeting",
+            "is_consented": True,
             "salutation": salutation,
             "user_display_name": user_display_name,
             "fallback_text": fallback,
