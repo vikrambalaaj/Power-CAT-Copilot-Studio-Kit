@@ -123,7 +123,7 @@
         {
             "type": "RemoteMCPServer",
             "spec": {
-                "url": "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp",
+                "url": "https://agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/mcp",
                 "mcp_tool_description": {
                     "tools": [
                         {

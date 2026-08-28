@@ -5,7 +5,7 @@
     "description": "SAP S/4HANA Finance integration for Velora Executive Agent",
     "version": "1.0.0"
   },
-  "host": "s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+  "host": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
   "basePath": "/",
   "schemes": [
     "https"
