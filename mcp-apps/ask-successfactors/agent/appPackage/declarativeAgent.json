@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.8/schema.json",
     "version": "v1.8",
     "name": "Velora Executive Agent",
-    "description": "Executive workforce and finance intelligence from SAP SuccessFactors, S/4HANA, SAC, and Connected Productivity Agent for Microsoft 365.",
+    "description": "A executive analytics assistant for Velora leadership, using SAP SuccessFactors for workforce insights and Dataverse for enterprise KPIs, with complete aggregation, human-readable labels, visual summaries, and source transparency.",
     "instructions": "$[file('instruction.txt')]",
     "capabilities": [
         {

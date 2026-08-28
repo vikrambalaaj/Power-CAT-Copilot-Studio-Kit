@@ -22,9 +22,7 @@ log = logging.getLogger("s4_finance")
 mcp = FastMCP(
     "velora-s4-finance",
     transport_security=TransportSecuritySettings(
-        enable_dns_rebinding_protection=True,
-        allowed_hosts=[value.strip() for value in settings.allowed_hosts.split(",") if value.strip()],
-        allowed_origins=[value.strip() for value in settings.allowed_origins.split(",") if value.strip()],
+        enable_dns_rebinding_protection=False,
     ),
 )
 
@@ -98,18 +96,24 @@ async def handle_tool_rest(request):
 
 def create_app():
     app = mcp.streamable_http_app()
-    app.routes.append(Route("/health", health, methods=["GET"]))
+    app.routes.append(Route("/", health, methods=["GET", "HEAD"]))
+    app.routes.append(Route("/health", health, methods=["GET", "HEAD"]))
     app.routes.append(Route("/mcp/tools", list_tools_endpoint, methods=["GET"]))
     for name, _, _ in TOOL_SPECS:
-        app.routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST"]))
-        app.routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST"]))
+        app.routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
+        app.routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
+        # Also alias camelCase operationIds from swagger
+        camel = "".join(part.capitalize() for part in name.replace("s4__", "").split("_"))
+        camel_op = "get" + camel.replace("Get", "")
+        if camel_op:
+            app.routes.append(Route(f"/{camel_op}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
     app.add_middleware(ApiKeyMiddleware)
     origins = [value.strip() for value in settings.cors_origins.split(",") if value.strip()]
     if origins:
         app.add_middleware(
             CORSMiddleware,
             allow_origins=origins,
-            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
             allow_headers=["Content-Type", "Authorization", "X-API-Key", "mcp-session-id"],
         )
     return app

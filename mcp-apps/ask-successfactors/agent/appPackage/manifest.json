@@ -18,8 +18,8 @@
         "full": "Velora Executive Agent"
     },
     "description": {
-        "short": "SAP workforce and finance intelligence in Copilot",
-        "full": "Velora Executive Agent connects Microsoft 365 Copilot to SAP SuccessFactors and SAP S/4HANA through two secured, permission-trimmed MCP servers."
+        "short": "Executive analytics assistant for Velora leadership",
+        "full": "A executive analytics assistant for Velora leadership, using SAP SuccessFactors for workforce insights and Dataverse for enterprise KPIs, with complete aggregation, human-readable labels, visual summaries, and source transparency."
     },
     "accentColor": "#0A6ED1",
     "composeExtensions": [],
