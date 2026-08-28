@@ -1577,7 +1577,8 @@ class SuccessFactorsClient:
         """Get details for a specific user ID."""
         params = {
             "$filter": f"userId eq '{_escape_odata_string(user_id)}'",
-            "$select": "userId,displayName,email,title,department,division,location,status",
+            "$select": "userId,displayName,email,title,department,division,location,status,manager/displayName,manager/userId",
+            "$expand": "manager",
         }
         res = await self._request("GET", "User", params=params, executive_id=executive_id)
         if isinstance(res, dict) and res.get("error"):

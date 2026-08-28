@@ -9,8 +9,15 @@ applications:
     env:
       PYTHON_VERSION: 3.11.15
       PYTHONUNBUFFERED: "1"
-      ALLOWED_HOSTS: "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com"
-      ALLOW_ANONYMOUS: "true"
+      ALLOWED_HOSTS: "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost,127.0.0.1,*"
+      ALLOW_ANONYMOUS: "false"
+      DEMO_MODE: "false"
+      SAC_AUTH_MODE: "oauth"
+      SAC_TENANT_URL: "https://your-sac-tenant.eu10.sapanalytics.cloud"
+      SAC_TOKEN_URL: "https://your-sac-auth.authentication.eu10.hana.ondemand.com/oauth/token"
+      SAC_CLIENT_ID_SECRET_REF: "kv://velora/sac/client-id"
+      SAC_CLIENT_SECRET_REF: "kv://velora/sac/client-secret"
+      MCP_API_KEY_SECRET_REF: "kv://velora/mcp/sac-api-key"
       CACHE_ENABLED: "true"
       CACHE_TTL_SECONDS: "120"
       CACHE_MAX_ENTRIES: "512"

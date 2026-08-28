@@ -7,15 +7,16 @@ set -e
 #   1. SF (SuccessFactors MCP)      -> Port 8082
 #   2. SAP S/4HANA (Finance MCP)    -> Port 8083
 #   3. SAC (Analytics Cloud MCP)    -> Port 8084
-#   4. Facilitator MCP              -> Port 8080
+#   4. Productivity MCP / Handoff   -> Port 8080
 # ==============================================================================
 
 # Configuration variables (customize or export as env variables)
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-copilot-studio-mcp}"
-LOCATION="${LOCATION:-eastus}"
+LOCATION="${LOCATION:-uaenorth}"
 ENVIRONMENT_NAME="${ENVIRONMENT_NAME:-cae-copilot-studio}"
 ACR_NAME="${ACR_NAME:-}"
 TAG="${TAG:-latest}"
+KEY_VAULT_NAME="${KEY_VAULT_NAME:-kv-velora-prod}"
 
 if [ -z "$ACR_NAME" ]; then
     echo "ERROR: Please specify your Azure Container Registry name via ACR_NAME."
@@ -61,11 +62,21 @@ az containerapp create \
     --ingress external \
     --cpu 0.5 --memory 1.0Gi \
     --min-replicas 1 --max-replicas 3 \
+    --secrets \
+        mcp-api-key="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-sf-api-key" \
+        sf-password="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-sf-password" \
     --env-vars \
         ALLOWED_HOSTS="*" \
-        ALLOW_ANONYMOUS="true" \
+        ALLOW_ANONYMOUS="false" \
         CORS_ORIGINS="*" \
         PORT="8082" \
+        MCP_API_KEY="secretref:mcp-api-key" \
+        SF_PASSWORD="secretref:sf-password" \
+        SF_USERNAME="SFAI" \
+        SF_COMPANY_ID="etihadairp" \
+        SF_API_URL="https://api22.sapsf.com/odata/v2" \
+        ENABLE_MUTATING_TOOLS="false" \
+        ENABLE_PERSONAL_INFO_TOOL="false" \
     --output table
 
 # 4. Deploy SAP S/4HANA Container App
@@ -81,11 +92,20 @@ az containerapp create \
     --ingress external \
     --cpu 0.5 --memory 1.0Gi \
     --min-replicas 1 --max-replicas 3 \
+    --secrets \
+        mcp-api-key="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-s4-api-key" \
+        s4-password="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-s4-password" \
     --env-vars \
         ALLOWED_HOSTS="*" \
-        ALLOW_ANONYMOUS="true" \
+        ALLOW_ANONYMOUS="false" \
         CORS_ORIGINS="*" \
         PORT="8083" \
+        MCP_API_KEY="secretref:mcp-api-key" \
+        S4_AUTH_MODE="basic" \
+        S4_USERNAME="xbhaskarraj" \
+        S4_PASSWORD="secretref:s4-password" \
+        S4_API_URL="https://fioriqas.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001" \
+        S4_VERIFY_TLS="true" \
     --output table
 
 # 5. Deploy SAC (SAP Analytics Cloud) Container App
@@ -101,58 +121,22 @@ az containerapp create \
     --ingress external \
     --cpu 0.5 --memory 1.0Gi \
     --min-replicas 1 --max-replicas 3 \
+    --secrets \
+        mcp-api-key="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-sac-api-key" \
+        sac-client-secret="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-sac-client-secret" \
     --env-vars \
         ALLOWED_HOSTS="*" \
-        ALLOW_ANONYMOUS="true" \
+        ALLOW_ANONYMOUS="false" \
+        DEMO_MODE="false" \
         CORS_ORIGINS="*" \
         PORT="8084" \
-    --output table
-
-# 6. Deploy Facilitator Container App
-echo ""
-echo "--> [Step 6] Deploying Facilitator MCP Container App..."
-az containerapp create \
-    --name "velora-mcp-facilitator" \
-    --resource-group "$RESOURCE_GROUP" \
-    --environment "$ENVIRONMENT_NAME" \
-    --image "${ACR_LOGIN_SERVER}/velora-mcp-facilitator:${TAG}" \
-    --registry-server "$ACR_LOGIN_SERVER" \
-    --target-port 8080 \
-    --ingress external \
-    --cpu 0.5 --memory 1.0Gi \
-    --min-replicas 1 --max-replicas 3 \
-    --env-vars \
-        ALLOWED_HOSTS="*" \
-        ALLOW_ANONYMOUS="true" \
-        CORS_ORIGINS="*" \
-        PORT="8080" \
-    --output table
-
-# 7. Deploy Dynamic Adaptive Card Service
-echo ""
-echo "--> [Step 7] Deploying Dynamic Adaptive Card Service Container App..."
-az containerapp create \
-    --name "velora-mcp-card-service" \
-    --resource-group "$RESOURCE_GROUP" \
-    --environment "$ENVIRONMENT_NAME" \
-    --image "${ACR_LOGIN_SERVER}/velora-mcp-card-service:${TAG}" \
-    --registry-server "$ACR_LOGIN_SERVER" \
-    --target-port 8080 \
-    --ingress external \
-    --cpu 0.5 --memory 1.0Gi \
-    --min-replicas 1 --max-replicas 3 \
-    --env-vars \
-        PORT="8080" \
-        NODE_ENV="production" \
+        MCP_API_KEY="secretref:mcp-api-key" \
+        SAC_AUTH_MODE="oauth" \
+        SAC_CLIENT_ID="velora-sac-client" \
+        SAC_CLIENT_SECRET="secretref:sac-client-secret" \
     --output table
 
 echo ""
 echo "=========================================================="
-echo "Deployment Complete! Retrieval of FQDNs:"
+echo "Deployment completed successfully with Key Vault secret references!"
 echo "=========================================================="
-echo "SF Ingress URL:          https://$(az containerapp show -n velora-mcp-sf -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
-echo "S/4HANA Ingress URL:     https://$(az containerapp show -n velora-mcp-s4hana -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
-echo "SAC Ingress URL:         https://$(az containerapp show -n velora-mcp-sac -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
-echo "Facilitator Ingress URL: https://$(az containerapp show -n velora-mcp-facilitator -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
-echo "Card Service Ingress:    https://$(az containerapp show -n velora-mcp-card-service -g "$RESOURCE_GROUP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
-

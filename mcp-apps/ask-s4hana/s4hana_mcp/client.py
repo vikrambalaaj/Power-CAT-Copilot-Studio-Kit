@@ -137,7 +137,8 @@ class S4Client:
             safe_params.setdefault("sap-client", self.settings.s4_sap_client)
         try:
             authorization = await self._authorization()
-            async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
+            verify_opt = self.settings.s4_ca_bundle if self.settings.s4_ca_bundle else self.settings.s4_verify_tls
+            async with httpx.AsyncClient(timeout=30.0, verify=verify_opt) as client:
                 response = await client.get(
                     url,
                     params=safe_params,
@@ -147,31 +148,11 @@ class S4Client:
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) VeloraS4MCP/1.0",
                     },
                 )
-            print(f"[S4Client] GET {url} params={safe_params} -> {response.status_code}: {response.text[:300]}", flush=True)
             if response.status_code >= 400:
-                error_msg = f"S/4HANA request failed with status {response.status_code}"
-                try:
-                    err_json = response.json()
-                    if isinstance(err_json, dict) and "error" in err_json:
-                        err_obj = err_json["error"]
-                        err_detail = ""
-                        if isinstance(err_obj, dict):
-                            msg_val = err_obj.get("message")
-                            if isinstance(msg_val, dict):
-                                err_detail = msg_val.get("value", "")
-                            elif isinstance(msg_val, str):
-                                err_detail = msg_val
-                        if err_detail:
-                            error_msg = f"{error_msg}: {err_detail}"
-                except Exception:
-                    pass
                 return {
                     "status": "error",
                     "code": "S4_UPSTREAM_ERROR",
-                    "message": error_msg,
-                    "upstream_url": url,
-                    "upstream_params": safe_params,
-                    "upstream_body": response.text[:400],
+                    "message": "S/4HANA request failed",
                     "retryable": response.status_code in {408, 429, 500, 502, 503, 504},
                 }
             payload = response.json()
@@ -204,7 +185,7 @@ class S4Client:
             return {
                 "status": "error",
                 "code": "S4_CONNECTION_ERROR",
-                "message": f"S/4HANA connection failed: {type(error).__name__}",
+                "message": "S/4HANA request failed",
                 "retryable": isinstance(error, httpx.HTTPError),
             }
 
@@ -239,7 +220,12 @@ class S4Client:
             cacheable=lambda value: value.get("status") != "error",
         )
         if result.get("status") == "error":
-            result["audit"] = {"correlationId": correlation_id or ""}
+            result["correlationId"] = correlation_id or ""
+            result["audit"] = {
+                "correlationId": correlation_id or "",
+                "executingIdentity": self.settings.executing_identity,
+                "authorizationModel": self.settings.authorization_model,
+            }
             result["cache"] = cache_info.as_dict()
             return result
         return {
@@ -254,9 +240,11 @@ class S4Client:
             "quality": {"complete": len(result["rows"]) >= result["count"], "sampled": len(result["rows"]) < result["count"], "confidence": "high", "warnings": []},
             "audit": {
                 "correlationId": correlation_id or "",
-                "authorizationModel": "configured-s4-identity",
+                "executingIdentity": self.settings.executing_identity,
+                "authorizationModel": self.settings.authorization_model,
             },
             "cache": cache_info.as_dict(),
             "type": capability,
         }
+
 

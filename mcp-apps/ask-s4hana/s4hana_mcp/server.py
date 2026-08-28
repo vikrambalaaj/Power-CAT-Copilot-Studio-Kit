@@ -30,22 +30,35 @@ for name, description, handler in TOOL_SPECS:
     mcp.tool(name=name, description=description)(handler)
 
 
+PUBLIC_PATHS = {"/health", "/"}
+
+
 class ApiKeyMiddleware:
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        if scope.get("type") == "http" and scope.get("path", "").startswith("/mcp"):
-            if not settings.allow_anonymous:
-                headers = {key.lower(): value for key, value in scope.get("headers", [])}
-                supplied = headers.get(b"x-api-key", b"").decode("utf-8")
-                bearer = headers.get(b"authorization", b"").decode("utf-8")
-                if not supplied and bearer.lower().startswith("bearer "):
-                    supplied = bearer[7:].strip()
-                if not settings.mcp_api_key or not hmac.compare_digest(supplied, settings.mcp_api_key):
-                    await JSONResponse({"error": "Unauthorized"}, status_code=401)(scope, receive, send)
-                    return
+        if scope.get("type") == "http":
+            path = scope.get("path", "")
+            if path not in PUBLIC_PATHS:
+                if not settings.allow_anonymous:
+                    headers = {key.lower(): value for key, value in scope.get("headers", [])}
+                    supplied = headers.get(b"x-api-key", b"").decode("utf-8")
+                    bearer = headers.get(b"authorization", b"").decode("utf-8")
+                    if not supplied and bearer.lower().startswith("bearer "):
+                        supplied = bearer[7:].strip()
+                    if not settings.mcp_api_key or not hmac.compare_digest(supplied, settings.mcp_api_key):
+                        await JSONResponse(
+                            {
+                                "status": "error",
+                                "code": "UNAUTHORIZED",
+                                "message": "Authentication required. Please provide a valid API key.",
+                            },
+                            status_code=401,
+                        )(scope, receive, send)
+                        return
         await self.app(scope, receive, send)
+
 
 
 async def health(_request):
@@ -192,10 +205,12 @@ async def handle_mcp_endpoint(request):
         })
     
     if method == "tools/call":
-        params = body.get("params", {})
+        params = body.get("params", {}) or {}
         tool_name = params.get("name", "")
-        tool_args = params.get("arguments", {})
-        tool_entry = next((item for item in TOOL_SPECS if item[0] == tool_name), None)
+        tool_args = params.get("arguments") or {}
+        if not isinstance(tool_args, dict):
+            tool_args = {}
+        tool_entry = next((item for item in TOOL_SPECS if item[0] == tool_name or item[0] == f"s4__{tool_name}" or item[0].replace("s4__", "") == tool_name or item[0] == tool_name.replace("-", "_")), None)
         if not tool_entry:
             return JSONResponse({
                 "jsonrpc": "2.0",
@@ -210,13 +225,14 @@ async def handle_mcp_endpoint(request):
                 content_list = [{"type": "text", "text": c.text} for c in res.content]
             elif isinstance(res, dict):
                 content_list = [{"type": "text", "text": _json.dumps(res, ensure_ascii=False, default=str)}]
-            else:
-                content_list = [{"type": "text", "text": str(res)}]
+            struct_data = res.structuredContent if hasattr(res, "structuredContent") and res.structuredContent else (res if isinstance(res, dict) else {})
             return JSONResponse({
                 "jsonrpc": "2.0",
                 "id": req_id,
                 "result": {
                     "content": content_list,
+                    "result": struct_data or {"status": "success", "content": content_list},
+                    "structuredContent": struct_data,
                     "isError": False,
                 },
             })

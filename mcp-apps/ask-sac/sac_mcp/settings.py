@@ -10,10 +10,17 @@ class SACSettings(BaseSettings):
     sac_token_url: str = "https://your-sac-auth.authentication.eu10.hana.ondemand.com/oauth/token"
     sac_client_id: str = ""
     sac_client_secret: str = ""
+    sac_client_id_secret_ref: str = ""
+    sac_client_secret_ref: str = ""
+    mcp_api_key_secret_ref: str = ""
+
+    executing_identity: str = "velora-sac-reader"
+    authorization_model: str = "MAKER_SERVICE_CREDENTIAL"
 
     port: int = 8084
-    mcp_api_key: str = "velora-sac-secret-2026"
-    allow_anonymous: bool = True
+    mcp_api_key: str = ""
+    allow_anonymous: bool = False
+    demo_mode: bool = False
     allowed_hosts: str = "*"
     cors_origins: str = "*"
     log_level: str = "INFO"

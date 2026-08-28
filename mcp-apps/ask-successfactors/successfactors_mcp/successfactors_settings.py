@@ -5,11 +5,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class SuccessFactorsSettings(BaseSettings):
-    # Secrets and tenant identifiers intentionally have no usable defaults.
+    # Secrets and tenant identifiers
     sf_api_url: str = ""
     sf_company_id: str = ""
     sf_username: str = ""
     sf_password: str = ""
+    sf_username_secret_ref: str = ""
+    sf_password_secret_ref: str = ""
+    mcp_api_key_secret_ref: str = ""
+
+    # Maker/Service credential identity
+    executing_identity: str = "velora-sf-reader"
+    authorization_model: str = "MAKER_SERVICE_CREDENTIAL"
 
     # Legacy tenant-specific filter retained for backwards compatibility. New
     # deployments should configure the explicit nationality mapping below.

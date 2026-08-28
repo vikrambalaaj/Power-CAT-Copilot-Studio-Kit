@@ -12,7 +12,16 @@ class Settings(BaseSettings):
     s4_client_secret: str = ""
     s4_username: str = ""
     s4_password: str = ""
+    s4_username_secret_ref: str = ""
+    s4_password_secret_ref: str = ""
+    mcp_api_key_secret_ref: str = ""
     s4_sap_client: str = "100"
+    s4_verify_tls: bool = True
+    s4_ca_bundle: str = ""
+    
+    executing_identity: str = "velora-s4-finance-reader"
+    authorization_model: str = "MAKER_SERVICE_CREDENTIAL"
+
     s4_ar_entity: str = "ARageingData"
     s4_ap_entity: str = "APageingData"
     s4_budget_api_url: str = "https://fioriqas.velora.ae/sap/opu/odata4/sap/zfi_sbn_budget_consm_srv/srvd_a2x/sap/zfi_sdf_budget_consm/0001"
@@ -21,7 +30,7 @@ class Settings(BaseSettings):
     s4_pl_entity: str = ""
     port: int = 8083
     mcp_api_key: str = ""
-    allow_anonymous: bool = True
+    allow_anonymous: bool = False
     allowed_hosts: str = "localhost:*,127.0.0.1:*,*"
     allowed_origins: str = ""
     cors_origins: str = "*"
@@ -41,4 +50,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

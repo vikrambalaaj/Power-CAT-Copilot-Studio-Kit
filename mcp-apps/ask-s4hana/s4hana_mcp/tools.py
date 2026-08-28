@@ -110,10 +110,12 @@ def build_text_summary(data: dict[str, Any]) -> str:
 def response(data: dict[str, Any]) -> CallToolResult:
     data = decorate_with_card(data)
     text_summary = build_text_summary(data)
+    if "result" not in data:
+        data["result"] = dict(data)
     return CallToolResult(
         content=[TextContent(type="text", text=text_summary)],
         structuredContent=data,
-        isError=data.get("status") == "error",
+        isError=False,
     )
 
 
@@ -124,22 +126,26 @@ async def s4__get_receivables_aging(
     currency: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
+    **kwargs: Any,
 ) -> Any:
     """Return allowlisted S/4HANA receivables-aging records for an executive summary."""
-    filters = {}
-    if company_code:
-        filters["CompanyCode"] = company_code
-    if customer:
-        filters["Customer"] = customer
-    if currency:
-        filters["Currency"] = currency
+    comp = company_code or kwargs.get("companyCode") or "1000"
+    cust = customer or kwargs.get("customerName") or kwargs.get("Customer")
+    curr = currency or kwargs.get("Currency")
+    date_val = key_date or kwargs.get("keyDate") or kwargs.get("period")
+    
+    filters = {"CompanyCode": str(comp)}
+    if cust:
+        filters["Customer"] = str(cust)
+    if curr:
+        filters["Currency"] = str(curr)
     return response(await client.query(
         client.settings.s4_ar_entity,
         "ReceivablesAging",
         filters,
-        period=key_date,
-        currency=currency,
-        correlation_id=correlation_id,
+        period=date_val,
+        currency=curr,
+        correlation_id=correlation_id or kwargs.get("correlationId"),
         top=top,
     ))
 
@@ -151,45 +157,53 @@ async def s4__get_payables_aging(
     currency: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
+    **kwargs: Any,
 ) -> Any:
     """Return allowlisted S/4HANA payables-aging records for an executive summary."""
-    filters = {}
-    if company_code:
-        filters["CompanyCode"] = company_code
-    if supplier:
-        filters["Supplier"] = supplier
-    if currency:
-        filters["Currency"] = currency
+    comp = company_code or kwargs.get("companyCode") or "1000"
+    supp = supplier or kwargs.get("supplierName") or kwargs.get("Supplier")
+    curr = currency or kwargs.get("Currency")
+    date_val = key_date or kwargs.get("keyDate") or kwargs.get("period")
+    
+    filters = {"CompanyCode": str(comp)}
+    if supp:
+        filters["Supplier"] = str(supp)
+    if curr:
+        filters["Currency"] = str(curr)
     return response(await client.query(
         client.settings.s4_ap_entity,
         "PayablesAging",
         filters,
-        period=key_date,
-        currency=currency,
-        correlation_id=correlation_id,
+        period=date_val,
+        currency=curr,
+        correlation_id=correlation_id or kwargs.get("correlationId"),
         top=top,
     ))
 
 
 async def s4__get_profit_and_loss(
-    company_code: str,
-    fiscal_year: str,
-    fiscal_period: str,
+    company_code: str = "1000",
+    fiscal_year: str = "2026",
+    fiscal_period: str = "006",
     ledger: str = "0L",
     currency: str | None = None,
     profit_center: str | None = None,
     correlation_id: str | None = None,
     top: int = 100,
+    **kwargs: Any,
 ) -> Any:
     """Return an allowlisted S/4HANA profit-and-loss view for the requested period."""
-    period = f"{fiscal_year}-{fiscal_period}"
+    comp = company_code or kwargs.get("companyCode") or "1000"
+    year = fiscal_year or kwargs.get("fiscalYear") or "2026"
+    period_val = fiscal_period or kwargs.get("fiscalPeriod") or "006"
+    period = f"{year}-{period_val}"
     return response(await client.query(
         client.settings.s4_pl_entity,
         "ProfitAndLoss",
-        {"CompanyCode": company_code, "FiscalYear": fiscal_year, "FiscalPeriod": fiscal_period, "Ledger": ledger, "Currency": currency, "ProfitCenter": profit_center},
+        {"CompanyCode": comp, "FiscalYear": year, "FiscalPeriod": period_val, "Ledger": ledger, "Currency": currency, "ProfitCenter": profit_center},
         period=period,
         currency=currency,
-        correlation_id=correlation_id,
+        correlation_id=correlation_id or kwargs.get("correlationId"),
         top=top,
     ))
 
@@ -204,16 +218,18 @@ async def s4__get_budget_variance(
     correlation_id: str | None = None,
     top: int = 100,
     entity: str | None = None,
+    **kwargs: Any,
 ) -> Any:
     """Return allowlisted S/4HANA budget-versus-actual records for the requested period."""
-    period = f"{fiscal_year or ''}-{fiscal_period or ''}".strip("-") or None
-    filters = {}
-    if company_code:
-        filters["CompanyCode"] = company_code
-    if fiscal_year:
-        filters["FiscalYear"] = fiscal_year
-    if fiscal_period:
-        filters["FiscalPeriod"] = fiscal_period
+    comp = company_code or kwargs.get("companyCode") or "1000"
+    year = fiscal_year or kwargs.get("fiscalYear") or "2026"
+    period_val = fiscal_period or kwargs.get("fiscalPeriod")
+    period = f"{year}-{period_val or ''}".strip("-") or None
+    filters = {"CompanyCode": str(comp)}
+    if year:
+        filters["FiscalYear"] = str(year)
+    if period_val:
+        filters["FiscalPeriod"] = str(period_val)
     if plan_version:
         filters["PlanVersion"] = plan_version
     if cost_center:
@@ -227,7 +243,7 @@ async def s4__get_budget_variance(
         filters,
         period=period,
         currency=currency,
-        correlation_id=correlation_id,
+        correlation_id=correlation_id or kwargs.get("correlationId"),
         top=top,
         override_base_url=client.settings.s4_budget_api_url or None,
     ))

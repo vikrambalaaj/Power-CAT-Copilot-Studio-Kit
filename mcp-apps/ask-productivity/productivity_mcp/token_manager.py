@@ -7,11 +7,14 @@ import hmac
 import json
 import os
 import time
+import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional, Tuple
 
-HMAC_SECRET = os.getenv("VELORA_APPROVAL_HMAC_SECRET", "velora-prod-executive-secret-key-2026")
-DEFAULT_EXPIRY_MINUTES = int(os.getenv("VeloraConfirmationExpiryMinutes", "15"))
+
+def get_hmac_secret() -> str:
+    secret = os.getenv("VELORA_APPROVAL_HMAC_SECRET", "velora-prod-executive-secret-key-2026")
+    return secret
 
 
 def compute_preview_checksum(preview_data: Dict[str, Any]) -> str:
@@ -26,15 +29,22 @@ def compute_token_hash_for_dataverse(token: str) -> str:
     """Compute secure HMAC-SHA256 hash of the approval token for audit storage."""
     if not token:
         return ""
-    return hmac.new(HMAC_SECRET.encode("utf-8"), token.encode("utf-8"), hashlib.sha256).hexdigest()
+    secret = get_hmac_secret()
+    return hmac.new(secret.encode("utf-8"), token.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
 class TokenManager:
     """Manages generation, validation, and integrity checking of short-lived approval tokens."""
 
-    def __init__(self, secret: Optional[str] = None, default_expiry_minutes: int = DEFAULT_EXPIRY_MINUTES):
-        self.secret = (secret or HMAC_SECRET).encode("utf-8")
-        self.default_expiry_minutes = default_expiry_minutes
+    def __init__(self, secret: Optional[str] = None, default_expiry_minutes: int = 10):
+        self._secret = secret
+        self.default_expiry_minutes = int(os.getenv("VELORA_CONFIRMATION_EXPIRY_MINUTES", str(default_expiry_minutes)))
+        self._consumed_nonces: set[str] = set()
+
+    @property
+    def secret(self) -> bytes:
+        sec = self._secret or get_hmac_secret()
+        return sec.encode("utf-8")
 
     def create_approval_token(
         self,
@@ -44,30 +54,37 @@ class TokenManager:
         preview_data: Dict[str, Any],
         idempotency_key: str,
         root_correlation_id: str,
+        tenant_id: str = "velora-tenant",
         expiry_minutes: Optional[int] = None,
     ) -> Tuple[str, str]:
-        """Generate a tamper-evident, time-bound approval token.
+        """Generate a tamper-evident, time-bound approval token bound to user identity and nonce.
         
         Returns:
             (token, expires_on_iso)
         """
+        if not user_object_id and not user_email:
+            raise ValueError("Authenticated user identity (oid or email) is required for approval tokens")
+
         mins = expiry_minutes if expiry_minutes is not None else self.default_expiry_minutes
         now = datetime.now(timezone.utc)
         expires_on = now + timedelta(minutes=mins)
         expires_on_iso = expires_on.isoformat()
         expires_ts = int(expires_on.timestamp())
+        nonce = str(uuid.uuid4())
 
         preview_checksum = compute_preview_checksum(preview_data)
 
         payload = {
-            "op": operation,
-            "uid": user_object_id or "",
-            "uem": (user_email or "").strip().lower(),
-            "exp": expires_ts,
-            "chk": preview_checksum,
-            "idk": idempotency_key,
-            "cid": root_correlation_id,
+            "oid": user_object_id or "",
+            "tid": tenant_id or "velora-tenant",
+            "operation": operation.upper(),
+            "previewChecksum": preview_checksum,
+            "idempotencyKey": idempotency_key,
+            "nonce": nonce,
             "iat": int(now.timestamp()),
+            "exp": expires_ts,
+            "uem": (user_email or "").strip().lower(),
+            "cid": root_correlation_id,
         }
 
         payload_bytes = json.dumps(payload, sort_keys=True).encode("utf-8")
@@ -87,7 +104,7 @@ class TokenManager:
         user_email: str,
         current_preview_data: Optional[Dict[str, Any]] = None,
     ) -> Tuple[bool, str, Dict[str, Any]]:
-        """Verify token cryptographic signature, expiry, user identity, and preview checksum.
+        """Verify token cryptographic signature, expiry, user identity, nonce, and preview checksum.
         
         Returns:
             (is_valid, error_reason, token_payload)
@@ -126,8 +143,14 @@ class TokenManager:
         if now_ts > exp_ts:
             return False, f"Approval token has expired at timestamp {exp_ts} (current: {now_ts}).", payload
 
+        # Check Nonce Replay
+        nonce = payload.get("nonce", "")
+        if nonce in self._consumed_nonces:
+            return False, "Approval token nonce has already been consumed (replay blocked).", payload
+
         # Check Operation Match
-        token_op = payload.get("op", "").upper()
+        token_op = payload.get("operation") or payload.get("op", "")
+        token_op = str(token_op).upper()
         expected_op = expected_operation.upper()
         
         def normalize_op(op_name: str) -> str:
@@ -144,24 +167,29 @@ class TokenManager:
         # Check User Identity Binding
         sanitized_email = (user_email or "").strip().lower()
         token_email = (payload.get("uem") or "").strip().lower()
-        token_uid = payload.get("uid", "")
+        token_uid = payload.get("oid") or payload.get("uid", "")
         
         user_matches = False
         if token_email and sanitized_email and token_email == sanitized_email:
             user_matches = True
         elif token_uid and user_object_id and token_uid == user_object_id:
             user_matches = True
-        elif not token_email and not token_uid:
-            user_matches = True
+        elif not sanitized_email and not user_object_id:
+            user_matches = False
 
-        if not user_matches:
-            return False, f"User identity mismatch: token issued to '{token_email}', presented by '{sanitized_email}'.", payload
+        if not user_matches and (sanitized_email or user_object_id):
+            return False, f"User identity mismatch: token issued to '{token_uid or token_email}', presented by '{user_object_id or sanitized_email}'.", payload
 
         # Check Preview Checksum Integrity if preview supplied
         if current_preview_data is not None:
             current_checksum = compute_preview_checksum(current_preview_data)
-            if payload.get("chk") and payload.get("chk") != current_checksum:
+            chk = payload.get("previewChecksum") or payload.get("chk")
+            if chk and chk != current_checksum:
                 return False, "Preview data has changed since approval was requested. A new approval is required.", payload
+
+        # Consume nonce
+        if nonce:
+            self._consumed_nonces.add(nonce)
 
         return True, "", payload
 

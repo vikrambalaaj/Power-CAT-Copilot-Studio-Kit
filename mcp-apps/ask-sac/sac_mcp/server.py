@@ -1,12 +1,37 @@
+import hmac
 import uvicorn
 from fastapi import FastAPI, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 from typing import Any, Dict, Optional
 
 from sac_mcp.settings import settings
 from sac_mcp.tools import ALL_TOOLS
 
 app = FastAPI(title="SAP Analytics Cloud MCP Server", version="0.1.0")
+
+PUBLIC_PATHS = {"/health", "/"}
+
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    if request.url.path not in PUBLIC_PATHS:
+        if not settings.allow_anonymous:
+            supplied = request.headers.get("x-api-key", "")
+            auth_header = request.headers.get("authorization", "")
+            if not supplied and auth_header.lower().startswith("bearer "):
+                supplied = auth_header[7:].strip()
+            if not settings.mcp_api_key or not hmac.compare_digest(supplied, settings.mcp_api_key):
+                return JSONResponse(
+                    {
+                        "status": "error",
+                        "code": "UNAUTHORIZED",
+                        "message": "Authentication required. Please provide a valid API key.",
+                    },
+                    status_code=401,
+                )
+    return await call_next(request)
+
 
 app.add_middleware(
     CORSMiddleware,

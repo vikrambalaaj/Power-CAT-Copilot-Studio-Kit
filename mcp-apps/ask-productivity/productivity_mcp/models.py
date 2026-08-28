@@ -109,6 +109,109 @@ class PlannerTaskPreview(BaseModel):
     approvalExpiresOn: str
 
 
+# --- Operation Parameter Models for Handoff Contract (Section 15) ---
+
+class GetMailThreadParameters(BaseModel):
+    threadId: str
+    maxMessages: int = 10
+
+
+class GetPriorityMailParameters(BaseModel):
+    top: int = 10
+    unreadOnly: bool = False
+    hoursLookback: int = 48
+
+
+class GetMailFollowUpsParameters(BaseModel):
+    daysLookback: int = 7
+    top: int = 10
+
+
+class PrepareEmailReplyParameters(BaseModel):
+    messageId: str
+    replyBody: str
+    replyAll: bool = False
+
+
+class GetCalendarEventsParameters(BaseModel):
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+    top: int = 10
+
+
+class GetMeetingContextParameters(BaseModel):
+    eventId: str
+
+
+class PrepareMeetingUpdateParameters(BaseModel):
+    eventId: str
+    subject: Optional[str] = None
+    startTime: Optional[str] = None
+    endTime: Optional[str] = None
+    body: Optional[str] = None
+
+
+class PrepareMeetingCancellationParameters(BaseModel):
+    eventId: str
+    cancellationComment: Optional[str] = None
+
+
+class GetTeamsChannelContextParameters(BaseModel):
+    teamId: str
+    channelId: str
+    top: int = 15
+
+
+class GetTeamsChatContextParameters(BaseModel):
+    chatId: str
+    top: int = 15
+
+
+class GetTeamsFollowUpsParameters(BaseModel):
+    daysLookback: int = 7
+    top: int = 10
+
+
+class PrepareTeamsChatSendParameters(BaseModel):
+    chatId: Optional[str] = None
+    recipientEmail: Optional[str] = None
+    messageContent: str = ""
+
+
+class PrepareTeamsChannelPostParameters(BaseModel):
+    teamId: str
+    channelId: str
+    subject: Optional[str] = None
+    messageContent: str = ""
+
+
+class GetPlannerUserTasksParameters(BaseModel):
+    statusFilter: str = "INCOMPLETE"
+    top: int = 20
+
+
+class GetPlannerPlanTasksParameters(BaseModel):
+    planId: str
+    bucketId: Optional[str] = None
+    top: int = 50
+
+
+class PreparePlannerTaskCreateParameters(BaseModel):
+    planId: str
+    bucketId: str
+    title: str
+    description: Optional[str] = None
+    dueDate: Optional[str] = None
+    assignees: List[str] = Field(default_factory=list)
+
+
+class PreparePlannerTaskUpdateParameters(BaseModel):
+    taskId: str
+    percentComplete: Optional[int] = None
+    dueDate: Optional[str] = None
+    title: Optional[str] = None
+
+
 # --- Handoff Contracts (Section 13) ---
 
 class HandoffRequest(BaseModel):

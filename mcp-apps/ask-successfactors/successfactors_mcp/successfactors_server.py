@@ -99,26 +99,38 @@ def _validate_env() -> None:
         sys.exit(1)
 
 
+PUBLIC_PATHS = {"/health", "/", "/copilot/logo.png"}
+
+
 class ApiKeyMiddleware:
-    """Protect the MCP endpoint with a vault-managed API key."""
+    """Protect all non-health endpoints with vault-managed API key."""
 
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        protected_paths = ("/mcp", "/copilot/")
-        if scope.get("type") == "http" and scope.get("path", "").startswith(protected_paths):
-            if not settings.allow_anonymous:
-                headers = {key.lower(): value for key, value in scope.get("headers", [])}
-                supplied = headers.get(b"x-api-key", b"").decode("utf-8")
-                authorization = headers.get(b"authorization", b"").decode("utf-8")
-                if not supplied and authorization.lower().startswith("bearer "):
-                    supplied = authorization[7:].strip()
-                if not settings.mcp_api_key or not hmac.compare_digest(supplied, settings.mcp_api_key):
-                    response = JSONResponse({"error": "Unauthorized"}, status_code=401)
-                    await response(scope, receive, send)
-                    return
+        if scope.get("type") == "http":
+            path = scope.get("path", "")
+            if path not in PUBLIC_PATHS:
+                if not settings.allow_anonymous:
+                    headers = {key.lower(): value for key, value in scope.get("headers", [])}
+                    supplied = headers.get(b"x-api-key", b"").decode("utf-8")
+                    authorization = headers.get(b"authorization", b"").decode("utf-8")
+                    if not supplied and authorization.lower().startswith("bearer "):
+                        supplied = authorization[7:].strip()
+                    if not settings.mcp_api_key or not hmac.compare_digest(supplied, settings.mcp_api_key):
+                        response = JSONResponse(
+                            {
+                                "status": "error",
+                                "code": "UNAUTHORIZED",
+                                "message": "Authentication required. Please provide a valid API key.",
+                            },
+                            status_code=401,
+                        )
+                        await response(scope, receive, send)
+                        return
         await self.app(scope, receive, send)
+
 
 
 class CopilotStudioAcceptMiddleware:
@@ -583,9 +595,8 @@ async def api_connections(request):
     """REST API for listing and registering managed enterprise connections."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
-    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
     env = request.query_params.get("environment")
-    conns = admin_svc.list_connections_for_user(user_roles=roles, environment=env)
+    conns = admin_svc.list_connections_for_user(user_roles=["Admin"], environment=env)
     return JSONResponse({"connections": conns, "total": len(conns)})
 
 
@@ -593,9 +604,8 @@ async def api_connection_test(request):
     """REST API for testing an enterprise connection."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
-    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
     conn_id = request.path_params.get("conn_id", "")
-    res = await admin_svc.test_connection(conn_id, user_roles=roles)
+    res = await admin_svc.test_connection(conn_id, user_roles=["Admin"])
     return JSONResponse(res)
 
 
@@ -603,15 +613,14 @@ async def api_connection_toggle(request):
     """REST API for toggling connection enabled/disabled status."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
-    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
-    admin_email = request.headers.get("X-User-Email", "admin@velora.ae")
+    admin_email = "platform-admin@velora.ae"
     conn_id = request.path_params.get("conn_id", "")
     try:
         body = await request.json()
     except Exception:
         body = {}
     enabled = bool(body.get("enabled", True))
-    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=roles)
+    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=["Admin"])
     return JSONResponse(res)
 
 
@@ -619,16 +628,16 @@ async def api_connection_rotate(request):
     """REST API for rotating secret references."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
-    roles = [r.strip() for r in request.headers.get("X-User-Roles", "").split(",") if r.strip()]
-    admin_email = request.headers.get("X-User-Email", "admin@velora.ae")
+    admin_email = "platform-admin@velora.ae"
     conn_id = request.path_params.get("conn_id", "")
     try:
         body = await request.json()
     except Exception:
         body = {}
     new_secret_ref = body.get("new_secret_ref", "")
-    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=roles)
+    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=["Admin"])
     return JSONResponse(res)
+
 
 
 async def api_cache_purge(request):
