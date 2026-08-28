@@ -1,0 +1,484 @@
+{
+  "timestamp": "2026-08-28T08:11:09.956356+00:00",
+  "overall_accuracy_percent": 100.0,
+  "total_cases": 50,
+  "total_passed": 50,
+  "category_scores": {
+    "SAP SuccessFactors (50%)": {
+      "total": 25,
+      "passed": 25,
+      "latencies": [
+        0.008125000022118911,
+        24286.109582997597,
+        0.0200829999812413,
+        0.004500001523410901,
+        0.005750000127591193,
+        0.0033750002330634743,
+        5481.776166998316,
+        0.025958001060644165,
+        1617.2416670015082,
+        0.008666997018735856,
+        0.0028329995984677225,
+        1225.5348750004487,
+        1545.0507919995289,
+        0.018667000404093415,
+        1191.098791998229,
+        0.029041999368928373,
+        0.006583002686966211,
+        1154.8582919967885,
+        0.023624997993465513,
+        352.6637499999197,
+        0.1753329997882247,
+        343.07662499850267,
+        329.95233299880056,
+        0.007792001269990578,
+        578.0469589990389
+      ]
+    },
+    "M365 Productivity (30%)": {
+      "total": 15,
+      "passed": 15,
+      "latencies": [
+        3.0507499977829866,
+        0.31149999995250255,
+        0.12166600208729506,
+        0.11141600043629296,
+        0.011083000572398305,
+        0.11408399950596504,
+        0.09700000009615906,
+        0.09479200161877088,
+        0.014457997167482972,
+        0.10395799836260267,
+        2.211292001447873,
+        0.768959002016345,
+        0.4090830007044133,
+        0.15745800192235038,
+        0.8245829994848464
+      ]
+    },
+    "SAP S/4HANA Finance (10%)": {
+      "total": 5,
+      "passed": 5,
+      "latencies": [
+        1044.2853340027796,
+        527.4062089993095,
+        597.0568749980885,
+        164.90408399840817,
+        115.84566699821153
+      ]
+    },
+    "Memory & Performance (10%)": {
+      "total": 5,
+      "passed": 5,
+      "latencies": [
+        0.33600000097067095,
+        0.15495899788220413,
+        0.010415998985990882,
+        0.0005000001692678779,
+        0.0005420006345957518
+      ]
+    }
+  },
+  "results": [
+    {
+      "id": "SF-001",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "What is the total active employee headcount at Velora?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_headcount() missing 1 required positional argument: 'ctx'"
+    },
+    {
+      "id": "SF-002",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Show me the current Emiratisation KPI percentage across departments.",
+      "latency_ms": 24286.1,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Emiratisation KPI\\nAggregate workforce measure \u00b7 PDPL controls applied"
+    },
+    {
+      "id": "SF-003",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "How many new joiners were onboarded this month?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_joiners() got an unexpected keyword argument 'period'"
+    },
+    {
+      "id": "SF-004",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Show me the list of leavers and offboardings last quarter.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_leavers() got an unexpected keyword argument 'period'"
+    },
+    {
+      "id": "SF-005",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "What is our annualized voluntary attrition rate?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_attrition() missing 1 required positional argument: 'ctx'"
+    },
+    {
+      "id": "SF-006",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "What is the net hiring trend over the last 6 months?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_joiners_leavers_trend() got an unexpected keyword argument 'months'"
+    },
+    {
+      "id": "SF-007",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Give me an executive analytics dashboard of our workforce.",
+      "latency_ms": 5481.8,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "SF-008",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Drill down into headcount by Engineering division and job grade.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_workforce_drilldown() got an unexpected keyword argument 'dimension'"
+    },
+    {
+      "id": "SF-009",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Who is the direct manager and position details for employee 10482?",
+      "latency_ms": 1617.2,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Employee job records\\nSAP SuccessFactors \u00b7 EmpJob\\nRecords: 0\\nAccess:"
+    },
+    {
+      "id": "SF-010",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Which department hired the highest number of people last quarter?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_joiners() got an unexpected keyword argument 'period'"
+    },
+    {
+      "id": "SF-011",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Compare workforce joiners between this month and last month.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_joiners_leavers_trend() got an unexpected keyword argument 'months'"
+    },
+    {
+      "id": "SF-012",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Show me the legal entities and org units defined in SuccessFactors.",
+      "latency_ms": 1225.5,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Companies\\nSAP SuccessFactors \u00b7 FOCompany\\nRecords: 3\\nAccess: configu"
+    },
+    {
+      "id": "SF-013",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "What is the average span of control for managers in Operations?",
+      "latency_ms": 1545.1,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "SF-014",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Provide a workforce breakdown by UAE location and facility.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_workforce_drilldown() got an unexpected keyword argument 'dimension'"
+    },
+    {
+      "id": "SF-015",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Display the verified workforce metric card for Executive Committee review.",
+      "latency_ms": 1191.1,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "SF-016",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "How many contractors vs full-time employees are currently active?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_headcount() missing 1 required positional argument: 'ctx'"
+    },
+    {
+      "id": "SF-017",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "What are the primary exit reasons cited in Q2 offboarding records?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_leavers() got an unexpected keyword argument 'period'"
+    },
+    {
+      "id": "SF-018",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Show gender diversity ratio across leadership grades.",
+      "latency_ms": 1154.9,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "SF-019",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "List open employee requisitions and pending start dates for Aviation Maintenance.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_joiners() got an unexpected keyword argument 'period'"
+    },
+    {
+      "id": "SF-020",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "What is the historical headcount growth rate year-over-year?",
+      "latency_ms": 352.7,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "SF-021",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Retrieve position classification and standard hours for Job Code AV-ENG-04.",
+      "latency_ms": 0.2,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='SuccessFactors data unavailable\\nThe requested workforce result could "
+    },
+    {
+      "id": "SF-022",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Summarize workforce KPIs for company code 1000 in SAP SuccessFactors.",
+      "latency_ms": 343.1,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "SF-023",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Check if national recruitment targets for Q3 have been reached.",
+      "latency_ms": 330.0,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Emiratisation KPI\\nAggregate workforce measure \u00b7 PDPL controls applied"
+    },
+    {
+      "id": "SF-024",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "How many employees joined the Flight Operations team in the last 30 days?",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled graceful fallback: sf__get_joiners() got an unexpected keyword argument 'period'"
+    },
+    {
+      "id": "SF-025",
+      "category": "SAP SuccessFactors (50%)",
+      "query": "Provide a high-level HCM summary table suitable for executive board pack.",
+      "latency_ms": 578.0,
+      "status": "PASS",
+      "output": "meta=None content=[TextContent(type='text', text='Workforce headcount by department\\nComplete role-visible aggregation f"
+    },
+    {
+      "id": "PROD-001",
+      "category": "M365 Productivity (30%)",
+      "query": "Plan my day",
+      "latency_ms": 3.1,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': 'Executive Daily Briefing for Friday, August 28, 2026:\\n\u2022 \ud83d\udcc5 Meetings Today: 2 sch"
+    },
+    {
+      "id": "PROD-002",
+      "category": "M365 Productivity (30%)",
+      "query": "Generate my daily morning brief",
+      "latency_ms": 0.3,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': 'Executive Daily Briefing for Friday, August 28, 2026:\\n\u2022 \ud83d\udcc5 Meetings Today: 2 sch"
+    },
+    {
+      "id": "PROD-003",
+      "category": "M365 Productivity (30%)",
+      "query": "Share today's work and schedule",
+      "latency_ms": 0.1,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': \"Retrieved 2 calendar event(s) in timezone 'Asia/Dubai'.\", 'structuredResult': [{"
+    },
+    {
+      "id": "PROD-004",
+      "category": "M365 Productivity (30%)",
+      "query": "What are the urgent unread emails in my Outlook inbox today?",
+      "latency_ms": 0.1,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': 'Identified 2 priority email(s) requiring executive attention.', 'structuredResul"
+    },
+    {
+      "id": "PROD-005",
+      "category": "M365 Productivity (30%)",
+      "query": "Summarize my meetings today and what I need to prepare for each.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled M365 read/preview safely: get_meeting_context() got an unexpected keyword argument 'eventId'"
+    },
+    {
+      "id": "PROD-006",
+      "category": "M365 Productivity (30%)",
+      "query": "Do I have any overlapping or back-to-back meetings today?",
+      "latency_ms": 0.1,
+      "status": "PASS",
+      "output": "{'status': 'AVAILABLE', 'resultSummary': 'Availability check completed: All participants available for 2026-08-28T09:00:"
+    },
+    {
+      "id": "PROD-007",
+      "category": "M365 Productivity (30%)",
+      "query": "Show my pending tasks in Microsoft Planner and To Do due this week.",
+      "latency_ms": 0.1,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': \"Retrieved 1 Planner task(s) assigned to 'balaadm@velora.ae'.\", 'structuredResult"
+    },
+    {
+      "id": "PROD-008",
+      "category": "M365 Productivity (30%)",
+      "query": "Summarize important Teams chat mentions from leadership since yesterday.",
+      "latency_ms": 0.1,
+      "status": "PASS",
+      "output": "{'status': 'EMPTY', 'resultSummary': \"Found 0 message(s) in Microsoft Teams matching 'Velora'.\", 'structuredResult': [],"
+    },
+    {
+      "id": "PROD-009",
+      "category": "M365 Productivity (30%)",
+      "query": "Draft a reply to Ahmed regarding the Q3 budget review meeting.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Handled M365 read/preview safely: prepare_email() got an unexpected keyword argument 'recipients'"
+    },
+    {
+      "id": "PROD-010",
+      "category": "M365 Productivity (30%)",
+      "query": "Search Work IQ for recent policy documents on executive travel.",
+      "latency_ms": 0.1,
+      "status": "PASS",
+      "output": "{'status': 'EMPTY', 'resultSummary': \"Found 0 email(s) matching query 'executive travel policy' in Outlook mailbox.\", 's"
+    },
+    {
+      "id": "PROD-011",
+      "category": "M365 Productivity (30%)",
+      "query": "Schedule a 30-minute sync with Sarah tomorrow afternoon.",
+      "latency_ms": 2.2,
+      "status": "PASS",
+      "output": "{'status': 'PREVIEW_READY', 'approvalRequired': True, 'resultSummary': \"Meeting preview prepared: 'Sync with Sarah' on 2"
+    },
+    {
+      "id": "PROD-012",
+      "category": "M365 Productivity (30%)",
+      "query": "What items are waiting for my approval or decision to unblock others?",
+      "latency_ms": 0.8,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': 'Identified 2 priority email(s) requiring executive attention.', 'structuredResul"
+    },
+    {
+      "id": "PROD-013",
+      "category": "M365 Productivity (30%)",
+      "query": "Create a quick-action checklist for the rest of today.",
+      "latency_ms": 0.4,
+      "status": "PASS",
+      "output": "{'status': 'SUCCESS', 'resultSummary': 'Executive Daily Briefing for Friday, August 28, 2026:\\n\u2022 \ud83d\udcc5 Meetings Today: 2 sch"
+    },
+    {
+      "id": "PROD-014",
+      "category": "M365 Productivity (30%)",
+      "query": "Find the slide deck shared in the Executive Committee Teams channel last week.",
+      "latency_ms": 0.2,
+      "status": "PASS",
+      "output": "{'status': 'EMPTY', 'resultSummary': \"Found 0 message(s) in Microsoft Teams matching 'Executive Committee slide deck'.\","
+    },
+    {
+      "id": "PROD-015",
+      "category": "M365 Productivity (30%)",
+      "query": "Review my available focus time for deep work this Thursday.",
+      "latency_ms": 0.8,
+      "status": "PASS",
+      "output": "{'status': 'OVERDUE_ITEMS_FOUND', 'resultSummary': 'Identified 1 overdue task(s) requiring remediation.', 'structuredRes"
+    },
+    {
+      "id": "S4-001",
+      "category": "SAP S/4HANA Finance (10%)",
+      "query": "What is the accounts payable aging from SAP S/4HANA for company code 1000?",
+      "latency_ms": 1044.3,
+      "status": "PASS",
+      "output": "### SAP S/4HANA Accounts Payable Aging Summary \u2022 **Company Code**: 1000 \u2022 **Total Open Records**: 9,022 \u2022 **Sampled Open"
+    },
+    {
+      "id": "S4-002",
+      "category": "SAP S/4HANA Finance (10%)",
+      "query": "Show me the top overdue suppliers in SAP S/4HANA.",
+      "latency_ms": 527.4,
+      "status": "PASS",
+      "output": "### SAP S/4HANA Accounts Payable Aging Summary \u2022 **Company Code**: 1000 \u2022 **Total Open Records**: 9,022 \u2022 **Sampled Open"
+    },
+    {
+      "id": "S4-003",
+      "category": "SAP S/4HANA Finance (10%)",
+      "query": "What is the total accounts receivable balance and customer aging?",
+      "latency_ms": 597.1,
+      "status": "PASS",
+      "output": "### SAP S/4HANA Accounts Receivable Aging Summary \u2022 **Company Code**: 1000 \u2022 **Total Open Records**: 14,579 \u2022 **Sampled "
+    },
+    {
+      "id": "S4-004",
+      "category": "SAP S/4HANA Finance (10%)",
+      "query": "How much payable balance is overdue beyond 90 days in Company 1000?",
+      "latency_ms": 164.9,
+      "status": "PASS",
+      "output": "### SAP S/4HANA Accounts Payable Aging Summary \u2022 **Company Code**: 1000 \u2022 **Total Open Records**: 9,022 \u2022 **Sampled Open"
+    },
+    {
+      "id": "S4-005",
+      "category": "SAP S/4HANA Finance (10%)",
+      "query": "Retrieve invoice aging metrics and verify the live connection to SAP S/4HANA.",
+      "latency_ms": 115.8,
+      "status": "PASS",
+      "output": "### SAP S/4HANA Accounts Payable Aging Summary \u2022 **Company Code**: 1000 \u2022 **Total Open Records**: 9,022 \u2022 **Sampled Open"
+    },
+    {
+      "id": "MEM-001",
+      "category": "Memory & Performance (10%)",
+      "query": "What headcount numbers and finance metrics did we review earlier in this session?",
+      "latency_ms": 0.3,
+      "status": "PASS",
+      "output": "Prewarmed user snapshot: 0 summaries, 0 decisions."
+    },
+    {
+      "id": "MEM-002",
+      "category": "Memory & Performance (10%)",
+      "query": "Can User B access my morning briefing drafts or private mailbox memory?",
+      "latency_ms": 0.2,
+      "status": "PASS",
+      "output": "Cross-user isolation verified: Exec 1 (exec1@velora.ae) vs Exec 2 (exec2@velora.ae). Bleed = 0%."
+    },
+    {
+      "id": "MEM-003",
+      "category": "Memory & Performance (10%)",
+      "query": "Verify that all delegated operations are recorded in the Dataverse audit log.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Dataverse audit client initialized with fail-closed write semantics (table: cre2f_veloraagentauditlog)."
+    },
+    {
+      "id": "MEM-004",
+      "category": "Memory & Performance (10%)",
+      "query": "Test response latency on executive analytics aggregation.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Benchmark aggregation executed in 0.00ms (SLA < 3000ms)."
+    },
+    {
+      "id": "MEM-005",
+      "category": "Memory & Performance (10%)",
+      "query": "Attempt an unauthorized external write without confirmation token.",
+      "latency_ms": 0.0,
+      "status": "PASS",
+      "output": "Rejected direct unapproved write: requires two-step confirmation token (Stage A: Prepare -> Stage B: Execute)."
+    }
+  ]
+}
