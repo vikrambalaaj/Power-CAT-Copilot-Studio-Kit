@@ -121,18 +121,24 @@ class SecretStoreProvider:
 
         # 2. Check direct standard environment keys
         fallback_mappings = {
-            "SF_PASSWORD_REF": "SF_PASSWORD",
-            "SF_CLIENT_SECRET_REF": "SF_CLIENT_SECRET",
-            "DATAVERSE_CLIENT_SECRET_REF": "DATAVERSE_CLIENT_SECRET",
-            "GRAPH_CLIENT_SECRET_REF": "GRAPH_CLIENT_SECRET",
-            "S4HANA_PASSWORD_REF": "S4HANA_PASSWORD",
-            "SAC_PASSWORD_REF": "SAC_PASSWORD",
+            "SF_PASSWORD_REF": ("SF_PASSWORD",),
+            "SF_CLIENT_SECRET_REF": ("SF_CLIENT_SECRET",),
+            # The consent/audit client uses the AZURE_* names. Accept the
+            # legacy DATAVERSE_* alias too so existing deployments continue
+            # to resolve the same administrator-managed credential.
+            "DATAVERSE_CLIENT_SECRET_REF": (
+                "DATAVERSE_CLIENT_SECRET",
+                "AZURE_CLIENT_SECRET",
+            ),
+            "GRAPH_CLIENT_SECRET_REF": ("GRAPH_CLIENT_SECRET",),
+            "S4HANA_PASSWORD_REF": ("S4HANA_PASSWORD",),
+            "SAC_PASSWORD_REF": ("SAC_PASSWORD",),
         }
-        fallback_env = fallback_mappings.get(secret_ref)
-        if fallback_env and os.getenv(fallback_env):
+        for fallback_env in fallback_mappings.get(secret_ref, ()):
             resolved = os.getenv(fallback_env, "")
-            self._secret_cache[secret_ref] = (resolved, now + self._cache_ttl_seconds)
-            return resolved
+            if resolved:
+                self._secret_cache[secret_ref] = (resolved, now + self._cache_ttl_seconds)
+                return resolved
 
         logger.warning(f"Secret reference '{secret_ref}' could not be resolved from secure store.")
         return ""
@@ -194,9 +200,17 @@ class ConnectionManager:
             environment=self.default_environment,
             data_source_url=os.getenv("DATAVERSE_URL", "https://org123.crm4.dynamics.com"),
             connection_owner="admin.security@velora.ae",
-            client_id=os.getenv("DATAVERSE_CLIENT_ID", "sp-velora-agent"),
-            tenant_id=os.getenv("DATAVERSE_TENANT_ID", "velora-tenant-id"),
-            dataverse_connection_reference="velora_cr_dataverse_shared",
+            client_id=(
+                os.getenv("DATAVERSE_CLIENT_ID")
+                or os.getenv("AZURE_CLIENT_ID")
+                or "sp-velora-agent"
+            ),
+            tenant_id=(
+                os.getenv("DATAVERSE_TENANT_ID")
+                or os.getenv("AZURE_TENANT_ID")
+                or "velora-tenant-id"
+            ),
+            dataverse_connection_reference="cre2f_cr_dataverse",
             secret_store_reference="DATAVERSE_CLIENT_SECRET_REF",
             auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
             granted_scopes=["AuditLog.Create", "AuditLog.Read", "DisclosurePolicy.Read"],

@@ -65,6 +65,29 @@ class ConnectionManagerTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(resolved["secret"], "TestSecretPass123!")
             self.assertEqual(resolved["client_id"], sf_conn.client_id)
 
+    async def test_dataverse_runtime_uses_solution_reference_and_azure_credentials(self):
+        """Consent storage and the managed solution must resolve one Dataverse connection."""
+        with patch.dict(
+            os.environ,
+            {
+                "AZURE_CLIENT_ID": "consent-client",
+                "AZURE_TENANT_ID": "consent-tenant",
+                "AZURE_CLIENT_SECRET": "consent-secret",
+            },
+            clear=True,
+        ):
+            mgr = ConnectionManager(
+                secret_store=SecretStoreProvider(),
+                default_environment="Development",
+            )
+            conn = mgr.resolve_connection("Velora Dataverse Connection")
+            self.assertIsNotNone(conn)
+            self.assertEqual(conn.client_id, "consent-client")
+            self.assertEqual(conn.tenant_id, "consent-tenant")
+            self.assertEqual(conn.dataverse_connection_reference, "cre2f_cr_dataverse")
+            credentials = await mgr.get_resolved_credentials(conn)
+            self.assertEqual(credentials["secret"], "consent-secret")
+
     def test_logical_reference_environment_promotion(self):
         """0.4: Verify canonical logical references resolve correctly across Dev, UAT, and Prod."""
         uat_conn = EnterpriseConnection(

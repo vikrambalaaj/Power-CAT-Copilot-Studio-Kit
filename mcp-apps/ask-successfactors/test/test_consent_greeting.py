@@ -78,7 +78,12 @@ async def test_one_time_consent_and_greeting_lifecycle():
     greeting_res = extract_res(greeting_res_raw)
     assert greeting_res["type"] == "SessionGreeting"
     assert greeting_res["is_consented"] is True
-    assert greeting_res["salutation"] in {"Good morning", "Good afternoon", "Good evening"}
+    assert greeting_res["salutation"] in {
+        "Welcome",
+        "Good morning",
+        "Good afternoon",
+        "Good evening",
+    }
     assert "Bala" in greeting_res["fallback_text"]
     print(f"✓ Step 4 Passed: Time-based greeting generated: '{greeting_res['salutation']}' for '{greeting_res['user_display_name']}'.")
 

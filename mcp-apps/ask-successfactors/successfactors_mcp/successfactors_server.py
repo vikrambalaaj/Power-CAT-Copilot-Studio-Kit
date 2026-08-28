@@ -3,6 +3,7 @@ import hmac
 import inspect
 import json
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -653,6 +654,32 @@ async def api_cache_purge(request):
 
 def create_app():
     app = mcp.streamable_http_app()
+
+    async def start_managed_connections() -> None:
+        """Keep administrator-managed connections validated for app lifetime."""
+        from .connection_manager import get_connection_manager
+        await get_connection_manager().start_health_monitor()
+
+    async def stop_managed_connections() -> None:
+        from .connection_manager import get_connection_manager
+        await get_connection_manager().stop_health_monitor()
+
+    # Preserve FastMCP's own lifespan while adding the connection monitor.
+    # The monitor performs an immediate validation pass, then keeps checking
+    # credentials in the background. Its start/stop methods are idempotent, so
+    # development reloads cannot start duplicate tasks.
+    fastmcp_lifespan = app.router.lifespan_context
+
+    @asynccontextmanager
+    async def managed_lifespan(app_instance):
+        async with fastmcp_lifespan(app_instance) as state:
+            await start_managed_connections()
+            try:
+                yield state
+            finally:
+                await stop_managed_connections()
+
+    app.router.lifespan_context = managed_lifespan
     app.routes.append(Route("/health", health, methods=["GET"]))
     app.routes.append(Route("/charts/{chart_id}.png", chart_image, methods=["GET"]))
     app.routes.append(Route("/copilot/ai-plugin.json", copilot_plugin_manifest, methods=["GET"]))
