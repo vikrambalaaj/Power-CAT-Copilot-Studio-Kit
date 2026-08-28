@@ -4,6 +4,7 @@ import inspect
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from mcp.types import CallToolResult
 
@@ -31,6 +32,42 @@ class FakeSettings:
     sf_metric_rule_version = "test-v2"
     sf_small_group_threshold = 1
     enable_personal_info_tool = False
+
+
+class ConnectionAdminRouteTests(unittest.IsolatedAsyncioTestCase):
+    async def test_connection_test_uses_registered_admin_role(self):
+        admin_service = MagicMock()
+        admin_service.test_connection = AsyncMock(
+            return_value={"success": True, "status": "HEALTHY"}
+        )
+        request = SimpleNamespace(path_params={"conn_id": "CONN-SF-001"})
+
+        with patch(
+            "successfactors_mcp.connection_admin.get_connection_admin_service",
+            return_value=admin_service,
+        ):
+            response = await server.api_connection_test(request)
+
+        admin_service.test_connection.assert_awaited_once_with(
+            "CONN-SF-001", user_roles=["Velora_Admin"]
+        )
+        self.assertEqual(response.status_code, 200)
+
+    async def test_connection_listing_uses_registered_admin_role(self):
+        admin_service = MagicMock()
+        admin_service.list_connections_for_user.return_value = []
+        request = SimpleNamespace(query_params={})
+
+        with patch(
+            "successfactors_mcp.connection_admin.get_connection_admin_service",
+            return_value=admin_service,
+        ):
+            response = await server.api_connections(request)
+
+        admin_service.list_connections_for_user.assert_called_once_with(
+            user_roles=["Velora_Admin"], environment=None
+        )
+        self.assertEqual(response.status_code, 200)
 
 
 class CapturingClient(SuccessFactorsClient):

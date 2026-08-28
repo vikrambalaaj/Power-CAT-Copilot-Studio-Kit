@@ -600,7 +600,7 @@ async def api_connections(request):
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
     env = request.query_params.get("environment")
-    conns = admin_svc.list_connections_for_user(user_roles=["Admin"], environment=env)
+    conns = admin_svc.list_connections_for_user(user_roles=["Velora_Admin"], environment=env)
     return JSONResponse({"connections": conns, "total": len(conns)})
 
 
@@ -609,7 +609,7 @@ async def api_connection_test(request):
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
     conn_id = request.path_params.get("conn_id", "")
-    res = await admin_svc.test_connection(conn_id, user_roles=["Admin"])
+    res = await admin_svc.test_connection(conn_id, user_roles=["Velora_Admin"])
     return JSONResponse(res)
 
 
@@ -624,7 +624,7 @@ async def api_connection_toggle(request):
     except Exception:
         body = {}
     enabled = bool(body.get("enabled", True))
-    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=["Admin"])
+    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=["Velora_Admin"])
     return JSONResponse(res)
 
 
@@ -639,7 +639,7 @@ async def api_connection_rotate(request):
     except Exception:
         body = {}
     new_secret_ref = body.get("new_secret_ref", "")
-    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=["Admin"])
+    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=["Velora_Admin"])
     return JSONResponse(res)
 
 
