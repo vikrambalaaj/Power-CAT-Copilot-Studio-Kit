@@ -24,6 +24,7 @@ FILES = (
     "sac-plugin.json",
     "sac-mcp-tools.json",
     "facilitator-plugin.json",
+    "productivity-plugin.json",
     "instruction.txt",
     "color.png",
     "outline.png",
@@ -69,6 +70,22 @@ def validate() -> None:
         if urlparse(runtime["spec"]["url"]).scheme != "https":
             raise SystemExit(f"The {plugin_name} production runtime URL must use HTTPS")
 
+    # productivity-plugin.json uses an OpenAPI runtime and has no companion
+    # mcp-tools file, so it is validated for binding and transport only.
+    for plugin_name in ("ai-plugin.json", "s4hana-plugin.json", "sac-plugin.json",
+                        "facilitator-plugin.json", "productivity-plugin.json"):
+        plugin = load_json(plugin_name)
+        declared = {item["name"] for item in plugin.get("functions", [])}
+        for runtime in plugin.get("runtimes", []):
+            bound = set(runtime.get("run_for_functions", []))
+            if declared != bound:
+                raise SystemExit(
+                    f"{plugin_name}: run_for_functions {sorted(bound)} does not bind "
+                    f"every declared function {sorted(declared)}"
+                )
+            if urlparse(runtime["spec"]["url"]).scheme != "https":
+                raise SystemExit(f"The {plugin_name} runtime URL must use HTTPS")
+
     for plugin_name in ("ai-plugin.json", "s4hana-plugin.json", "sac-plugin.json", "facilitator-plugin.json"):
         for function in load_json(plugin_name).get("functions", []):
             semantics = function.get("capabilities", {}).get("response_semantics", {})
@@ -79,7 +96,10 @@ def validate() -> None:
                 raise SystemExit(f"{plugin_name}:{function.get('name')} has an invalid card fallback template")
 
     agent_actions = {item["file"] for item in load_json("declarativeAgent.json").get("actions", [])}
-    required_plugins = {"ai-plugin.json", "s4hana-plugin.json", "sac-plugin.json", "facilitator-plugin.json"}
+    required_plugins = {
+        "ai-plugin.json", "s4hana-plugin.json", "sac-plugin.json",
+        "facilitator-plugin.json", "productivity-plugin.json",
+    }
     if not required_plugins.issubset(agent_actions):
         raise SystemExit("The declarative agent must reference every packaged MCP plugin")
     if not manifest.get("copilotAgents", {}).get("declarativeAgents"):
