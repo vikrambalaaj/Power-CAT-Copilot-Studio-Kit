@@ -190,6 +190,27 @@ def _visualization_spec(result: dict[str, Any]) -> dict[str, Any]:
             "values": [int(row.get("joiners", 0)) for row in rows],
             "source": "SAP SuccessFactors",
         }
+    if result.get("type") == "WorkforceDemographics":
+        group_by = str(result.get("group_by") or "gender")
+        cross_by = result.get("cross_by")
+        rows = result.get("chart_bars", result.get("breakdown", [])[:15])
+        categories = [
+            " · ".join(
+                value for value in [str(row.get(cross_by, "")) if cross_by else "", str(row.get(group_by, ""))]
+                if value
+            )
+            for row in rows
+        ]
+        return {
+            "template": "ranked_horizontal_bar",
+            "title": f"Workforce {group_by}" + (f" by {cross_by}" if cross_by else ""),
+            "total": int(result.get("active_headcount", 0)),
+            "categoryLabel": "Group",
+            "valueLabel": "Headcount",
+            "categories": categories,
+            "values": [int(row.get("headcount", 0)) for row in rows],
+            "source": "SAP SuccessFactors",
+        }
     return {"template": "facts", "source": "SAP SuccessFactors"}
 
 
@@ -425,6 +446,55 @@ def decorate(data: dict[str, Any]) -> dict[str, Any]:
                 _fact("As of", result.get("as_of_date") or "Current effective view"),
             ]
             card = _card(title, subtitle, facts, status=status.replace("_", " ").title(), status_color="Good" if status == "ON_TRACK" else "Warning", note="Individual nationality data is not displayed.")
+        elif kind == "WorkforceDemographics":
+            group_by = str(result.get("group_by") or "gender")
+            cross_by = result.get("cross_by")
+            dimension_title = group_by.title() + (f" by {str(cross_by).title()}" if cross_by else "")
+            title = f"Workforce {dimension_title}"
+            subtitle = "Aggregate active workforce · privacy threshold enforced"
+            body = [
+                {"type": "TextBlock", "text": title, "weight": "Bolder", "size": "Medium", "wrap": True},
+                {"type": "TextBlock", "text": subtitle, "isSubtle": True, "wrap": True, "spacing": "Small"},
+                {
+                    "type": "FactSet",
+                    "separator": True,
+                    "facts": [
+                        _fact("Active headcount", f"{int(result.get('active_headcount', 0)):,}"),
+                        _fact("Released headcount", f"{int(result.get('released_headcount', 0)):,}"),
+                        _fact("Privacy-protected headcount", f"{int(result.get('suppressed_headcount', 0)):,}"),
+                        _fact("Suppression threshold", result.get("privacy_threshold")),
+                        _fact("Coverage", "Complete" if result.get("aggregation_complete") else "Partial"),
+                    ],
+                },
+            ]
+            for row in result.get("breakdown", [])[:15]:
+                labels = []
+                if cross_by:
+                    labels.append(str(row.get(cross_by, "Unclassified")))
+                labels.append(str(row.get(group_by, "Unclassified")))
+                body.append({
+                    "type": "TextBlock",
+                    "text": f"**{' · '.join(labels)}** — {int(row.get('headcount', 0)):,} ({row.get('percentage', 0)}%)",
+                    "wrap": True,
+                    "spacing": "Small",
+                })
+            if result.get("suppressed_group_count"):
+                body.append({
+                    "type": "TextBlock",
+                    "text": f"{int(result.get('suppressed_group_count', 0))} smaller group(s), representing {int(result.get('suppressed_headcount', 0)):,} employees, are privacy protected and not named.",
+                    "isSubtle": True,
+                    "size": "Small",
+                    "wrap": True,
+                    "separator": True,
+                })
+            body.append({
+                "type": "TextBlock",
+                "text": "No employee-level gender or nationality information is included.",
+                "isSubtle": True,
+                "size": "Small",
+                "wrap": True,
+            })
+            card = {"$schema": "http://adaptivecards.io/schemas/adaptive-card.json", "type": "AdaptiveCard", "version": "1.5", "body": body}
         elif kind == "AnalyticsDashboard":
             title = "Workforce overview"
             subtitle = "SAP SuccessFactors executive summary"

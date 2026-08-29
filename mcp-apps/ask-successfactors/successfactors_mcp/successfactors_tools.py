@@ -165,6 +165,24 @@ async def sf__get_emiratisation_kpi(
     return _json_response(res)
 
 
+async def sf__get_workforce_demographics(
+    group_by: str = "gender",
+    cross_by: Optional[str] = None,
+    company: Optional[str] = None,
+    business_unit: Optional[str] = None,
+    as_of_date: Optional[str] = None,
+) -> Any:
+    """Return governed aggregate nationality/gender workforce composition."""
+    res = await _client.aggregate_workforce_demographics(
+        group_by=group_by,
+        cross_by=cross_by,
+        company=company,
+        business_unit=business_unit,
+        as_of_date=as_of_date,
+    )
+    return _json_response(res)
+
+
 async def sf__get_headcount(
     ctx: Context,
     company: Optional[str] = None,
@@ -666,6 +684,11 @@ TOOL_SPECS = [
         "name": "sf__get_emiratisation_kpi",
         "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Uses the configured nationality mapping and the same active population for numerator and denominator; missing nationality stays separate and individual nationality is never exposed.",
         "handler": sf__get_emiratisation_kpi,
+    },
+    {
+        "name": "sf__get_workforce_demographics",
+        "description": "Use for privacy-safe aggregate workforce composition: headcount/percentage by nationality (group_by='nationality'), gender (group_by='gender'), gender by department (group_by='gender', cross_by='department'), or gender by nationality (group_by='gender', cross_by='nationality'). Small groups are suppressed and combined totals are withheld from named categories; never returns employee-level gender or nationality.",
+        "handler": sf__get_workforce_demographics,
     },
     {
         "name": "sf__get_emp_jobs",

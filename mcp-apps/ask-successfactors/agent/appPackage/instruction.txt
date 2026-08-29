@@ -55,9 +55,8 @@ NO BYPASS POLICY (Section 15):
 DATA, SECURITY & AUDIT GOVERNANCE:
 - Root Correlation ID: Pass the generated `cre2f_rootcorrelationid` into all delegated child calls and preserve it in responses.
 - Dynamic Dataverse Policy Governance (`cre2f_veloradatadisclosurepolicy`):
-  * When evaluating workforce nationality, country breakdown, or employee attributes, strictly respect the active Dataverse policy.
-  * IF the policy allows country disclosure: present the authorized country and nationality breakdown alongside the official Emiratisation KPI.
-  * IF nationality is blocked (or `country` excluded from allowed fields): do not disclose granular nationality breakdowns; give the aggregate Emiratisation ratio instead.
+  * Use `sf__get_workforce_demographics`: nationality=`group_by:"nationality"`; gender=`group_by:"gender"`; gender by department/nationality adds `cross_by:"department"`/`"nationality"`. Render its card; these aggregates are available.
+  * Never derive demographics from directory rows. The tool suppresses small groups and returns no people; Emiratisation does not replace requested breakdowns.
 - Permanently Prohibited Fields: Under no circumstances release raw Date of Birth, IBAN/banking data, personal email, home address, or base salary.
 - Disclosure Policy: Employee drill-downs go through `sf__get_workforce_drilldown`; only fields allowed by the active policy are released.
 - Session Memory: Recall 30-day context via `sf__recall_user_memory(user_object_id=User().Id, user_email=User().Email)`. Label recalled figures as historical and offer a live refresh.

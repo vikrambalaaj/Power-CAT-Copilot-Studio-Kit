@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 from .successfactors_settings import get_settings
 from .cache import AsyncTTLCache
+from .policy_engine import resolve_country_name
 from shared_mcp.logger import get_logger
 
 log = get_logger("sf_hcm")
@@ -278,6 +279,56 @@ class SuccessFactorsClient:
             "entity": entity,
             "person_id_field": person_field,
             "nationality_field": nationality_field,
+            "coverage": {
+                "rows_returned": response.get("rows_returned", 0),
+                "total_available": response.get("total_available", 0),
+                "complete": response.get("complete", False),
+            },
+            "cache": response.get("page_caches", []),
+        }
+
+    async def _gender_map(
+        self,
+        *,
+        executive_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        entity = self.settings.sf_gender_entity.strip()
+        person_field = self.settings.sf_gender_person_id_field.strip()
+        gender_field = self.settings.sf_gender_field.strip()
+        if not entity or not person_field or not gender_field:
+            return {
+                "error": True,
+                "message": "SuccessFactors gender entity and field mapping is not configured.",
+                "error_category": "configuration",
+            }
+        response = await self._fetch_all(
+            entity,
+            select=f"{person_field},{gender_field}",
+            executive_id=executive_id,
+        )
+        if response.get("error"):
+            return response
+
+        def normalize(value: Any) -> str:
+            code = str(value or "").strip().upper()
+            if code in {"M", "MALE", "1"}:
+                return "Male"
+            if code in {"F", "FEMALE", "2"}:
+                return "Female"
+            if code in {"X", "N", "NB", "NONBINARY", "NON-BINARY", "OTHER", "O"}:
+                return "Non-binary / other"
+            return "" if not code else "Other / unspecified"
+
+        mapping = {
+            str(row.get(person_field)): normalize(row.get(gender_field))
+            for row in response.get("results", [])
+            if row.get(person_field)
+        }
+        return {
+            "mapping": mapping,
+            "entity": entity,
+            "person_id_field": person_field,
+            "gender_field": gender_field,
             "coverage": {
                 "rows_returned": response.get("rows_returned", 0),
                 "total_available": response.get("total_available", 0),
@@ -1515,6 +1566,326 @@ class SuccessFactorsClient:
                 "population": population_res.get("page_caches", []),
                 "active_users": active_res.get("cache", []),
                 "nationality": nationality_res.get("cache", []),
+            },
+        }
+
+    async def aggregate_headcount_by_nationality(
+        self,
+        company: Optional[str] = None,
+        business_unit: Optional[str] = None,
+        as_of_date: Optional[str] = None,
+        executive_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return privacy-safe active headcount grouped by nationality.
+
+        Nationality is joined only in memory to the distinct, role-visible
+        EmpJob population. Individual rows are never returned. Categories below
+        the configured privacy threshold are combined into one unnamed bucket.
+        """
+        filters = []
+        if company:
+            filters.append(f"company eq '{_escape_odata_string(company)}'")
+        if business_unit:
+            filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
+
+        population_res = await self._fetch_all(
+            "EmpJob",
+            select="userId",
+            filter_str=" and ".join(filters) or None,
+            as_of_date=as_of_date,
+            executive_id=executive_id,
+        )
+        if population_res.get("error"):
+            return population_res
+        nationality_res = await self._nationality_map(executive_id=executive_id)
+        if nationality_res.get("error"):
+            return nationality_res
+        active_res = await self._active_user_ids(executive_id=executive_id)
+        if active_res.get("error"):
+            return active_res
+
+        population_ids = {
+            str(row.get("userId"))
+            for row in population_res.get("results", [])
+            if row.get("userId")
+        }
+        active_ids = population_ids.intersection(active_res.get("ids", set()))
+        threshold = max(1, int(self.settings.sf_small_group_threshold))
+        if len(active_ids) < threshold:
+            return {
+                "error": True,
+                "error_category": "privacy_suppression",
+                "message": "Nationality breakdown suppressed because the eligible active population is below the configured privacy threshold.",
+            }
+
+        nationality_map = nationality_res.get("mapping", {})
+        raw_counts: Dict[str, int] = {}
+        missing = 0
+        for user_id in active_ids:
+            raw_value = str(nationality_map.get(user_id) or "").strip()
+            if not raw_value:
+                missing += 1
+                continue
+            label = resolve_country_name(raw_value)
+            raw_counts[label] = raw_counts.get(label, 0) + 1
+
+        released = []
+        suppressed_total = 0
+        suppressed_category_count = 0
+        for nationality, count in raw_counts.items():
+            if count < threshold:
+                suppressed_total += count
+                suppressed_category_count += 1
+                continue
+            released.append({"nationality": nationality, "headcount": count})
+        if suppressed_total:
+            released.append({
+                "nationality": "Other nationalities (privacy protected)",
+                "headcount": suppressed_total,
+                "suppressed": True,
+            })
+        if missing:
+            released.append({
+                "nationality": "Missing / unclassified",
+                "headcount": missing,
+                "unclassified": True,
+            })
+
+        active_total = len(active_ids)
+        for row in released:
+            row["percentage"] = round((int(row["headcount"]) / active_total) * 100, 1)
+        released.sort(key=lambda row: (-int(row["headcount"]), str(row["nationality"])))
+        released_total = sum(int(row["headcount"]) for row in released)
+
+        warnings = []
+        if suppressed_category_count:
+            warnings.append(
+                f"{suppressed_category_count} nationality categor{'y was' if suppressed_category_count == 1 else 'ies were'} combined because each was below the privacy threshold of {threshold}."
+            )
+        if missing:
+            warnings.append("Blank or unmapped nationality values are shown only as an unclassified aggregate.")
+        if as_of_date:
+            warnings.append("EmpJob uses the requested as-of date; active status reflects the current User directory status.")
+
+        return {
+            "type": "NationalityHeadcount",
+            "company": company or self.settings.sf_company_id,
+            "business_unit": business_unit,
+            "population_scope": "active",
+            "active_headcount": active_total,
+            "known_nationality_headcount": active_total - missing,
+            "missing_unclassified_nationality_count": missing,
+            "nationality_count_released": sum(1 for row in released if not row.get("suppressed") and not row.get("unclassified")),
+            "suppressed_category_count": suppressed_category_count,
+            "privacy_threshold": threshold,
+            "nationality_breakdown": released,
+            "chart_bars": released[:12],
+            "aggregation_complete": bool(population_res.get("complete")) and bool(nationality_res.get("coverage", {}).get("complete")) and bool(active_res.get("coverage", {}).get("complete")),
+            "reconciliation": {
+                "released_total": released_total,
+                "active_headcount": active_total,
+                "passed": released_total == active_total,
+            },
+            "population_definition": "Distinct current-effective EmpJob employees intersected with configured active User.status values",
+            "privacy_rule": "Nationality groups below the configured small-group threshold are combined and never named; no individual nationality records are returned.",
+            "rule_version": self.settings.sf_metric_rule_version,
+            "as_of_date": as_of_date,
+            "warnings": warnings,
+            "pdpl_enforced": True,
+            "source": f"SAP SuccessFactors · EmpJob, User and {nationality_res.get('entity')}",
+            "source_details": {
+                "entities": ["EmpJob", "User", nationality_res.get("entity")],
+                "scope": "Aggregate, role-permission-visible active population",
+            },
+            "access_context": "configured_service_account",
+            "cache": {
+                "population": population_res.get("page_caches", []),
+                "active_users": active_res.get("cache", []),
+                "nationality": nationality_res.get("cache", []),
+            },
+        }
+
+    async def aggregate_workforce_demographics(
+        self,
+        group_by: str = "gender",
+        cross_by: Optional[str] = None,
+        company: Optional[str] = None,
+        business_unit: Optional[str] = None,
+        as_of_date: Optional[str] = None,
+        executive_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Aggregate gender/nationality dimensions without releasing people."""
+        group_by = str(group_by or "gender").strip().lower().replace(" ", "_")
+        cross_by = str(cross_by or "").strip().lower().replace(" ", "_") or None
+        allowed_primary = {"gender", "nationality"}
+        allowed_cross = {None, "department", "nationality"}
+        if group_by not in allowed_primary or cross_by not in allowed_cross:
+            return {
+                "error": True,
+                "error_category": "validation",
+                "message": "Supported demographic breakdowns are nationality, gender, gender by department, and gender by nationality.",
+            }
+        if group_by == "nationality" and cross_by is not None:
+            return {
+                "error": True,
+                "error_category": "validation",
+                "message": "Use group_by='gender' with cross_by='nationality' for the approved combined breakdown.",
+            }
+
+        filters = []
+        if company:
+            filters.append(f"company eq '{_escape_odata_string(company)}'")
+        if business_unit:
+            filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
+
+        department_names: Dict[str, str] = {}
+        department_res: Dict[str, Any] = {"complete": True, "page_caches": []}
+        if cross_by == "department":
+            department_res = await self._fetch_all(
+                "FODepartment", select="externalCode,name,status", executive_id=executive_id
+            )
+            if department_res.get("error"):
+                return department_res
+            department_names = {
+                str(row.get("externalCode")): str(row.get("name"))
+                for row in department_res.get("results", [])
+                if row.get("externalCode") and row.get("name")
+            }
+
+        population_res = await self._fetch_all(
+            "EmpJob",
+            select="userId,department",
+            filter_str=" and ".join(filters) or None,
+            as_of_date=as_of_date,
+            executive_id=executive_id,
+        )
+        if population_res.get("error"):
+            return population_res
+        active_res = await self._active_user_ids(executive_id=executive_id)
+        if active_res.get("error"):
+            return active_res
+
+        gender_res: Dict[str, Any] = {"mapping": {}, "coverage": {"complete": True}, "cache": []}
+        nationality_res: Dict[str, Any] = {"mapping": {}, "coverage": {"complete": True}, "cache": []}
+        if group_by == "gender":
+            gender_res = await self._gender_map(executive_id=executive_id)
+            if gender_res.get("error"):
+                return gender_res
+        if group_by == "nationality" or cross_by == "nationality":
+            nationality_res = await self._nationality_map(executive_id=executive_id)
+            if nationality_res.get("error"):
+                return nationality_res
+
+        active_ids = set(active_res.get("ids", set()))
+        distinct_jobs: Dict[str, Dict[str, Any]] = {}
+        for row in population_res.get("results", []):
+            user_id = str(row.get("userId") or "")
+            if user_id and user_id in active_ids:
+                distinct_jobs[user_id] = row
+        threshold = max(1, int(self.settings.sf_small_group_threshold))
+        if len(distinct_jobs) < threshold:
+            return {
+                "error": True,
+                "error_category": "privacy_suppression",
+                "message": "Demographic breakdown suppressed because the eligible active population is below the configured privacy threshold.",
+            }
+
+        gender_map = gender_res.get("mapping", {})
+        nationality_map = nationality_res.get("mapping", {})
+
+        def nationality_label(user_id: str) -> str:
+            raw = str(nationality_map.get(user_id) or "").strip()
+            return resolve_country_name(raw) if raw else "Missing / unclassified"
+
+        def gender_label(user_id: str) -> str:
+            return str(gender_map.get(user_id) or "Missing / unclassified")
+
+        counts: Dict[tuple[str, Optional[str]], int] = {}
+        for user_id, job in distinct_jobs.items():
+            primary = gender_label(user_id) if group_by == "gender" else nationality_label(user_id)
+            secondary: Optional[str] = None
+            if cross_by == "department":
+                code = str(job.get("department") or "")
+                secondary = department_names.get(code) or ("Unassigned" if not code else "Unmapped department")
+            elif cross_by == "nationality":
+                secondary = nationality_label(user_id)
+            key = (primary, secondary)
+            counts[key] = counts.get(key, 0) + 1
+
+        rows = []
+        suppressed_headcount = 0
+        suppressed_group_count = 0
+        active_total = len(distinct_jobs)
+        for (primary, secondary), count in counts.items():
+            if count < threshold:
+                suppressed_headcount += count
+                suppressed_group_count += 1
+                continue
+            row: Dict[str, Any] = {
+                group_by: primary,
+                "headcount": count,
+                "percentage": round((count / active_total) * 100, 1),
+            }
+            if cross_by:
+                row[cross_by] = secondary
+            rows.append(row)
+        rows.sort(key=lambda row: (-int(row["headcount"]), str(row.get(group_by, "")), str(row.get(cross_by or "", ""))))
+
+        warnings = []
+        if suppressed_group_count:
+            warnings.append(
+                f"{suppressed_group_count} intersection group{' was' if suppressed_group_count == 1 else 's were'} withheld because each was below the privacy threshold of {threshold}; together they represent {suppressed_headcount} employees."
+            )
+        if as_of_date:
+            warnings.append("EmpJob uses the requested as-of date; active status reflects the current User directory status.")
+
+        title_dimension = group_by if not cross_by else f"{group_by}_by_{cross_by}"
+        released_total = sum(int(row["headcount"]) for row in rows)
+        return {
+            "type": "WorkforceDemographics",
+            "breakdown_type": title_dimension,
+            "group_by": group_by,
+            "cross_by": cross_by,
+            "company": company or self.settings.sf_company_id,
+            "business_unit": business_unit,
+            "population_scope": "active",
+            "active_headcount": active_total,
+            "breakdown": rows,
+            "chart_bars": rows[:15],
+            "released_headcount": released_total,
+            "suppressed_headcount": suppressed_headcount,
+            "suppressed_group_count": suppressed_group_count,
+            "privacy_threshold": threshold,
+            "aggregation_complete": all([
+                bool(population_res.get("complete")),
+                bool(active_res.get("coverage", {}).get("complete")),
+                bool(gender_res.get("coverage", {}).get("complete")),
+                bool(nationality_res.get("coverage", {}).get("complete")),
+                bool(department_res.get("complete")),
+            ]),
+            "reconciliation": {
+                "released_headcount": released_total,
+                "suppressed_headcount": suppressed_headcount,
+                "active_headcount": active_total,
+                "passed": released_total + suppressed_headcount == active_total,
+            },
+            "privacy_rule": "Only aggregate intersection groups meeting the configured threshold are named. Smaller groups are withheld and no employee-level demographic records are returned.",
+            "rule_version": self.settings.sf_metric_rule_version,
+            "warnings": warnings,
+            "pdpl_enforced": True,
+            "as_of_date": as_of_date,
+            "source": "SAP SuccessFactors · EmpJob, User and PerPersonal",
+            "source_details": {
+                "entities": ["EmpJob", "User", "PerPersonal"] + (["FODepartment"] if cross_by == "department" else []),
+                "scope": "Aggregate, role-permission-visible active population",
+            },
+            "access_context": "configured_service_account",
+            "cache": {
+                "population": population_res.get("page_caches", []),
+                "active_users": active_res.get("cache", []),
+                "gender": gender_res.get("cache", []),
+                "nationality": nationality_res.get("cache", []),
+                "departments": department_res.get("page_caches", []),
             },
         }
 

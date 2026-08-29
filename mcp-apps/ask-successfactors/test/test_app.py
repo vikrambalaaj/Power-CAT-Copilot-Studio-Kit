@@ -27,6 +27,9 @@ class FakeSettings:
     sf_nationality_entity = "PerPersonal"
     sf_nationality_person_id_field = "personIdExternal"
     sf_nationality_field = "nationality"
+    sf_gender_entity = "PerPersonal"
+    sf_gender_person_id_field = "personIdExternal"
+    sf_gender_field = "gender"
     sf_uae_nationality_codes = "ARE"
     sf_active_user_statuses = "t"
     sf_metric_rule_version = "test-v2"
@@ -244,6 +247,70 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result["error"])
         self.assertNotIn("emiratisation_ratio_percent", result)
 
+    async def test_gender_by_department_returns_only_aggregate_groups(self):
+        client = CapturingClient([
+            {"results": [{"externalCode": "D1", "name": "Finance"}]},
+            {"results": [
+                {"userId": "one", "department": "D1"},
+                {"userId": "two", "department": "D1"},
+                {"userId": "three", "department": "D1"},
+            ], "__count": "3"},
+            {"results": [
+                {"userId": "one", "status": "t"},
+                {"userId": "two", "status": "t"},
+                {"userId": "three", "status": "t"},
+            ], "__count": "3"},
+            {"results": [
+                {"personIdExternal": "one", "gender": "M"},
+                {"personIdExternal": "two", "gender": "F"},
+                {"personIdExternal": "three", "gender": "F"},
+            ], "__count": "3"},
+        ])
+
+        result = await client.aggregate_workforce_demographics(
+            group_by="gender", cross_by="department"
+        )
+
+        self.assertEqual(result["type"], "WorkforceDemographics")
+        self.assertEqual(result["active_headcount"], 3)
+        self.assertEqual(sum(row["headcount"] for row in result["breakdown"]), 3)
+        self.assertTrue(all("userId" not in row for row in result["breakdown"]))
+        self.assertEqual({row["department"] for row in result["breakdown"]}, {"Finance"})
+
+    async def test_gender_by_nationality_suppresses_small_intersections(self):
+        settings = FakeSettings()
+        settings.sf_small_group_threshold = 2
+        client = CapturingClient([
+            {"results": [{"userId": str(i), "department": "D1"} for i in range(1, 6)], "__count": "5"},
+            {"results": [{"userId": str(i), "status": "t"} for i in range(1, 6)], "__count": "5"},
+            {"results": [
+                {"personIdExternal": "1", "gender": "M"},
+                {"personIdExternal": "2", "gender": "M"},
+                {"personIdExternal": "3", "gender": "F"},
+                {"personIdExternal": "4", "gender": "F"},
+                {"personIdExternal": "5", "gender": "F"},
+            ], "__count": "5"},
+            {"results": [
+                {"personIdExternal": "1", "nationality": "ARE"},
+                {"personIdExternal": "2", "nationality": "ARE"},
+                {"personIdExternal": "3", "nationality": "ARE"},
+                {"personIdExternal": "4", "nationality": "IND"},
+                {"personIdExternal": "5", "nationality": "IND"},
+            ], "__count": "5"},
+        ], settings=settings)
+
+        result = await client.aggregate_workforce_demographics(
+            group_by="gender", cross_by="nationality"
+        )
+
+        self.assertEqual(result["suppressed_group_count"], 1)
+        self.assertEqual(result["suppressed_headcount"], 1)
+        self.assertTrue(result["reconciliation"]["passed"])
+        self.assertNotIn(
+            {"gender": "Female", "nationality": "United Arab Emirates"},
+            [{"gender": row["gender"], "nationality": row["nationality"]} for row in result["breakdown"]],
+        )
+
 
 class ToolTests(unittest.IsolatedAsyncioTestCase):
     def test_aggregate_tool_handlers_do_not_require_conversational_filters(self):
@@ -255,6 +322,7 @@ class ToolTests(unittest.IsolatedAsyncioTestCase):
             "sf__get_headcount",
             "sf__get_analytics_dashboard",
             "sf__get_emiratisation_kpi",
+            "sf__get_workforce_demographics",
         }
         specs = {spec["name"]: spec for spec in tools_module.TOOL_SPECS}
         for name in aggregate_names:
