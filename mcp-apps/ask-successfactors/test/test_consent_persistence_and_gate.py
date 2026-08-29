@@ -5,9 +5,13 @@ from typing import Any, Dict, List, Optional
 from successfactors_mcp.consent_service import ConsentService, CURRENT_NOTICE_VERSION
 from successfactors_mcp.consent_gate import CONSENT_REQUIRED_TOOLS, require_consent
 from successfactors_mcp.dataverse_audit import (
-    AUDIT_ENTITY_SET,
+    AUDIT_LOG_COLUMNS,
+    CONSENT_COLUMNS,
+    CONSENT_ENTITY_SET,
+    DataverseAuditRecord,
     DataverseClient,
     RECORD_TYPE_CONSENT,
+    RECORD_TYPE_USER_TURN,
 )
 
 
@@ -34,14 +38,13 @@ class FakeDataverseClient(DataverseClient):
             if self.fail_next_write:
                 raise RuntimeError("Dataverse 503")
             row = dict(json_body or {})
-            row["cre2f_veloraagentauditlogid"] = f"guid-{len(self.rows) + 1}"
+            row["cre2f_botuserconsentid"] = f"guid-{len(self.rows) + 1}"
             self.rows.append(row)
             return row
         # GET: apply the consent filter against stored rows.
         matches = [
             row for row in self.rows
-            if row.get("cre2f_recordtype") == RECORD_TYPE_CONSENT
-            and row.get("cre2f_consentstatus") == "ACCEPTED"
+            if row.get("cre2f_consentgranted") is True
             and row.get("cre2f_consentversion") == self._version_in(params)
         ]
         return {"value": matches[-1:]}
@@ -67,16 +70,17 @@ class ConsentPersistenceTests(unittest.IsolatedAsyncioTestCase):
 
         posts = [r for r in self.client.requests if r["method"] == "POST"]
         self.assertEqual(len(posts), 1)
-        self.assertEqual(posts[0]["path"], AUDIT_ENTITY_SET)
+        self.assertEqual(posts[0]["path"], CONSENT_ENTITY_SET)
 
         row = self.client.rows[0]
-        self.assertEqual(row["cre2f_recordtype"], RECORD_TYPE_CONSENT)
-        self.assertEqual(row["cre2f_consentstatus"], "ACCEPTED")
+        self.assertTrue(row["cre2f_consentgranted"])
         self.assertEqual(row["cre2f_consentversion"], CURRENT_NOTICE_VERSION)
-        self.assertEqual(row["cre2f_useremail"], "exec@velora.ae")
+        self.assertEqual(row["cre2f_userobjectid"], "entra-a1")
+        # Every column sent must exist on cre2f_botuserconsent.
+        self.assertTrue(set(row) - {"cre2f_botuserconsentid"} <= CONSENT_COLUMNS)
         # Dataverse assigns the primary key, so the id on the row is the one it
         # returned, not the locally generated AUD- placeholder.
-        self.assertEqual(row["cre2f_veloraagentauditlogid"], "guid-1")
+        self.assertEqual(row["cre2f_botuserconsentid"], "guid-1")
         self.assertEqual(res["audit_id"], "guid-1")
 
     async def test_second_session_does_not_reprompt(self):
@@ -114,6 +118,23 @@ class ConsentPersistenceTests(unittest.IsolatedAsyncioTestCase):
             user_object_id="entra-a2", user_email="other@velora.ae")
         self.assertFalse(is_consented)
         self.assertIsNotNone(card)
+
+    async def test_no_write_names_a_column_the_table_lacks(self):
+        """The defect that broke both consent paths: sending unknown columns."""
+        consent = DataverseAuditRecord(
+            record_type=RECORD_TYPE_CONSENT, user_object_id="u1",
+            user_email="a@velora.ae", consent_version="2026.1",
+            consent_status="ACCEPTED", channel="copilot_studio")
+        self.assertTrue(set(consent.to_consent_payload()) <= CONSENT_COLUMNS)
+
+        turn = DataverseAuditRecord(
+            record_type=RECORD_TYPE_USER_TURN, user_email="a@velora.ae",
+            operation="headcount", outcome="SUCCESS", tool_name="sf__get_headcount",
+            message_summary="How many staff?")
+        audit = turn.to_audit_log_payload()
+        self.assertTrue(set(audit) <= AUDIT_LOG_COLUMNS)
+        # The record type has no column, so it survives on the detail field.
+        self.assertIn(RECORD_TYPE_USER_TURN, audit["cre2f_auditdetail"])
 
     async def test_unreadable_consent_table_fails_closed(self):
         async def boom(*args, **kwargs):

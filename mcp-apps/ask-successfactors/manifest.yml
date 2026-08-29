@@ -41,10 +41,12 @@ applications:
       PUBLIC_BASE_URL: "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com"
       # Consent gate: enforced in-server for employee-level disclosure tools.
       ENFORCE_CONSENT_GATE: "true"
-      # Durable consent store (`cre2f_veloraagentauditlog`). All four values must
-      # be set or consent falls back to a per-process buffer and re-prompts on
-      # every restart. Set AZURE_CLIENT_SECRET with `cf set-env`, never here.
+      # Durable consent store (`cre2f_botuserconsent`, shared with the Copilot
+      # Studio consent flow). All four values must be set, and the table must have
+      # a cre2f_userobjectid column, or consent falls back to a per-process buffer
+      # and re-prompts on every restart. Set AZURE_CLIENT_SECRET with `cf set-env`.
       DATAVERSE_URL: ""
+      DATAVERSE_CONSENT_ENTITY_SET: "cre2f_botuserconsents"
       DATAVERSE_AUDIT_ENTITY_SET: "cre2f_veloraagentauditlogs"
       AZURE_TENANT_ID: ""
       AZURE_CLIENT_ID: ""

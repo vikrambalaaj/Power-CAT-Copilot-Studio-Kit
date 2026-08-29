@@ -26,9 +26,25 @@ from shared_mcp.logger import get_logger
 log = get_logger("dataverse_audit")
 
 # --- Dataverse Web API wiring (Section 3.1) -----------------------------------
-# Logical table `cre2f_veloraagentauditlog`; the OData collection is the plural
-# entity set name, overridable for tenants that customised it.
+# Logical tables `cre2f_veloraagentauditlog` and `cre2f_botuserconsent`; the OData
+# collections are the plural entity set names, overridable for customised tenants.
 AUDIT_ENTITY_SET = os.getenv("DATAVERSE_AUDIT_ENTITY_SET", "cre2f_veloraagentauditlogs")
+CONSENT_ENTITY_SET = os.getenv("DATAVERSE_CONSENT_ENTITY_SET", "cre2f_botuserconsents")
+
+# Dataverse rejects an entire insert that names any column the table does not have,
+# so every write is projected onto the columns that genuinely exist. These two sets
+# mirror the live schema; widen them only once the column is created and published.
+AUDIT_LOG_COLUMNS = frozenset({
+    "cre2f_actor", "cre2f_agentname", "cre2f_auditdetail", "cre2f_correlationid",
+    "cre2f_dataclassification", "cre2f_demodata", "cre2f_durationms",
+    "cre2f_environment", "cre2f_errorcode", "cre2f_eventtime", "cre2f_newcolumn",
+    "cre2f_operation", "cre2f_outcome", "cre2f_responsehash", "cre2f_resultcount",
+    "cre2f_safefilters", "cre2f_sessionid", "cre2f_sourcesystem", "cre2f_toolname",
+})
+CONSENT_COLUMNS = frozenset({
+    "cre2f_userobjectid", "cre2f_newcolumn", "cre2f_channel",
+    "cre2f_consentdate", "cre2f_consentgranted", "cre2f_consentversion",
+})
 DATAVERSE_API_VERSION = os.getenv("DATAVERSE_API_VERSION", "v9.2")
 DATAVERSE_TIMEOUT_SECONDS = float(os.getenv("DATAVERSE_TIMEOUT_SECONDS", "10"))
 # Consent must survive process restarts, so its lookup is never served from the
@@ -276,6 +292,61 @@ class DataverseAuditRecord:
         self.retry_count = 0
         self.reconciled = False
 
+    def to_audit_log_payload(self) -> Dict[str, Any]:
+        """Project this record onto the columns `cre2f_veloraagentauditlog` really has.
+
+        The rich record models ~70 fields; the table exposes 19 writable ones. The
+        record type has no column of its own, so it is preserved as a prefix on
+        `cre2f_auditdetail` rather than being silently dropped.
+        """
+        detail = (
+            self.audit_detail
+            or self.message_summary
+            or self.error_message_safe
+            or self.operation
+            or self.record_type
+        )
+        payload = {
+            "cre2f_actor": self.user_email or self.user_display_name or self.executing_agent,
+            "cre2f_agentname": self.agent_name,
+            "cre2f_auditdetail": f"[{self.record_type}] {detail}"[:4000],
+            "cre2f_correlationid": self.root_correlation_id,
+            "cre2f_dataclassification": self.content_classification,
+            "cre2f_demodata": False,
+            "cre2f_durationms": self.latency_ms,
+            "cre2f_environment": self.environment,
+            "cre2f_errorcode": self.error_category,
+            "cre2f_eventtime": self.event_time,
+            "cre2f_newcolumn": self.user_email,
+            "cre2f_operation": self.operation or self.record_type,
+            "cre2f_outcome": self.outcome,
+            "cre2f_responsehash": self.content_hash,
+            "cre2f_resultcount": self.result_count,
+            "cre2f_safefilters": (self.request_filter_safe or "")[:2000],
+            "cre2f_sessionid": self.session_id,
+            "cre2f_sourcesystem": self.source_system,
+            "cre2f_toolname": self.tool_name,
+        }
+        return {k: v for k, v in payload.items() if k in AUDIT_LOG_COLUMNS and v not in (None, "")}
+
+    def to_consent_payload(self) -> Dict[str, Any]:
+        """Project this record onto `cre2f_botuserconsent`.
+
+        `cre2f_userobjectid` is the identity key shared with the Copilot Studio flow,
+        so both writers agree on the same row. The primary name column carries the
+        same value to keep the row legible in the Dataverse UI.
+        """
+        identity = self.user_object_id or sanitize_email(self.user_email)
+        payload = {
+            "cre2f_userobjectid": identity,
+            "cre2f_newcolumn": identity,
+            "cre2f_channel": self.channel,
+            "cre2f_consentdate": self.event_time,
+            "cre2f_consentgranted": self.consent_status == "ACCEPTED",
+            "cre2f_consentversion": self.consent_version,
+        }
+        return {k: v for k, v in payload.items() if k in CONSENT_COLUMNS and v is not None}
+
     def to_dataverse_payload(self) -> Dict[str, Any]:
         """Convert record into exact Dataverse payload matching logical column names (Section 3.2)."""
         detail = (
@@ -500,17 +571,15 @@ class DataverseClient:
                 return None
             return resp.json()
 
-    async def _create_row(self, payload: Dict[str, Any]) -> Optional[str]:
-        """Insert one audit row into `cre2f_veloraagentauditlog`; returns the Dataverse GUID."""
-        # Dataverse rejects unknown/None columns, and assigns the primary key itself.
-        body = {
-            key: value
-            for key, value in payload.items()
-            if value is not None and key != "cre2f_veloraagentauditlogid"
-        }
-        created = await self._request("POST", AUDIT_ENTITY_SET, json_body=body)
+    async def _create_row(self, entity_set: str, body: Dict[str, Any], id_field: str) -> Optional[str]:
+        """Insert one row into the given entity set; returns the Dataverse GUID.
+
+        The caller supplies an already-projected body, so no column that the table
+        lacks is ever sent. Dataverse assigns the primary key itself.
+        """
+        created = await self._request("POST", entity_set, json_body=body)
         if isinstance(created, dict):
-            return created.get("cre2f_veloraagentauditlogid")
+            return created.get(id_field)
         return None
 
     def check_alternate_key_exists(self, invocation_id: str, record_type: str) -> bool:
@@ -560,12 +629,21 @@ class DataverseClient:
         payload["cre2f_veloraagentauditlogid"] = log_id
         payload["cre2f_loggingstatus"] = "PERSISTED"
 
-        # Durable write to `cre2f_veloraagentauditlog`. Consent is the one record
-        # type that must fail closed: if it cannot be stored, the user would be
-        # re-prompted forever, so the caller has to know the write failed.
+        # Durable write. Consent rows go to `cre2f_botuserconsent`, the table that
+        # actually models consent and that the Copilot Studio flow shares; everything
+        # else goes to `cre2f_veloraagentauditlog`. Consent is the one record type
+        # that must fail closed: if it cannot be stored the user would be re-prompted
+        # forever, so the caller has to know the write failed.
         if self.is_live:
             try:
-                remote_id = await self._create_row(payload)
+                if rec_type == RECORD_TYPE_CONSENT:
+                    remote_id = await self._create_row(
+                        CONSENT_ENTITY_SET, record.to_consent_payload(), "cre2f_botuserconsentid"
+                    )
+                else:
+                    remote_id = await self._create_row(
+                        AUDIT_ENTITY_SET, record.to_audit_log_payload(), "cre2f_veloraagentauditlogid"
+                    )
                 if remote_id:
                     log_id = remote_id
                     payload["cre2f_veloraagentauditlogid"] = remote_id
@@ -769,30 +847,30 @@ class DataverseClient:
         if cached and time.time() < cached[0]:
             return cached[1]
 
-        clauses = []
-        if user_object_id:
-            clauses.append(f"cre2f_userobjectid eq '{_odata_escape(user_object_id)}'")
-        if sanitized:
-            clauses.append(f"tolower(cre2f_useremail) eq '{_odata_escape(sanitized)}'")
-        if not clauses:
+        # The Copilot Studio flow writes whichever identity string the agent passes
+        # into `cre2f_userobjectid`, so match on the object id or the email — either
+        # may be the value on the stored row.
+        identities = [v for v in (user_object_id, sanitized) if v]
+        if not identities:
             return None
-
+        ident_clause = " or ".join(
+            f"cre2f_userobjectid eq '{_odata_escape(v)}'" for v in identities
+        )
         filter_expr = (
-            f"cre2f_recordtype eq '{RECORD_TYPE_CONSENT}'"
-            f" and cre2f_consentstatus eq 'ACCEPTED'"
+            f"cre2f_consentgranted eq true"
             f" and cre2f_consentversion eq '{_odata_escape(notice_version)}'"
-            f" and ({' or '.join(clauses)})"
+            f" and ({ident_clause})"
         )
         params = {
             "$filter": filter_expr,
             "$orderby": "createdon desc",
             "$top": "1",
-            "$select": "cre2f_veloraagentauditlogid,cre2f_userobjectid,cre2f_useremail,"
-                       "cre2f_consentversion,cre2f_consentstatus,cre2f_eventtime",
+            "$select": "cre2f_botuserconsentid,cre2f_userobjectid,cre2f_consentversion,"
+                       "cre2f_consentgranted,cre2f_consentdate,cre2f_channel",
         }
 
         try:
-            body = await self._request("GET", AUDIT_ENTITY_SET, params=params)
+            body = await self._request("GET", CONSENT_ENTITY_SET, params=params)
         except Exception as exc:
             # Fail closed: an unreadable consent table must re-prompt, never
             # silently grant access to employee data.

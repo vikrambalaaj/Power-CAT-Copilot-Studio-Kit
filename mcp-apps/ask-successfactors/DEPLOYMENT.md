@@ -52,29 +52,58 @@ Do not reuse local ZIP artifacts. Generate the package only after production URL
 
 ## Consent store (required)
 
-The confidentiality consent gate is the first screen of every session. A decision
-is written to `cre2f_veloraagentauditlog` with `cre2f_recordtype = CONSENT`, and
-every later session reads it back so the user is asked exactly once per notice
-version.
+The confidentiality consent gate is the first screen of every session. A decision is
+written to `cre2f_botuserconsent` and every later session reads it back, so the user
+is asked exactly once per notice version.
 
-That read/write needs an app registration with `Dataverse user_impersonation`
-(or a Dataverse application user) and these four values:
+`cre2f_botuserconsent` is shared with the Copilot Studio flow *Check and Register Bot
+Consent*. Both writers key on `cre2f_userobjectid`, so a consent granted through either
+path is honoured by the other.
+
+### Schema prerequisite
+
+`cre2f_botuserconsent` must have a `cre2f_userobjectid` (String) column. Without it the
+table has no user-identity column at all — the flow originally filtered on a
+non-existent `cre2f_userid` and failed every run with `BadRequest`, surfaced by Copilot
+Studio as `FlowActionBadGateway`. Create the column and publish before enabling live
+persistence.
+
+Columns written by the MCP server:
+
+| Column | Value |
+| --- | --- |
+| `cre2f_userobjectid` | Entra object id, or the email when no object id is supplied |
+| `cre2f_newcolumn` | same identity, so the row is legible in the Dataverse UI |
+| `cre2f_channel` | originating channel, e.g. `copilot_studio` |
+| `cre2f_consentdate` | decision timestamp |
+| `cre2f_consentgranted` | `true` for ACCEPTED, `false` for DECLINED |
+| `cre2f_consentversion` | notice version, e.g. `2026.1` |
+
+### Connection
 
 | Variable | Purpose |
 | --- | --- |
-| `DATAVERSE_URL` | e.g. `https://velora.crm4.dynamics.com` |
+| `DATAVERSE_URL` | e.g. `https://org4b098979.crm15.dynamics.com` |
 | `AZURE_TENANT_ID` | Entra tenant of the Dataverse environment |
 | `AZURE_CLIENT_ID` | App registration / application user |
 | `AZURE_CLIENT_SECRET` | Client secret — set with `cf set-env`, never in `manifest.yml` |
 
-Optional: `DATAVERSE_AUDIT_ENTITY_SET` (default `cre2f_veloraagentauditlogs`) if
-the table's OData collection name was customised, and
-`DATAVERSE_CONSENT_CACHE_SECONDS` (default `300`) for the positive-lookup cache.
+Optional: `DATAVERSE_CONSENT_ENTITY_SET` (default `cre2f_botuserconsents`) and
+`DATAVERSE_AUDIT_ENTITY_SET` (default `cre2f_veloraagentauditlogs`) for customised
+collection names, and `DATAVERSE_CONSENT_CACHE_SECONDS` (default `300`).
 
-Behaviour without them: the server still runs and still gates, but consent lives
-only in the process buffer, so every restart and every additional instance
-re-prompts. Treat all four as a release gate.
+Behaviour without them: the server still runs and still gates, but consent lives only
+in the process buffer, so every restart and every additional instance re-prompts.
+
+### Column projection
+
+Dataverse rejects an entire insert that names any column the table does not have. Both
+writes are therefore projected onto allowlists that mirror the live schema —
+`CONSENT_COLUMNS` and `AUDIT_LOG_COLUMNS` in `dataverse_audit.py`. `cre2f_veloraagentauditlog`
+exposes 19 writable custom columns and has no `cre2f_recordtype`, so the record type is
+preserved as a `[TYPE]` prefix on `cre2f_auditdetail`. Widen either allowlist only after
+the column exists and customisations are published.
 
 Failure semantics are fail-closed: a consent write that Dataverse rejects returns
-`status: FAILED` and the user stays blocked; an unreadable consent table
-re-prompts rather than assuming consent.
+`status: FAILED` and the user stays blocked; an unreadable consent table re-prompts
+rather than assuming consent.
