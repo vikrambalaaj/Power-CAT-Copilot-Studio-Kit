@@ -50,6 +50,12 @@ from .tools_m365_writes import (
     send_daily_briefing_email,
 )
 
+from pathlib import Path
+
+# The connector spec the Copilot Studio plugin fetches. It lives beside the
+# package so it ships with the app and is served, not just committed.
+CONNECTOR_SPEC_PATH = Path(__file__).parent.parent / "productivity-connector-swagger.json"
+
 # Optional FastAPI instantiation
 try:
     from fastapi import FastAPI
@@ -64,6 +70,17 @@ except ImportError:
         def get(self, *args, **kwargs): return lambda f: f
         def post(self, *args, **kwargs): return lambda f: f
     app = MockFastAPI()
+
+
+@app.get("/productivity-connector-swagger.json")
+async def connector_spec() -> Dict[str, Any]:
+    """Serve the connector spec fetched by the Copilot Studio productivity plugin.
+
+    Without this route the plugin's spec URL 404s, Copilot discovers no operations,
+    and the parent agent reports Microsoft 365 as unavailable even though every
+    handoff operation below is implemented and running.
+    """
+    return json.loads(CONNECTOR_SPEC_PATH.read_text(encoding="utf-8"))
 
 
 @app.get("/health")
@@ -279,8 +296,7 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("GET_MAIL_THREAD", "GETMAILTHREAD"):
             res = await get_mail_thread(
-                conversationId_filter=params.get("conversationId", ""),
-                maximumResults=params.get("maximumResults", 10),
+                threadId=params.get("threadId", params.get("conversationId", "")),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -298,7 +314,6 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("SUMMARIZE_PRIORITY_MAIL", "SUMMARIZEPRIORITYMAIL"):
             res = await summarize_priority_mail(
-                timeWindowHours=params.get("timeWindowHours", 24),
                 maximumResults=params.get("maximumResults", 5),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
@@ -317,7 +332,6 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("FIND_MAIL_FOLLOW_UPS", "FINDMAILFOLLOWUPS"):
             res = await find_mail_follow_ups(
-                timeWindowHours=params.get("timeWindowHours", 72),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -335,9 +349,8 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("PREPARE_EMAIL_REPLY", "PREPAREEMAILREPLY"):
             res = await prepare_email_reply(
-                messageId=params.get("messageId", ""),
-                replyBody=params.get("replyBody", params.get("body", "")),
-                replyAll=params.get("replyAll", False),
+                threadId=params.get("threadId", params.get("messageId", "")),
+                body=params.get("body", params.get("replyBody", "")),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -377,10 +390,9 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("LIST_CALENDAR_EVENTS", "LISTCALENDAREVENTS", "LIST_EVENTS", "CALENDAR"):
             res = await list_calendar_events(
-                startTime=params.get("startTime"),
-                endTime=params.get("endTime"),
+                dateFrom=params.get("dateFrom", params.get("startDateTime", params.get("startTime"))),
+                dateTo=params.get("dateTo", params.get("endDateTime", params.get("endTime"))),
                 timeZone=request.userTimezone or "Asia/Dubai",
-                maximumResults=params.get("maximumResults", 10),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -437,7 +449,7 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("GET_MEETING_CONTEXT", "GETMEETINGCONTEXT"):
             res = await get_meeting_context(
-                subjectOrEventId=params.get("subjectOrEventId", params.get("subject", "")),
+                subjectOrId=params.get("subjectOrId", params.get("subjectOrEventId", params.get("subject", ""))),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -456,11 +468,15 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
         elif op in ("PREPARE_MEETING_UPDATE", "PREPAREMEETINGUPDATE"):
             res = await prepare_meeting_update(
                 eventId=params.get("eventId", ""),
-                subject=params.get("subject"),
-                attendees=params.get("attendees"),
-                startTime=params.get("startTime"),
-                endTime=params.get("endTime"),
-                body=params.get("body"),
+                updates=params.get("updates") or {
+                    k: v for k, v in {
+                        "subject": params.get("subject"),
+                        "attendees": params.get("attendees"),
+                        "startTime": params.get("startTime"),
+                        "endTime": params.get("endTime"),
+                        "body": params.get("body"),
+                    }.items() if v is not None
+                },
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -501,7 +517,7 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
         elif op in ("PREPARE_MEETING_CANCELLATION", "PREPAREMEETINGCANCELLATION"):
             res = await prepare_meeting_cancellation(
                 eventId=params.get("eventId", ""),
-                cancellationReason=params.get("cancellationReason", "Cancelled by executive"),
+                reason=params.get("reason", params.get("cancellationReason", "Cancelled by executive")),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -562,7 +578,7 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
             res = await get_channel_context(
                 teamName=params.get("teamName", ""),
                 channelName=params.get("channelName", ""),
-                maximumMessages=params.get("maximumMessages", 10),
+                maximumResults=params.get("maximumResults", params.get("maximumMessages", 10)),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -580,8 +596,8 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("GET_CHAT_CONTEXT", "GETCHATCONTEXT"):
             res = await get_chat_context(
-                participantEmail=params.get("participantEmail", ""),
-                maximumMessages=params.get("maximumMessages", 10),
+                chatId=params.get("chatId", params.get("participantEmail", "")),
+                maximumResults=params.get("maximumResults", params.get("maximumMessages", 10)),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -599,7 +615,6 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("FIND_TEAMS_FOLLOW_UPS", "FINDTEAMSFOLLOWUPS"):
             res = await find_teams_follow_ups(
-                timeWindowHours=params.get("timeWindowHours", 48),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -617,8 +632,8 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("PREPARE_TEAMS_CHAT_MESSAGE", "PREPARETEAMSCHAT"):
             res = await prepare_teams_chat_message(
-                recipientEmail=params.get("recipientEmail", "leadership@velora.ae"),
-                messageText=params.get("messageText", params.get("message", "")),
+                chatId=params.get("chatId", params.get("recipientEmail", "leadership@velora.ae")),
+                messageContent=params.get("messageContent", params.get("messageText", params.get("message", ""))),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -660,8 +675,7 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
             res = await prepare_teams_channel_post(
                 teamName=params.get("teamName", "Executive Leadership Team"),
                 channelName=params.get("channelName", "General"),
-                subject=params.get("subject", "Executive Update"),
-                postBody=params.get("postBody", params.get("body", "")),
+                messageContent=params.get("messageContent", params.get("postBody", params.get("body", ""))),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -701,8 +715,6 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("LIST_MY_PLANNER_TASKS", "LISTMYPLANNER", "PLANNER_TASKS", "TASKS"):
             res = await list_my_planner_tasks(
-                includeCompleted=params.get("includeCompleted", False),
-                maximumResults=params.get("maximumResults", 20),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -720,8 +732,7 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("LIST_PLAN_TASKS", "LISTPLANTASKS"):
             res = await list_plan_tasks(
-                planTitle=params.get("planTitle", "Executive Strategic Initiatives"),
-                includeCompleted=params.get("includeCompleted", False),
+                planName=params.get("planName", params.get("planTitle", "Executive Strategic Initiatives")),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -774,12 +785,13 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
 
         elif op in ("PREPARE_PLANNER_TASK", "PREPAREPLANNER"):
             res = await prepare_planner_task(
-                planTitle=params.get("planTitle", "Executive Strategic Initiatives"),
+                planName=params.get("planName", params.get("planTitle", "Executive Strategic Initiatives")),
+                bucketName=params.get("bucketName", "To do"),
                 title=params.get("title", "Strategic Initiative Action Item"),
-                assignedToEmail=params.get("assignedToEmail", email or "leadership@velora.ae"),
-                dueDate=params.get("dueDate", "2026-08-30"),
-                priority=params.get("priority", "HIGH"),
-                notes=params.get("notes", ""),
+                description=params.get("description", params.get("notes", "")),
+                assignees=params.get("assignees") or [params.get("assignedToEmail", email or "leadership@velora.ae")],
+                dueDate=params.get("dueDate"),
+                priority=params.get("priority", "High"),
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
@@ -820,11 +832,15 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
         elif op in ("PREPARE_PLANNER_TASK_UPDATE", "PREPAREPLANNERUPDATE"):
             res = await prepare_planner_task_update(
                 taskId=params.get("taskId", ""),
-                title=params.get("title"),
-                percentComplete=params.get("percentComplete"),
-                dueDate=params.get("dueDate"),
-                priority=params.get("priority"),
-                notes=params.get("notes"),
+                updates=params.get("updates") or {
+                    k: v for k, v in {
+                        "title": params.get("title"),
+                        "percentComplete": params.get("percentComplete"),
+                        "dueDate": params.get("dueDate"),
+                        "priority": params.get("priority"),
+                        "description": params.get("notes"),
+                    }.items() if v is not None
+                },
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,

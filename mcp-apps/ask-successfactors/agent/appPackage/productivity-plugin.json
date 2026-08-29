@@ -4,11 +4,11 @@
     "name_for_human": "Velora Productivity Connected Agent",
     "name_for_model": "velora_productivity_agent",
     "description_for_human": "Connected child agent for Microsoft 365, Mail, Calendar, Teams, and Planner operations.",
-    "description_for_model": "Use this connected agent exclusively for Microsoft 365 email, Outlook calendar, meetings, Teams messages, people, files, Work IQ and Planner. Use it for both retrieval and action preparation. Never use it for SAP workforce, finance or SAC questions. All Microsoft 365 writes require a preview and explicit user approval.",
+    "description_for_model": "Use this connected agent exclusively for Microsoft 365: Outlook mail, Outlook calendar and meetings (including recapping or looking back at a past day, week or specific date), Teams messages and chats, Planner tasks, people, files, Work IQ search, and the executive daily briefing. Call HandleParentHandoff with the `operation` field set to the required operation, for example LIST_CALENDAR_EVENTS to retrieve meetings for any date range past or future, GET_MEETING_DETAILS, SEARCH_MAIL, SEARCH_TEAMS_MESSAGES, LIST_MY_PLANNER_TASKS, or GET_DAILY_EXECUTIVE_BRIEFING. Never use it for SAP workforce, finance or SAC questions. All Microsoft 365 writes use a PREPARE_* operation to produce a preview, then the matching SEND_/CREATE_/UPDATE_/CANCEL_APPROVED_* operation only after explicit user approval.",
     "functions": [
         {
             "name": "HandleParentHandoff",
-            "description": "Parent-to-child executive task delegation router",
+            "description": "Execute a Microsoft 365 operation for the signed-in executive: calendar and meeting retrieval, mail, Teams, Planner, Work IQ and the daily briefing. Set `operation` to the required action.",
             "states": {
                 "reasoning": {
                     "description": "Analyzing parameters for HandleParentHandoff..."
@@ -30,7 +30,10 @@
             },
             "spec": {
                 "url": "https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com/productivity-connector-swagger.json"
-            }
+            },
+            "run_for_functions": [
+                "HandleParentHandoff"
+            ]
         }
     ]
 }
