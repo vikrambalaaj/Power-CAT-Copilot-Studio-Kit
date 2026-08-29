@@ -60,20 +60,24 @@ is asked exactly once per notice version.
 Consent*. Both writers key on `cre2f_userobjectid`, so a consent granted through either
 path is honoured by the other.
 
-### Schema prerequisite
+### Identity column
 
-`cre2f_botuserconsent` must have a `cre2f_userobjectid` (String) column. Without it the
-table has no user-identity column at all — the flow originally filtered on a
-non-existent `cre2f_userid` and failed every run with `BadRequest`, surfaced by Copilot
-Studio as `FlowActionBadGateway`. Create the column and publish before enabling live
-persistence.
+Both writers key on `cre2f_newcolumn`, the table's primary name column. Its *display*
+name is "User ID", which is the trap that produced the original outage: the flow's
+author saw "User ID" in the designer and wrote `cre2f_userid`, a column that does not
+exist, so every run failed with `BadRequest` — surfaced by Copilot Studio as
+`FlowActionBadGateway`.
+
+A properly named `cre2f_userobjectid` column would be clearer, but creating it needs
+schema-write privilege that the current maker account does not hold in this
+environment. If that privilege becomes available, add the column, repoint both writers,
+and change `CONSENT_IDENTITY_COLUMN` in `dataverse_audit.py`.
 
 Columns written by the MCP server:
 
 | Column | Value |
 | --- | --- |
-| `cre2f_userobjectid` | Entra object id, or the email when no object id is supplied |
-| `cre2f_newcolumn` | same identity, so the row is legible in the Dataverse UI |
+| `cre2f_newcolumn` | identity: Entra object id, or the email when no object id is supplied |
 | `cre2f_channel` | originating channel, e.g. `copilot_studio` |
 | `cre2f_consentdate` | decision timestamp |
 | `cre2f_consentgranted` | `true` for ACCEPTED, `false` for DECLINED |

@@ -75,7 +75,7 @@ class ConsentPersistenceTests(unittest.IsolatedAsyncioTestCase):
         row = self.client.rows[0]
         self.assertTrue(row["cre2f_consentgranted"])
         self.assertEqual(row["cre2f_consentversion"], CURRENT_NOTICE_VERSION)
-        self.assertEqual(row["cre2f_userobjectid"], "entra-a1")
+        self.assertEqual(row["cre2f_newcolumn"], "entra-a1")
         # Every column sent must exist on cre2f_botuserconsent.
         self.assertTrue(set(row) - {"cre2f_botuserconsentid"} <= CONSENT_COLUMNS)
         # Dataverse assigns the primary key, so the id on the row is the one it

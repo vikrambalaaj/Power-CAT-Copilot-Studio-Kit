@@ -41,10 +41,15 @@ AUDIT_LOG_COLUMNS = frozenset({
     "cre2f_operation", "cre2f_outcome", "cre2f_responsehash", "cre2f_resultcount",
     "cre2f_safefilters", "cre2f_sessionid", "cre2f_sourcesystem", "cre2f_toolname",
 })
+# `cre2f_newcolumn` is the table's primary name column. Its *display* name is
+# "User ID", which is what the Copilot Studio flow's designer shows — that mismatch
+# is what produced the original `cre2f_userid` bug. It is the only identity column
+# the table has, so both writers key on it.
 CONSENT_COLUMNS = frozenset({
-    "cre2f_userobjectid", "cre2f_newcolumn", "cre2f_channel",
+    "cre2f_newcolumn", "cre2f_channel",
     "cre2f_consentdate", "cre2f_consentgranted", "cre2f_consentversion",
 })
+CONSENT_IDENTITY_COLUMN = "cre2f_newcolumn"
 DATAVERSE_API_VERSION = os.getenv("DATAVERSE_API_VERSION", "v9.2")
 DATAVERSE_TIMEOUT_SECONDS = float(os.getenv("DATAVERSE_TIMEOUT_SECONDS", "10"))
 # Consent must survive process restarts, so its lookup is never served from the
@@ -332,14 +337,13 @@ class DataverseAuditRecord:
     def to_consent_payload(self) -> Dict[str, Any]:
         """Project this record onto `cre2f_botuserconsent`.
 
-        `cre2f_userobjectid` is the identity key shared with the Copilot Studio flow,
-        so both writers agree on the same row. The primary name column carries the
-        same value to keep the row legible in the Dataverse UI.
+        The identity is written to the table's primary name column, the same column
+        the Copilot Studio flow writes and filters on, so both writers address the
+        same row.
         """
         identity = self.user_object_id or sanitize_email(self.user_email)
         payload = {
-            "cre2f_userobjectid": identity,
-            "cre2f_newcolumn": identity,
+            CONSENT_IDENTITY_COLUMN: identity,
             "cre2f_channel": self.channel,
             "cre2f_consentdate": self.event_time,
             "cre2f_consentgranted": self.consent_status == "ACCEPTED",
@@ -848,13 +852,13 @@ class DataverseClient:
             return cached[1]
 
         # The Copilot Studio flow writes whichever identity string the agent passes
-        # into `cre2f_userobjectid`, so match on the object id or the email — either
-        # may be the value on the stored row.
+        # into the primary name column, so match on the object id or the email —
+        # either may be the value on the stored row.
         identities = [v for v in (user_object_id, sanitized) if v]
         if not identities:
             return None
         ident_clause = " or ".join(
-            f"cre2f_userobjectid eq '{_odata_escape(v)}'" for v in identities
+            f"{CONSENT_IDENTITY_COLUMN} eq '{_odata_escape(v)}'" for v in identities
         )
         filter_expr = (
             f"cre2f_consentgranted eq true"
@@ -865,7 +869,7 @@ class DataverseClient:
             "$filter": filter_expr,
             "$orderby": "createdon desc",
             "$top": "1",
-            "$select": "cre2f_botuserconsentid,cre2f_userobjectid,cre2f_consentversion,"
+            "$select": "cre2f_botuserconsentid,cre2f_newcolumn,cre2f_consentversion,"
                        "cre2f_consentgranted,cre2f_consentdate,cre2f_channel",
         }
 
