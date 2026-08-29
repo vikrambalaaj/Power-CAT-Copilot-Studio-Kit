@@ -1582,6 +1582,8 @@ class SuccessFactorsClient:
         EmpJob population. Individual rows are never returned. Categories below
         the configured privacy threshold are combined into one unnamed bucket.
         """
+        requested_as_of_date = as_of_date
+        as_of_date = as_of_date or date.today().isoformat()
         filters = []
         if company:
             filters.append(f"company eq '{_escape_odata_string(company)}'")
@@ -1664,7 +1666,7 @@ class SuccessFactorsClient:
             )
         if missing:
             warnings.append("Blank or unmapped nationality values are shown only as an unclassified aggregate.")
-        if as_of_date:
+        if requested_as_of_date:
             warnings.append("EmpJob uses the requested as-of date; active status reflects the current User directory status.")
 
         return {
@@ -1715,6 +1717,8 @@ class SuccessFactorsClient:
         executive_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Aggregate gender/nationality dimensions without releasing people."""
+        requested_as_of_date = as_of_date
+        as_of_date = as_of_date or date.today().isoformat()
         group_by = str(group_by or "gender").strip().lower().replace(" ", "_")
         cross_by = str(cross_by or "").strip().lower().replace(" ", "_") or None
         allowed_primary = {"gender", "nationality"}
@@ -1836,7 +1840,7 @@ class SuccessFactorsClient:
             warnings.append(
                 f"{suppressed_group_count} intersection group{' was' if suppressed_group_count == 1 else 's were'} withheld because each was below the privacy threshold of {threshold}; together they represent {suppressed_headcount} employees."
             )
-        if as_of_date:
+        if requested_as_of_date:
             warnings.append("EmpJob uses the requested as-of date; active status reflects the current User directory status.")
 
         title_dimension = group_by if not cross_by else f"{group_by}_by_{cross_by}"
