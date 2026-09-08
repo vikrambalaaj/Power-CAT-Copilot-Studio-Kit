@@ -16,14 +16,25 @@ import hmac
 import json
 import os
 import time
-import urllib.error
-import urllib.request
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Set, Tuple
+
+import httpx
 
 from shared_mcp.logger import get_logger
 
 log = get_logger("dataverse_audit")
+
+AUDIT_ENTITY_SET = os.getenv("DATAVERSE_AUDIT_ENTITY_SET", "cre2f_veloraagentauditlogs")
+DATAVERSE_API_VERSION = os.getenv("DATAVERSE_API_VERSION", "v9.2")
+DATAVERSE_TIMEOUT_SECONDS = float(os.getenv("DATAVERSE_TIMEOUT_SECONDS", "10"))
+AUDIT_LOG_COLUMNS = frozenset({
+    "cre2f_actor", "cre2f_agentname", "cre2f_auditdetail", "cre2f_correlationid",
+    "cre2f_dataclassification", "cre2f_demodata", "cre2f_durationms",
+    "cre2f_environment", "cre2f_errorcode", "cre2f_eventtime", "cre2f_newcolumn",
+    "cre2f_operation", "cre2f_outcome", "cre2f_responsehash", "cre2f_resultcount",
+    "cre2f_safefilters", "cre2f_sessionid", "cre2f_sourcesystem", "cre2f_toolname",
+})
 
 # --- Standard Record Type Discriminators (Section 3.3) ---
 RECORD_TYPE_AGENT_DELEGATION_START = "AGENT_DELEGATION_START"
@@ -79,6 +90,14 @@ APPROVAL_STATUS_EXPIRED = "EXPIRED"
 APPROVAL_STATUS_NOT_REQUIRED = "NOT_REQUIRED"
 
 HMAC_SECRET = os.getenv("VELORA_APPROVAL_HMAC_SECRET", "velora-prod-executive-secret-key-2026")
+
+
+class AuditCommitStatus:
+    """Explicit result contract for audit persistence (Defect 5)."""
+    COMMITTED = "COMMITTED"
+    ALREADY_COMMITTED = "ALREADY_COMMITTED"
+    BUFFERED = "BUFFERED"
+    FAILED = "FAILED"
 
 
 def sanitize_email(email: Optional[str]) -> str:
@@ -257,9 +276,42 @@ class DataverseAuditRecord:
         self.memory_importance = memory_importance
 
         self.event_time = event_time or datetime.now(timezone.utc).isoformat()
+        self.audit_id = invocation_id or f"EVT-{int(time.time() * 1000)}-{os.urandom(4).hex()}"
         self.logging_status = "PENDING"
         self.retry_count = 0
         self.reconciled = False
+
+    def to_audit_log_payload(self) -> Dict[str, Any]:
+        """Project the rich audit envelope onto the columns in the live table."""
+        detail = (
+            self.audit_detail
+            or self.message_summary
+            or self.error_message_safe
+            or self.operation
+            or self.record_type
+        )
+        payload = {
+            "cre2f_actor": self.user_email or self.user_display_name or self.executing_agent,
+            "cre2f_agentname": self.agent_name,
+            "cre2f_auditdetail": f"[{self.record_type}] {detail}"[:4000],
+            "cre2f_correlationid": self.root_correlation_id,
+            "cre2f_dataclassification": self.content_classification,
+            "cre2f_demodata": False,
+            "cre2f_durationms": self.latency_ms,
+            "cre2f_environment": self.environment,
+            "cre2f_errorcode": self.error_category,
+            "cre2f_eventtime": self.event_time,
+            "cre2f_newcolumn": self.user_email or self.user_object_id or self.executing_agent,
+            "cre2f_operation": self.operation or self.record_type,
+            "cre2f_outcome": self.outcome,
+            "cre2f_responsehash": self.content_hash,
+            "cre2f_resultcount": self.result_count,
+            "cre2f_safefilters": (self.request_filter_safe or "")[:2000],
+            "cre2f_sessionid": self.session_id,
+            "cre2f_sourcesystem": self.source_system,
+            "cre2f_toolname": self.tool_name,
+        }
+        return {k: v for k, v in payload.items() if k in AUDIT_LOG_COLUMNS and v not in (None, "")}
 
     def to_dataverse_payload(self) -> Dict[str, Any]:
         """Convert record into exact Dataverse payload matching logical column names."""
@@ -361,15 +413,79 @@ class DataverseClient:
         client_secret: Optional[str] = None,
     ):
         self.base_url = (base_url or os.getenv("DATAVERSE_URL", "")).rstrip("/")
-        self.tenant_id = tenant_id or os.getenv("AZURE_TENANT_ID", "")
-        self.client_id = client_id or os.getenv("AZURE_CLIENT_ID", "")
-        self.client_secret = client_secret or os.getenv("AZURE_CLIENT_SECRET", "")
+        self.tenant_id = (
+            tenant_id
+            or os.getenv("AZURE_TENANT_ID", "")
+            or os.getenv("M365_TENANT_ID", "")
+            or os.getenv("ENTRA_TENANT_ID", "")
+        )
+        self.client_id = (
+            client_id
+            or os.getenv("AZURE_CLIENT_ID", "")
+            or os.getenv("M365_CLIENT_ID", "")
+            or os.getenv("ENTRA_CLIENT_ID", "")
+        )
+        self.client_secret = (
+            client_secret
+            or os.getenv("AZURE_CLIENT_SECRET", "")
+            or os.getenv("DATAVERSE_CLIENT_SECRET", "")
+            or os.getenv("M365_CLIENT_SECRET", "")
+            or os.getenv("ENTRA_CLIENT_SECRET", "")
+        )
         self.simulate_down = False
+
+        self._access_token = ""
+        self._token_expires_at = 0.0
 
         self._audit_store: List[Dict[str, Any]] = []
         self._policy_store: List[Dict[str, Any]] = []
         self._alternate_keys_index: Set[Tuple[str, str]] = set()
         self._idempotency_index: Set[Tuple[str, str]] = set()
+
+    @property
+    def is_live(self) -> bool:
+        if os.getenv("MOCK_M365") == "1" or os.getenv("MOCK_DATAVERSE") == "1":
+            return False
+        return bool(self.base_url and self.tenant_id and self.client_id and self.client_secret)
+
+    async def _get_access_token(self) -> str:
+        now = time.time()
+        if self._access_token and now < self._token_expires_at:
+            return self._access_token
+
+        async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+            response = await client.post(
+                f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token",
+                data={
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                    "scope": f"{self.base_url}/.default",
+                    "grant_type": "client_credentials",
+                },
+            )
+            response.raise_for_status()
+            token_body = response.json()
+
+        self._access_token = token_body["access_token"]
+        self._token_expires_at = now + max(int(token_body.get("expires_in", 3600)) - 60, 60)
+        return self._access_token
+
+    async def _create_live_audit_row(self, payload: Dict[str, Any]) -> str:
+        token = await self._get_access_token()
+        url = f"{self.base_url}/api/data/{DATAVERSE_API_VERSION}/{AUDIT_ENTITY_SET}"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            "OData-MaxVersion": "4.0",
+            "OData-Version": "4.0",
+            "Prefer": "return=representation",
+        }
+        async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+            response = await client.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            created = response.json() if response.content else {}
+        return created.get("cre2f_veloraagentauditlogid", "")
 
     def check_alternate_key_exists(self, invocation_id: str, record_type: str) -> bool:
         if not invocation_id:
@@ -396,31 +512,72 @@ class DataverseClient:
             log.warning("duplicate_alternate_key_detected", invocation_id=inv_id, record_type=rec_type)
             return {
                 "status": "DUPLICATE_KEY",
-                "message": f"Record with invocation ID '{inv_id}' and record type '{rec_type}' already exists.",
-                "id": f"EXISTS-{inv_id}"
+                "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
+                "message": f"Record with invocation ID '{inv_id}' and record type '{rec_type}' already exists and is committed.",
+                "id": f"EXISTS-{inv_id}",
+                "invocation_id": inv_id,
             }
 
         if rec_type == RECORD_TYPE_TRANSACTION_START and self.check_successful_idempotency_exists(idemp_key, operation):
             log.warning("duplicate_successful_transaction_detected", idempotency_key=idemp_key, operation=operation)
             return {
-                "status": "DUPLICATE_TRANSACTION",
+                "status": AuditCommitStatus.ALREADY_COMMITTED,
+                "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
                 "message": f"A successful transaction for operation '{operation}' with idempotency key '{idemp_key}' has already executed.",
-                "id": f"EXISTS-{idemp_key}"
+                "id": f"EXISTS-{idemp_key}",
+                "invocation_id": inv_id,
             }
 
-        log_id = f"AUD-{int(time.time() * 1000)}-{len(self._audit_store) + 1}"
-        payload["cre2f_veloraagentauditlogid"] = log_id
-        payload["cre2f_loggingstatus"] = "PERSISTED"
-        
-        self._audit_store.append(payload)
-        if inv_id:
-            self._alternate_keys_index.add((inv_id, rec_type))
-        if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
-            if idemp_key:
-                self._idempotency_index.add((idemp_key, operation))
+        if not self.is_live:
+            buf_id = f"BUF-{rec_type}-{int(time.time() * 1000)}-{os.urandom(2).hex()}"
+            payload["cre2f_veloraagentauditlogid"] = buf_id
+            payload["cre2f_loggingstatus"] = AuditCommitStatus.BUFFERED
+            self._audit_store.append(payload)
+            if inv_id:
+                self._alternate_keys_index.add((inv_id, rec_type))
+            if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
+                if idemp_key:
+                    self._idempotency_index.add((idemp_key, operation))
+            log.info("dataverse_not_configured_audit_buffered", record_type=rec_type, buffer_id=buf_id)
+            return {
+                "status": "SUCCESS",
+                "commit_status": AuditCommitStatus.BUFFERED,
+                "id": buf_id,
+                "invocation_id": inv_id,
+                "logging_status": AuditCommitStatus.BUFFERED,
+            }
 
-        log.debug("audit_record_created", type=record.record_type, turn_id=record.turn_id, log_id=log_id)
-        return {"status": "SUCCESS", "id": log_id, "invocation_id": inv_id}
+        try:
+            log_id = await self._create_live_audit_row(record.to_audit_log_payload())
+            payload["cre2f_veloraagentauditlogid"] = log_id
+            payload["cre2f_loggingstatus"] = AuditCommitStatus.COMMITTED
+            self._audit_store.append(payload)
+            if inv_id:
+                self._alternate_keys_index.add((inv_id, rec_type))
+            if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
+                if idemp_key:
+                    self._idempotency_index.add((idemp_key, operation))
+
+            return {
+                "status": "SUCCESS",
+                "commit_status": AuditCommitStatus.COMMITTED,
+                "id": log_id,
+                "invocation_id": inv_id,
+            }
+        except httpx.HTTPStatusError as http_err:
+            if http_err.response.status_code == 412 or "DuplicateKey" in http_err.response.text:
+                log.info("dataverse_duplicate_already_committed", invocation_id=inv_id)
+                return {
+                    "status": AuditCommitStatus.ALREADY_COMMITTED,
+                    "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
+                    "id": f"EXISTS-{inv_id}",
+                    "invocation_id": inv_id,
+                }
+            log.error("dataverse_live_write_failed", error=str(http_err), status_code=http_err.response.status_code)
+            raise ConnectionError(f"Dataverse destination write failed: {http_err}") from http_err
+        except Exception as exc:
+            log.error("dataverse_live_write_failed", error=str(exc))
+            raise ConnectionError(f"Dataverse destination write failed: {exc}") from exc
 
     async def start_write_transaction_fail_closed(self, record: DataverseAuditRecord) -> Dict[str, Any]:
         if record.record_type != RECORD_TYPE_TRANSACTION_START:
@@ -436,10 +593,30 @@ class DataverseClient:
 
         try:
             res = await self.create_audit_record(record)
-            if res.get("status") == "SUCCESS":
+            commit_status = res.get("commit_status") or res.get("status")
+            if commit_status in (AuditCommitStatus.COMMITTED, AuditCommitStatus.ALREADY_COMMITTED):
                 return {
                     "may_proceed": True,
                     "status": "AUDIT_PERSISTED",
+                    "commit_status": commit_status,
+                    "audit_record_id": res.get("id"),
+                    "invocation_id": record.invocation_id,
+                    "error": None,
+                }
+            elif commit_status == AuditCommitStatus.BUFFERED:
+                strict_fail_closed = os.getenv("STRICT_FAIL_CLOSED_AUDIT", "1") == "1"
+                if strict_fail_closed and not (os.getenv("ALLOW_BUFFERED_AUDIT_WRITES", "") == "1" or os.getenv("MOCK_M365", "") == "1"):
+                    return {
+                        "may_proceed": False,
+                        "status": "AUDIT_BUFFERED_BLOCKED",
+                        "commit_status": AuditCommitStatus.BUFFERED,
+                        "error": "Governed write blocked: Audit destination is only BUFFERED in memory; durable Dataverse commitment required.",
+                        "audit_record_id": res.get("id"),
+                    }
+                return {
+                    "may_proceed": True,
+                    "status": "AUDIT_BUFFERED",
+                    "commit_status": AuditCommitStatus.BUFFERED,
                     "audit_record_id": res.get("id"),
                     "invocation_id": record.invocation_id,
                     "error": None,
@@ -448,6 +625,7 @@ class DataverseClient:
                 return {
                     "may_proceed": False,
                     "status": res.get("status", "AUDIT_REJECTED"),
+                    "commit_status": AuditCommitStatus.FAILED,
                     "error": res.get("message", "Audit could not be persisted."),
                     "audit_record_id": "",
                 }
@@ -456,6 +634,7 @@ class DataverseClient:
             return {
                 "may_proceed": False,
                 "status": "FAIL_CLOSED_BLOCKED",
+                "commit_status": AuditCommitStatus.FAILED,
                 "error": f"Write action blocked: Dataverse audit log could not be saved ({str(ex)}).",
                 "audit_record_id": "",
             }

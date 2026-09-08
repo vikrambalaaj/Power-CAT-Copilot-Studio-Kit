@@ -186,5 +186,122 @@ class DataverseAuditAndMemoryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(res2["backfilled_turns"], 0)
 
 
+    async def test_spool_replay_ignores_committed_records(self):
+        """F09 verification: A pending record followed by its commit marker must NOT be requeued on restart."""
+        import tempfile
+        import json
+        with tempfile.NamedTemporaryFile("w+", delete=False, suffix=".jsonl") as tf:
+            spool_file = tf.name
+            # Turn 1: Enqueued then committed
+            turn_1_pending = {
+                "turn_id": "turn-committed-001",
+                "record_type": RECORD_TYPE_USER_TURN,
+                "time": 1000.0,
+                "persisted": False,
+                "payload": {
+                    "cre2f_recordtype": "USER_TURN",
+                    "cre2f_turnid": "turn-committed-001",
+                    "cre2f_usermessage": "Should not be recovered",
+                    "cre2f_useremail": "exec@velora.ae",
+                },
+            }
+            turn_1_commit = {
+                "turn_id": "turn-committed-001",
+                "persisted": True,
+                "time": 1001.0,
+            }
+            # Turn 2: Pending (uncommitted)
+            turn_2_pending = {
+                "turn_id": "turn-pending-002",
+                "record_type": RECORD_TYPE_TOOL_EXECUTION,
+                "time": 1002.0,
+                "persisted": False,
+                "payload": {
+                    "cre2f_recordtype": "TOOL_EXECUTION",
+                    "cre2f_turnid": "turn-pending-002",
+                    "cre2f_toolname": "sf__get_headcount",
+                    "cre2f_latencymilliseconds": 142,
+                    "cre2f_useremail": "exec@velora.ae",
+                },
+            }
+            tf.write(json.dumps(turn_1_pending) + "\n")
+            tf.write(json.dumps(turn_1_commit) + "\n")
+            tf.write(json.dumps(turn_2_pending) + "\n")
+            tf.flush()
+
+        logger = BackgroundLogger(dataverse_client=self.dv_client, spool_path=spool_file)
+        stats = logger.get_stats()
+        # Only turn-pending-002 should be enqueued!
+        self.assertEqual(stats["total_enqueued"], 1)
+        self.assertEqual(stats["queue_size"], 1)
+        recovered_rec = logger._get_queue().get_nowait()
+        self.assertEqual(recovered_rec.turn_id, "turn-pending-002")
+        self.assertEqual(recovered_rec.tool_name, "sf__get_headcount")
+        self.assertEqual(recovered_rec.latency_ms, 142)
+
+    async def test_spool_reconstructs_full_record_fields(self):
+        """F09 verification: Full 70+ field audit record is reconstructed without dropping fields."""
+        import tempfile
+        import json
+        with tempfile.NamedTemporaryFile("w+", delete=False, suffix=".jsonl") as tf:
+            spool_file = tf.name
+            original_rec = DataverseAuditRecord(
+                record_type=RECORD_TYPE_TOOL_EXECUTION,
+                user_object_id="entra-user-999",
+                user_email="cfo@velora.ae",
+                user_display_name="Chief Financial Officer",
+                root_correlation_id="root-corr-xyz",
+                conversation_id="conv-abc",
+                session_id="sess-123",
+                turn_id="turn-full-payload",
+                parent_turn_id="pturn-0",
+                tool_name="sf__execute_query",
+                operation="sf__execute_query",
+                transaction_type="QUERY",
+                source_system="SuccessFactors",
+                approval_status="APPROVED",
+                approval_token_hash="hash-abc-def",
+                latency_ms=280,
+                result_count=42,
+                error_category="",
+                content_classification="HIGHLY_CONFIDENTIAL",
+                request_filter_safe="CompanyCode eq '1000'",
+                user_groups=["ExecutiveBoard", "FinanceAudit"],
+                memory_eligible=True,
+                memory_summary="CFO queried Q3 budget execution.",
+                memory_topics=["Finance", "Budget"],
+            )
+            spool_entry = {
+                "turn_id": original_rec.turn_id,
+                "record_type": original_rec.record_type,
+                "time": 2000.0,
+                "persisted": False,
+                "payload": original_rec.to_dataverse_payload(),
+            }
+            tf.write(json.dumps(spool_entry) + "\n")
+            tf.flush()
+
+        logger = BackgroundLogger(dataverse_client=self.dv_client, spool_path=spool_file)
+        self.assertEqual(logger.get_stats()["total_enqueued"], 1)
+        rec = logger._get_queue().get_nowait()
+        self.assertEqual(rec.turn_id, "turn-full-payload")
+        self.assertEqual(rec.user_email, "cfo@velora.ae")
+        self.assertEqual(rec.user_display_name, "Chief Financial Officer")
+        self.assertEqual(rec.root_correlation_id, "root-corr-xyz")
+        self.assertEqual(rec.session_id, "sess-123")
+        self.assertEqual(rec.transaction_type, "QUERY")
+        self.assertEqual(rec.source_system, "SuccessFactors")
+        self.assertEqual(rec.approval_status, "APPROVED")
+        self.assertEqual(rec.approval_token_hash, "hash-abc-def")
+        self.assertEqual(rec.latency_ms, 280)
+        self.assertEqual(rec.result_count, 42)
+        self.assertEqual(rec.content_classification, "HIGHLY_CONFIDENTIAL")
+        self.assertEqual(rec.request_filter_safe, "CompanyCode eq '1000'")
+        self.assertEqual(rec.user_groups, ["ExecutiveBoard", "FinanceAudit"])
+        self.assertTrue(rec.memory_eligible)
+        self.assertEqual(rec.memory_summary, "CFO queried Q3 budget execution.")
+        self.assertEqual(rec.memory_topics, ["Finance", "Budget"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -24,12 +24,16 @@ async def tool_descriptions():
 CARD_BY_TOOL = {
     "s4__get_receivables_aging": "receivables-aging.json",
     "s4__get_payables_aging": "payables-aging.json",
-    "s4__get_profit_and_loss": "profit-and-loss.json",
-    "s4__get_budget_variance": "budget-variance.json",
+    "s4__get_budget_transfers": "budget-movements.json",
+    "s4__get_budget_consumption": "budget-consumption.json",
+    "s4__get_customer_master": "customer-master.json",
+    "s4__get_cost_center_master": "cost-center-master.json",
+    "s4__get_profit_center_master": "profit-center-master.json",
 }
 
 
 def function_manifest(tool):
+    card_file = CARD_BY_TOOL.get(tool["name"], "generic-card.json")
     return {
         "name": tool["name"],
         "description": tool["description"],
@@ -41,7 +45,7 @@ def function_manifest(tool):
                     "subtitle": "$.cardSubtitle",
                     "template_selector": "$.adaptiveCard",
                 },
-                "static_template": {"file": f"./adaptive-cards/{CARD_BY_TOOL[tool['name']]}"},
+                "static_template": {"file": f"./adaptive-cards/{card_file}"},
             }
         },
     }
@@ -66,7 +70,7 @@ def main() -> None:
         "schema_version": "v2.4",
         "name_for_human": "Velora S/4HANA Finance",
         "description_for_human": "S/4HANA finance intelligence for the Velora Executive Agent",
-        "description_for_model": "Use these read-only SAP S/4HANA tools for receivables, payables, P&L, and budget variance. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
+        "description_for_model": "Use these read-only SAP S/4HANA tools for receivables aging, payables aging, budget movements, and budget consumption. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
         "namespace": "s4",
         "functions": functions,
         "runtimes": [{
@@ -79,6 +83,7 @@ def main() -> None:
     REPO_APP.mkdir(parents=True, exist_ok=True)
     (REPO_APP / "s4hana-plugin.json").write_text(json.dumps(plugin, indent=4) + "\n", encoding="utf-8")
     (REPO_APP / "s4hana-mcp-tools.json").write_text(json.dumps({"tools": tools}, indent=4) + "\n", encoding="utf-8")
+    print(f"Generated {len(tools)} tools into s4hana-plugin.json and s4hana-mcp-tools.json")
 
 
 if __name__ == "__main__":

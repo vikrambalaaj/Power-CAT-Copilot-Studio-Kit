@@ -43,17 +43,23 @@ docker build -t "${REGISTRY_PREFIX}velora-mcp-facilitator:${TAG}" -f "${SCRIPT_D
 
 # 5. Dynamic Adaptive Card Service
 echo ""
-echo "[5/5] Building Dynamic Adaptive Card Service image..."
+echo "[5/6] Building Dynamic Adaptive Card Service image..."
 docker build -t "${REGISTRY_PREFIX}velora-mcp-card-service:${TAG}" -f "${SCRIPT_DIR}/dynamic-adaptive-card-service/Dockerfile" "${SCRIPT_DIR}/dynamic-adaptive-card-service"
+
+# 6. Productivity MCP
+echo ""
+echo "[6/6] Building Productivity image..."
+docker build -t "${REGISTRY_PREFIX}velora-mcp-productivity:${TAG}" -f "${SCRIPT_DIR}/ask-productivity/Dockerfile" "${SCRIPT_DIR}/ask-productivity"
 
 echo ""
 echo "========================================="
-echo "All 5 images built successfully!"
+echo "All 6 images built successfully!"
 echo " - ${REGISTRY_PREFIX}velora-mcp-sf:${TAG} (Port 8082)"
 echo " - ${REGISTRY_PREFIX}velora-mcp-s4hana:${TAG} (Port 8083)"
 echo " - ${REGISTRY_PREFIX}velora-mcp-sac:${TAG} (Port 8084)"
 echo " - ${REGISTRY_PREFIX}velora-mcp-facilitator:${TAG} (Port 8080)"
 echo " - ${REGISTRY_PREFIX}velora-mcp-card-service:${TAG} (Port 8085)"
+echo " - ${REGISTRY_PREFIX}velora-mcp-productivity:${TAG} (Port 8080)"
 echo "========================================="
 
 if [ -n "$REGISTRY" ]; then
@@ -64,4 +70,6 @@ if [ -n "$REGISTRY" ]; then
     echo "  docker push ${REGISTRY_PREFIX}velora-mcp-sac:${TAG}"
     echo "  docker push ${REGISTRY_PREFIX}velora-mcp-facilitator:${TAG}"
     echo "  docker push ${REGISTRY_PREFIX}velora-mcp-card-service:${TAG}"
+    echo "  docker push ${REGISTRY_PREFIX}velora-mcp-productivity:${TAG}"
 fi
+

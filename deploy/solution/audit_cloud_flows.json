@@ -7,68 +7,125 @@
       "schemaName": "cre2f_AuditStartOperation",
       "displayName": "Audit — Start operation",
       "description": "Solution-aware Cloud Flow to check alternate key idempotency, enforce fail-closed write protection, and persist TRANSACTION_START into Dataverse.",
-      "inputs": {
-        "rootCorrelationId": {"type": "string"},
-        "conversationId": {"type": "string"},
-        "turnId": {"type": "string"},
-        "userObjectId": {"type": "string"},
-        "userEmail": {"type": "string"},
-        "capability": {"type": "string"},
-        "operation": {"type": "string"},
-        "transactionType": {"type": "string", "enum": ["READ", "WRITE_PREVIEW", "WRITE_EXECUTE"]},
-        "safeRequestSummary": {"type": "string"},
-        "dataClassification": {"type": "string"},
-        "idempotencyKey": {"type": "string"},
-        "approvalStatus": {"type": "string"}
-      },
-      "outputs": {
-        "auditRecordId": {"type": "string"},
-        "invocationId": {"type": "string"},
-        "existingTransactionStatus": {"type": "string"},
-        "mayProceed": {"type": "boolean"},
-        "auditError": {"type": "string"}
-      },
       "definition": {
-        "trigger": "manual_or_agent_call",
-        "actions": [
-          {
-            "name": "Check_Idempotency_Alternate_Key",
-            "type": "Dataverse_QueryRows",
-            "filter": "cre2f_idempotencykey eq '@{inputs().idempotencyKey}' and cre2f_operation eq '@{inputs().operation}' and cre2f_recordtype eq 'TRANSACTION_RESULT'"
-          },
-          {
-            "name": "Condition_Duplicate_Detected",
-            "type": "If",
-            "expression": "length(body('Check_Idempotency_Alternate_Key')?['value']) > 0",
-            "ifTrue": {
-              "return": {
-                "mayProceed": false,
-                "existingTransactionStatus": "ALREADY_COMPLETED",
-                "auditError": "Duplicate transaction prevented by idempotency key."
-              }
-            },
-            "ifFalse": {
-              "name": "Create_TRANSACTION_START_Record",
-              "type": "Dataverse_AddRow",
-              "table": "cre2f_veloraagentauditlogs",
-              "item": {
-                "cre2f_rootcorrelationid": "@{inputs().rootCorrelationId}",
-                "cre2f_conversationid": "@{inputs().conversationId}",
-                "cre2f_turnid": "@{inputs().turnId}",
-                "cre2f_userobjectid": "@{inputs().userObjectId}",
-                "cre2f_useremail": "@{inputs().userEmail}",
-                "cre2f_recordtype": "TRANSACTION_START",
-                "cre2f_capability": "@{inputs().capability}",
-                "cre2f_operation": "@{inputs().operation}",
-                "cre2f_transactiontype": "@{inputs().transactionType}",
-                "cre2f_dataclassification": "@{inputs().dataClassification}",
-                "cre2f_idempotencykey": "@{inputs().idempotencyKey}",
-                "cre2f_messagesummary": "@{inputs().safeRequestSummary}",
-                "cre2f_eventtime": "@{utcNow()}"
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+          "manual": {
+            "type": "Request",
+            "kind": "Http",
+            "inputs": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rootCorrelationId": {"type": "string"},
+                  "conversationId": {"type": "string"},
+                  "turnId": {"type": "string"},
+                  "userObjectId": {"type": "string"},
+                  "userEmail": {"type": "string"},
+                  "capability": {"type": "string"},
+                  "operation": {"type": "string"},
+                  "transactionType": {"type": "string", "enum": ["READ", "WRITE_PREVIEW", "WRITE_EXECUTE"]},
+                  "safeRequestSummary": {"type": "string"},
+                  "dataClassification": {"type": "string"},
+                  "idempotencyKey": {"type": "string"},
+                  "approvalStatus": {"type": "string"}
+                },
+                "required": ["rootCorrelationId", "conversationId", "turnId", "operation"]
               }
             }
           }
-        ]
+        },
+        "actions": {
+          "Check_Idempotency_Alternate_Key": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": {
+                "connectionName": "shared_commondataserviceforapps",
+                "operationId": "ListRecordsWithOrganization",
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+              },
+              "parameters": {
+                "entityName": "cre2f_veloraagentauditlogs",
+                "$filter": "cre2f_idempotencykey eq '@{triggerBody()?['idempotencyKey']}' and cre2f_operation eq '@{triggerBody()?['operation']}' and cre2f_recordtype eq 'TRANSACTION_RESULT'"
+              }
+            },
+            "runAfter": {}
+          },
+          "Condition_Duplicate_Detected": {
+            "type": "If",
+            "expression": {
+              "and": [
+                {
+                  "greater": [
+                    "@length(body('Check_Idempotency_Alternate_Key')?['value'])",
+                    0
+                  ]
+                }
+              ]
+            },
+            "actions": {
+              "Respond_Duplicate_Rejected": {
+                "type": "Response",
+                "inputs": {
+                  "statusCode": 409,
+                  "body": {
+                    "mayProceed": false,
+                    "existingTransactionStatus": "ALREADY_COMPLETED",
+                    "auditError": "Duplicate transaction prevented by idempotency key."
+                  }
+                }
+              }
+            },
+            "else": {
+              "actions": {
+                "Create_TRANSACTION_START_Record": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "CreateRecordWithOrganization",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "entityName": "cre2f_veloraagentauditlogs",
+                      "item/cre2f_rootcorrelationid": "@{triggerBody()?['rootCorrelationId']}",
+                      "item/cre2f_conversationid": "@{triggerBody()?['conversationId']}",
+                      "item/cre2f_turnid": "@{triggerBody()?['turnId']}",
+                      "item/cre2f_userobjectid": "@{triggerBody()?['userObjectId']}",
+                      "item/cre2f_useremail": "@{triggerBody()?['userEmail']}",
+                      "item/cre2f_recordtype": "TRANSACTION_START",
+                      "item/cre2f_capability": "@{triggerBody()?['capability']}",
+                      "item/cre2f_operation": "@{triggerBody()?['operation']}",
+                      "item/cre2f_transactiontype": "@{triggerBody()?['transactionType']}",
+                      "item/cre2f_dataclassification": "@{triggerBody()?['dataClassification']}",
+                      "item/cre2f_idempotencykey": "@{triggerBody()?['idempotencyKey']}",
+                      "item/cre2f_messagesummary": "@{triggerBody()?['safeRequestSummary']}",
+                      "item/cre2f_eventtime": "@{utcNow()}"
+                    }
+                  }
+                },
+                "Respond_Proceed": {
+                  "type": "Response",
+                  "inputs": {
+                    "statusCode": 200,
+                    "body": {
+                      "mayProceed": true,
+                      "existingTransactionStatus": "NEW",
+                      "auditRecordId": "@{body('Create_TRANSACTION_START_Record')?['cre2f_veloraagentauditlogid']}"
+                    }
+                  },
+                  "runAfter": {
+                    "Create_TRANSACTION_START_Record": ["Succeeded"]
+                  }
+                }
+              }
+            },
+            "runAfter": {
+              "Check_Idempotency_Alternate_Key": ["Succeeded"]
+            }
+          }
+        }
       }
     },
     {
@@ -76,45 +133,74 @@
       "schemaName": "cre2f_AuditCompleteOperation",
       "displayName": "Audit — Complete operation",
       "description": "Solution-aware Cloud Flow to record terminal TRANSACTION_RESULT or TRANSACTION_ERROR, calculate latency, and store platform object IDs.",
-      "inputs": {
-        "auditRecordId": {"type": "string"},
-        "invocationId": {"type": "string"},
-        "rootCorrelationId": {"type": "string"},
-        "outcome": {"type": "string", "enum": ["SUCCESS", "ERROR"]},
-        "externalObjectId": {"type": "string"},
-        "evidenceLink": {"type": "string"},
-        "resultCount": {"type": "integer"},
-        "safeResultSummary": {"type": "string"},
-        "safeError": {"type": "string"},
-        "startTime": {"type": "string"},
-        "endTime": {"type": "string"}
-      },
-      "outputs": {
-        "status": {"type": "string"},
-        "auditRecordId": {"type": "string"}
-      },
       "definition": {
-        "trigger": "manual_or_agent_call",
-        "actions": [
-          {
-            "name": "Create_Terminal_Record",
-            "type": "Dataverse_AddRow",
-            "table": "cre2f_veloraagentauditlogs",
-            "item": {
-              "cre2f_rootcorrelationid": "@{inputs().rootCorrelationId}",
-              "cre2f_recordtype": "@if(equals(inputs().outcome, 'SUCCESS'), 'TRANSACTION_RESULT', 'TRANSACTION_ERROR')",
-              "cre2f_outcome": "@{inputs().outcome}",
-              "cre2f_externalobjectid": "@{inputs().externalObjectId}",
-              "cre2f_evidencelink": "@{inputs().evidenceLink}",
-              "cre2f_resultcount": "@inputs().resultCount",
-              "cre2f_messagesummary": "@{inputs().safeResultSummary}",
-              "cre2f_errormessagesafe": "@{inputs().safeError}",
-              "cre2f_starttime": "@{inputs().startTime}",
-              "cre2f_endtime": "@{if(empty(inputs().endTime), utcNow(), inputs().endTime)}",
-              "cre2f_eventtime": "@{utcNow()}"
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+          "manual": {
+            "type": "Request",
+            "kind": "Http",
+            "inputs": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "auditRecordId": {"type": "string"},
+                  "invocationId": {"type": "string"},
+                  "rootCorrelationId": {"type": "string"},
+                  "outcome": {"type": "string", "enum": ["SUCCESS", "ERROR"]},
+                  "externalObjectId": {"type": "string"},
+                  "evidenceLink": {"type": "string"},
+                  "resultCount": {"type": "integer"},
+                  "safeResultSummary": {"type": "string"},
+                  "safeError": {"type": "string"},
+                  "startTime": {"type": "string"},
+                  "endTime": {"type": "string"}
+                },
+                "required": ["rootCorrelationId", "outcome"]
+              }
             }
           }
-        ]
+        },
+        "actions": {
+          "Create_Terminal_Record": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": {
+                "connectionName": "shared_commondataserviceforapps",
+                "operationId": "CreateRecordWithOrganization",
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+              },
+              "parameters": {
+                "entityName": "cre2f_veloraagentauditlogs",
+                "item/cre2f_rootcorrelationid": "@{triggerBody()?['rootCorrelationId']}",
+                "item/cre2f_recordtype": "@if(equals(triggerBody()?['outcome'], 'SUCCESS'), 'TRANSACTION_RESULT', 'TRANSACTION_ERROR')",
+                "item/cre2f_outcome": "@{triggerBody()?['outcome']}",
+                "item/cre2f_externalobjectid": "@{triggerBody()?['externalObjectId']}",
+                "item/cre2f_evidencelink": "@{triggerBody()?['evidenceLink']}",
+                "item/cre2f_resultcount": "@triggerBody()?['resultCount']",
+                "item/cre2f_messagesummary": "@{triggerBody()?['safeResultSummary']}",
+                "item/cre2f_errormessagesafe": "@{triggerBody()?['safeError']}",
+                "item/cre2f_starttime": "@{triggerBody()?['startTime']}",
+                "item/cre2f_endtime": "@{if(empty(triggerBody()?['endTime']), utcNow(), triggerBody()?['endTime'])}",
+                "item/cre2f_eventtime": "@{utcNow()}"
+              }
+            },
+            "runAfter": {}
+          },
+          "Respond_Complete": {
+            "type": "Response",
+            "inputs": {
+              "statusCode": 200,
+              "body": {
+                "status": "RECORDED",
+                "auditRecordId": "@{body('Create_Terminal_Record')?['cre2f_veloraagentauditlogid']}"
+              }
+            },
+            "runAfter": {
+              "Create_Terminal_Record": ["Succeeded"]
+            }
+          }
+        }
       }
     },
     {
@@ -122,41 +208,70 @@
       "schemaName": "cre2f_AuditRecordApproval",
       "displayName": "Audit — Record approval",
       "description": "Solution-aware Cloud Flow to record user approval status (APPROVED, REJECTED, MODIFIED, EXPIRED) with token hash verification and user matching.",
-      "inputs": {
-        "invocationId": {"type": "string"},
-        "rootCorrelationId": {"type": "string"},
-        "userObjectId": {"type": "string"},
-        "userEmail": {"type": "string"},
-        "approvalStatus": {"type": "string", "enum": ["APPROVED", "REJECTED", "MODIFIED", "EXPIRED"]},
-        "approvalTime": {"type": "string"},
-        "approvalTokenHash": {"type": "string"},
-        "safePreviewSummary": {"type": "string"},
-        "expirationTime": {"type": "string"}
-      },
-      "outputs": {
-        "status": {"type": "string"},
-        "auditRecordId": {"type": "string"}
-      },
       "definition": {
-        "trigger": "manual_or_agent_call",
-        "actions": [
-          {
-            "name": "Create_USER_APPROVAL_Record",
-            "type": "Dataverse_AddRow",
-            "table": "cre2f_veloraagentauditlogs",
-            "item": {
-              "cre2f_rootcorrelationid": "@{inputs().rootCorrelationId}",
-              "cre2f_recordtype": "USER_APPROVAL",
-              "cre2f_userobjectid": "@{inputs().userObjectId}",
-              "cre2f_useremail": "@{inputs().userEmail}",
-              "cre2f_approvalstatus": "@{inputs().approvalStatus}",
-              "cre2f_approvalexpireson": "@{inputs().expirationTime}",
-              "cre2f_approvaltokenhash": "@{inputs().approvalTokenHash}",
-              "cre2f_messagesummary": "@{inputs().safePreviewSummary}",
-              "cre2f_eventtime": "@{if(empty(inputs().approvalTime), utcNow(), inputs().approvalTime)}"
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+          "manual": {
+            "type": "Request",
+            "kind": "Http",
+            "inputs": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invocationId": {"type": "string"},
+                  "rootCorrelationId": {"type": "string"},
+                  "userObjectId": {"type": "string"},
+                  "userEmail": {"type": "string"},
+                  "approvalStatus": {"type": "string", "enum": ["APPROVED", "REJECTED", "MODIFIED", "EXPIRED"]},
+                  "approvalTime": {"type": "string"},
+                  "approvalTokenHash": {"type": "string"},
+                  "safePreviewSummary": {"type": "string"},
+                  "expirationTime": {"type": "string"}
+                },
+                "required": ["rootCorrelationId", "approvalStatus"]
+              }
             }
           }
-        ]
+        },
+        "actions": {
+          "Create_USER_APPROVAL_Record": {
+            "type": "OpenApiConnection",
+            "inputs": {
+              "host": {
+                "connectionName": "shared_commondataserviceforapps",
+                "operationId": "CreateRecordWithOrganization",
+                "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+              },
+              "parameters": {
+                "entityName": "cre2f_veloraagentauditlogs",
+                "item/cre2f_rootcorrelationid": "@{triggerBody()?['rootCorrelationId']}",
+                "item/cre2f_recordtype": "USER_APPROVAL",
+                "item/cre2f_userobjectid": "@{triggerBody()?['userObjectId']}",
+                "item/cre2f_useremail": "@{triggerBody()?['userEmail']}",
+                "item/cre2f_approvalstatus": "@{triggerBody()?['approvalStatus']}",
+                "item/cre2f_approvalexpireson": "@{triggerBody()?['expirationTime']}",
+                "item/cre2f_approvaltokenhash": "@{triggerBody()?['approvalTokenHash']}",
+                "item/cre2f_messagesummary": "@{triggerBody()?['safePreviewSummary']}",
+                "item/cre2f_eventtime": "@{if(empty(triggerBody()?['approvalTime']), utcNow(), triggerBody()?['approvalTime'])}"
+              }
+            },
+            "runAfter": {}
+          },
+          "Respond_Approval_Recorded": {
+            "type": "Response",
+            "inputs": {
+              "statusCode": 200,
+              "body": {
+                "status": "RECORDED",
+                "auditRecordId": "@{body('Create_USER_APPROVAL_Record')?['cre2f_veloraagentauditlogid']}"
+              }
+            },
+            "runAfter": {
+              "Create_USER_APPROVAL_Record": ["Succeeded"]
+            }
+          }
+        }
       }
     }
   ]

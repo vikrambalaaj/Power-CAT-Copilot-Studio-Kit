@@ -169,14 +169,18 @@ async def sf__get_workforce_demographics(
     group_by: str = "gender",
     cross_by: Optional[str] = None,
     company: Optional[str] = None,
+    division: Optional[str] = None,
+    department: Optional[str] = None,
     business_unit: Optional[str] = None,
     as_of_date: Optional[str] = None,
 ) -> Any:
-    """Return governed aggregate nationality/gender workforce composition."""
+    """Return governed aggregate workforce composition by nationality, gender, age_group, or tenure_group with optional division, department, or company filtering."""
     res = await _client.aggregate_workforce_demographics(
         group_by=group_by,
         cross_by=cross_by,
         company=company,
+        division=division,
+        department=department,
         business_unit=business_unit,
         as_of_date=as_of_date,
     )
@@ -187,10 +191,11 @@ async def sf__get_headcount(
     ctx: Context,
     company: Optional[str] = None,
     department: Optional[str] = None,
+    division: Optional[str] = None,
     business_unit: Optional[str] = None,
     as_of_date: Optional[str] = None,
 ) -> Any:
-    """Return complete aggregate headcount by department description with an executive visualization and sources."""
+    """Return complete aggregate headcount by department/division with an executive visualization and sources."""
     await ctx.report_progress(0.03, 1.0, "Connecting to SAP SuccessFactors test environment")
 
     async def report(progress: float, message: str) -> None:
@@ -199,6 +204,7 @@ async def sf__get_headcount(
     res = await _client.aggregate_headcount_by_department(
         company=company,
         department=department,
+        division=division,
         business_unit=business_unit,
         as_of_date=as_of_date,
         progress_callback=report,
@@ -479,6 +485,7 @@ async def sf__execute_odata(
     )
 async def sf__get_workforce_drilldown(
     department: Optional[str] = "Unassigned",
+    division: Optional[str] = None,
     company: Optional[str] = None,
     business_unit: Optional[str] = None,
     as_of_date: Optional[str] = None,
@@ -488,9 +495,10 @@ async def sf__get_workforce_drilldown(
     user_object_id: Optional[str] = None,
     user_email: Optional[str] = None,
 ) -> Any:
-    """Drill down into employee-level records for a specific group/department governed by Dataverse disclosure policy."""
+    """Drill down into employee-level records for a specific group/department/division governed by Dataverse disclosure policy."""
     res = await _client.drilldown_employees(
         department=department,
+        division=division,
         company=company,
         business_unit=business_unit,
         as_of_date=as_of_date,
@@ -672,7 +680,7 @@ TOOL_SPECS = [
     },
     {
         "name": "sf__get_headcount",
-        "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns distinct current-effective employees, active headcount, complete pagination, and reconciled department breakdowns.",
+        "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns distinct current-effective employees, active headcount, complete pagination, and reconciled department/division breakdowns.",
         "handler": sf__get_headcount,
     },
     {
@@ -687,7 +695,7 @@ TOOL_SPECS = [
     },
     {
         "name": "sf__get_workforce_demographics",
-        "description": "Use for privacy-safe aggregate workforce composition: headcount/percentage by nationality (group_by='nationality'), gender (group_by='gender'), gender by department (group_by='gender', cross_by='department'), or gender by nationality (group_by='gender', cross_by='nationality'). Small groups are suppressed and combined totals are withheld from named categories; never returns employee-level gender or nationality.",
+        "description": "Use for privacy-safe aggregate workforce composition: headcount/percentage by nationality (group_by='nationality'), gender (group_by='gender'), age group (group_by='age_group' or 'age'), or tenure (group_by='tenure_group' or 'tenure'), with optional division (e.g. division='Corporate – Digital & Innovation'), department, or cross-grouping (e.g. cross_by='department', 'nationality', 'gender'). Never returns individual employee records.",
         "handler": sf__get_workforce_demographics,
     },
     {

@@ -5,12 +5,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    s4_api_url: str = ""
+    s4_api_url: str = "https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001"
     s4_auth_mode: str = "basic"
     s4_token_url: str = ""
     s4_client_id: str = ""
     s4_client_secret: str = ""
-    s4_username: str = ""
+    s4_username: str = "API_USER"
     s4_password: str = ""
     s4_username_secret_ref: str = ""
     s4_password_secret_ref: str = ""
@@ -22,14 +22,29 @@ class Settings(BaseSettings):
     executing_identity: str = "velora-s4-finance-reader"
     authorization_model: str = "MAKER_SERVICE_CREDENTIAL"
 
+    # Four approved reports in scope:
     s4_ar_entity: str = "ARageingData"
     s4_ap_entity: str = "APageingData"
-    s4_budget_api_url: str = "https://fioriqas.velora.ae/sap/opu/odata4/sap/zfi_sbn_budget_consm_srv/srvd_a2x/sap/zfi_sdf_budget_consm/0001"
+    s4_budget_transfer_entity: str = "BudgetTransfer"
+    s4_budget_consumption_entity: str = "BudgetConsumData"
+
+    # Legacy / Master Data entity configuration
+    s4_budget_api_url: str = ""
     s4_budget_entity: str = "BudgetConsumReport"
-    s4_pl_api_url: str = "https://fioriqas.velora.ae/sap/opu/odata/sap/C_FINANCIALSTATEMENTKPI_CDS"
-    s4_pl_entity: str = "C_FINANCIALSTATEMENTKPI"
-    s4_pl_gl_account_hierarchy: str = "ZVOP"
-    s4_pl_planning_category: str = "ACT01"
+    s4_customer_api_url: str = ""
+    s4_customer_entity: str = "CustomerMaster"
+    s4_costcenter_api_url: str = ""
+    s4_costcenter_entity: str = "CostCenterMaster"
+    s4_profitcenter_api_url: str = ""
+    s4_profitcenter_entity: str = "ProfitCenterMaster"
+
+    # Environment & Governance settings
+    s4_environment_label: str = "Production"
+    s4_report_timezone: str = "Asia/Dubai"
+    s4_report_max_rows: int = 1000
+    s4_report_max_pages: int = 50
+    s4_total_timeout_seconds: float = 60.0
+
     port: int = 8083
     mcp_api_key: str = ""
     allow_anonymous: bool = False
@@ -52,3 +67,7 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+S4Settings = Settings
+

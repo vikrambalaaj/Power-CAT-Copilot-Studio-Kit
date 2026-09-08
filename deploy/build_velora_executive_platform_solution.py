@@ -11,12 +11,14 @@ PRODUCTIVITY_DIR = ROOT / "mcp-apps" / "ask-productivity"
 
 
 def build_solution_zip():
-    """Package solution.xml and customizations.xml into cre2f_VeloraExecutiveAgentPlatform.zip."""
+    """Package the validated Dataverse-exported governance solution files."""
     out_path = ROOT / "deploy" / "cre2f_VeloraExecutiveAgentPlatform.zip"
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as zf:
         zf.write(SOLUTION_DIR / "solution.xml", "solution.xml")
         zf.write(SOLUTION_DIR / "customizations.xml", "customizations.xml")
-        zf.write(SOLUTION_DIR / "audit_cloud_flows.json", "audit_cloud_flows.json")
+        zf.write(SOLUTION_DIR / "[Content_Types].xml", "[Content_Types].xml")
+        if (SOLUTION_DIR / "audit_cloud_flows.json").exists():
+            zf.write(SOLUTION_DIR / "audit_cloud_flows.json", "audit_cloud_flows.json")
     print(f"Created solution archive: {out_path} ({out_path.stat().st_size} bytes)")
 
 

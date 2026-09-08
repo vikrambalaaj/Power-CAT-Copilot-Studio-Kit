@@ -41,6 +41,18 @@
                         "default": null,
                         "title": "Customer"
                     },
+                    "customer_name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Customer Name"
+                    },
                     "currency": {
                         "anyOf": [
                             {
@@ -52,6 +64,30 @@
                         ],
                         "default": null,
                         "title": "Currency"
+                    },
+                    "profit_center": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Profit Center"
+                    },
+                    "segment": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Segment"
                     },
                     "correlation_id": {
                         "anyOf": [
@@ -116,7 +152,7 @@
                         "default": null,
                         "title": "Supplier"
                     },
-                    "currency": {
+                    "supplier_name": {
                         "anyOf": [
                             {
                                 "type": "string"
@@ -126,75 +162,7 @@
                             }
                         ],
                         "default": null,
-                        "title": "Currency"
-                    },
-                    "correlation_id": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Correlation Id"
-                    },
-                    "top": {
-                        "default": 100,
-                        "title": "Top",
-                        "type": "integer"
-                    }
-                },
-                "title": "s4__get_payables_agingArguments",
-                "type": "object"
-            }
-        },
-        {
-            "name": "s4__get_profit_and_loss",
-            "description": "Retrieve a sourced profit-and-loss view from SAP S/4HANA.",
-            "inputSchema": {
-                "properties": {
-                    "company_code": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Company Code"
-                    },
-                    "fiscal_year": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Fiscal Year"
-                    },
-                    "fiscal_period": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Fiscal Period"
-                    },
-                    "ledger": {
-                        "default": "0L",
-                        "title": "Ledger",
-                        "type": "string"
+                        "title": "Supplier Name"
                     },
                     "currency": {
                         "anyOf": [
@@ -220,6 +188,18 @@
                         "default": null,
                         "title": "Profit Center"
                     },
+                    "segment": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Segment"
+                    },
                     "correlation_id": {
                         "anyOf": [
                             {
@@ -238,13 +218,334 @@
                         "type": "integer"
                     }
                 },
-                "title": "s4__get_profit_and_lossArguments",
+                "title": "s4__get_payables_agingArguments",
                 "type": "object"
             }
         },
         {
-            "name": "s4__get_budget_variance",
-            "description": "Retrieve sourced budget-versus-actual variance records from SAP S/4HANA.",
+            "name": "s4__get_budget_transfers",
+            "description": "Retrieve budget movement and original-budget entries from SAP S/4HANA.",
+            "inputSchema": {
+                "properties": {
+                    "financial_management_area": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Financial Management Area"
+                    },
+                    "funds_center": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Funds Center"
+                    },
+                    "commitment_item": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Commitment Item"
+                    },
+                    "fiscal_year": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Fiscal Year"
+                    },
+                    "budget_period": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Budget Period"
+                    },
+                    "currency": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Currency"
+                    },
+                    "budgeting_process": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Budgeting Process"
+                    },
+                    "movement_type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Movement Type"
+                    },
+                    "correlation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Correlation Id"
+                    },
+                    "top": {
+                        "default": 100,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "s4__get_budget_transfersArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "s4__get_budget_consumption",
+            "description": "Retrieve budget, commitment, and expenditure records from SAP S/4HANA.",
+            "inputSchema": {
+                "properties": {
+                    "financial_management_area": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Financial Management Area"
+                    },
+                    "funds_center": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Funds Center"
+                    },
+                    "commitment_item": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Commitment Item"
+                    },
+                    "fiscal_year": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Fiscal Year"
+                    },
+                    "period": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Period"
+                    },
+                    "currency": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Currency"
+                    },
+                    "budget_version": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Budget Version"
+                    },
+                    "company_code": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company Code"
+                    },
+                    "correlation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Correlation Id"
+                    },
+                    "top": {
+                        "default": 100,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "s4__get_budget_consumptionArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "s4__get_customer_master",
+            "description": "Retrieve customer master records from SAP S/4HANA.",
+            "inputSchema": {
+                "properties": {
+                    "customer": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Customer"
+                    },
+                    "customer_name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Customer Name"
+                    },
+                    "city": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "City"
+                    },
+                    "country": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Country"
+                    },
+                    "correlation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Correlation Id"
+                    },
+                    "top": {
+                        "default": 50,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "s4__get_customer_masterArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "s4__get_cost_center_master",
+            "description": "Retrieve cost center master records from SAP S/4HANA.",
             "inputSchema": {
                 "properties": {
                     "company_code": {
@@ -259,54 +560,6 @@
                         "default": null,
                         "title": "Company Code"
                     },
-                    "fiscal_year": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Fiscal Year"
-                    },
-                    "fiscal_period": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Fiscal Period"
-                    },
-                    "plan_version": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Plan Version"
-                    },
-                    "currency": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "default": null,
-                        "title": "Currency"
-                    },
                     "cost_center": {
                         "anyOf": [
                             {
@@ -318,6 +571,18 @@
                         ],
                         "default": null,
                         "title": "Cost Center"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Description"
                     },
                     "correlation_id": {
                         "anyOf": [
@@ -332,12 +597,75 @@
                         "title": "Correlation Id"
                     },
                     "top": {
-                        "default": 100,
+                        "default": 50,
                         "title": "Top",
                         "type": "integer"
                     }
                 },
-                "title": "s4__get_budget_varianceArguments",
+                "title": "s4__get_cost_center_masterArguments",
+                "type": "object"
+            }
+        },
+        {
+            "name": "s4__get_profit_center_master",
+            "description": "Retrieve profit center master records from SAP S/4HANA.",
+            "inputSchema": {
+                "properties": {
+                    "company_code": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Company Code"
+                    },
+                    "profit_center": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Profit Center"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Name"
+                    },
+                    "correlation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Correlation Id"
+                    },
+                    "top": {
+                        "default": 50,
+                        "title": "Top",
+                        "type": "integer"
+                    }
+                },
+                "title": "s4__get_profit_center_masterArguments",
                 "type": "object"
             }
         }

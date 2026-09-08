@@ -23,6 +23,8 @@ from .tools_m365_reads import (
     get_planner_task,
     find_overdue_tasks,
     get_daily_executive_briefing,
+    plan_my_day,
+    get_quick_action_checklist,
 )
 from .tools_m365_writes import (
     prepare_email,
@@ -48,6 +50,7 @@ from .tools_m365_writes import (
     prepare_daily_briefing_email,
     send_approved_daily_briefing_email,
     send_daily_briefing_email,
+    prepare_end_of_day_wrapup_email,
 )
 
 from pathlib import Path
@@ -216,6 +219,64 @@ async def handle_parent_handoff(request: HandoffRequest) -> HandoffResponse:
                 auditStatus=res["auditStatus"],
                 warnings=res.get("warnings", []),
                 structuredResult={"externalObjectId": res.get("externalObjectId"), "evidenceLink": res.get("evidenceLink")},
+            )
+
+        elif op in ("PLAN_MY_DAY", "PLANMYDAY"):
+            res = await plan_my_day(
+                userTimezone=params.get("userTimezone") or request.userTimezone or "Asia/Dubai",
+                rootCorrelationId=corr_id,
+                conversationId=conv_id,
+                turnId=turn_id,
+                userObjectId=uid,
+                userEmail=email,
+            )
+            return HandoffResponse(
+                status=res["status"],
+                approvalRequired=False,
+                resultSummary=res["resultSummary"],
+                correlationId=corr_id,
+                auditStatus=res["auditStatus"],
+                warnings=res.get("warnings", []),
+                structuredResult=res["structuredResult"],
+            )
+
+        elif op in ("QUICK_ACTION_CHECKLIST", "QUICKACTIONCHECKLIST", "CHECKLIST"):
+            res = await get_quick_action_checklist(
+                rootCorrelationId=corr_id,
+                conversationId=conv_id,
+                turnId=turn_id,
+                userObjectId=uid,
+                userEmail=email,
+            )
+            return HandoffResponse(
+                status=res["status"],
+                approvalRequired=False,
+                resultSummary=res["resultSummary"],
+                correlationId=corr_id,
+                auditStatus=res["auditStatus"],
+                warnings=res.get("warnings", []),
+                structuredResult=res["structuredResult"],
+            )
+
+        elif op in ("PREPARE_END_OF_DAY_WRAPUP_EMAIL", "PREPAREENDOFDAYWRAPUPEMAIL", "WRAPUP_EMAIL"):
+            res = await prepare_end_of_day_wrapup_email(
+                userTimezone=params.get("userTimezone") or request.userTimezone or "Asia/Dubai",
+                recipientOverride=params.get("recipientOverride") or params.get("to"),
+                rootCorrelationId=corr_id,
+                conversationId=conv_id,
+                turnId=turn_id,
+                userObjectId=uid,
+                userEmail=email,
+            )
+            return HandoffResponse(
+                status=res["status"],
+                approvalRequired=res["approvalRequired"],
+                resultSummary=res["resultSummary"],
+                confirmationToken=res["confirmationToken"],
+                correlationId=corr_id,
+                auditStatus=res["auditStatus"],
+                warnings=res.get("warnings", []),
+                previewDetails=res.get("previewDetails"),
             )
 
         elif op in ("GET_DAILY_EXECUTIVE_BRIEFING", "GETDAILYBRIEFING", "DAILY_BRIEFING", "BRIEFING"):

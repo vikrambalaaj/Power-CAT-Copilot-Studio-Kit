@@ -109,7 +109,7 @@ class ProductivityAuditService:
             root_correlation_id=root_correlation_id,
             conversation_id=conversation_id,
             turn_id=turn_id,
-            invocation_id=f"prev-{idempotency_key[:12]}",
+            invocation_id=f"prev-{idempotency_key}",
             idempotency_key=idempotency_key,
             user_object_id=user_object_id,
             user_email=user_email,
@@ -150,7 +150,7 @@ class ProductivityAuditService:
     ) -> Dict[str, Any]:
         """Record Stage B TRANSACTION_START with strict fail-closed enforcement (Section 3.5 & 6.1)."""
         token_hash = compute_approval_token_hash(approval_token)
-        inv_id = f"exec-{idempotency_key[:12]}"
+        inv_id = f"exec-{idempotency_key}"
 
         rec = DataverseAuditRecord(
             record_type=RECORD_TYPE_TRANSACTION_START,

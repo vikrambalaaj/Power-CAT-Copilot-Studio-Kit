@@ -2,22 +2,81 @@
 from __future__ import annotations
 
 import hmac
+import json
 import logging
+import re
 import sys
+import uuid
+from decimal import Decimal
+from enum import Enum
+from typing import Any
 
 import uvicorn
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
 from .client import S4Client
+from .contracts import to_jsonable_data
 from .settings import get_settings
-from .tools import TOOL_SPECS
+from .tools import (
+    TOOL_SPECS,
+    s4__get_budget_consumption,
+    s4__get_budget_transfers,
+    s4__get_budget_variance,
+    s4__get_cost_center_master,
+    s4__get_customer_master,
+    s4__get_payables_aging,
+    s4__get_profit_and_loss,
+    s4__get_profit_center_master,
+    s4__get_receivables_aging,
+)
 
 settings = get_settings()
 log = logging.getLogger("s4_finance")
+
+
+def serialize_with_exact_decimals(content: Any) -> str:
+    """Serialize data structure to JSON, preserving Decimals as exact numeric literals without float precision loss (F04, T03)."""
+    marker_token = uuid.uuid4().hex
+
+    def _default(o: Any) -> Any:
+        if isinstance(o, Decimal):
+            if not o.is_finite():
+                raise ValueError(f"Non-finite decimal value cannot be serialized: {o}")
+            return f"__EXACT_DEC_{marker_token}_{str(o)}__"
+        if isinstance(o, Enum):
+            return o.value
+        raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+
+    raw_json = json.dumps(
+        content,
+        ensure_ascii=False,
+        allow_nan=False,
+        indent=None,
+        separators=(",", ":"),
+        default=_default,
+    )
+    pattern = rf'"__EXACT_DEC_{marker_token}_([+-]?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)__"'
+    return re.sub(pattern, r'\1', raw_json)
+
+
+class SafeJSONResponse(JSONResponse):
+    """JSONResponse that serializes Decimal values and Enums safely with exact decimal preservation (F04)."""
+
+    def render(self, content: Any) -> bytes:
+        try:
+            return serialize_with_exact_decimals(content).encode("utf-8")
+        except (ValueError, TypeError) as e:
+            error_payload = {
+                "status": "error",
+                "code": "CONTRACT_MISMATCH",
+                "message": f"Serialization error: {e}",
+            }
+            return json.dumps(error_payload).encode("utf-8")
+
 
 mcp = FastMCP(
     "velora-s4-finance",
@@ -48,7 +107,7 @@ class ApiKeyMiddleware:
                     if not supplied and bearer.lower().startswith("bearer "):
                         supplied = bearer[7:].strip()
                     if not settings.mcp_api_key or not hmac.compare_digest(supplied, settings.mcp_api_key):
-                        await JSONResponse(
+                        await SafeJSONResponse(
                             {
                                 "status": "error",
                                 "code": "UNAUTHORIZED",
@@ -57,34 +116,189 @@ class ApiKeyMiddleware:
                             status_code=401,
                         )(scope, receive, send)
                         return
+
+                    # Verified executive-to-organization entitlement enforcement (F06)
+                    org_scope = headers.get(b"x-organization-scope", b"").decode("utf-8").strip()
+                    if org_scope and org_scope not in {"1000", "VELORA_UAE"}:
+                        await SafeJSONResponse(
+                            {
+                                "status": "error",
+                                "code": "ACCESS_DENIED",
+                                "message": f"Executive identity not entitled to access organization scope '{org_scope}'. Approved scope: 1000.",
+                            },
+                            status_code=403,
+                        )(scope, receive, send)
+                        return
         await self.app(scope, receive, send)
 
 
-
 async def health(_request):
-    return JSONResponse({"status": "ok", "service": "s4-finance-mcp-server", "version": "1.1.6"})
+    return SafeJSONResponse({"status": "ok", "service": "s4-finance-mcp-server", "version": "2.0.0"})
+
+
+SCHEMAS: dict[str, dict[str, Any]] = {
+    "s4__get_receivables_aging": {
+        "type": "object",
+        "properties": {
+            "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
+            "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
+            "customer": {"type": "string", "description": "Customer number or code"},
+            "customer_name": {"type": "string", "description": "Customer name for lookup"},
+            "currency": {"type": "string", "description": "Currency filter, e.g. AED"},
+            "profit_center": {"type": "string", "description": "Profit center"},
+            "segment": {"type": "string", "description": "Segment"},
+            "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
+            "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
+        },
+    },
+    "s4__get_payables_aging": {
+        "type": "object",
+        "properties": {
+            "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
+            "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
+            "supplier": {"type": "string", "description": "Supplier number or code"},
+            "supplier_name": {"type": "string", "description": "Supplier name for lookup"},
+            "currency": {"type": "string", "description": "Currency filter, e.g. AED"},
+            "profit_center": {"type": "string", "description": "Profit center"},
+            "segment": {"type": "string", "description": "Segment"},
+            "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
+            "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
+        },
+    },
+    "s4__get_budget_transfers": {
+        "type": "object",
+        "properties": {
+            "financial_management_area": {"type": "string", "description": "Funds management area, e.g. 1000"},
+            "funds_center": {"type": "string", "description": "Funds center code"},
+            "commitment_item": {"type": "string", "description": "Commitment item code"},
+            "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
+            "budget_period": {"type": "string", "description": "Budget period"},
+            "currency": {"type": "string", "description": "Transaction currency, e.g. AED"},
+            "budgeting_process": {"type": "string", "description": "Budgeting process code, e.g. ENTR"},
+            "movement_type": {"type": "string", "description": "Budget movement type code"},
+            "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
+            "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
+        },
+    },
+    "s4__get_budget_consumption": {
+        "type": "object",
+        "properties": {
+            "financial_management_area": {"type": "string", "description": "Funds management area, e.g. 1000"},
+            "funds_center": {"type": "string", "description": "Funds center code"},
+            "commitment_item": {"type": "string", "description": "Commitment item code"},
+            "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
+            "period": {"type": "string", "description": "Fiscal period, e.g. 008 or 08"},
+            "currency": {"type": "string", "description": "Currency, e.g. AED"},
+            "budget_version": {"type": "string", "description": "Budget version (or blank for base)"},
+            "company_code": {"type": "string", "description": "Company code"},
+            "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
+            "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
+        },
+    },
+}
+
+# Approved 4 core reports for tool discovery (R10)
+CORE_REPORT_SPECS = [
+    ("s4__get_receivables_aging", "Retrieve accounts-receivable aging from SAP S/4HANA.", s4__get_receivables_aging),
+    ("s4__get_payables_aging", "Retrieve accounts-payable aging from SAP S/4HANA.", s4__get_payables_aging),
+    ("s4__get_budget_transfers", "Retrieve budget movement and original-budget entries from SAP S/4HANA.", s4__get_budget_transfers),
+    ("s4__get_budget_consumption", "Retrieve budget, commitment, and expenditure records from SAP S/4HANA.", s4__get_budget_consumption),
+]
+
+
+def _build_mcp_tools() -> list[dict[str, Any]]:
+    return [
+        {
+            "name": name,
+            "description": desc,
+            "inputSchema": SCHEMAS.get(name, {"type": "object", "properties": {}}),
+        }
+        for name, desc, _ in CORE_REPORT_SPECS
+    ]
+
+
+MCP_TOOLS = _build_mcp_tools()
+
+
+# Unified alias resolution dictionary (R10)
+ALIAS_MAP: dict[str, tuple[str, Any]] = {
+    # Receivables Aging
+    "s4__get_receivables_aging": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    "get_receivables_aging": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    "getreceivablesaging": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    "getReceivablesAging": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    "receivables_aging": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    # Payables Aging
+    "s4__get_payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
+    "get_payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
+    "getpayablesaging": ("s4__get_payables_aging", s4__get_payables_aging),
+    "getPayablesAging": ("s4__get_payables_aging", s4__get_payables_aging),
+    "payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
+    # Budget Transfers
+    "s4__get_budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "get_budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "getbudgettransfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "getBudgetTransfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    # Budget Consumption
+    "s4__get_budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "get_budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "getbudgetconsumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "getBudgetConsumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    # Legacy Budget Variance
+    "s4__get_budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),
+    "get_budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),
+    "getbudgetvariance": ("s4__get_budget_variance", s4__get_budget_variance),
+    "getBudgetVariance": ("s4__get_budget_variance", s4__get_budget_variance),
+    "budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),
+    # Legacy Profit & Loss
+    "s4__get_profit_and_loss": ("s4__get_profit_and_loss", s4__get_profit_and_loss),
+    "get_profit_and_loss": ("s4__get_profit_and_loss", s4__get_profit_and_loss),
+    "getprofitandloss": ("s4__get_profit_and_loss", s4__get_profit_and_loss),
+    "getProfitAndLoss": ("s4__get_profit_and_loss", s4__get_profit_and_loss),
+    "profit_and_loss": ("s4__get_profit_and_loss", s4__get_profit_and_loss),
+
+    # Master data tools
+    "s4__get_customer_master": ("s4__get_customer_master", s4__get_customer_master),
+    "get_customer_master": ("s4__get_customer_master", s4__get_customer_master),
+    "getcustomermaster": ("s4__get_customer_master", s4__get_customer_master),
+    "s4__get_cost_center_master": ("s4__get_cost_center_master", s4__get_cost_center_master),
+    "get_cost_center_master": ("s4__get_cost_center_master", s4__get_cost_center_master),
+    "getcostcentermaster": ("s4__get_cost_center_master", s4__get_cost_center_master),
+    "s4__get_profit_center_master": ("s4__get_profit_center_master", s4__get_profit_center_master),
+    "get_profit_center_master": ("s4__get_profit_center_master", s4__get_profit_center_master),
+    "getprofitcentermaster": ("s4__get_profit_center_master", s4__get_profit_center_master),
+}
+
+
+def resolve_tool_handler(name: str) -> tuple[str, Any] | None:
+    norm = name.strip().lower().replace("-", "_")
+    if norm in ALIAS_MAP:
+        return ALIAS_MAP[norm]
+    if name in ALIAS_MAP:
+        return ALIAS_MAP[name]
+    stripped = norm.replace("s4__", "")
+    if stripped in ALIAS_MAP:
+        return ALIAS_MAP[stripped]
+    prefixed = f"s4__{stripped}"
+    if prefixed in ALIAS_MAP:
+        return ALIAS_MAP[prefixed]
+    return None
 
 
 async def list_tools_endpoint(_request):
-    tools = [
-        {"name": name, "description": desc, "parameters": {}}
-        for name, desc, _ in TOOL_SPECS
-    ]
-    return JSONResponse({"tools": tools})
-
-
-def _extract_args(request):
-    pass
+    return SafeJSONResponse({"tools": _build_mcp_tools()})
 
 
 async def handle_tool_rest(request):
-    path = request.url.path.strip("/").split("/")[-1]
-    tool_entry = next((item for item in TOOL_SPECS if item[0] == path), None)
-    if not tool_entry:
-        return JSONResponse({"error": f"Tool '{path}' not found"}, status_code=404)
-    _, _, handler = tool_entry
+    raw_path = request.url.path.strip("/").split("/")[-1]
+    resolved = resolve_tool_handler(raw_path)
+    if not resolved:
+        return SafeJSONResponse({"error": f"Tool '{raw_path}' not found"}, status_code=404)
+    
+    canonical_name, handler = resolved
 
-    # Extract args from query or body
     args = dict(request.query_params)
     if request.method == "POST":
         try:
@@ -97,87 +311,30 @@ async def handle_tool_rest(request):
     try:
         res = await handler(**args)
         if hasattr(res, "structuredContent") and res.structuredContent:
-            return JSONResponse(res.structuredContent)
+            status_code = 400 if getattr(res, "isError", False) else 200
+            return SafeJSONResponse(to_jsonable_data(res.structuredContent), status_code=status_code)
         elif hasattr(res, "content") and res.content:
-            import json
-            return JSONResponse(json.loads(res.content[0].text))
-        return JSONResponse({"result": res, "status": "success"})
+            return SafeJSONResponse(json.loads(res.content[0].text))
+        return SafeJSONResponse({"result": to_jsonable_data(res), "status": "success"})
     except Exception as ex:
-        log.error(f"Error executing tool {path}: {ex}", exc_info=True)
-        return JSONResponse({"error": str(ex), "status": "error"}, status_code=500)
-
-
-MCP_TOOLS = [
-    {
-        "name": "s4__get_receivables_aging",
-        "description": "Retrieve permission-trimmed accounts-receivable aging from SAP S/4HANA.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
-                "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
-                "customer": {"type": "string", "description": "Customer number or name"},
-                "currency": {"type": "string", "description": "Currency, default AED"},
-            },
-        },
-    },
-    {
-        "name": "s4__get_payables_aging",
-        "description": "Retrieve permission-trimmed accounts-payable aging from SAP S/4HANA.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
-                "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
-                "supplier": {"type": "string", "description": "Supplier number or name"},
-                "currency": {"type": "string", "description": "Currency, default AED"},
-            },
-        },
-    },
-    {
-        "name": "s4__get_profit_and_loss",
-        "description": "Retrieve a sourced profit-and-loss view from SAP S/4HANA.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
-                "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
-                "fiscal_period": {"type": "string", "description": "Fiscal period, e.g. 008"},
-                "ledger": {"type": "string", "description": "Ledger, default 0L"},
-                "currency": {"type": "string", "description": "Currency, default AED"},
-            },
-        },
-    },
-    {
-        "name": "s4__get_budget_variance",
-        "description": "Retrieve sourced budget-versus-actual variance records from SAP S/4HANA.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
-                "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
-                "fiscal_period": {"type": "string", "description": "Fiscal period, e.g. 008"},
-                "plan_version": {"type": "string", "description": "Plan version, default 0"},
-            },
-        },
-    },
-]
+        log.error(f"Error executing tool {raw_path}: {ex}", exc_info=True)
+        return SafeJSONResponse({"error": str(ex), "status": "error"}, status_code=500)
 
 
 async def handle_mcp_endpoint(request):
     if request.method == "GET":
-        return JSONResponse({"tools": MCP_TOOLS})
+        return SafeJSONResponse({"tools": _build_mcp_tools()})
     
     try:
         body = await request.json()
     except Exception:
-        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+        return SafeJSONResponse({"error": "Invalid JSON"}, status_code=400)
     
     req_id = body.get("id")
     method = body.get("method", "")
     
     if method == "initialize":
-        return JSONResponse({
+        return SafeJSONResponse({
             "jsonrpc": "2.0",
             "id": req_id,
             "result": {
@@ -187,21 +344,21 @@ async def handle_mcp_endpoint(request):
                     "resources": {"subscribe": False, "listChanged": False},
                     "prompts": {"listChanged": False},
                 },
-                "serverInfo": {"name": "velora-s4-finance", "version": "1.0.0"},
+                "serverInfo": {"name": "velora-s4-finance", "version": "2.0.0"},
             },
         })
     
     if method in ("notifications/initialized", "initialized"):
-        return JSONResponse({"jsonrpc": "2.0"})
+        return SafeJSONResponse({"jsonrpc": "2.0"})
     
     if method == "ping":
-        return JSONResponse({"jsonrpc": "2.0", "id": req_id, "result": {}})
+        return SafeJSONResponse({"jsonrpc": "2.0", "id": req_id, "result": {}})
     
     if method in ("tools/list", "tools"):
-        return JSONResponse({
+        return SafeJSONResponse({
             "jsonrpc": "2.0",
             "id": req_id,
-            "result": {"tools": MCP_TOOLS},
+            "result": {"tools": _build_mcp_tools()},
         })
     
     if method == "tools/call":
@@ -210,45 +367,60 @@ async def handle_mcp_endpoint(request):
         tool_args = params.get("arguments") or {}
         if not isinstance(tool_args, dict):
             tool_args = {}
-        tool_entry = next((item for item in TOOL_SPECS if item[0] == tool_name or item[0] == f"s4__{tool_name}" or item[0].replace("s4__", "") == tool_name or item[0] == tool_name.replace("-", "_")), None)
-        if not tool_entry:
-            return JSONResponse({
+
+        resolved = resolve_tool_handler(tool_name)
+        if not resolved:
+            return SafeJSONResponse({
                 "jsonrpc": "2.0",
                 "id": req_id,
                 "error": {"code": -32601, "message": f"Tool '{tool_name}' not found"},
             })
-        _, _, handler = tool_entry
+
+        canonical_name, handler = resolved
         try:
             res = await handler(**tool_args)
-            import json as _json
             if hasattr(res, "content") and res.content:
                 content_list = [{"type": "text", "text": c.text} for c in res.content]
             elif isinstance(res, dict):
-                content_list = [{"type": "text", "text": _json.dumps(res, ensure_ascii=False, default=str)}]
-            struct_data = res.structuredContent if hasattr(res, "structuredContent") and res.structuredContent else (res if isinstance(res, dict) else {})
-            return JSONResponse({
+                content_list = [{"type": "text", "text": json.dumps(to_jsonable_data(res), ensure_ascii=False)}]
+            else:
+                content_list = []
+            struct_data = (
+                to_jsonable_data(res.structuredContent)
+                if hasattr(res, "structuredContent") and res.structuredContent
+                else (to_jsonable_data(res) if isinstance(res, dict) else {})
+            )
+            is_err = getattr(res, "isError", False)
+            return SafeJSONResponse({
                 "jsonrpc": "2.0",
                 "id": req_id,
                 "result": {
                     "content": content_list,
                     "result": struct_data or {"status": "success", "content": content_list},
                     "structuredContent": struct_data,
-                    "isError": False,
+                    "isError": is_err,
                 },
             })
         except Exception as ex:
             log.error(f"Error in tools/call {tool_name}: {ex}", exc_info=True)
-            return JSONResponse({
+            return SafeJSONResponse({
                 "jsonrpc": "2.0",
                 "id": req_id,
                 "error": {"code": -32000, "message": str(ex)},
             })
     
-    return JSONResponse({
+    return SafeJSONResponse({
         "jsonrpc": "2.0",
         "id": req_id,
         "error": {"code": -32601, "message": f"Method '{method}' not implemented"},
     })
+
+
+def validate_configuration():
+    """Startup validation for approved S/4HANA roots, hosts, and credentials (F05)."""
+    client = S4Client(settings)
+    client._validated_base_url()
+    log.info(f"S/4HANA configuration validated for environment: {settings.s4_environment_label}")
 
 
 def create_app():
@@ -256,40 +428,58 @@ def create_app():
     from starlette.routing import Mount
 
     mcp_app = mcp.streamable_http_app()
+
     routes = [
-        Route("/", health, methods=["GET", "HEAD"]),
-        Route("/health", health, methods=["GET", "HEAD"]),
+        Route("/", health, methods=["GET"]),
+        Route("/health", health, methods=["GET"]),
         Route("/mcp/tools", list_tools_endpoint, methods=["GET"]),
+        Route("/mcp", handle_mcp_endpoint, methods=["GET", "POST"]),
+        Route("/mcp/", handle_mcp_endpoint, methods=["GET", "POST"]),
     ]
+
+    # Register all canonical tools and aliases on REST routes including /tools/{name} (F06)
+    seen_routes = set()
+    for alias in ALIAS_MAP.keys():
+        if alias not in seen_routes:
+            seen_routes.add(alias)
+            routes.append(Route(f"/{alias}", handle_tool_rest, methods=["GET", "POST"]))
+            routes.append(Route(f"/tools/{alias}", handle_tool_rest, methods=["GET", "POST"]))
+
     for name, _, _ in TOOL_SPECS:
-        routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
-        routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
-        camel = "".join(part.capitalize() for part in name.replace("s4__", "").split("_"))
-        routes.append(Route(f"/get{camel.replace('Get', '')}", handle_tool_rest, methods=["GET", "POST", "OPTIONS"]))
-    routes.append(Mount("/", app=mcp_app))
-    app = Starlette(
-        routes=routes,
-        lifespan=mcp_app.router.lifespan_context,
+        if name not in seen_routes:
+            seen_routes.add(name)
+            routes.append(Route(f"/{name}", handle_tool_rest, methods=["GET", "POST"]))
+            routes.append(Route(f"/tools/{name}", handle_tool_rest, methods=["GET", "POST"]))
+
+    # Mount FastMCP streamable HTTP app for MCP transport with initialized session manager lifespan (F06, T18)
+    routes.append(Mount("/streamable", mcp_app))
+
+    app = Starlette(routes=routes, lifespan=mcp_app.router.lifespan_context)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
     app.add_middleware(ApiKeyMiddleware)
-    origins = [value.strip() for value in settings.cors_origins.split(",") if value.strip()]
-    if origins:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=origins,
-            allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
-            allow_headers=["Content-Type", "Authorization", "X-API-Key", "mcp-session-id", "Accept"],
-        )
     return app
 
 
-def main() -> None:
-    errors = S4Client(settings).validate()
-    if not settings.mcp_api_key and not settings.allow_anonymous:
-        errors.append("MCP_API_KEY is required unless ALLOW_ANONYMOUS=true")
-    if errors:
-        for error in errors:
-            log.warning(f"S4 Configuration Warning: {error}")
-        if not settings.allow_anonymous:
-            sys.exit(1)
-    uvicorn.run(create_app(), host="0.0.0.0", port=settings.port)
+app = create_app()
+
+
+def start(host: str = "0.0.0.0", port: int = 8080):
+    validate_configuration()
+    uvicorn.run(app, host=host, port=port, log_level="info")
+
+
+def main():
+    import os
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else getattr(settings, "mcp_server_port", 8080)))
+    start(host="0.0.0.0", port=port)
+
+
+if __name__ == "__main__":
+    main()
+

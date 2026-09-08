@@ -72,9 +72,12 @@ def _headcount_card(result: dict[str, Any]) -> dict[str, Any]:
     # elements. Send the generated image as the primary, standards-based card
     # element and retain text as its fallback.
     chart_element = image_fallback
+    div_name = result.get("division_name") or result.get("division")
+    heading = f"Headcount — {div_name}" if div_name else "Workforce headcount by department"
+    sub = f"Division {div_name} department breakdown" if div_name else "Complete role-visible aggregation from SAP SuccessFactors"
     body: list[dict[str, Any]] = [
-        {"type": "TextBlock", "text": "Workforce headcount by department", "weight": "Bolder", "size": "Medium", "wrap": True},
-        {"type": "TextBlock", "text": "Complete role-visible aggregation from SAP SuccessFactors", "isSubtle": True, "wrap": True, "spacing": "Small"},
+        {"type": "TextBlock", "text": heading, "weight": "Bolder", "size": "Medium", "wrap": True},
+        {"type": "TextBlock", "text": sub, "isSubtle": True, "wrap": True, "spacing": "Small"},
         {
             "type": "FactSet",
             "separator": True,
@@ -247,22 +250,31 @@ def _drilldown_card(result: dict[str, Any]) -> dict[str, Any]:
         name = emp.get("name", "Unknown")
         emp_id = emp.get("userId", "—")
         job = emp.get("jobTitle", "—")
+        email = emp.get("email") or emp.get("work_email")
         country = emp.get("country", "—")
+        location = emp.get("location", "—")
+        dept_name = emp.get("department", "—")
+        age_val = emp.get("age")
         age_group = emp.get("age_group", "—")
+        if age_val is not None and str(age_val) not in ("Not available", "—", "None", ""):
+            age_disp = f"{age_val} ({age_group})" if age_group and str(age_group) not in ("Not available", "—", "None", "") else str(age_val)
+        else:
+            age_disp = age_group or "—"
         joined = emp.get("joined_date", "—")
-        service = emp.get("length_of_service", "—")
+        service = emp.get("tenure") or emp.get("length_of_service", "—")
         recruiter = emp.get("recruited_by", "—")
 
+        email_part = f" · ✉️ `{email}`" if email and email not in ("—", "None", "") else ""
         body.append({
             "type": "TextBlock",
-            "text": f"**{name}** (ID: `{emp_id}`) · {job}",
+            "text": f"**{name}** (ID: `{emp_id}`){email_part} · {job}",
             "wrap": True,
             "spacing": "Medium",
             "separator": True,
         })
         body.append({
             "type": "TextBlock",
-            "text": f"📍 **Country:** {country} | 🎂 **Age Group:** {age_group} | 📅 **Joined:** {joined} ({service}) | 🤝 **Recruiter:** {recruiter}",
+            "text": f"📍 **Location:** {location} ({country}) | 🏢 **Dept:** {dept_name} | 🎂 **Age:** {age_disp} | 📅 **Joined:** {joined} (Tenure: {service}) | 🤝 **Recruiter:** {recruiter}",
             "size": "Small",
             "isSubtle": True,
             "wrap": True,
@@ -386,12 +398,18 @@ def decorate(data: dict[str, Any]) -> dict[str, Any]:
     else:
         kind = str(result.get("type", "SuccessFactorsResult"))
         if kind == "WorkforceDrilldown":
-            title = f"Workforce drill-down ({result.get('department', 'All')})"
+            scope = result.get("division_name") or result.get("division") or result.get("department", "All")
+            title = f"Workforce drill-down ({scope})"
             subtitle = f"Dataverse Policy v{result.get('policy_version', '1.0.0')} · {result.get('total_matched', 0)} employees"
             card = _drilldown_card(result)
         elif kind == "Headcount":
-            title = "Workforce headcount"
-            subtitle = "SAP SuccessFactors · complete department aggregation"
+            div_name = result.get("division_name") or result.get("division")
+            if div_name:
+                title = f"Headcount — {div_name}"
+                subtitle = "SAP SuccessFactors · verified division workforce"
+            else:
+                title = "Workforce headcount"
+                subtitle = "SAP SuccessFactors · complete department aggregation"
             card = _headcount_card(result)
         elif kind == "JoinerAnalytics":
             title = "New-hire analytics"
@@ -449,9 +467,14 @@ def decorate(data: dict[str, Any]) -> dict[str, Any]:
         elif kind == "WorkforceDemographics":
             group_by = str(result.get("group_by") or "gender")
             cross_by = result.get("cross_by")
-            dimension_title = group_by.title() + (f" by {str(cross_by).title()}" if cross_by else "")
-            title = f"Workforce {dimension_title}"
-            subtitle = "Aggregate active workforce · privacy threshold enforced"
+            dimension_title = group_by.replace("_", " ").title() + (f" by {str(cross_by).replace('_', ' ').title()}" if cross_by else "")
+            scope_name = result.get("division_name") or result.get("division") or result.get("department")
+            if scope_name:
+                title = f"{dimension_title} — {scope_name}"
+                subtitle = f"Aggregate active workforce for {scope_name}"
+            else:
+                title = f"Workforce {dimension_title}"
+                subtitle = "Aggregate active workforce · privacy threshold enforced"
             body = [
                 {"type": "TextBlock", "text": title, "weight": "Bolder", "size": "Medium", "wrap": True},
                 {"type": "TextBlock", "text": subtitle, "isSubtle": True, "wrap": True, "spacing": "Small"},

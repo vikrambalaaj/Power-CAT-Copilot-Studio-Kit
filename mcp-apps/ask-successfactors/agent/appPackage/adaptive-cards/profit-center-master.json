@@ -1,0 +1,15 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Profit Center Master Data", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA · permission-trimmed", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Controlling Area", "value": "${if(query.filters.ControllingArea, query.filters.ControllingArea, '1000')}"},
+      {"title": "Segment", "value": "${if(query.filters.Segment, query.filters.Segment, 'Aviation Operations')}"}
+    ]},
+    {"type": "TextBlock", "text": "Copilot summarizes profit center responsibility, validity, segment alignment, and company assignments.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

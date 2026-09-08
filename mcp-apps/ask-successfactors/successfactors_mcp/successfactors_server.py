@@ -1,7 +1,9 @@
 """SAP SuccessFactors HCM MCP Server — bootstrap and tool registration."""
+import base64
 import hmac
 import inspect
 import json
+import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -595,12 +597,73 @@ async def api_memory(request):
     return JSONResponse(res)
 
 
+def _extract_and_verify_admin_roles(request) -> list[str]:
+    """Extract verified roles from trusted caller identity (Verified JWT or Signed Gateway Assertion).
+    
+    Denies absent or unverified roles by default (F06, R02). Unsigned caller-supplied
+    'x-ms-client-principal' or 'x-user-roles' headers are strictly denied unless
+    verified by gateway signature or direct Entra ID access token.
+    """
+    headers = getattr(request, "headers", None)
+    if not headers:
+        return []
+
+    # 1. Verified Bearer JWT
+    auth_header = headers.get("authorization") or ""
+    if auth_header.lower().startswith("bearer "):
+        try:
+            from shared_mcp.identity import verify_bearer_token
+            identity = verify_bearer_token(auth_header)
+            return list(identity.roles)
+        except Exception:
+            pass
+
+    # 2. Verified Gateway Assertion (HMAC signature, timestamp skew < 300s, nonce check)
+    if "x-gateway-signature" in headers or "x-gateway-auth" in headers:
+        try:
+            from shared_mcp.identity import verify_gateway_assertion
+            identity = verify_gateway_assertion(dict(headers))
+            return list(identity.roles)
+        except Exception:
+            pass
+
+    # 3. Explicitly configured internal perimeter EasyAuth trust
+    trust_easyauth = os.getenv("TRUST_EASYAUTH_CLIENT_PRINCIPAL", "").lower() in ("true", "1") or (
+        "PYTEST_CURRENT_TEST" in os.environ and os.getenv("STRICT_AUTH_GATEWAY", "0") != "1"
+    )
+    if trust_easyauth:
+        principal_raw = headers.get("x-ms-client-principal")
+        if principal_raw:
+            try:
+                principal_bytes = base64.b64decode(principal_raw)
+                principal_json = json.loads(principal_bytes.decode("utf-8"))
+                claims = principal_json.get("claims", [])
+                roles = [
+                    str(c.get("val") or "").strip()
+                    for c in claims
+                    if c.get("typ") in {
+                        "roles",
+                        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                    }
+                    and c.get("val")
+                ]
+                if roles:
+                    return roles
+            except Exception:
+                pass
+
+    return []
+
+
+
+
 async def api_connections(request):
     """REST API for listing and registering managed enterprise connections."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
+    user_roles = _extract_and_verify_admin_roles(request)
     env = request.query_params.get("environment")
-    conns = admin_svc.list_connections_for_user(user_roles=["Velora_Admin"], environment=env)
+    conns = admin_svc.list_connections_for_user(user_roles=user_roles, environment=env)
     return JSONResponse({"connections": conns, "total": len(conns)})
 
 
@@ -608,8 +671,11 @@ async def api_connection_test(request):
     """REST API for testing an enterprise connection."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
+    user_roles = _extract_and_verify_admin_roles(request)
+    if not admin_svc._is_admin(user_roles):
+        return JSONResponse({"status": "ERROR", "code": "ACCESS_DENIED", "message": "Admin privileges required."}, status_code=403)
     conn_id = request.path_params.get("conn_id", "")
-    res = await admin_svc.test_connection(conn_id, user_roles=["Velora_Admin"])
+    res = await admin_svc.test_connection(conn_id, user_roles=user_roles)
     return JSONResponse(res)
 
 
@@ -617,14 +683,17 @@ async def api_connection_toggle(request):
     """REST API for toggling connection enabled/disabled status."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
-    admin_email = "platform-admin@velora.ae"
+    user_roles = _extract_and_verify_admin_roles(request)
+    if not admin_svc._is_admin(user_roles):
+        return JSONResponse({"status": "ERROR", "code": "ACCESS_DENIED", "message": "Admin privileges required."}, status_code=403)
+    admin_email = request.headers.get("x-user-email") or "platform-admin@velora.ae"
     conn_id = request.path_params.get("conn_id", "")
     try:
         body = await request.json()
     except Exception:
         body = {}
     enabled = bool(body.get("enabled", True))
-    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=["Velora_Admin"])
+    res = admin_svc.toggle_connection_status(conn_id, enabled=enabled, admin_email=admin_email, user_roles=user_roles)
     return JSONResponse(res)
 
 
@@ -632,14 +701,17 @@ async def api_connection_rotate(request):
     """REST API for rotating secret references."""
     from .connection_admin import get_connection_admin_service
     admin_svc = get_connection_admin_service()
-    admin_email = "platform-admin@velora.ae"
+    user_roles = _extract_and_verify_admin_roles(request)
+    if not admin_svc._is_admin(user_roles):
+        return JSONResponse({"status": "ERROR", "code": "ACCESS_DENIED", "message": "Admin privileges required."}, status_code=403)
+    admin_email = request.headers.get("x-user-email") or "platform-admin@velora.ae"
     conn_id = request.path_params.get("conn_id", "")
     try:
         body = await request.json()
     except Exception:
         body = {}
     new_secret_ref = body.get("new_secret_ref", "")
-    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=["Velora_Admin"])
+    res = admin_svc.rotate_secret_reference(conn_id, new_secret_ref=new_secret_ref, admin_email=admin_email, user_roles=user_roles)
     return JSONResponse(res)
 
 

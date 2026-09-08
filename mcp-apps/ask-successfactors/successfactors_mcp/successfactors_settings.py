@@ -28,12 +28,15 @@ class SuccessFactorsSettings(BaseSettings):
     sf_gender_entity: str = "PerPersonal"
     sf_gender_person_id_field: str = "personIdExternal"
     sf_gender_field: str = "gender"
+    sf_dob_entity: str = "PerPerson"
+    sf_dob_person_id_field: str = "personIdExternal"
+    sf_dob_field: str = "dateOfBirth"
     sf_uae_nationality_codes: str = "ARE"
     sf_active_user_statuses: str = "t"
     sf_voluntary_event_reasons: str = ""
     sf_involuntary_event_reasons: str = ""
     sf_metric_rule_version: str = "velora-workforce-v2"
-    sf_small_group_threshold: int = 5
+    sf_small_group_threshold: int = 1
 
     port: int = 8082
     cors_origins: str = ""

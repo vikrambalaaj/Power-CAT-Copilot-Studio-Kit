@@ -30,6 +30,9 @@ log = get_logger("dataverse_audit")
 # collections are the plural entity set names, overridable for customised tenants.
 AUDIT_ENTITY_SET = os.getenv("DATAVERSE_AUDIT_ENTITY_SET", "cre2f_veloraagentauditlogs")
 CONSENT_ENTITY_SET = os.getenv("DATAVERSE_CONSENT_ENTITY_SET", "cre2f_botuserconsents")
+POLICY_ENTITY_SET = os.getenv(
+    "DATAVERSE_POLICY_ENTITY_SET", "cre2f_veloradatadisclosurepolicies"
+)
 
 # Dataverse rejects an entire insert that names any column the table does not have,
 # so every write is projected onto the columns that genuinely exist. These two sets
@@ -110,6 +113,14 @@ APPROVAL_STATUS_EXPIRED = "EXPIRED"
 APPROVAL_STATUS_NOT_REQUIRED = "NOT_REQUIRED"
 
 HMAC_SECRET = os.getenv("VELORA_APPROVAL_HMAC_SECRET", "velora-prod-executive-secret-key-2026")
+
+
+class AuditCommitStatus:
+    """Explicit result contract for audit persistence (Defect 5)."""
+    COMMITTED = "COMMITTED"
+    ALREADY_COMMITTED = "ALREADY_COMMITTED"
+    BUFFERED = "BUFFERED"
+    FAILED = "FAILED"
 
 
 def sanitize_email(email: Optional[str]) -> str:
@@ -293,6 +304,7 @@ class DataverseAuditRecord:
         self.memory_importance = memory_importance
 
         self.event_time = event_time or datetime.now(timezone.utc).isoformat()
+        self.audit_id = invocation_id or f"EVT-{int(time.time() * 1000)}-{os.urandom(4).hex()}"
         self.logging_status = "PENDING"
         self.retry_count = 0
         self.reconciled = False
@@ -399,6 +411,7 @@ class DataverseAuditRecord:
             "cre2f_externalobjectid": self.external_object_id,
             "cre2f_evidencelink": self.evidence_link,
             "cre2f_toolname": self.tool_name,
+            "cre2f_auditid": getattr(self, "audit_id", ""),
 
             # Outcome Columns (Section 3.2)
             "cre2f_outcome": self.outcome,
@@ -447,6 +460,101 @@ class DataverseAuditRecord:
             "cre2f_reconciled": self.reconciled,
         }
 
+    @classmethod
+    def from_dataverse_payload(cls, payload: Dict[str, Any]) -> "DataverseAuditRecord":
+        """Reconstruct a complete DataverseAuditRecord preserving all fields from a Dataverse payload."""
+        def _parse_json_list(val: Any) -> List[str]:
+            if isinstance(val, list):
+                return val
+            if isinstance(val, str) and val.strip():
+                try:
+                    parsed = json.loads(val)
+                    if isinstance(parsed, list):
+                        return parsed
+                except Exception:
+                    pass
+            return []
+
+        rec = cls(
+            record_type=payload.get("cre2f_recordtype") or "USER_TURN",
+            user_object_id=payload.get("cre2f_userobjectid") or "",
+            user_email=payload.get("cre2f_useremail") or "",
+            user_display_name=payload.get("cre2f_userdisplayname") or "",
+            root_correlation_id=payload.get("cre2f_rootcorrelationid") or payload.get("cre2f_correlationid") or "",
+            conversation_id=payload.get("cre2f_conversationid") or "",
+            session_id=payload.get("cre2f_sessionid") or "",
+            turn_id=payload.get("cre2f_turnid") or "",
+            parent_turn_id=payload.get("cre2f_parentturnid") or "",
+            parent_invocation_id=payload.get("cre2f_parentinvocationid") or "",
+            invocation_id=payload.get("cre2f_invocationid") or "",
+            idempotency_key=payload.get("cre2f_idempotencykey") or "",
+            turn_sequence=int(payload.get("cre2f_turnsequence") or 0),
+            correlation_id=payload.get("cre2f_correlationid") or "",
+            calling_agent=payload.get("cre2f_callingagent") or "Velora Executive Agent",
+            executing_agent=payload.get("cre2f_executingagent") or "Velora Productivity Agent",
+            agent_name=payload.get("cre2f_agentname") or "Velora Executive Agent",
+            agent_version=payload.get("cre2f_agentversion") or "1.0.0",
+            environment=payload.get("cre2f_environment") or "Velora-AgenticAD-Dev",
+            channel=payload.get("cre2f_channel") or "copilot_studio",
+            capability=payload.get("cre2f_capability") or "",
+            operation=payload.get("cre2f_operation") or "",
+            transaction_type=payload.get("cre2f_transactiontype") or "READ",
+            source_system=payload.get("cre2f_sourcesystem") or "Microsoft365",
+            approval_status=payload.get("cre2f_approvalstatus") or APPROVAL_STATUS_NOT_REQUIRED,
+            approval_expires_on=payload.get("cre2f_approvalexpireson") or "",
+            approval_token_hash=payload.get("cre2f_approvaltokenhash") or "",
+            external_object_id=payload.get("cre2f_externalobjectid") or "",
+            evidence_link=payload.get("cre2f_evidencelink") or "",
+            outcome=payload.get("cre2f_outcome") or "SUCCESS",
+            start_time=payload.get("cre2f_starttime") or "",
+            end_time=payload.get("cre2f_endtime") or "",
+            latency_ms=payload.get("cre2f_latencymilliseconds"),
+            result_count=int(payload.get("cre2f_resultcount") or 0),
+            error_category=payload.get("cre2f_errorcategory") or "",
+            error_message_safe=payload.get("cre2f_errormessagesafe") or "",
+            source_as_of=payload.get("cre2f_sourceasof") or "",
+            cache_hit=payload.get("cre2f_cachehit"),
+            cache_age=payload.get("cre2f_cacheage"),
+            audit_detail=payload.get("cre2f_auditdetail") or "",
+            message_summary=payload.get("cre2f_messagesummary") or "",
+            content_classification=payload.get("cre2f_dataclassification") or "CONFIDENTIAL",
+            request_filter_safe=payload.get("cre2f_requestfiltersafe") or "",
+            target_summary_safe=payload.get("cre2f_targetsummarysafe") or "",
+            user_groups=_parse_json_list(payload.get("cre2f_usergroups")),
+            message_role=payload.get("cre2f_messagerole") or "",
+            user_message=payload.get("cre2f_usermessage") or "",
+            assistant_message=payload.get("cre2f_assistantmessage") or "",
+            policy_id=payload.get("cre2f_policyid") or "",
+            policy_version=payload.get("cre2f_policyversion") or "",
+            policy_decision=payload.get("cre2f_policydecision") or "",
+            released_fields=_parse_json_list(payload.get("cre2f_releasedfields")),
+            consent_version=payload.get("cre2f_consentversion") or "",
+            consent_status=payload.get("cre2f_consentstatus") or "",
+            tool_name=payload.get("cre2f_toolname") or "",
+            memory_eligible=bool(payload.get("cre2f_memoryeligible", False)),
+            memory_summary=payload.get("cre2f_memorysummary") or "",
+            memory_topics=_parse_json_list(payload.get("cre2f_memorytopics")),
+            memory_valid_from=payload.get("cre2f_memoryvalidfrom") or "",
+            memory_expires_on=payload.get("cre2f_memoryexpireson") or "",
+            memory_superseded=bool(payload.get("cre2f_memorysuperseded", False)),
+            memory_last_used=payload.get("cre2f_memorylastused") or "",
+            memory_importance=int(payload.get("cre2f_memoryimportance") or 1),
+            event_time=payload.get("cre2f_eventtime"),
+        )
+        if "cre2f_loggingstatus" in payload:
+            rec.logging_status = payload["cre2f_loggingstatus"]
+        if "cre2f_retrycount" in payload:
+            rec.retry_count = int(payload["cre2f_retrycount"] or 0)
+        if "cre2f_reconciled" in payload:
+            rec.reconciled = bool(payload["cre2f_reconciled"])
+        if "cre2f_contenthash" in payload:
+            rec.content_hash = payload["cre2f_contenthash"]
+        if "cre2f_auditid" in payload:
+            rec.audit_id = payload["cre2f_auditid"]
+        elif "cre2f_veloraagentauditlogid" in payload:
+            rec.audit_id = payload["cre2f_veloraagentauditlogid"]
+        return rec
+
 
 class DataverseClient:
     """Production Dataverse client with fail-closed write semantics and in-memory fallback."""
@@ -492,9 +600,9 @@ class DataverseClient:
             "cre2f_allowemployeesearch": True,
             "cre2f_allowgroupdrilldown": True,
             "cre2f_allowedemployeefields": json.dumps([
-                "userId", "name", "country", "age_group", "joined_date",
-                "length_of_service", "department", "businessUnit", "division",
-                "jobTitle", "location", "employmentStatus", "recruited_by"
+                "userId", "name", "email", "jobTitle", "department", "division", "businessUnit",
+                "location", "country", "gender", "age", "age_group", "joined_date",
+                "tenure", "length_of_service", "employmentStatus", "recruited_by"
             ]),
             "cre2f_restrictedemployeefields": json.dumps([
                 "dateOfBirth", "bankAccountNumber", "iban", "nationalId",
@@ -614,73 +722,87 @@ class DataverseClient:
         if inv_id and self.check_alternate_key_exists(inv_id, rec_type):
             log.warning("duplicate_alternate_key_detected", invocation_id=inv_id, record_type=rec_type)
             return {
-                "status": "DUPLICATE_KEY",
-                "message": f"Record with invocation ID '{inv_id}' and record type '{rec_type}' already exists.",
-                "id": f"EXISTS-{inv_id}"
+                "status": AuditCommitStatus.ALREADY_COMMITTED,
+                "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
+                "message": f"Record with invocation ID '{inv_id}' and record type '{rec_type}' already committed.",
+                "id": f"EXISTS-{inv_id}",
+                "invocation_id": inv_id,
             }
 
         # 2. Duplicate successful write check (Section 3.4)
         if rec_type == RECORD_TYPE_TRANSACTION_START and self.check_successful_idempotency_exists(idemp_key, operation):
             log.warning("duplicate_successful_transaction_detected", idempotency_key=idemp_key, operation=operation)
             return {
-                "status": "DUPLICATE_TRANSACTION",
+                "status": AuditCommitStatus.ALREADY_COMMITTED,
+                "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
                 "message": f"A successful transaction for operation '{operation}' with idempotency key '{idemp_key}' has already executed.",
-                "id": f"EXISTS-{idemp_key}"
+                "id": f"EXISTS-{idemp_key}",
+                "invocation_id": inv_id,
             }
 
-        # Persist
-        log_id = f"AUD-{int(time.time() * 1000)}-{len(self._audit_store) + 1}"
-        payload["cre2f_veloraagentauditlogid"] = log_id
-        payload["cre2f_loggingstatus"] = "PERSISTED"
+        # Unconfigured / Mock Fallback
+        if not self.is_live:
+            buf_id = f"BUF-{rec_type}-{int(time.time() * 1000)}-{os.urandom(2).hex()}"
+            payload["cre2f_veloraagentauditlogid"] = buf_id
+            payload["cre2f_loggingstatus"] = AuditCommitStatus.BUFFERED
+            self._audit_store.append(payload)
+            if inv_id:
+                self._alternate_keys_index.add((inv_id, rec_type))
+            if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
+                if idemp_key:
+                    self._idempotency_index.add((idemp_key, operation))
+            log.info("dataverse_not_configured_audit_buffered", record_type=rec_type, buffer_id=buf_id)
+            return {
+                "status": AuditCommitStatus.BUFFERED,
+                "commit_status": AuditCommitStatus.BUFFERED,
+                "id": buf_id,
+                "invocation_id": inv_id,
+                "logging_status": AuditCommitStatus.BUFFERED,
+            }
 
-        # Durable write. Consent rows go to `cre2f_botuserconsent`, the table that
-        # actually models consent and that the Copilot Studio flow shares; everything
-        # else goes to `cre2f_veloraagentauditlog`. Consent is the one record type
-        # that must fail closed: if it cannot be stored the user would be re-prompted
-        # forever, so the caller has to know the write failed.
-        if self.is_live:
-            try:
-                if rec_type == RECORD_TYPE_CONSENT:
-                    remote_id = await self._create_row(
-                        CONSENT_ENTITY_SET, record.to_consent_payload(), "cre2f_botuserconsentid"
-                    )
-                else:
-                    remote_id = await self._create_row(
-                        AUDIT_ENTITY_SET, record.to_audit_log_payload(), "cre2f_veloraagentauditlogid"
-                    )
-                if remote_id:
-                    log_id = remote_id
-                    payload["cre2f_veloraagentauditlogid"] = remote_id
-            except Exception as exc:
-                if rec_type == RECORD_TYPE_CONSENT:
-                    log.error(
-                        "dataverse_consent_write_failed",
-                        error=str(exc),
-                        exc_type=type(exc).__name__,
-                    )
-                    raise ConnectionError(
-                        f"Consent could not be persisted to Dataverse: {exc}"
-                    ) from exc
-                payload["cre2f_loggingstatus"] = "BUFFERED"
-                log.warning(
-                    "dataverse_write_buffered",
-                    record_type=rec_type,
-                    error=str(exc),
-                    exc_type=type(exc).__name__,
+        # Live Dataverse Persistence
+        try:
+            if rec_type == RECORD_TYPE_CONSENT:
+                remote_id = await self._create_row(
+                    CONSENT_ENTITY_SET, record.to_consent_payload(), "cre2f_botuserconsentid"
                 )
+            else:
+                remote_id = await self._create_row(
+                    AUDIT_ENTITY_SET, record.to_audit_log_payload(), "cre2f_veloraagentauditlogid"
+                )
+            log_id = remote_id or f"AUD-{int(time.time() * 1000)}-{len(self._audit_store) + 1}"
+            payload["cre2f_veloraagentauditlogid"] = log_id
+            payload["cre2f_loggingstatus"] = AuditCommitStatus.COMMITTED
+            self._audit_store.append(payload)
+            if rec_type == RECORD_TYPE_CONSENT:
+                self._consent_cache.clear()
+            if inv_id:
+                self._alternate_keys_index.add((inv_id, rec_type))
+            if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
+                if idemp_key:
+                    self._idempotency_index.add((idemp_key, operation))
 
-        self._audit_store.append(payload)
-        if rec_type == RECORD_TYPE_CONSENT:
-            # A new decision supersedes any cached lookup for this identity.
-            self._consent_cache.clear()
-        if inv_id:
-            self._alternate_keys_index.add((inv_id, rec_type))
-        if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
-            if idemp_key:
-                self._idempotency_index.add((idemp_key, operation))
-
-        log.debug("audit_record_created", type=record.record_type, turn_id=record.turn_id, log_id=log_id)
-        return {"status": "SUCCESS", "id": log_id, "invocation_id": inv_id}
+            log.debug("audit_record_created", type=record.record_type, turn_id=record.turn_id, log_id=log_id)
+            return {
+                "status": AuditCommitStatus.COMMITTED,
+                "commit_status": AuditCommitStatus.COMMITTED,
+                "id": log_id,
+                "invocation_id": inv_id,
+            }
+        except httpx.HTTPStatusError as http_err:
+            if http_err.response.status_code == 412 or "DuplicateKey" in http_err.response.text:
+                log.info("dataverse_duplicate_already_committed", invocation_id=inv_id)
+                return {
+                    "status": AuditCommitStatus.ALREADY_COMMITTED,
+                    "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
+                    "id": f"EXISTS-{inv_id}",
+                    "invocation_id": inv_id,
+                }
+            log.error("dataverse_live_write_failed", error=str(http_err), status_code=http_err.response.status_code)
+            raise ConnectionError(f"Dataverse destination write failed: {http_err}") from http_err
+        except Exception as exc:
+            log.error("dataverse_live_write_failed", error=str(exc))
+            raise ConnectionError(f"Dataverse destination write failed: {exc}") from exc
 
     async def start_write_transaction_fail_closed(self, record: DataverseAuditRecord) -> Dict[str, Any]:
         """Strict Fail-Closed Write Auditing (Section 3.5 & 6.1).
@@ -702,10 +824,30 @@ class DataverseClient:
 
         try:
             res = await self.create_audit_record(record)
-            if res.get("status") == "SUCCESS":
+            commit_status = res.get("commit_status") or res.get("status")
+            if commit_status in (AuditCommitStatus.COMMITTED, AuditCommitStatus.ALREADY_COMMITTED):
                 return {
                     "may_proceed": True,
                     "status": "AUDIT_PERSISTED",
+                    "commit_status": commit_status,
+                    "audit_record_id": res.get("id"),
+                    "invocation_id": record.invocation_id,
+                    "error": None,
+                }
+            elif commit_status == AuditCommitStatus.BUFFERED:
+                strict_fail_closed = os.getenv("STRICT_FAIL_CLOSED_AUDIT", "1") == "1"
+                if strict_fail_closed and not os.getenv("ALLOW_BUFFERED_AUDIT_WRITES", ""):
+                    return {
+                        "may_proceed": False,
+                        "status": "AUDIT_BUFFERED_BLOCKED",
+                        "commit_status": AuditCommitStatus.BUFFERED,
+                        "error": "Governed write blocked: Audit destination is only BUFFERED in memory; durable Dataverse commitment required.",
+                        "audit_record_id": res.get("id"),
+                    }
+                return {
+                    "may_proceed": True,
+                    "status": "AUDIT_BUFFERED",
+                    "commit_status": AuditCommitStatus.BUFFERED,
                     "audit_record_id": res.get("id"),
                     "invocation_id": record.invocation_id,
                     "error": None,
@@ -714,6 +856,7 @@ class DataverseClient:
                 return {
                     "may_proceed": False,
                     "status": res.get("status", "AUDIT_REJECTED"),
+                    "commit_status": AuditCommitStatus.FAILED,
                     "error": res.get("message", "Audit could not be persisted."),
                     "audit_record_id": "",
                 }
@@ -722,6 +865,7 @@ class DataverseClient:
             return {
                 "may_proceed": False,
                 "status": "FAIL_CLOSED_BLOCKED",
+                "commit_status": AuditCommitStatus.FAILED,
                 "error": f"Write action blocked: Dataverse audit log could not be saved ({str(ex)}).",
                 "audit_record_id": "",
             }
@@ -943,6 +1087,40 @@ class DataverseClient:
         environment: str = "Production",
     ) -> Optional[Dict[str, Any]]:
         """Retrieve the currently active Dataverse disclosure policy."""
+        if self.is_live:
+            escaped_domain = _odata_escape(domain)
+            escaped_agent = _odata_escape(agent_id)
+            result = await self._request(
+                "GET",
+                POLICY_ENTITY_SET,
+                params={
+                    "$filter": (
+                        f"cre2f_isactive eq true and cre2f_datadomain eq '{escaped_domain}' "
+                        f"and cre2f_agentid eq '{escaped_agent}'"
+                    ),
+                    "$orderby": "modifiedon desc",
+                    "$top": "1",
+                },
+            )
+            rows = result.get("value", []) if isinstance(result, dict) else []
+            if rows:
+                return rows[0]
+
+            # Environment labels changed during early development. If no exact
+            # agent match exists, retain the strict domain-only lookup rather than
+            # silently using the process-local seed.
+            result = await self._request(
+                "GET",
+                POLICY_ENTITY_SET,
+                params={
+                    "$filter": f"cre2f_isactive eq true and cre2f_datadomain eq '{escaped_domain}'",
+                    "$orderby": "modifiedon desc",
+                    "$top": "1",
+                },
+            )
+            rows = result.get("value", []) if isinstance(result, dict) else []
+            return rows[0] if rows else None
+
         for policy in self._policy_store:
             if (
                 policy.get("cre2f_isactive") is True
@@ -953,12 +1131,60 @@ class DataverseClient:
 
     async def list_policies(self) -> List[Dict[str, Any]]:
         """List all policy versions in the table."""
+        if self.is_live:
+            result = await self._request(
+                "GET", POLICY_ENTITY_SET, params={"$orderby": "modifiedon desc"}
+            )
+            return result.get("value", []) if isinstance(result, dict) else []
         return list(self._policy_store)
 
     async def save_policy(self, policy_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create or update a policy entry."""
         policy_id = policy_data.get("cre2f_veloradatadisclosurepolicyid")
         now_iso = datetime.now(timezone.utc).isoformat()
+
+        if self.is_live:
+            writable = {
+                key: value
+                for key, value in policy_data.items()
+                if key.startswith("cre2f_")
+                and key != "cre2f_veloradatadisclosurepolicyid"
+                and key not in {"cre2f_createdon", "cre2f_modifiedon"}
+            }
+            if writable.get("cre2f_isactive"):
+                domain = _odata_escape(writable.get("cre2f_datadomain", "Employee"))
+                current = await self._request(
+                    "GET",
+                    POLICY_ENTITY_SET,
+                    params={
+                        "$select": "cre2f_veloradatadisclosurepolicyid",
+                        "$filter": f"cre2f_isactive eq true and cre2f_datadomain eq '{domain}'",
+                    },
+                )
+                for row in (current or {}).get("value", []):
+                    row_id = row.get("cre2f_veloradatadisclosurepolicyid")
+                    if row_id and row_id != policy_id:
+                        await self._request(
+                            "PATCH",
+                            f"{POLICY_ENTITY_SET}({row_id})",
+                            json_body={"cre2f_isactive": False},
+                        )
+
+            if policy_id and len(str(policy_id)) == 36:
+                await self._request(
+                    "PATCH",
+                    f"{POLICY_ENTITY_SET}({policy_id})",
+                    json_body=writable,
+                )
+                refreshed = await self._request(
+                    "GET", f"{POLICY_ENTITY_SET}({policy_id})"
+                )
+                return {"status": "UPDATED", "policy": refreshed or writable}
+
+            created = await self._request(
+                "POST", POLICY_ENTITY_SET, json_body=writable
+            )
+            return {"status": "CREATED", "policy": created or writable}
         
         if policy_data.get("cre2f_isactive"):
             domain = policy_data.get("cre2f_datadomain", "Employee")

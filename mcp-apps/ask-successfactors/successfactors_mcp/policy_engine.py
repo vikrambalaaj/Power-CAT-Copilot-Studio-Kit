@@ -70,45 +70,64 @@ COUNTRY_CODE_MAP: Dict[str, str] = {
     "SGP": "Singapore",
 }
 
-# Field Profile Presets
 PROFILE_BASIC: List[str] = ["userId", "name", "country"]
 PROFILE_WORKFORCE_DRILLDOWN: List[str] = [
-    "userId", "name", "country", "age_group", "joined_date",
-    "length_of_service", "department", "businessUnit", "division",
-    "jobTitle", "location", "employmentStatus", "recruited_by"
+    "userId", "name", "email", "jobTitle", "department", "division", "businessUnit",
+    "location", "country", "gender", "age", "age_group", "joined_date",
+    "tenure", "length_of_service", "employmentStatus", "recruited_by"
 ]
 
 
-def calculate_age_group(dob: Optional[Any]) -> str:
-    """Calculate age bucket on the server. Never return date of birth."""
-    if not dob:
-        return "Not available"
-    
-    birth_date: Optional[date] = None
-    if isinstance(dob, (date, datetime)):
-        birth_date = dob.date() if isinstance(dob, datetime) else dob
-    elif isinstance(dob, str):
-        # Extract /Date(1234567890)/ or YYYY-MM-DD
-        match_ms = re.search(r"/Date\((\d+)\)/", dob)
+def _parse_date_input(val: Optional[Any]) -> Optional[date]:
+    """Safely parse various date formats (date, datetime, OData /Date(...)/, ISO string)."""
+    if not val:
+        return None
+    if isinstance(val, datetime):
+        return val.date()
+    if isinstance(val, date):
+        return val
+    if isinstance(val, str):
+        val_str = val.strip()
+        if not val_str or val_str.lower() in ("null", "none", "—", ""):
+            return None
+        match_ms = re.search(r"/Date\((\d+)\)/", val_str)
         if match_ms:
             try:
-                birth_date = datetime.fromtimestamp(int(match_ms.group(1)) / 1000, tz=timezone.utc).date()
+                return datetime.fromtimestamp(int(match_ms.group(1)) / 1000, tz=timezone.utc).date()
             except Exception:
                 pass
-        else:
-            try:
-                birth_date = datetime.strptime(dob[:10], "%Y-%m-%d").date()
-            except Exception:
-                pass
+        try:
+            return datetime.strptime(val_str[:10], "%Y-%m-%d").date()
+        except Exception:
+            pass
+    return None
 
-    if not birth_date:
-        return "Not available"
 
-    today = date.today()
-    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+def calculate_age(dob: Optional[Any], as_of: Optional[date] = None) -> Optional[int]:
+    """Calculate integer age in years from date of birth without exposing DOB.
     
+    Returns None if DOB is invalid or out of realistic range (0-120).
+    """
+    birth_date = _parse_date_input(dob)
+    if not birth_date:
+        return None
+
+    target_date = as_of or date.today()
+    if birth_date > target_date:
+        return None
+
+    age = target_date.year - birth_date.year - ((target_date.month, target_date.day) < (birth_date.month, birth_date.day))
     if age < 0 or age > 120:
+        return None
+    return age
+
+
+def calculate_age_group(dob: Optional[Any], as_of: Optional[date] = None) -> str:
+    """Calculate age bucket on the server. Never return raw date of birth."""
+    age = calculate_age(dob, as_of=as_of)
+    if age is None:
         return "Not available"
+    
     if age < 25:
         return "Under 25"
     elif 25 <= age <= 34:
@@ -121,27 +140,9 @@ def calculate_age_group(dob: Optional[Any]) -> str:
         return "55 and above"
 
 
-def calculate_length_of_service(hire_date: Optional[Any], as_of: Optional[date] = None) -> str:
-    """Calculate length of service in years and months from original hire date."""
-    if not hire_date:
-        return "Not available"
-    
-    start: Optional[date] = None
-    if isinstance(hire_date, (date, datetime)):
-        start = hire_date.date() if isinstance(hire_date, datetime) else hire_date
-    elif isinstance(hire_date, str):
-        match_ms = re.search(r"/Date\((\d+)\)/", hire_date)
-        if match_ms:
-            try:
-                start = datetime.fromtimestamp(int(match_ms.group(1)) / 1000, tz=timezone.utc).date()
-            except Exception:
-                pass
-        else:
-            try:
-                start = datetime.strptime(hire_date[:10], "%Y-%m-%d").date()
-            except Exception:
-                pass
-
+def calculate_tenure(hire_date: Optional[Any], as_of: Optional[date] = None) -> str:
+    """Calculate tenure in years and months from original hire/start date."""
+    start = _parse_date_input(hire_date)
     if not start:
         return "Not available"
 
@@ -157,12 +158,61 @@ def calculate_length_of_service(hire_date: Optional[Any], as_of: Optional[date] 
     years = total_months // 12
     months = total_months % 12
 
-    if years == 0:
+    if years == 0 and months == 0:
+        return "Less than 1 mo"
+    elif years == 0:
         return f"{months} mo{'s' if months != 1 else ''}"
     elif months == 0:
         return f"{years} yr{'s' if years != 1 else ''}"
     else:
         return f"{years} yr{'s' if years != 1 else ''} {months} mo{'s' if months != 1 else ''}"
+
+
+def calculate_length_of_service(hire_date: Optional[Any], as_of: Optional[date] = None) -> str:
+    """Calculate length of service (alias for tenure)."""
+    return calculate_tenure(hire_date, as_of=as_of)
+
+
+def calculate_tenure_years(hire_date: Optional[Any], as_of: Optional[date] = None) -> Optional[float]:
+    """Calculate tenure as fractional years rounded to 1 decimal place."""
+    start = _parse_date_input(hire_date)
+    if not start:
+        return None
+
+    target_date = as_of or date.today()
+    if start > target_date:
+        return 0.0
+
+    days = (target_date - start).days
+    if days < 0:
+        return 0.0
+    return round(days / 365.25, 1)
+
+
+def calculate_tenure_group(hire_date: Optional[Any], as_of: Optional[date] = None) -> str:
+    """Calculate tenure bracket for aggregate demographic reporting."""
+    start = _parse_date_input(hire_date)
+    if not start:
+        return "Not available"
+
+    target_date = as_of or date.today()
+    if start > target_date:
+        return "Future Hire"
+
+    years = calculate_tenure_years(hire_date, as_of=target_date)
+    if years is None:
+        return "Not available"
+
+    if years < 1.0:
+        return "< 1 year"
+    elif 1.0 <= years < 3.0:
+        return "1–3 years"
+    elif 3.0 <= years < 5.0:
+        return "3–5 years"
+    elif 5.0 <= years < 10.0:
+        return "5–10 years"
+    else:
+        return "10+ years"
 
 
 def resolve_country_name(raw_val: Optional[str]) -> str:
@@ -336,11 +386,16 @@ class PolicyEngine:
             country = resolve_country_name(raw_country)
             
             raw_dob = record.get("dateOfBirth") or record.get("dob")
+            age = calculate_age(raw_dob)
             age_group = calculate_age_group(raw_dob)
             
-            raw_hire_date = record.get("hireDate") or record.get("startDate") or record.get("origHireDate")
-            joined_date_str = str(raw_hire_date)[:10] if raw_hire_date else "Not available"
-            length_of_service = calculate_length_of_service(raw_hire_date)
+            raw_hire_date = record.get("hireDate") or record.get("startDate") or record.get("origHireDate") or record.get("originalStartDate")
+            parsed_hire = _parse_date_input(raw_hire_date)
+            joined_date_str = parsed_hire.isoformat() if parsed_hire else "Not available"
+            tenure = calculate_tenure(raw_hire_date)
+            length_of_service = tenure
+            tenure_years = calculate_tenure_years(raw_hire_date)
+            tenure_group = calculate_tenure_group(raw_hire_date)
             
             dept = normalize_department(record.get("department"))
             business_unit = record.get("businessUnit", "—")
@@ -353,10 +408,19 @@ class PolicyEngine:
             field_pool: Dict[str, Any] = {
                 "userid": emp_id,
                 "name": name or f"Employee {emp_id}",
+                "email": record.get("email") or record.get("work_email") or f"{emp_id.lower()}@velora.ae",
+                "work_email": record.get("email") or record.get("work_email") or f"{emp_id.lower()}@velora.ae",
                 "country": country,
+                "nationality": country,
+                "gender": record.get("gender") or "Not disclosed",
+                "age": age if age is not None else "Not available",
                 "age_group": age_group,
                 "joined_date": joined_date_str,
+                "hire_date": joined_date_str,
+                "tenure": tenure,
                 "length_of_service": length_of_service,
+                "tenure_years": tenure_years if tenure_years is not None else "Not available",
+                "tenure_group": tenure_group,
                 "department": dept,
                 "businessunit": business_unit,
                 "division": division,

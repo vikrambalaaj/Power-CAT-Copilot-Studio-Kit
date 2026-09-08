@@ -1,6 +1,7 @@
 """SAP SuccessFactors OData v2 API client — authentication, HTTP requests, Delegated Identity & RBP trimming."""
 from __future__ import annotations
 
+import asyncio
 import base64
 import hashlib
 import json
@@ -337,6 +338,45 @@ class SuccessFactorsClient:
             "cache": response.get("page_caches", []),
         }
 
+    async def _dob_map(
+        self,
+        *,
+        executive_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        entity = self.settings.sf_dob_entity.strip()
+        person_field = self.settings.sf_dob_person_id_field.strip()
+        dob_field = self.settings.sf_dob_field.strip()
+        if not entity or not person_field or not dob_field:
+            return {
+                "error": True,
+                "message": "SuccessFactors date of birth entity and field mapping is not configured.",
+                "error_category": "configuration",
+            }
+        response = await self._fetch_all(
+            entity,
+            select=f"{person_field},{dob_field}",
+            executive_id=executive_id,
+        )
+        if response.get("error"):
+            return response
+        mapping = {
+            str(row.get(person_field)): row.get(dob_field)
+            for row in response.get("results", [])
+            if row.get(person_field) and row.get(dob_field) is not None
+        }
+        return {
+            "mapping": mapping,
+            "entity": entity,
+            "person_id_field": person_field,
+            "dob_field": dob_field,
+            "coverage": {
+                "rows_returned": response.get("rows_returned", 0),
+                "total_available": response.get("total_available", 0),
+                "complete": response.get("complete", False),
+            },
+            "cache": response.get("page_caches", []),
+        }
+
     async def _active_user_ids(
         self,
         *,
@@ -438,7 +478,8 @@ class SuccessFactorsClient:
 
     async def drilldown_employees(
         self,
-        department: Optional[str] = "Unassigned",
+        department: Optional[str] = None,
+        division: Optional[str] = None,
         company: Optional[str] = None,
         business_unit: Optional[str] = None,
         as_of_date: Optional[str] = None,
@@ -479,7 +520,7 @@ class SuccessFactorsClient:
             policy_version=decision.policy_version,
             policy_decision="ALLOWED" if decision.allowed else "DENIED",
             released_fields=decision.allowed_fields,
-            message_summary=f"Policy decision for {department or 'All'}: {'ALLOWED' if decision.allowed else 'DENIED'} - {decision.reason}",
+            message_summary=f"Policy decision for {division or department or 'All'}: {'ALLOWED' if decision.allowed else 'DENIED'} - {decision.reason}",
             content_classification="INTERNAL_GOVERNANCE",
         ))
 
@@ -499,13 +540,13 @@ class SuccessFactorsClient:
             policy_id=decision.policy_id,
             policy_version=decision.policy_version,
             field_profile=field_profile,
-            department=department,
+            department=f"{division}:{department}" if division else department,
             top=page_size,
             page=page,
         )
 
         async def load_drilldown() -> Dict[str, Any]:
-            # Read department mapping
+            # Read department and division mapping
             dept_res = await self._fetch_all("FODepartment", select="externalCode,name", executive_id=executive_id)
             dept_map = {}
             if isinstance(dept_res, dict) and not dept_res.get("error"):
@@ -514,6 +555,15 @@ class SuccessFactorsClient:
                     for r in dept_res.get("results", [])
                     if r.get("externalCode") and r.get("name")
                 }
+            div_map = {}
+            if division or department:
+                div_res = await self._fetch_all("FODivision", select="externalCode,name", executive_id=executive_id)
+                if isinstance(div_res, dict) and not div_res.get("error"):
+                    div_map = {
+                        str(r.get("externalCode")): str(r.get("name"))
+                        for r in div_res.get("results", [])
+                        if r.get("externalCode") and r.get("name")
+                    }
 
             # Fetch EmpJob records
             emp_filters = []
@@ -522,13 +572,45 @@ class SuccessFactorsClient:
             if business_unit:
                 emp_filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
 
-            is_unassigned = (department or "").strip().lower() in ("unassigned", "unmapped department", "none", "null")
+            # Resolve division if provided
+            resolved_div_code = None
+            resolved_div_name = None
+            if division:
+                div_clean = division.replace("–", "-").replace("—", "-").strip().lower()
+                for code, name in div_map.items():
+                    if code.lower() == div_clean or name.replace("–", "-").replace("—", "-").strip().lower() == div_clean:
+                        resolved_div_code = code
+                        resolved_div_name = name
+                        break
+                if not resolved_div_code:
+                    resolved_div_code = division
+
+            # Smart department vs division detection
+            resolved_dept_code = None
+            is_unassigned = bool(department and department.strip().lower() in ("unassigned", "unmapped department", "none", "null"))
+            if resolved_div_code and is_unassigned:
+                is_unassigned = False
+
             if department and not is_unassigned:
-                matching_codes = [code for code, name in dept_map.items() if name.lower() == department.strip().lower() or code.lower() == department.strip().lower()]
-                if matching_codes:
-                    emp_filters.append(f"department eq '{_escape_odata_string(matching_codes[0])}'")
-                else:
-                    emp_filters.append(f"department eq '{_escape_odata_string(department)}'")
+                dept_clean = department.replace("–", "-").replace("—", "-").strip().lower()
+                for code, name in dept_map.items():
+                    if code.lower() == dept_clean or name.replace("–", "-").replace("—", "-").strip().lower() == dept_clean:
+                        resolved_dept_code = code
+                        break
+                if not resolved_dept_code:
+                    # Check if the department parameter actually contained a division code/name
+                    for code, name in div_map.items():
+                        if code.lower() == dept_clean or name.replace("–", "-").replace("—", "-").strip().lower() == dept_clean or dept_clean.startswith("div"):
+                            resolved_div_code = code
+                            resolved_div_name = name
+                            break
+                    if not resolved_div_code:
+                        resolved_dept_code = department
+
+            if resolved_div_code:
+                emp_filters.append(f"division eq '{_escape_odata_string(resolved_div_code)}'")
+            if resolved_dept_code:
+                emp_filters.append(f"department eq '{_escape_odata_string(resolved_dept_code)}'")
 
             jobs_res = await self._fetch_all(
                 "EmpJob",
@@ -582,6 +664,12 @@ class SuccessFactorsClient:
             nat_res = await self._nationality_map(executive_id=executive_id)
             nat_map = nat_res.get("mapping", {}) if isinstance(nat_res, dict) else {}
 
+            dob_res = await self._dob_map(executive_id=executive_id)
+            dob_map = dob_res.get("mapping", {}) if isinstance(dob_res, dict) else {}
+
+            gender_res = await self._gender_map(executive_id=executive_id)
+            gender_map = gender_res.get("mapping", {}) if isinstance(gender_res, dict) else {}
+
             enriched_records = []
             for uid in paged_uids:
                 job_data = matched_jobs[uid]
@@ -590,8 +678,11 @@ class SuccessFactorsClient:
                 merged = {
                     "userId": uid,
                     "name": user_obj.get("displayName") or f"{user_obj.get('firstName', '')} {user_obj.get('lastName', '')}".strip() or f"Employee {uid}",
+                    "email": user_obj.get("email") or f"{uid.lower()}@velora.ae",
+                    "work_email": user_obj.get("email") or f"{uid.lower()}@velora.ae",
+                    "gender": gender_map.get(uid) or user_obj.get("gender") or "Not disclosed",
                     "nationality": nat_map.get(uid),
-                    "dateOfBirth": None,
+                    "dateOfBirth": dob_map.get(uid),
                     "hireDate": job_data.get("hireDate") or job_data.get("startDate"),
                     "department": job_data.get("resolved_department", "Unassigned"),
                     "businessUnit": job_data.get("businessUnit"),
@@ -635,6 +726,7 @@ class SuccessFactorsClient:
         self,
         company: Optional[str] = None,
         department: Optional[str] = None,
+        division: Optional[str] = None,
         business_unit: Optional[str] = None,
         as_of_date: Optional[str] = None,
         executive_id: Optional[str] = None,
@@ -647,13 +739,14 @@ class SuccessFactorsClient:
             "executiveId": executive_id or "configured-service-account",
             "company": company,
             "department": department,
+            "division": division,
             "businessUnit": business_unit,
             "asOfDate": as_of_date,
         }, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
         async def load() -> Dict[str, Any]:
             return await self._aggregate_headcount_by_department_uncached(
-                company=company, department=department, business_unit=business_unit,
+                company=company, department=department, division=division, business_unit=business_unit,
                 as_of_date=as_of_date, executive_id=executive_id,
                 progress_callback=progress_callback,
             )
@@ -671,6 +764,7 @@ class SuccessFactorsClient:
         self,
         company: Optional[str] = None,
         department: Optional[str] = None,
+        division: Optional[str] = None,
         business_unit: Optional[str] = None,
         as_of_date: Optional[str] = None,
         executive_id: Optional[str] = None,
@@ -690,24 +784,72 @@ class SuccessFactorsClient:
         )
         if department_res.get("error"):
             return department_res
+
         department_names = {
             str(row.get("externalCode")): str(row.get("name"))
-            for row in department_res.get("results", [])
+            for row in (department_res.get("results", []) if isinstance(department_res, dict) else [])
             if row.get("externalCode") and row.get("name")
         }
+        
+        division_names = {}
+        if division or department:
+            div_res = await self._fetch_all(
+                "FODivision",
+                select="externalCode,name,status",
+                executive_id=executive_id,
+            )
+            if isinstance(div_res, dict) and not div_res.get("error"):
+                division_names = {
+                    str(row.get("externalCode")): str(row.get("name"))
+                    for row in div_res.get("results", [])
+                    if row.get("externalCode") and row.get("name")
+                }
+
+        # Resolve division if specified
+        resolved_div_code = None
+        resolved_div_name = None
+        if division:
+            div_clean = division.replace("–", "-").replace("—", "-").strip().lower()
+            for code, name in division_names.items():
+                if code.lower() == div_clean or name.replace("–", "-").replace("—", "-").strip().lower() == div_clean:
+                    resolved_div_code = code
+                    resolved_div_name = name
+                    break
+            if not resolved_div_code:
+                resolved_div_code = division
+
+        # Resolve department or smart auto-redirect if division code/name was passed into department
+        resolved_dept_code = None
+        if department:
+            dept_clean = department.replace("–", "-").replace("—", "-").strip().lower()
+            for code, name in department_names.items():
+                if code.lower() == dept_clean or name.replace("–", "-").replace("—", "-").strip().lower() == dept_clean:
+                    resolved_dept_code = code
+                    break
+            if not resolved_dept_code:
+                # Check if it was actually a division passed into department
+                for code, name in division_names.items():
+                    if code.lower() == dept_clean or name.replace("–", "-").replace("—", "-").strip().lower() == dept_clean or dept_clean.startswith("div"):
+                        resolved_div_code = code
+                        resolved_div_name = name
+                        break
+                if not resolved_div_code:
+                    resolved_dept_code = department
 
         filters = []
         if company:
             filters.append(f"company eq '{_escape_odata_string(company)}'")
-        if department:
-            filters.append(f"department eq '{_escape_odata_string(department)}'")
+        if resolved_div_code:
+            filters.append(f"division eq '{_escape_odata_string(resolved_div_code)}'")
+        if resolved_dept_code:
+            filters.append(f"department eq '{_escape_odata_string(resolved_dept_code)}'")
         if business_unit:
             filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
 
         await report(0.25, "Reading all role-visible SuccessFactors workforce records")
         job_res = await self._fetch_all(
             "EmpJob",
-            select="userId,department",
+            select="userId,department,division,businessUnit",
             filter_str=" and ".join(filters) if filters else None,
             as_of_date=as_of_date,
             executive_id=executive_id,
@@ -771,6 +913,9 @@ class SuccessFactorsClient:
             "type": "Headcount",
             "total_headcount": total,
             "active_headcount": active_total,
+            "division": resolved_div_code,
+            "division_name": resolved_div_name,
+            "division_code": resolved_div_code,
             "rows_evaluated": len(rows),
             "distinct_employees_evaluated": total,
             "department_count": len(breakdown),
@@ -792,6 +937,7 @@ class SuccessFactorsClient:
             "filters": {
                 "company": company,
                 "department": department,
+                "division": resolved_div_code or division,
                 "business_unit": business_unit,
                 "as_of_date": as_of_date,
             },
@@ -1712,39 +1858,49 @@ class SuccessFactorsClient:
         group_by: str = "gender",
         cross_by: Optional[str] = None,
         company: Optional[str] = None,
+        division: Optional[str] = None,
+        department: Optional[str] = None,
         business_unit: Optional[str] = None,
         as_of_date: Optional[str] = None,
         executive_id: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Aggregate gender/nationality dimensions without releasing people."""
+        """Aggregate workforce demographic dimensions (gender, nationality, age, tenure) without releasing individual employee records."""
+        from .policy_engine import calculate_age_group, calculate_tenure_group
+
         requested_as_of_date = as_of_date
         as_of_date = as_of_date or date.today().isoformat()
         group_by = str(group_by or "gender").strip().lower().replace(" ", "_")
         cross_by = str(cross_by or "").strip().lower().replace(" ", "_") or None
-        allowed_primary = {"gender", "nationality"}
-        allowed_cross = {None, "department", "nationality"}
+
+        # Normalize aliases
+        if group_by == "age":
+            group_by = "age_group"
+        elif group_by in ("tenure", "length_of_service"):
+            group_by = "tenure_group"
+
+        if cross_by == "age":
+            cross_by = "age_group"
+        elif cross_by in ("tenure", "length_of_service"):
+            cross_by = "tenure_group"
+
+        allowed_primary = {"gender", "nationality", "age_group", "tenure_group"}
+        allowed_cross = {None, "department", "nationality", "gender", "age_group", "tenure_group"}
         if group_by not in allowed_primary or cross_by not in allowed_cross:
             return {
                 "error": True,
                 "error_category": "validation",
-                "message": "Supported demographic breakdowns are nationality, gender, gender by department, and gender by nationality.",
+                "message": "Supported demographic dimensions are nationality, gender, age_group (or age), tenure_group (or tenure), and department.",
             }
-        if group_by == "nationality" and cross_by is not None:
+        if cross_by is not None and group_by == cross_by:
             return {
                 "error": True,
                 "error_category": "validation",
-                "message": "Use group_by='gender' with cross_by='nationality' for the approved combined breakdown.",
+                "message": f"group_by and cross_by cannot both be '{group_by}'.",
             }
-
-        filters = []
-        if company:
-            filters.append(f"company eq '{_escape_odata_string(company)}'")
-        if business_unit:
-            filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
 
         department_names: Dict[str, str] = {}
         department_res: Dict[str, Any] = {"complete": True, "page_caches": []}
-        if cross_by == "department":
+        if group_by == "department" or cross_by == "department" or department:
             department_res = await self._fetch_all(
                 "FODepartment", select="externalCode,name,status", executive_id=executive_id
             )
@@ -1752,13 +1908,65 @@ class SuccessFactorsClient:
                 return department_res
             department_names = {
                 str(row.get("externalCode")): str(row.get("name"))
-                for row in department_res.get("results", [])
+                for row in (department_res.get("results", []) if isinstance(department_res, dict) else [])
                 if row.get("externalCode") and row.get("name")
             }
 
+        division_names: Dict[str, str] = {}
+        if division or department:
+            div_res = await self._fetch_all(
+                "FODivision", select="externalCode,name,status", executive_id=executive_id
+            )
+            if isinstance(div_res, dict) and not div_res.get("error"):
+                division_names = {
+                    str(row.get("externalCode")): str(row.get("name"))
+                    for row in div_res.get("results", [])
+                    if row.get("externalCode") and row.get("name")
+                }
+
+        # Resolve division if specified
+        resolved_div_code = None
+        resolved_div_name = None
+        if division:
+            div_clean = division.replace("–", "-").replace("—", "-").strip().lower()
+            for code, name in division_names.items():
+                if code.lower() == div_clean or name.replace("–", "-").replace("—", "-").strip().lower() == div_clean:
+                    resolved_div_code = code
+                    resolved_div_name = name
+                    break
+            if not resolved_div_code:
+                resolved_div_code = division
+
+        # Resolve department or smart auto-redirect if division code/name was passed into department
+        resolved_dept_code = None
+        if department:
+            dept_clean = department.replace("–", "-").replace("—", "-").strip().lower()
+            for code, name in department_names.items():
+                if code.lower() == dept_clean or name.replace("–", "-").replace("—", "-").strip().lower() == dept_clean:
+                    resolved_dept_code = code
+                    break
+            if not resolved_dept_code:
+                for code, name in division_names.items():
+                    if code.lower() == dept_clean or name.replace("–", "-").replace("—", "-").strip().lower() == dept_clean or dept_clean.startswith("div"):
+                        resolved_div_code = code
+                        resolved_div_name = name
+                        break
+                if not resolved_div_code:
+                    resolved_dept_code = department
+
+        filters = []
+        if company:
+            filters.append(f"company eq '{_escape_odata_string(company)}'")
+        if resolved_div_code:
+            filters.append(f"division eq '{_escape_odata_string(resolved_div_code)}'")
+        if resolved_dept_code:
+            filters.append(f"department eq '{_escape_odata_string(resolved_dept_code)}'")
+        if business_unit:
+            filters.append(f"businessUnit eq '{_escape_odata_string(business_unit)}'")
+
         population_res = await self._fetch_all(
             "EmpJob",
-            select="userId,department",
+            select="userId,department,division,startDate,hireDate",
             filter_str=" and ".join(filters) or None,
             as_of_date=as_of_date,
             executive_id=executive_id,
@@ -1771,7 +1979,9 @@ class SuccessFactorsClient:
 
         gender_res: Dict[str, Any] = {"mapping": {}, "coverage": {"complete": True}, "cache": []}
         nationality_res: Dict[str, Any] = {"mapping": {}, "coverage": {"complete": True}, "cache": []}
-        if group_by == "gender":
+        dob_res: Dict[str, Any] = {"mapping": {}, "coverage": {"complete": True}, "cache": []}
+
+        if group_by == "gender" or cross_by == "gender":
             gender_res = await self._gender_map(executive_id=executive_id)
             if gender_res.get("error"):
                 return gender_res
@@ -1779,6 +1989,10 @@ class SuccessFactorsClient:
             nationality_res = await self._nationality_map(executive_id=executive_id)
             if nationality_res.get("error"):
                 return nationality_res
+        if group_by == "age_group" or cross_by == "age_group":
+            dob_res = await self._dob_map(executive_id=executive_id)
+            if dob_res.get("error"):
+                return dob_res
 
         active_ids = set(active_res.get("ids", set()))
         distinct_jobs: Dict[str, Dict[str, Any]] = {}
@@ -1796,6 +2010,7 @@ class SuccessFactorsClient:
 
         gender_map = gender_res.get("mapping", {})
         nationality_map = nationality_res.get("mapping", {})
+        dob_map = dob_res.get("mapping", {})
 
         def nationality_label(user_id: str) -> str:
             raw = str(nationality_map.get(user_id) or "").strip()
@@ -1804,15 +2019,35 @@ class SuccessFactorsClient:
         def gender_label(user_id: str) -> str:
             return str(gender_map.get(user_id) or "Missing / unclassified")
 
+        def age_group_label(user_id: str) -> str:
+            raw_dob = dob_map.get(user_id)
+            return calculate_age_group(raw_dob)
+
+        def tenure_group_label(user_id: str, job: Dict[str, Any]) -> str:
+            hire_val = job.get("hireDate") or job.get("startDate")
+            return calculate_tenure_group(hire_val)
+
+        def department_label(job: Dict[str, Any]) -> str:
+            code = str(job.get("department") or "")
+            return department_names.get(code) or ("Unassigned" if not code else "Unmapped department")
+
+        def resolve_dimension(dim: str, user_id: str, job: Dict[str, Any]) -> str:
+            if dim == "gender":
+                return gender_label(user_id)
+            elif dim == "nationality":
+                return nationality_label(user_id)
+            elif dim == "age_group":
+                return age_group_label(user_id)
+            elif dim == "tenure_group":
+                return tenure_group_label(user_id, job)
+            elif dim == "department":
+                return department_label(job)
+            return "Unclassified"
+
         counts: Dict[tuple[str, Optional[str]], int] = {}
         for user_id, job in distinct_jobs.items():
-            primary = gender_label(user_id) if group_by == "gender" else nationality_label(user_id)
-            secondary: Optional[str] = None
-            if cross_by == "department":
-                code = str(job.get("department") or "")
-                secondary = department_names.get(code) or ("Unassigned" if not code else "Unmapped department")
-            elif cross_by == "nationality":
-                secondary = nationality_label(user_id)
+            primary = resolve_dimension(group_by, user_id, job)
+            secondary = resolve_dimension(cross_by, user_id, job) if cross_by else None
             key = (primary, secondary)
             counts[key] = counts.get(key, 0) + 1
 
@@ -1845,12 +2080,29 @@ class SuccessFactorsClient:
 
         title_dimension = group_by if not cross_by else f"{group_by}_by_{cross_by}"
         released_total = sum(int(row["headcount"]) for row in rows)
+        
+        used_entities = ["EmpJob", "User"]
+        if group_by == "nationality" or cross_by == "nationality":
+            used_entities.append(nationality_res.get("entity", "PerPersonal"))
+        if group_by == "gender" or cross_by == "gender":
+            used_entities.append(gender_res.get("entity", "PerPersonal"))
+        if group_by == "age_group" or cross_by == "age_group":
+            used_entities.append(dob_res.get("entity", "PerPersonal"))
+        if group_by == "department" or cross_by == "department":
+            used_entities.append("FODepartment")
+        # Deduplicate entity list preserving order
+        unique_entities = list(dict.fromkeys(used_entities))
+
         return {
             "type": "WorkforceDemographics",
             "breakdown_type": title_dimension,
             "group_by": group_by,
             "cross_by": cross_by,
             "company": company or self.settings.sf_company_id,
+            "division": resolved_div_code,
+            "division_name": resolved_div_name,
+            "division_code": resolved_div_code,
+            "department": resolved_dept_code or department,
             "business_unit": business_unit,
             "population_scope": "active",
             "active_headcount": active_total,
@@ -1865,6 +2117,7 @@ class SuccessFactorsClient:
                 bool(active_res.get("coverage", {}).get("complete")),
                 bool(gender_res.get("coverage", {}).get("complete")),
                 bool(nationality_res.get("coverage", {}).get("complete")),
+                bool(dob_res.get("coverage", {}).get("complete")),
                 bool(department_res.get("complete")),
             ]),
             "reconciliation": {
@@ -1878,9 +2131,9 @@ class SuccessFactorsClient:
             "warnings": warnings,
             "pdpl_enforced": True,
             "as_of_date": as_of_date,
-            "source": "SAP SuccessFactors · EmpJob, User and PerPersonal",
+            "source": f"SAP SuccessFactors · {', '.join(unique_entities)}",
             "source_details": {
-                "entities": ["EmpJob", "User", "PerPersonal"] + (["FODepartment"] if cross_by == "department" else []),
+                "entities": unique_entities,
                 "scope": "Aggregate, role-permission-visible active population",
             },
             "access_context": "configured_service_account",
@@ -1889,6 +2142,7 @@ class SuccessFactorsClient:
                 "active_users": active_res.get("cache", []),
                 "gender": gender_res.get("cache", []),
                 "nationality": nationality_res.get("cache", []),
+                "dob": dob_res.get("cache", []),
                 "departments": department_res.get("page_caches", []),
             },
         }

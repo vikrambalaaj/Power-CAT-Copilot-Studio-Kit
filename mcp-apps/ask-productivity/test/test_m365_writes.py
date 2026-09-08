@@ -24,11 +24,13 @@ from productivity_mcp.tools_m365_writes import (
     prepare_planner_completion,
     complete_approved_planner_task,
 )
+import os
 from productivity_mcp.dataverse_audit import get_dataverse_client
 
 
 class TestM365Writes(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        os.environ["MOCK_M365"] = "1"
         get_dataverse_client().clear_all_for_testing()
 
     # --- Email Write Tools ---
@@ -196,6 +198,44 @@ class TestM365Writes(unittest.IsolatedAsyncioTestCase):
             userEmail="balaadm@velora.ae",
         )
         self.assertEqual(res_cmp["status"], "SUCCESS")
+
+    async def test_f07_fail_closed_on_live_auth_failure(self):
+        """F07 verification: Live credentials failure must fail-closed with RuntimeError, NEVER falling through to mock simulation."""
+        from productivity_mcp.m365_client import Microsoft365Client
+        client = Microsoft365Client(user_email="exec@velora.ae")
+        # Force live mode with credentials that cannot authenticate
+        client.tenant_id = "mock-tenant-id"
+        client.client_id = "mock-client-id"
+        client.client_secret = "invalid-secret"
+        client.force_mock = False
+        self.assertTrue(client.is_live)
+
+        with self.assertRaises(RuntimeError) as ctx:
+            client.execute_send_email(
+                to=["cfo@velora.ae"],
+                cc=[],
+                subject="Test Live Auth Failure",
+                body="Should not succeed",
+                attachments=[],
+            )
+        self.assertIn("authentication", str(ctx.exception).lower())
+
+    async def test_f07_simulation_receipt_propagation(self):
+        """F07 verification: Simulation receipt is truthfully propagated to envelope summary and warnings."""
+        prep = await prepare_email(
+            to=["ahmed.nuaimi@velora.ae"],
+            subject="Q3 Executive Receivables Simulation Test",
+            body="Checking truthful envelope labeling.",
+            userEmail="balaadm@velora.ae",
+        )
+        res = await send_approved_email(
+            confirmationToken=prep["confirmationToken"],
+            previewDetails=prep["previewDetails"],
+            userEmail="balaadm@velora.ae",
+        )
+        self.assertEqual(res["status"], "SUCCESS")
+        self.assertTrue(res["resultSummary"].startswith("[DEMO SIMULATION]"))
+        self.assertTrue(any("simulated demo mode" in w for w in res["warnings"]))
 
 
 if __name__ == "__main__":

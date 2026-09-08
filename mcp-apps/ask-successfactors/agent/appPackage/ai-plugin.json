@@ -1,8 +1,8 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
     "schema_version": "v2.4",
-    "name_for_human": "Velora Executive AI Agent",
-    "description_for_human": "Velora Executive AI Agent for executive workforce, finance, corporate analytics, and productivity orchestration",
+    "name_for_human": "Velora SuccessFactors",
+    "description_for_human": "SuccessFactors workforce intelligence for the Velora Executive Agent",
     "description_for_model": "Use these SAP SuccessFactors tools for authorized headcount, Emiratisation, employee, job, and organization facts. Keep Emiratisation aggregate and never invent values when a tool reports an error or missing configuration.",
     "namespace": "sf",
     "functions": [
@@ -18,19 +18,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Verifying user authorization and Dataverse disclosure policy..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP + Dataverse] Filtering employee roster with strict PII & banking privacy masking..."
-                },
-                "responding": {
-                    "description": "Rendering governed employee roster drilldown..."
                 }
             }
         },
@@ -46,19 +35,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Evaluating confidentiality notice version compliance..."
-                },
-                "executing": {
-                    "description": "[Dataverse MCP] Persisting consent audit log in Microsoft Dataverse..."
-                },
-                "responding": {
-                    "description": "Confirming data access authorization..."
                 }
             }
         },
@@ -74,19 +52,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Validating user session and confidentiality consent..."
-                },
-                "executing": {
-                    "description": "[Dataverse MCP] Checking governance audit & consent records..."
-                },
-                "responding": {
-                    "description": "Delivering personalized executive greeting..."
                 }
             }
         },
@@ -102,25 +69,48 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
                 }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Retrieving 30-day institutional memory snapshot..."
-                },
-                "executing": {
-                    "description": "[Dataverse MCP] Loading contextual session history from Microsoft Dataverse..."
-                },
-                "responding": {
-                    "description": "Applying historical context to conversation..."
+            }
+        },
+        {
+            "name": "sf__manage_disclosure_policy",
+            "description": "Administrative tool to view, draft, or activate Dataverse employee disclosure policies and trigger cache invalidation.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
+                }
+            }
+        },
+        {
+            "name": "sf__preview_disclosure_policy",
+            "description": "Generate a preview comparing released vs permanently prohibited fields for a given employee query under active policy.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
                 }
             }
         },
         {
             "name": "sf__get_joiners",
-            "description": "Use for aggregate hires, joiners, and hiring trends over an inclusive YYYY-MM-DD range. Returns distinct employees, reconciled breakdowns, UAE/non-UAE/missing-nationality aggregates when available, coverage, population definition, and rule version. Never use employee-directory records to calculate hiring analytics.",
+            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns distinct joiners over an inclusive YYYY-MM-DD range with reconciled breakdowns and nationality aggregates when available; never use employee-directory records to calculate hiring analytics.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -130,25 +120,14 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Identifying reporting period and new-hire filters..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying onboarding and new-hire records..."
-                },
-                "responding": {
-                    "description": "Formatting verified joiners summary..."
                 }
             }
         },
         {
             "name": "sf__get_leavers",
-            "description": "Use for aggregate separations and leavers over an inclusive YYYY-MM-DD range. Returns only verified counts and reconciled time breakdowns; unavailable reason or organization classifications are explicitly unclassified and never estimated.",
+            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns verified distinct leavers over an inclusive YYYY-MM-DD range; unavailable reason or organization classifications are explicitly unclassified and never estimated.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -158,25 +137,14 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Resolving exit reason classifications and departure periods..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Retrieving voluntary and involuntary exit records..."
-                },
-                "responding": {
-                    "description": "Formatting verified leavers analytics..."
                 }
             }
         },
         {
             "name": "sf__get_attrition",
-            "description": "Use for period attrition after verified leaver and active-headcount queries succeed. Returns numerator, denominator, formula, denominator method, UAE National rate when independently verified, rule version, and warnings; never substitutes historical values.",
+            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Calculates period leavers divided by current active headcount, is not annualized, and never substitutes historical values.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -186,25 +154,14 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Evaluating workforce departure parameters and calculation window..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Calculating annualized attrition and turnover rates..."
-                },
-                "responding": {
-                    "description": "Synthesizing attrition intelligence and trend data..."
                 }
             }
         },
         {
             "name": "sf__get_joiners_leavers_trend",
-            "description": "Use for reconciled joiner-versus-leaver trends over one inclusive reporting window. Every period is calculated from live joiner and leaver results; period totals must match headline totals and zero denominators are not converted to fallback values.",
+            "description": "Fallback for explicitly dated or filtered joiner-versus-leaver analysis. For normal aggregate Copilot responses, prefer the enabled native Adaptive Card workforce connector. If dates are omitted, use the current year-to-date period without asking a follow-up question. Every period is calculated from live joiner and leaver results; period totals must match headline totals and zero denominators are not converted to fallback values.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -214,25 +171,14 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Compiling multi-period workforce movement timeline..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Calculating net headcount growth and turnover trends..."
-                },
-                "responding": {
-                    "description": "Rendering workforce movement trend visualization..."
                 }
             }
         },
         {
             "name": "sf__get_headcount",
-            "description": "Use for aggregate workforce headcount and department distribution. Returns distinct current-effective employees, active headcount, complete pagination, reconciled breakdowns, population definitions, effective date, coverage, source metadata, and rule version.",
+            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns distinct current-effective employees, active headcount, complete pagination, and reconciled department/division breakdowns.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -242,25 +188,14 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/headcount.json"
+                        "file": "./adaptive-cards/headcount.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Analyzing workforce headcount query and department filters..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Connecting to HCM & calculating live department headcount..."
-                },
-                "responding": {
-                    "description": "Synthesizing workforce analytics and rendering Executive Headcount Card..."
                 }
             }
         },
         {
             "name": "sf__get_analytics_dashboard",
-            "description": "Use only for a combined workforce overview built from independently verified SuccessFactors KPIs. Preserve each KPI's population, period, coverage, source, and warnings; omit any KPI whose query failed.",
+            "description": "Fallback only when the native Adaptive Card workforce connector is unavailable. Builds a combined overview from independently verified KPIs, preserves each population and period, and omits any KPI whose query failed.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -270,25 +205,14 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/workforce-overview.json"
+                        "file": "./adaptive-cards/workforce-overview.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Aggregating multi-KPI workforce health indicators..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying executive headcount, Emiratisation, and retention..."
-                },
-                "responding": {
-                    "description": "Rendering Executive Workforce Health Dashboard..."
                 }
             }
         },
         {
             "name": "sf__get_emiratisation_kpi",
-            "description": "Use for aggregate Emiratisation, UAE National, non-UAE National, expatriate-share, or nationality-mix questions. Uses the configured PerPersonal nationality mapping and the same population scope for numerator and denominator; returns active and total counts, missing nationality, rates, target gap in percentage points, reconciliation, rule version, and warnings. Never exposes individual nationality or uses fallback values.",
+            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Uses the configured nationality mapping and the same active population for numerator and denominator; missing nationality stays separate and individual nationality is never exposed.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -298,19 +222,25 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/emiratisation.json"
+                        "file": "./adaptive-cards/emiratisation.json"
                     }
                 }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Identifying nationalization metrics and compliance targets..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Connecting to HCM & evaluating UAE Emiratisation ratios..."
-                },
-                "responding": {
-                    "description": "Synthesizing Emiratisation KPI and rendering compliance card..."
+            }
+        },
+        {
+            "name": "sf__get_workforce_demographics",
+            "description": "Use for privacy-safe aggregate workforce composition: headcount/percentage by nationality (group_by='nationality'), gender (group_by='gender'), age group (group_by='age_group' or 'age'), or tenure (group_by='tenure_group' or 'tenure'), with optional division (e.g. division='Corporate \u2013 Digital & Innovation'), department, or cross-grouping (e.g. cross_by='department', 'nationality', 'gender'). Never returns individual employee records.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/sap-result.json"
+                    }
                 }
             }
         },
@@ -326,19 +256,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Resolving employee position and job classification filters..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying EmpJob position records..."
-                },
-                "responding": {
-                    "description": "Formatting job assignment details..."
                 }
             }
         },
@@ -354,19 +273,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Retrieving detailed position attributes and organizational unit..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying single-record EmpJob entity..."
-                },
-                "responding": {
-                    "description": "Formatting verified job detail record..."
                 }
             }
         },
@@ -382,19 +290,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Querying user profile directory in SAP SuccessFactors..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Retrieving active user profile metadata..."
-                },
-                "responding": {
-                    "description": "Formatting user profile results..."
                 }
             }
         },
@@ -410,19 +307,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Resolving specific user profile attributes..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying User entity in SAP SuccessFactors..."
-                },
-                "responding": {
-                    "description": "Formatting verified user profile..."
                 }
             }
         },
@@ -438,19 +324,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Checking employment dates, service length, and status..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying EmpEmployment in SAP SuccessFactors..."
-                },
-                "responding": {
-                    "description": "Formatting employment service record..."
                 }
             }
         },
@@ -466,19 +341,8 @@
                         "template_selector": "$.adaptiveCard"
                     },
                     "static_template": {
-                        "file": "adaptive-cards/sap-result.json"
+                        "file": "./adaptive-cards/sap-result.json"
                     }
-                }
-            },
-            "states": {
-                "reasoning": {
-                    "description": "Mapping corporate organizational hierarchy..."
-                },
-                "executing": {
-                    "description": "[SAP SuccessFactors MCP] Querying FODepartment and FOCompany organizational entities..."
-                },
-                "responding": {
-                    "description": "Formatting organizational structure view..."
                 }
             }
         }
@@ -496,9 +360,64 @@
                             "inputSchema": {
                                 "properties": {
                                     "department": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
                                         "default": "Unassigned",
-                                        "title": "Department",
-                                        "type": "string"
+                                        "title": "Department"
+                                    },
+                                    "division": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Division"
+                                    },
+                                    "company": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Company"
+                                    },
+                                    "business_unit": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Business Unit"
+                                    },
+                                    "as_of_date": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "As Of Date"
                                     },
                                     "page": {
                                         "default": 1,
@@ -516,14 +435,28 @@
                                         "type": "string"
                                     },
                                     "user_object_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
                                         "default": null,
-                                        "title": "User Object ID",
-                                        "type": "string"
+                                        "title": "User Object Id"
                                     },
                                     "user_email": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
                                         "default": null,
-                                        "title": "User Email",
-                                        "type": "string"
+                                        "title": "User Email"
                                     }
                                 },
                                 "title": "sf__get_workforce_drilldownArguments",
@@ -536,10 +469,12 @@
                             "inputSchema": {
                                 "properties": {
                                     "user_object_id": {
-                                        "title": "User Object ID",
+                                        "default": "",
+                                        "title": "User Object Id",
                                         "type": "string"
                                     },
                                     "user_email": {
+                                        "default": "",
                                         "title": "User Email",
                                         "type": "string"
                                     },
@@ -552,12 +487,13 @@
                                         "default": false,
                                         "title": "Accepted",
                                         "type": "boolean"
+                                    },
+                                    "notice_version": {
+                                        "default": "2026.1",
+                                        "title": "Notice Version",
+                                        "type": "string"
                                     }
                                 },
-                                "required": [
-                                    "user_object_id",
-                                    "user_email"
-                                ],
                                 "title": "sf__check_and_record_consentArguments",
                                 "type": "object"
                             }
@@ -569,7 +505,7 @@
                                 "properties": {
                                     "user_object_id": {
                                         "default": "",
-                                        "title": "User Object ID",
+                                        "title": "User Object Id",
                                         "type": "string"
                                     },
                                     "user_email": {
@@ -598,30 +534,143 @@
                             "inputSchema": {
                                 "properties": {
                                     "user_object_id": {
-                                        "title": "User Object ID",
+                                        "default": "",
+                                        "title": "User Object Id",
                                         "type": "string"
                                     },
                                     "user_email": {
+                                        "default": "",
                                         "title": "User Email",
                                         "type": "string"
                                     },
                                     "topic_query": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
                                         "default": null,
-                                        "title": "Topic Query",
-                                        "type": "string"
+                                        "title": "Topic Query"
                                     }
                                 },
-                                "required": [
-                                    "user_object_id",
-                                    "user_email"
-                                ],
                                 "title": "sf__recall_user_memoryArguments",
                                 "type": "object"
                             }
                         },
                         {
+                            "name": "sf__manage_disclosure_policy",
+                            "description": "Administrative tool to view, draft, or activate Dataverse employee disclosure policies and trigger cache invalidation.",
+                            "inputSchema": {
+                                "properties": {
+                                    "action": {
+                                        "default": "list",
+                                        "title": "Action",
+                                        "type": "string"
+                                    },
+                                    "policy_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Policy Id"
+                                    },
+                                    "policy_name": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Policy Name"
+                                    },
+                                    "policy_code": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Policy Code"
+                                    },
+                                    "version": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Version"
+                                    },
+                                    "allowed_fields": {
+                                        "anyOf": [
+                                            {
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "type": "array"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Allowed Fields"
+                                    },
+                                    "is_active": {
+                                        "default": false,
+                                        "title": "Is Active",
+                                        "type": "boolean"
+                                    },
+                                    "change_reason": {
+                                        "default": "Policy update",
+                                        "title": "Change Reason",
+                                        "type": "string"
+                                    }
+                                },
+                                "title": "sf__manage_disclosure_policyArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "sf__preview_disclosure_policy",
+                            "description": "Generate a preview comparing released vs permanently prohibited fields for a given employee query under active policy.",
+                            "inputSchema": {
+                                "properties": {
+                                    "sample_query": {
+                                        "default": "Who are the 15 employees in the Unassigned department?",
+                                        "title": "Sample Query",
+                                        "type": "string"
+                                    },
+                                    "profile": {
+                                        "default": "workforce_drilldown",
+                                        "title": "Profile",
+                                        "type": "string"
+                                    }
+                                },
+                                "title": "sf__preview_disclosure_policyArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
                             "name": "sf__get_joiners",
-                            "description": "Use for aggregate hires, joiners, and hiring trends over an inclusive YYYY-MM-DD range. Returns distinct employees, reconciled breakdowns, UAE/non-UAE/missing-nationality aggregates when available, coverage, population definition, and rule version. Never use employee-directory records to calculate hiring analytics.",
+                            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns distinct joiners over an inclusive YYYY-MM-DD range with reconciled breakdowns and nationality aggregates when available; never use employee-directory records to calculate hiring analytics.",
                             "inputSchema": {
                                 "properties": {
                                     "start_date": {
@@ -672,7 +721,7 @@
                         },
                         {
                             "name": "sf__get_leavers",
-                            "description": "Use for aggregate separations and leavers over an inclusive YYYY-MM-DD range. Returns only verified counts and reconciled time breakdowns; unavailable reason or organization classifications are explicitly unclassified and never estimated.",
+                            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns verified distinct leavers over an inclusive YYYY-MM-DD range; unavailable reason or organization classifications are explicitly unclassified and never estimated.",
                             "inputSchema": {
                                 "properties": {
                                     "start_date": {
@@ -735,7 +784,7 @@
                         },
                         {
                             "name": "sf__get_attrition",
-                            "description": "Use for period attrition after verified leaver and active-headcount queries succeed. Returns numerator, denominator, formula, denominator method, UAE National rate when independently verified, rule version, and warnings; never substitutes historical values.",
+                            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Calculates period leavers divided by current active headcount, is not annualized, and never substitutes historical values.",
                             "inputSchema": {
                                 "properties": {
                                     "start_date": {
@@ -793,16 +842,32 @@
                         },
                         {
                             "name": "sf__get_joiners_leavers_trend",
-                            "description": "Use for reconciled joiner-versus-leaver trends over one inclusive reporting window. Every period is calculated from live joiner and leaver results; period totals must match headline totals and zero denominators are not converted to fallback values.",
+                            "description": "Fallback for explicitly dated or filtered joiner-versus-leaver analysis. For normal aggregate Copilot responses, prefer the enabled native Adaptive Card workforce connector. If dates are omitted, use the current year-to-date period without asking a follow-up question. Every period is calculated from live joiner and leaver results; period totals must match headline totals and zero denominators are not converted to fallback values.",
                             "inputSchema": {
                                 "properties": {
                                     "start_date": {
-                                        "title": "Start Date",
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Start Date"
                                     },
                                     "end_date": {
-                                        "title": "End Date",
-                                        "type": "string"
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "End Date"
                                     },
                                     "granularity": {
                                         "default": "month",
@@ -822,17 +887,13 @@
                                         "title": "Company"
                                     }
                                 },
-                                "required": [
-                                    "start_date",
-                                    "end_date"
-                                ],
                                 "title": "sf__get_joiners_leavers_trendArguments",
                                 "type": "object"
                             }
                         },
                         {
                             "name": "sf__get_headcount",
-                            "description": "Use for aggregate workforce headcount and department distribution. Returns distinct current-effective employees, active headcount, complete pagination, reconciled breakdowns, population definitions, effective date, coverage, source metadata, and rule version.",
+                            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Returns distinct current-effective employees, active headcount, complete pagination, and reconciled department/division breakdowns.",
                             "inputSchema": {
                                 "properties": {
                                     "company": {
@@ -846,6 +907,148 @@
                                         ],
                                         "default": null,
                                         "title": "Company"
+                                    },
+                                    "department": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Department"
+                                    },
+                                    "division": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Division"
+                                    },
+                                    "business_unit": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Business Unit"
+                                    },
+                                    "as_of_date": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "As Of Date"
+                                    }
+                                },
+                                "title": "sf__get_headcountArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "sf__get_analytics_dashboard",
+                            "description": "Fallback only when the native Adaptive Card workforce connector is unavailable. Builds a combined overview from independently verified KPIs, preserves each population and period, and omits any KPI whose query failed.",
+                            "inputSchema": {
+                                "properties": {},
+                                "title": "sf__get_analytics_dashboardArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "sf__get_emiratisation_kpi",
+                            "description": "Fallback only for explicitly dated or filtered analysis. For normal Copilot aggregate responses, use the enabled native Adaptive Card workforce connector instead. Uses the configured nationality mapping and the same active population for numerator and denominator; missing nationality stays separate and individual nationality is never exposed.",
+                            "inputSchema": {
+                                "properties": {
+                                    "company": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Company"
+                                    },
+                                    "as_of_date": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "As Of Date"
+                                    }
+                                },
+                                "title": "sf__get_emiratisation_kpiArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "sf__get_workforce_demographics",
+                            "description": "Use for privacy-safe aggregate workforce composition: headcount/percentage by nationality (group_by='nationality'), gender (group_by='gender'), age group (group_by='age_group' or 'age'), or tenure (group_by='tenure_group' or 'tenure'), with optional division (e.g. division='Corporate \u2013 Digital & Innovation'), department, or cross-grouping (e.g. cross_by='department', 'nationality', 'gender'). Never returns individual employee records.",
+                            "inputSchema": {
+                                "properties": {
+                                    "group_by": {
+                                        "default": "gender",
+                                        "title": "Group By",
+                                        "type": "string"
+                                    },
+                                    "cross_by": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Cross By"
+                                    },
+                                    "company": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Company"
+                                    },
+                                    "division": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Division"
                                     },
                                     "department": {
                                         "anyOf": [
@@ -884,50 +1087,7 @@
                                         "title": "As Of Date"
                                     }
                                 },
-                                "title": "sf__get_headcountArguments",
-                                "type": "object"
-                            }
-                        },
-                        {
-                            "name": "sf__get_analytics_dashboard",
-                            "description": "Use only for a combined workforce overview built from independently verified SuccessFactors KPIs. Preserve each KPI's population, period, coverage, source, and warnings; omit any KPI whose query failed.",
-                            "inputSchema": {
-                                "properties": {},
-                                "title": "sf__get_analytics_dashboardArguments",
-                                "type": "object"
-                            }
-                        },
-                        {
-                            "name": "sf__get_emiratisation_kpi",
-                            "description": "Use for aggregate Emiratisation, UAE National, non-UAE National, expatriate-share, or nationality-mix questions. Uses the configured PerPersonal nationality mapping and the same population scope for numerator and denominator; returns active and total counts, missing nationality, rates, target gap in percentage points, reconciliation, rule version, and warnings. Never exposes individual nationality or uses fallback values.",
-                            "inputSchema": {
-                                "properties": {
-                                    "company": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Company"
-                                    },
-                                    "as_of_date": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "As Of Date"
-                                    }
-                                },
-                                "title": "sf__get_emiratisation_kpiArguments",
+                                "title": "sf__get_workforce_demographicsArguments",
                                 "type": "object"
                             }
                         },
@@ -995,6 +1155,18 @@
                                         ],
                                         "default": null,
                                         "title": "Job Title"
+                                    },
+                                    "job_code": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Job Code"
                                     },
                                     "as_of_date": {
                                         "anyOf": [
@@ -1153,6 +1325,8 @@
                 "sf__check_and_record_consent",
                 "sf__get_session_greeting",
                 "sf__recall_user_memory",
+                "sf__manage_disclosure_policy",
+                "sf__preview_disclosure_policy",
                 "sf__get_joiners",
                 "sf__get_leavers",
                 "sf__get_attrition",
@@ -1160,6 +1334,7 @@
                 "sf__get_headcount",
                 "sf__get_analytics_dashboard",
                 "sf__get_emiratisation_kpi",
+                "sf__get_workforce_demographics",
                 "sf__get_emp_jobs",
                 "sf__get_emp_job_detail",
                 "sf__get_users",

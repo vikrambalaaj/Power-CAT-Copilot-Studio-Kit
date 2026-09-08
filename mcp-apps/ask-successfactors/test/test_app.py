@@ -2,6 +2,7 @@ import json
 import asyncio
 import inspect
 import unittest
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -30,6 +31,9 @@ class FakeSettings:
     sf_gender_entity = "PerPersonal"
     sf_gender_person_id_field = "personIdExternal"
     sf_gender_field = "gender"
+    sf_dob_entity = "PerPersonal"
+    sf_dob_person_id_field = "personIdExternal"
+    sf_dob_field = "dateOfBirth"
     sf_uae_nationality_codes = "ARE"
     sf_active_user_statuses = "t"
     sf_metric_rule_version = "test-v2"
@@ -43,13 +47,33 @@ class ConnectionAdminRouteTests(unittest.IsolatedAsyncioTestCase):
         admin_service.test_connection = AsyncMock(
             return_value={"success": True, "status": "HEALTHY"}
         )
-        request = SimpleNamespace(path_params={"conn_id": "CONN-SF-001"})
+        admin_service._is_admin = lambda roles: "Velora_Admin" in (roles or [])
+
+        # 1. Unverified / missing headers: rejected with 403 Access Denied
+        request_unverified = SimpleNamespace(path_params={"conn_id": "CONN-SF-001"}, headers={})
+        with patch(
+            "successfactors_mcp.connection_admin.get_connection_admin_service",
+            return_value=admin_service,
+        ):
+            resp_denied = await server.api_connection_test(request_unverified)
+        self.assertEqual(resp_denied.status_code, 403)
+        admin_service.test_connection.assert_not_awaited()
+
+        # 2. Verified EasyAuth principal: authorized with 200
+        import base64
+        valid_principal = base64.b64encode(json.dumps({
+            "claims": [{"typ": "roles", "val": "Velora_Admin"}]
+        }).encode()).decode()
+        request_verified = SimpleNamespace(
+            path_params={"conn_id": "CONN-SF-001"},
+            headers={"x-ms-client-principal": valid_principal}
+        )
 
         with patch(
             "successfactors_mcp.connection_admin.get_connection_admin_service",
             return_value=admin_service,
         ):
-            response = await server.api_connection_test(request)
+            response = await server.api_connection_test(request_verified)
 
         admin_service.test_connection.assert_awaited_once_with(
             "CONN-SF-001", user_roles=["Velora_Admin"]
@@ -59,18 +83,44 @@ class ConnectionAdminRouteTests(unittest.IsolatedAsyncioTestCase):
     async def test_connection_listing_uses_registered_admin_role(self):
         admin_service = MagicMock()
         admin_service.list_connections_for_user.return_value = []
-        request = SimpleNamespace(query_params={})
-
+        
+        # 1. Missing headers: deny absent roles (returns empty roles, never Velora_Admin)
+        request_no_headers = SimpleNamespace(query_params={})
         with patch(
             "successfactors_mcp.connection_admin.get_connection_admin_service",
             return_value=admin_service,
         ):
-            response = await server.api_connections(request)
-
-        admin_service.list_connections_for_user.assert_called_once_with(
-            user_roles=["Velora_Admin"], environment=None
+            response = await server.api_connections(request_no_headers)
+        admin_service.list_connections_for_user.assert_called_with(
+            user_roles=[], environment=None
         )
         self.assertEqual(response.status_code, 200)
+
+        # 2. Forged role header without verified identity: strictly denied
+        request_forged = SimpleNamespace(query_params={}, headers={"x-user-roles": "Velora_Admin"})
+        with patch(
+            "successfactors_mcp.connection_admin.get_connection_admin_service",
+            return_value=admin_service,
+        ):
+            await server.api_connections(request_forged)
+        admin_service.list_connections_for_user.assert_called_with(
+            user_roles=[], environment=None
+        )
+
+        # 3. Verified EasyAuth principal: trusted identity extracted
+        import base64
+        valid_principal = base64.b64encode(json.dumps({
+            "claims": [{"typ": "roles", "val": "Velora_Admin"}]
+        }).encode()).decode()
+        request_verified = SimpleNamespace(query_params={}, headers={"x-ms-client-principal": valid_principal})
+        with patch(
+            "successfactors_mcp.connection_admin.get_connection_admin_service",
+            return_value=admin_service,
+        ):
+            await server.api_connections(request_verified)
+        admin_service.list_connections_for_user.assert_called_with(
+            user_roles=["Velora_Admin"], environment=None
+        )
 
 
 class CapturingClient(SuccessFactorsClient):
@@ -310,6 +360,59 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
             {"gender": "Female", "nationality": "United Arab Emirates"},
             [{"gender": row["gender"], "nationality": row["nationality"]} for row in result["breakdown"]],
         )
+
+    async def test_age_group_demographics(self):
+        client = CapturingClient([
+            {"results": [
+                {"userId": "1", "department": "D1", "startDate": "2020-01-01"},
+                {"userId": "2", "department": "D1", "startDate": "2023-01-01"},
+                {"userId": "3", "department": "D1", "startDate": "2025-06-01"},
+            ], "__count": "3"},
+            {"results": [
+                {"userId": "1", "status": "t"},
+                {"userId": "2", "status": "t"},
+                {"userId": "3", "status": "t"},
+            ], "__count": "3"},
+            {"results": [
+                {"personIdExternal": "1", "dateOfBirth": "1970-01-01"},
+                {"personIdExternal": "2", "dateOfBirth": "1995-05-15"},
+                {"personIdExternal": "3", "dateOfBirth": "2002-10-10"},
+            ], "__count": "3"},
+        ])
+
+        result = await client.aggregate_workforce_demographics(group_by="age_group")
+        self.assertEqual(result["type"], "WorkforceDemographics")
+        self.assertEqual(result["active_headcount"], 3)
+        self.assertEqual(len(result["breakdown"]), 3)
+        self.assertTrue(all("userId" not in row for row in result["breakdown"]))
+        age_groups = {row["age_group"] for row in result["breakdown"]}
+        self.assertIn("55 and above", age_groups)
+        self.assertIn("35–44" if date.today().year - 1995 >= 35 else "25–34", age_groups)
+        self.assertIn("Under 25", age_groups)
+
+    async def test_tenure_group_demographics(self):
+        client = CapturingClient([
+            {"results": [
+                {"userId": "1", "department": "D1", "startDate": "2015-01-01"},
+                {"userId": "2", "department": "D1", "startDate": "2022-01-01"},
+                {"userId": "3", "department": "D1", "startDate": "2025-10-01"},
+            ], "__count": "3"},
+            {"results": [
+                {"userId": "1", "status": "t"},
+                {"userId": "2", "status": "t"},
+                {"userId": "3", "status": "t"},
+            ], "__count": "3"},
+        ])
+
+        result = await client.aggregate_workforce_demographics(group_by="tenure")
+        self.assertEqual(result["type"], "WorkforceDemographics")
+        self.assertEqual(result["active_headcount"], 3)
+        self.assertEqual(len(result["breakdown"]), 3)
+        self.assertTrue(all("userId" not in row for row in result["breakdown"]))
+        tenure_groups = {row["tenure_group"] for row in result["breakdown"]}
+        self.assertIn("10+ years", tenure_groups)
+        self.assertIn("3–5 years", tenure_groups)
+        self.assertIn("< 1 year", tenure_groups)
 
 
 class ToolTests(unittest.IsolatedAsyncioTestCase):

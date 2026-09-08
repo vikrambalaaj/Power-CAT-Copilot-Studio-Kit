@@ -1,0 +1,16 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Budget Consumption", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA · permission-trimmed", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Cost Center", "value": "${if(query.filters.CostCenter, query.filters.CostCenter, 'All Mapped')}"},
+      {"title": "Fiscal Period", "value": "${query.period}"},
+      {"title": "Currency", "value": "${if(query.currency, query.currency, 'AED')}"}
+    ]},
+    {"type": "TextBlock", "text": "Copilot summarizes budget allocated, actual expenditures, commitments, and remaining consumption percentage.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

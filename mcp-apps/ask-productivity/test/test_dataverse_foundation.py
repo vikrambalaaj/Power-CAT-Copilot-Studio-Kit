@@ -2,6 +2,7 @@
 import asyncio
 import unittest
 from datetime import datetime, timezone
+from unittest.mock import AsyncMock
 
 from productivity_mcp.dataverse_audit import (
     DataverseAuditRecord,
@@ -24,7 +25,15 @@ from productivity_mcp.dataverse_audit import (
 
 class TestDataverseAuditFoundation(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.dv_client = DataverseClient()
+        self.dv_client = DataverseClient(
+            base_url="https://example.crm.dynamics.com",
+            tenant_id="tenant",
+            client_id="client",
+            client_secret="secret",
+        )
+        self.dv_client._create_live_audit_row = AsyncMock(
+            side_effect=lambda payload: f"00000000-0000-0000-0000-{len(self.dv_client._audit_store) + 1:012d}"
+        )
         self.dv_client.clear_all_for_testing()
 
     async def test_all_12_record_types_valid(self):
@@ -55,7 +64,7 @@ class TestDataverseAuditFoundation(unittest.IsolatedAsyncioTestCase):
             )
             res = await self.dv_client.create_audit_record(rec)
             self.assertEqual(res["status"], "SUCCESS")
-            self.assertTrue(res["id"].startswith("AUD-"))
+            self.assertTrue(res["id"])
 
     async def test_alternate_key_idempotency(self):
         """Verify Section 3.4 alternate key idempotency: cre2f_invocationid + cre2f_recordtype."""

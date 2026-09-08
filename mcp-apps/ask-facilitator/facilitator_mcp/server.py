@@ -1,6 +1,7 @@
-"""Facilitator MCP Server."""
+"""Facilitator MCP Server with Strict Identity, Authorization, and Governed Writes."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import uvicorn
@@ -10,21 +11,43 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
+from shared_mcp.identity import (
+    AuthenticationError,
+    AuthorizationError,
+    extract_verified_identity,
+)
 from .tools import TOOL_SPECS, FACILITATOR_AUTO_SEND_GUIDE
 
 log = logging.getLogger("facilitator_mcp")
+
+# Side-effect tools that MUST NOT be invoked via GET
+MUTATING_TOOLS = {
+    "send_executive_email_via_graph",
+    "configure_auto_send_policy",
+    "export_meeting_to_loop_notebook",
+    "process_calendar_meeting_workflow",
+    "ingest_chat_to_knowledge_graph",
+}
+
+# Admin-only tools
+ADMIN_ONLY_TOOLS = {
+    "configure_auto_send_policy",
+}
 
 allowed_hosts = [
     value.strip()
     for value in os.getenv(
         "ALLOWED_HOSTS",
-        "localhost:*,127.0.0.1:*",
+        "teams.microsoft.com,copilotstudio.microsoft.com,localhost,127.0.0.1",
     ).split(",")
     if value.strip()
 ]
 allowed_origins = [
     value.strip()
-    for value in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    for value in os.getenv(
+        "CORS_ORIGINS",
+        "https://teams.microsoft.com,https://copilotstudio.microsoft.com",
+    ).split(",")
     if value.strip()
 ]
 
@@ -45,14 +68,23 @@ async def health(_request):
     return JSONResponse({"status": "ok", "service": "facilitator-mcp-server"})
 
 
-async def guide_endpoint(_request):
+async def guide_endpoint(request):
+    # Enforce authentication
+    try:
+        extract_verified_identity(dict(request.headers))
+    except (AuthenticationError, AuthorizationError) as e:
+        return JSONResponse({"error": "Unauthorized", "detail": str(e)}, status_code=401)
     return JSONResponse({
         "service": "facilitator",
         "guide": FACILITATOR_AUTO_SEND_GUIDE,
     })
 
 
-async def list_tools_endpoint(_request):
+async def list_tools_endpoint(request):
+    try:
+        extract_verified_identity(dict(request.headers))
+    except (AuthenticationError, AuthorizationError) as e:
+        return JSONResponse({"error": "Unauthorized", "detail": str(e)}, status_code=401)
     tools = [
         {"name": name, "description": desc, "parameters": {}}
         for name, desc, _ in TOOL_SPECS
@@ -65,7 +97,39 @@ async def handle_facilitator_tool_rest(request):
     tool_entry = next((item for item in TOOL_SPECS if item[0] == path), None)
     if not tool_entry:
         return JSONResponse({"error": f"Tool '{path}' not found"}, status_code=404)
-    _, _, handler = tool_entry
+    name, _, handler = tool_entry
+
+    # 1. Enforce Authentication
+    allow_anon = os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1")
+    identity = None
+    if not allow_anon:
+        try:
+            identity = extract_verified_identity(dict(request.headers))
+        except AuthenticationError as e:
+            return JSONResponse({"error": "Unauthorized", "message": str(e)}, status_code=401)
+        except AuthorizationError as e:
+            return JSONResponse({"error": "Forbidden", "message": str(e)}, status_code=403)
+
+    # 2. Enforce HTTP method restriction: GET must not trigger mutating tools
+    if request.method == "GET" and name in MUTATING_TOOLS:
+        return JSONResponse(
+            {
+                "error": "Method Not Allowed",
+                "message": f"Tool '{name}' modifies state and cannot be invoked via GET. Use POST.",
+            },
+            status_code=405,
+        )
+
+    # 3. Enforce Role-Based Authorization
+    if name in ADMIN_ONLY_TOOLS:
+        if not identity or not identity.is_admin:
+            return JSONResponse(
+                {
+                    "error": "Forbidden",
+                    "message": f"Tool '{name}' requires administrator privileges (Velora_Admin role).",
+                },
+                status_code=403,
+            )
 
     args = dict(request.query_params)
     if request.method == "POST":
@@ -88,7 +152,6 @@ async def handle_facilitator_tool_rest(request):
 
 
 def create_app():
-    import asyncio
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", health, methods=["GET"]))
     app.routes.append(Route("/guide", guide_endpoint, methods=["GET"]))
@@ -96,11 +159,12 @@ def create_app():
     for name, _, _ in TOOL_SPECS:
         app.routes.append(Route(f"/{name}", handle_facilitator_tool_rest, methods=["GET", "POST"]))
         app.routes.append(Route(f"/tools/{name}", handle_facilitator_tool_rest, methods=["GET", "POST"]))
+    
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=allowed_origins if allowed_origins else ["https://copilotstudio.microsoft.com"],
         allow_credentials=True,
-        allow_methods=["*"],
+        allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )
     return app
@@ -110,4 +174,5 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    uvicorn.run("facilitator_mcp.server:app", host="0.0.0.0", port=8000, reload=False)
+    port = int(os.getenv("PORT", "8085"))
+    uvicorn.run("facilitator_mcp.server:app", host="0.0.0.0", port=port, reload=False)

@@ -3,7 +3,7 @@
   "info": {
     "title": "Velora S4HANA Finance MCP",
     "description": "SAP S/4HANA Finance integration for Velora Executive Agent",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "host": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
   "basePath": "/",
@@ -62,6 +62,9 @@
                 "customer": {
                   "type": "string"
                 },
+                "customer_name": {
+                  "type": "string"
+                },
                 "currency": {
                   "type": "string",
                   "default": "AED"
@@ -98,6 +101,9 @@
                 "supplier": {
                   "type": "string"
                 },
+                "supplier_name": {
+                  "type": "string"
+                },
                 "currency": {
                   "type": "string",
                   "default": "AED"
@@ -113,10 +119,10 @@
         }
       }
     },
-    "/s4__get_profit_and_loss": {
+    "/s4__get_budget_transfers": {
       "post": {
-        "summary": "Retrieve Profit and Loss statement from SAP S/4HANA",
-        "operationId": "getProfitAndLoss",
+        "summary": "Retrieve budget movement and original-budget entries from SAP S/4HANA",
+        "operationId": "getBudgetTransfers",
         "parameters": [
           {
             "name": "body",
@@ -125,22 +131,30 @@
             "schema": {
               "type": "object",
               "properties": {
-                "company_code": {
+                "financial_management_area": {
+                  "type": "string"
+                },
+                "funds_center": {
+                  "type": "string"
+                },
+                "commitment_item": {
                   "type": "string"
                 },
                 "fiscal_year": {
                   "type": "string"
                 },
-                "fiscal_period": {
+                "budget_period": {
                   "type": "string"
-                },
-                "ledger": {
-                  "type": "string",
-                  "default": "0L"
                 },
                 "currency": {
                   "type": "string",
                   "default": "AED"
+                },
+                "budgeting_process": {
+                  "type": "string"
+                },
+                "movement_type": {
+                  "type": "string"
                 }
               }
             }
@@ -148,15 +162,98 @@
         ],
         "responses": {
           "200": {
-            "description": "P&L statement summary with Adaptive Card"
+            "description": "Budget transfers and movements dataset with Adaptive Card"
           }
         }
       }
     },
-    "/s4__get_budget_variance": {
+    "/s4__get_budget_consumption": {
       "post": {
-        "summary": "Retrieve budget versus actuals variance from SAP S/4HANA",
-        "operationId": "getBudgetVariance",
+        "summary": "Retrieve budget, commitment, and actual expenditure from SAP S/4HANA",
+        "operationId": "getBudgetConsumption",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "financial_management_area": {
+                  "type": "string"
+                },
+                "funds_center": {
+                  "type": "string"
+                },
+                "commitment_item": {
+                  "type": "string"
+                },
+                "fiscal_year": {
+                  "type": "string"
+                },
+                "period": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string",
+                  "default": "AED"
+                },
+                "budget_version": {
+                  "type": "string"
+                },
+                "company_code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Budget consumption dataset with Adaptive Card"
+          }
+        }
+      }
+    },
+    "/s4__get_customer_master": {
+      "post": {
+        "summary": "Retrieve customer master records from SAP S/4HANA",
+        "operationId": "getCustomerMaster",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customer": {
+                  "type": "string"
+                },
+                "customer_name": {
+                  "type": "string"
+                },
+                "city": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer master records"
+          }
+        }
+      }
+    },
+    "/s4__get_cost_center_master": {
+      "post": {
+        "summary": "Retrieve cost center master records from SAP S/4HANA",
+        "operationId": "getCostCenterMaster",
         "parameters": [
           {
             "name": "body",
@@ -168,15 +265,11 @@
                 "company_code": {
                   "type": "string"
                 },
-                "fiscal_year": {
+                "cost_center": {
                   "type": "string"
                 },
-                "fiscal_period": {
+                "description": {
                   "type": "string"
-                },
-                "plan_version": {
-                  "type": "string",
-                  "default": "0"
                 }
               }
             }
@@ -184,7 +277,39 @@
         ],
         "responses": {
           "200": {
-            "description": "Budget variance analysis"
+            "description": "Cost center master records"
+          }
+        }
+      }
+    },
+    "/s4__get_profit_center_master": {
+      "post": {
+        "summary": "Retrieve profit center master records from SAP S/4HANA",
+        "operationId": "getProfitCenterMaster",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "company_code": {
+                  "type": "string"
+                },
+                "profit_center": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profit center master records"
           }
         }
       }

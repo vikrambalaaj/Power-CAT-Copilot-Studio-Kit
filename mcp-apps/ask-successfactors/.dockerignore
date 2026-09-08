@@ -1,0 +1,15 @@
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!requirements.txt
+!successfactors_mcp/
+!successfactors_mcp/**
+!shared_mcp/
+!shared_mcp/**
+!deploy/
+!deploy/copilot-workforce-card-openapi.json
+**/__pycache__/
+**/*.pyc
+**/.env*
+**/logs/

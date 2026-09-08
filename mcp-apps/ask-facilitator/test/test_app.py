@@ -12,10 +12,14 @@ from facilitator_mcp.tools import (
     generate_pre_meeting_briefing,
     export_meeting_to_loop_notebook,
     send_executive_email_via_graph,
+    seed_test_facilitator_data,
 )
 
 
 class TestFacilitatorServer(unittest.TestCase):
+    def setUp(self):
+        seed_test_facilitator_data()
+
     def test_get_facilitator_guide(self):
         res = get_facilitator_guide()
         self.assertIn("content", res)

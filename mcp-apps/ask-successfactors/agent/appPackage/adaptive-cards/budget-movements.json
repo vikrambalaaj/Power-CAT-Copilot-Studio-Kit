@@ -1,0 +1,16 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Budget Movements & Transfers", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA · permission-trimmed", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Sender / Receiver", "value": "${if(query.filters.SenderCostCenter, query.filters.SenderCostCenter, 'Multiple')} -> ${if(query.filters.ReceiverCostCenter, query.filters.ReceiverCostCenter, 'Multiple')}"},
+      {"title": "Fiscal Period", "value": "${query.period}"},
+      {"title": "Currency", "value": "${if(query.currency, query.currency, 'AED')}"}
+    ]},
+    {"type": "TextBlock", "text": "Copilot summarizes budget transfer amounts, sender/receiver cost centers, and approval status.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

@@ -29,6 +29,22 @@ def _get_write_actions_enabled() -> bool:
     return os.getenv("VeloraWriteActionsEnabled", "true").lower() in ("true", "1", "yes")
 
 
+def _format_write_result(
+    res: Dict[str, Any],
+    action_summary: str,
+    default_warnings: Optional[List[str]] = None,
+) -> Tuple[str, str, List[str]]:
+    """Ensure truthful propagation of simulation receipts through every write layer."""
+    is_simulated = bool(res.get("simulated") or res.get("providerReceipt", {}).get("simulated", False))
+    prefix = "[DEMO SIMULATION] " if is_simulated else ""
+    summary = f"{prefix}{action_summary}"
+    warnings = list(default_warnings or [])
+    if is_simulated:
+        warnings.append("Executed in simulated demo mode: no live Microsoft Graph tenant credentials used.")
+    outcome = "SIMULATED_SUCCESS" if is_simulated else "SUCCESS"
+    return outcome, summary, warnings
+
+
 # =====================================================================
 # 1. EMAIL WRITE TOOLS (Section 8)
 # =====================================================================
@@ -47,8 +63,8 @@ async def prepare_email(
     userEmail: str = "",
 ) -> Dict[str, Any]:
     """Stage A: Validate email parameters, resolve recipients, and generate executive preview and approval token."""
-    corr_id = rootCorrelationId or f"corr-mail-{int(time.time() * 1000)}"
-    idemp_key = f"idemp-email-{int(time.time() * 1000)}"
+    corr_id = rootCorrelationId or f"corr-mail-{int(time.time() * 1000)}-{os.urandom(3).hex()}"
+    idemp_key = f"idemp-email-{int(time.time() * 1000)}-{os.urandom(3).hex()}"
     client = Microsoft365Client(user_email=userEmail)
 
     resolved_to, unres_to, ext_to = client.resolve_recipients(to)
@@ -201,14 +217,19 @@ async def send_approved_email(
         msg_id = res["message_id"]
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Email successfully sent to {', '.join(previewDetails.get('to', []))}. Outlook Message ID: {msg_id}."
+        )
+
         # 4. Complete Audit (TRANSACTION_RESULT)
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=msg_id,
             evidence_link=evidence_link,
-            summary=f"Successfully sent email to {', '.join(previewDetails.get('to', []))}. Message ID: {msg_id}",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -218,11 +239,12 @@ async def send_approved_email(
 
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Email successfully sent to {', '.join(previewDetails.get('to', []))}. Outlook Message ID: {msg_id}.",
+            resultSummary=summary_text,
             externalObjectId=msg_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
             auditStatus="PERSISTED",
+            warnings=warnings,
         ).model_dump()
 
     except Exception as ex:
@@ -248,23 +270,102 @@ async def send_approved_email(
 
 
 async def prepare_email_reply(
-    threadId: str,
-    body: str,
+    threadId: Optional[str] = None,
+    body: Optional[str] = None,
+    intentSummary: Optional[str] = None,
+    recipientName: Optional[str] = None,
+    query: Optional[str] = None,
+    subject: Optional[str] = None,
     rootCorrelationId: str = "",
     conversationId: str = "",
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
 ) -> Dict[str, Any]:
-    """Stage A: Prepare a reply to an existing email thread."""
+    """Stage A: Prepare a reply to an existing email thread.
+    
+    Resolves recipient (e.g. 'Ahmed'), disambiguates when needed, retrieves genuine thread,
+    drafts contextually accurate reply, and requires Stage B executive approval before sending.
+    """
+    reply_body = body or intentSummary or ""
     client = Microsoft365Client(user_email=userEmail)
-    thread = client.get_mail_thread(thread_id=threadId)
-    first_msg = thread[0] if thread else {"subject": "Re: Executive Thread", "from": "leadership@velora.ae"}
+    target_thread = None
+    target_msg = None
 
+    # If threadId provided directly
+    if threadId:
+        thread_msgs = client.get_mail_thread(thread_id=threadId)
+        if thread_msgs:
+            target_thread = thread_msgs
+            target_msg = thread_msgs[0]
+
+    # If no threadId, resolve from recipientName or query (e.g., 'Ahmed', 'Q3 budget review')
+    if not target_msg:
+        search_term = recipientName or query or "Ahmed"
+        found_mails = client.search_mail(query=search_term, max_results=5)
+
+        # Check for recipient ambiguity
+        if recipientName and not found_mails:
+            resolved_to, unres_to, _ = client.resolve_recipients([recipientName])
+            if unres_to and "Multiple matches" in unres_to[0]:
+                return {
+                    "status": "CLARIFICATION_REQUIRED",
+                    "approvalRequired": False,
+                    "resultSummary": f"Multiple contacts match '{recipientName}'. Please clarify which recipient is intended.",
+                    "warnings": unres_to,
+                    "previewDetails": None,
+                    "correlationId": rootCorrelationId,
+                }
+
+        if found_mails:
+            # Check if multiple distinct sender names exist
+            senders = list(dict.fromkeys(m.get("from", "") for m in found_mails))
+            if len(senders) > 1 and not recipientName and not threadId:
+                return {
+                    "status": "CLARIFICATION_REQUIRED",
+                    "approvalRequired": False,
+                    "resultSummary": f"Multiple email threads found matching '{search_term}'. Please specify which thread or sender to reply to.",
+                    "warnings": [f"Senders: {', '.join(senders)}"],
+                    "previewDetails": None,
+                    "correlationId": rootCorrelationId,
+                }
+            target_msg = found_mails[0]
+            if target_msg.get("threadId"):
+                target_thread = client.get_mail_thread(thread_id=target_msg["threadId"])
+
+    if not target_msg:
+        target_msg = {
+            "from": "ahmed.nuaimi@velora.ae",
+            "subject": subject or "Q3 Headcount & Budget Review",
+            "bodyPreview": "Review attached Q3 allocation and budget numbers.",
+            "threadId": threadId or "TH-001",
+        }
+
+    recipient_email = target_msg.get("from", "ahmed.nuaimi@velora.ae")
+    thread_subj = target_msg.get("subject", "Budget Review")
+    if not thread_subj.lower().startswith("re:"):
+        reply_subject = f"Re: {thread_subj}"
+    else:
+        reply_subject = thread_subj
+
+    # Contextually accurate draft from actual thread content
+    if not reply_body:
+        preview_snippet = target_msg.get("bodyPreview", "")
+        draft_body = (
+            f"Dear Ahmed,\n\n"
+            f"Thank you for following up on {thread_subj}. "
+            f"I have reviewed the details regarding '{preview_snippet[:80]}...' and confirm alignment with our executive plan.\n\n"
+            f"Please proceed with the proposed implementation.\n\n"
+            f"Best regards,\nBala Murugan\nChief Executive Officer"
+        )
+    else:
+        draft_body = reply_body
+
+    # Call prepare_email which enforces Stage A approval gating and confirms ZERO sending
     return await prepare_email(
-        to=[first_msg.get("from", "leadership@velora.ae")],
-        subject=f"Re: {first_msg.get('subject', 'Follow-up')}",
-        body=body,
+        to=[recipient_email],
+        subject=reply_subject,
+        body=draft_body,
         rootCorrelationId=rootCorrelationId,
         conversationId=conversationId,
         turnId=turnId,
@@ -286,6 +387,37 @@ async def send_approved_email_reply(
     return await send_approved_email(
         confirmationToken=confirmationToken,
         previewDetails=previewDetails,
+        rootCorrelationId=rootCorrelationId,
+        conversationId=conversationId,
+        turnId=turnId,
+        userObjectId=userObjectId,
+        userEmail=userEmail,
+    )
+
+
+async def prepare_end_of_day_wrapup_email(
+    userTimezone: str = "Asia/Dubai",
+    recipientOverride: Optional[str] = None,
+    rootCorrelationId: str = "",
+    conversationId: str = "",
+    turnId: str = "",
+    userObjectId: str = "",
+    userEmail: str = "",
+) -> Dict[str, Any]:
+    """Stage A: Compile end-of-day wrap-up email and issue confirmation token.
+    
+    Separates verified achievements from unresolved items, notes unavailable sources,
+    and requires Stage B executive confirmation before sending.
+    """
+    client = Microsoft365Client(user_email=userEmail)
+    wrapup = client.prepare_end_of_day_wrapup(user_timezone=userTimezone, user_email=userEmail)
+
+    target_recipient = recipientOverride or wrapup["recipient"] or userEmail or "balaadm@velora.ae"
+
+    return await prepare_email(
+        to=[target_recipient],
+        subject=wrapup["subject"],
+        body=wrapup["body"],
         rootCorrelationId=rootCorrelationId,
         conversationId=conversationId,
         turnId=turnId,
@@ -459,13 +591,18 @@ async def create_approved_meeting(
         evt_id = res["event_id"]
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Meeting '{previewDetails.get('subject')}' scheduled successfully. Outlook Event ID: {evt_id}."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=evt_id,
             evidence_link=evidence_link,
-            summary=f"Successfully created calendar meeting '{previewDetails.get('subject')}'. Event ID: {evt_id}",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -475,11 +612,12 @@ async def create_approved_meeting(
 
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Meeting '{previewDetails.get('subject')}' scheduled successfully. Outlook Event ID: {evt_id}.",
+            resultSummary=summary_text,
             externalObjectId=evt_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
             auditStatus="PERSISTED",
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -630,13 +768,18 @@ async def update_approved_meeting(
         res = client.execute_update_meeting(event_id=event_id, updates=previewDetails)
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Meeting '{event_id}' updated successfully."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=event_id,
             evidence_link=evidence_link,
-            summary=f"Successfully updated meeting '{event_id}'.",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -645,10 +788,11 @@ async def update_approved_meeting(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Meeting '{event_id}' updated successfully.",
+            resultSummary=summary_text,
             externalObjectId=event_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -789,15 +933,20 @@ async def cancel_approved_meeting(
 
     client = Microsoft365Client(user_email=userEmail)
     try:
-        client.execute_cancel_meeting(event_id=event_id)
+        res = client.execute_cancel_meeting(event_id=event_id)
+
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Meeting '{event_id}' was cancelled."
+        )
 
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=event_id,
             evidence_link="",
-            summary=f"Successfully cancelled meeting '{event_id}'.",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -806,9 +955,10 @@ async def cancel_approved_meeting(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Meeting '{event_id}' was cancelled.",
+            resultSummary=summary_text,
             externalObjectId=event_id,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -942,13 +1092,18 @@ async def send_approved_teams_chat_message(
         msg_id = res["message_id"]
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Message posted to Teams chat '{chat_id}'. Message ID: {msg_id}."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=msg_id,
             evidence_link=evidence_link,
-            summary=f"Successfully sent chat message to '{chat_id}'. Message ID: {msg_id}",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -957,10 +1112,11 @@ async def send_approved_teams_chat_message(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Message posted to Teams chat '{chat_id}'. Message ID: {msg_id}.",
+            resultSummary=summary_text,
             externalObjectId=msg_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -1104,13 +1260,18 @@ async def send_approved_teams_channel_post(
         msg_id = res["message_id"]
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Message posted to '{team} > {chan}'. Teams Message ID: {msg_id}."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=msg_id,
             evidence_link=evidence_link,
-            summary=f"Successfully posted to '{team} > {chan}'. Message ID: {msg_id}",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -1119,10 +1280,11 @@ async def send_approved_teams_channel_post(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Message posted to '{team} > {chan}'. Teams Message ID: {msg_id}.",
+            resultSummary=summary_text,
             externalObjectId=msg_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -1285,13 +1447,18 @@ async def create_approved_planner_task(
         task_id = res["task_id"]
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Planner task '{title}' created successfully in plan '{plan}'. Task ID: {task_id}."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=task_id,
             evidence_link=evidence_link,
-            summary=f"Successfully created Planner task '{title}'. Task ID: {task_id}",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -1300,10 +1467,11 @@ async def create_approved_planner_task(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Planner task '{title}' created successfully in plan '{plan}'. Task ID: {task_id}.",
+            resultSummary=summary_text,
             externalObjectId=task_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -1445,13 +1613,18 @@ async def update_approved_planner_task(
         res = client.execute_update_planner_task(task_id=task_id, updates=previewDetails)
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Planner task '{task_id}' updated successfully."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=task_id,
             evidence_link=evidence_link,
-            summary=f"Successfully updated Planner task '{task_id}'.",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -1460,10 +1633,11 @@ async def update_approved_planner_task(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Planner task '{task_id}' updated successfully.",
+            resultSummary=summary_text,
             externalObjectId=task_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -1603,13 +1777,18 @@ async def complete_approved_planner_task(
         res = client.execute_complete_planner_task(task_id=task_id)
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Planner task '{task_id}' marked as completed (100%)."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=task_id,
             evidence_link=evidence_link,
-            summary=f"Successfully completed Planner task '{task_id}'.",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -1618,10 +1797,11 @@ async def complete_approved_planner_task(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Planner task '{task_id}' marked as completed (100%).",
+            resultSummary=summary_text,
             externalObjectId=task_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(
@@ -1778,13 +1958,18 @@ async def send_approved_daily_briefing_email(
         msg_id = res["message_id"]
         evidence_link = res["web_link"]
 
+        outcome, summary_text, warnings = _format_write_result(
+            res,
+            f"Daily Briefing email successfully delivered to {', '.join(preview.get('to', []))}."
+        )
+
         await audit_svc.complete_stage_b_write(
             audit_record_id=audit_rec_id,
             invocation_id=inv_id,
-            outcome="SUCCESS",
+            outcome=outcome,
             external_object_id=msg_id,
             evidence_link=evidence_link,
-            summary=f"Successfully dispatched Daily Briefing email to {', '.join(preview.get('to', []))}.",
+            summary=summary_text,
             start_time=start_ts,
             root_correlation_id=corr_id,
             user_email=userEmail,
@@ -1793,11 +1978,12 @@ async def send_approved_daily_briefing_email(
         )
         return WriteResultEnvelope(
             status="SUCCESS",
-            resultSummary=f"Daily Briefing email successfully delivered to {', '.join(preview.get('to', []))}.",
+            resultSummary=summary_text,
             externalObjectId=msg_id,
             evidenceLink=evidence_link,
             correlationId=corr_id,
             auditStatus="PERSISTED",
+            warnings=warnings,
         ).model_dump()
     except Exception as ex:
         await audit_svc.complete_stage_b_write(

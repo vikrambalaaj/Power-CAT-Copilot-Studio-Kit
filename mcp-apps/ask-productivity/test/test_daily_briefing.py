@@ -1,9 +1,10 @@
 """Unit tests for Executive Daily Briefing tools and email dispatch."""
 import asyncio
+import os
 import unittest
 
 from productivity_mcp.dataverse_audit import get_dataverse_client
-from productivity_mcp.m365_client import Microsoft365Client
+from productivity_mcp.m365_client import Microsoft365Client, seed_test_m365_data
 from productivity_mcp.tools_m365_reads import get_daily_executive_briefing
 from productivity_mcp.tools_m365_writes import (
     prepare_daily_briefing_email,
@@ -14,6 +15,8 @@ from productivity_mcp.tools_m365_writes import (
 
 class TestDailyBriefing(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        os.environ["MOCK_M365"] = "1"
+        seed_test_m365_data()
         get_dataverse_client().clear_all_for_testing()
 
     def test_m365_client_get_daily_briefing(self):

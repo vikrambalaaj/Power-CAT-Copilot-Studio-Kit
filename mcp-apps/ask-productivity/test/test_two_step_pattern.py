@@ -1,15 +1,19 @@
 """Security, Integrity, and Resilience tests for Two-Step Transaction Pattern."""
 import asyncio
+import os
 import time
 import unittest
 
 from productivity_mcp.token_manager import TokenManager
 from productivity_mcp.tools_m365_writes import prepare_email, send_approved_email
 from productivity_mcp.dataverse_audit import get_dataverse_client
+from productivity_mcp.m365_client import seed_test_m365_data
 
 
 class TestTwoStepSecurityAndIntegrity(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        os.environ["MOCK_M365"] = "1"
+        seed_test_m365_data()
         get_dataverse_client().clear_all_for_testing()
 
     async def test_modified_preview_checksum_rejection(self):

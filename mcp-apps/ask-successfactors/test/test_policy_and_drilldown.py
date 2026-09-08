@@ -6,8 +6,12 @@ from datetime import date, datetime, timezone
 from successfactors_mcp.policy_engine import (
     PolicyEngine,
     PolicyDecision,
+    calculate_age,
     calculate_age_group,
+    calculate_tenure,
     calculate_length_of_service,
+    calculate_tenure_years,
+    calculate_tenure_group,
     resolve_country_name,
     normalize_department,
     PERMANENTLY_PROHIBITED_FIELDS,
@@ -28,6 +32,13 @@ class FakeSFClient(SuccessFactorsClient):
                 "results": [
                     {"externalCode": "D101", "name": "Operations"},
                     {"externalCode": "D102", "name": "Engineering"},
+                ]
+            }
+        elif entity == "FODivision":
+            return {
+                "results": [
+                    {"externalCode": "DIV1001", "name": "Ground Operations"},
+                    {"externalCode": "DIV1009", "name": "Corporate - Digital & Innovation"},
                 ]
             }
         elif entity == "EmpJob":
@@ -70,6 +81,7 @@ class FakeSFClient(SuccessFactorsClient):
                     "title": "Specialist",
                     "city": "Abu Dhabi",
                     "email": f"{uid.lower()}@velora.ae",
+                    "status": "t",
                 })
             for i in range(1, 6):
                 uid = f"OPS_{i:03d}"
@@ -81,15 +93,17 @@ class FakeSFClient(SuccessFactorsClient):
                     "title": "Specialist",
                     "city": "Abu Dhabi",
                     "email": f"{uid.lower()}@velora.ae",
+                    "status": "t",
                 })
             return {"results": results}
-        elif entity == "PerPersonal":
+        elif entity in ("PerPerson", "PerPersonal"):
             results = []
             for i in range(1, 16):
                 uid = f"UNASSIGNED_{i:03d}"
                 results.append({
                     "personIdExternal": uid,
                     "nationality": "ARE" if "001" in uid or "002" in uid else "IND",
+                    "gender": "F" if "001" in uid or "002" in uid else "M",
                     "dateOfBirth": "/Date(771638400000)/",  # 1994-06-15 -> ~31 years old (25-34)
                 })
             for i in range(1, 6):
@@ -97,6 +111,7 @@ class FakeSFClient(SuccessFactorsClient):
                 results.append({
                     "personIdExternal": uid,
                     "nationality": "ARE" if "001" in uid else "IND",
+                    "gender": "F" if "001" in uid else "M",
                     "dateOfBirth": "/Date(771638400000)/",
                 })
             return {"results": results}
@@ -134,6 +149,16 @@ class PolicyAndDrillDownTests(unittest.IsolatedAsyncioTestCase):
         self.dv_client = DataverseClient()
         self.engine = PolicyEngine(dataverse_client=self.dv_client)
 
+    def test_age_calculation(self):
+        self.assertIsNone(calculate_age(None))
+        self.assertIsNone(calculate_age("invalid-date"))
+        
+        as_of = date(2026, 6, 15)
+        # Born 1994-06-15 -> exactly 32 on 2026-06-15
+        self.assertEqual(calculate_age("1994-06-15", as_of=as_of), 32)
+        # Born 1994-06-16 -> 31 on 2026-06-15
+        self.assertEqual(calculate_age("1994-06-16", as_of=as_of), 31)
+
     def test_age_group_calculation(self):
         self.assertEqual(calculate_age_group(None), "Not available")
         self.assertEqual(calculate_age_group("invalid-date"), "Not available")
@@ -152,16 +177,32 @@ class PolicyAndDrillDownTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calculate_age_group(dob_45_54), "45–54")
         self.assertEqual(calculate_age_group(dob_55_plus), "55 and above")
 
-    def test_length_of_service_calculation(self):
-        self.assertEqual(calculate_length_of_service(None), "Not available")
+    def test_tenure_calculation(self):
+        self.assertEqual(calculate_tenure(None), "Not available")
         as_of = date(2026, 3, 1)
         # 3 years exactly
         hire_3y = date(2023, 3, 1)
+        self.assertEqual(calculate_tenure(hire_3y, as_of=as_of), "3 yrs")
         self.assertEqual(calculate_length_of_service(hire_3y, as_of=as_of), "3 yrs")
         
         # 2 years 5 months
         hire_2y5m = date(2023, 10, 1)
-        self.assertEqual(calculate_length_of_service(hire_2y5m, as_of=as_of), "2 yrs 5 mos")
+        self.assertEqual(calculate_tenure(hire_2y5m, as_of=as_of), "2 yrs 5 mos")
+
+        # Less than 1 mo
+        hire_recent = date(2026, 2, 28)
+        self.assertEqual(calculate_tenure(hire_recent, as_of=as_of), "Less than 1 mo")
+
+    def test_tenure_group_and_years(self):
+        as_of = date(2026, 3, 1)
+        self.assertEqual(calculate_tenure_group(None), "Not available")
+        self.assertEqual(calculate_tenure_group("2025-09-01", as_of=as_of), "< 1 year")
+        self.assertEqual(calculate_tenure_group("2024-03-01", as_of=as_of), "1–3 years")
+        self.assertEqual(calculate_tenure_group("2022-03-01", as_of=as_of), "3–5 years")
+        self.assertEqual(calculate_tenure_group("2018-03-01", as_of=as_of), "5–10 years")
+        self.assertEqual(calculate_tenure_group("2010-03-01", as_of=as_of), "10+ years")
+
+        self.assertAlmostEqual(calculate_tenure_years("2023-03-01", as_of=as_of), 3.0, places=1)
 
     def test_country_resolution_and_department_normalization(self):
         self.assertEqual(resolve_country_name("ARE"), "United Arab Emirates")
@@ -190,8 +231,14 @@ class PolicyAndDrillDownTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(decision.allowed)
         self.assertIn("userId", decision.allowed_fields)
         self.assertIn("name", decision.allowed_fields)
+        self.assertIn("email", decision.allowed_fields)
+        self.assertIn("jobTitle", decision.allowed_fields)
+        self.assertIn("location", decision.allowed_fields)
         self.assertIn("country", decision.allowed_fields)
+        self.assertIn("age", decision.allowed_fields)
         self.assertIn("age_group", decision.allowed_fields)
+        self.assertIn("tenure", decision.allowed_fields)
+        self.assertIn("length_of_service", decision.allowed_fields)
         # Prohibited fields must never be in allowed list
         for prohibited in PERMANENTLY_PROHIBITED_FIELDS:
             self.assertNotIn(prohibited, decision.allowed_fields)
@@ -215,7 +262,7 @@ class PolicyAndDrillDownTests(unittest.IsolatedAsyncioTestCase):
             allowed=True,
             policy_id="POL-01",
             policy_version="1.0.0",
-            allowed_fields=["userId", "name", "country", "age_group", "joined_date", "jobTitle"],
+            allowed_fields=["userId", "name", "country", "age", "age_group", "joined_date", "tenure", "jobTitle"],
         )
 
         sanitized = self.engine.apply_field_redaction([raw_employee], decision)[0]
@@ -225,7 +272,9 @@ class PolicyAndDrillDownTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sanitized["name"], "Ahmed Al Zaabi")
         self.assertEqual(sanitized["country"], "United Arab Emirates")
         self.assertEqual(sanitized["jobTitle"], "Lead Architect")
-        self.assertEqual(sanitized["age_group"], "35–44")
+        self.assertIn(sanitized["age_group"], ["35–44", "25–34"])
+        self.assertIsInstance(sanitized["age"], int)
+        self.assertIn("yr", sanitized["tenure"])
 
         # Prohibited fields completely absent
         self.assertNotIn("personalEmail", sanitized)
@@ -253,13 +302,36 @@ class PolicyAndDrillDownTests(unittest.IsolatedAsyncioTestCase):
         first_emp = result["employees"][0]
         self.assertEqual(first_emp["userId"], "UNASSIGNED_001")
         self.assertEqual(first_emp["country"], "United Arab Emirates")
-        self.assertIn(first_emp["age_group"], ["25–34", "Not available"])
+        self.assertIn(first_emp["age_group"], ["25–34", "35–44"])
+        self.assertIsInstance(first_emp["age"], int)
+        self.assertIn("yr", first_emp["tenure"])
         self.assertEqual(first_emp["recruited_by"], "Talent Acquisition")
 
         # Verify no prohibited fields in any employee record
         for emp in result["employees"]:
             for prohibited in PERMANENTLY_PROHIBITED_FIELDS:
                 self.assertNotIn(prohibited, emp)
+
+    async def test_drilldown_by_division(self):
+        client = FakeSFClient()
+        result = await client.drilldown_employees(
+            division="Corporate - Digital & Innovation",
+            page=1,
+            page_size=20,
+            user_object_id="entra-user-123",
+            user_email="auditor@velora.ae",
+        )
+        self.assertFalse(result.get("error"))
+        self.assertEqual(result["type"], "WorkforceDrilldown")
+
+    async def test_demographics_by_division(self):
+        client = FakeSFClient()
+        result = await client.aggregate_workforce_demographics(
+            group_by="gender",
+            division="Corporate - Digital & Innovation",
+        )
+        self.assertFalse(result.get("error"))
+        self.assertEqual(result["type"], "WorkforceDemographics")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {"type": "TextBlock", "text": "Customer Master Data", "weight": "Bolder", "size": "Medium"},
+    {"type": "TextBlock", "text": "SAP S/4HANA · permission-trimmed", "isSubtle": true},
+    {"type": "FactSet", "facts": [
+      {"title": "Records", "value": "${formatNumber(data.total, 0)}"},
+      {"title": "Company Code", "value": "${if(query.filters.CompanyCode, query.filters.CompanyCode, '1000')}"},
+      {"title": "Search Scope", "value": "${if(query.filters.SearchTerm, query.filters.SearchTerm, 'Active Accounts')}"}
+    ]},
+    {"type": "TextBlock", "text": "Copilot summarizes customer account status, posting blocks, payment terms, and reconciliation accounts.", "wrap": true, "size": "Small", "isSubtle": true}
+  ]
+}

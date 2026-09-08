@@ -22,7 +22,15 @@ from productivity_mcp.tools_m365_reads import (
 )
 
 
+import os
+from productivity_mcp.m365_client import seed_test_m365_data
+
+
 class TestM365Reads(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        os.environ["MOCK_M365"] = "1"
+        seed_test_m365_data()
+
     # --- Mail Reads ---
     async def test_search_mail(self):
         res = await search_mail(query="headcount", userEmail="balaadm@velora.ae")
