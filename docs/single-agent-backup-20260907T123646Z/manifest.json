@@ -1,0 +1,175 @@
+{
+  "created_utc": "20260907T123646Z",
+  "scope": "Repository agent packages only; not a live Copilot Studio export",
+  "archive_sha256": "3c7210e021f3f915b17c141d9c13c8e5acc55bede3128b315e0b0bdb7f2c945c",
+  "files": [
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/instruction.txt",
+      "sha256": "c0f4e87b4810177fbae5257ffc47a5fc1caf0589e2678610248b6a25527cc19d"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/color.png",
+      "sha256": "bf6e855b67618763d38f0cd8c2ab5ea9aed7b28f4475939f040e4e3ac016bedc"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/manifest.json",
+      "sha256": "a839588487494d8070d5ee46248e389a65abe05fa7e241ffa99728050a572c6e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/outline.png",
+      "sha256": "bf6e855b67618763d38f0cd8c2ab5ea9aed7b28f4475939f040e4e3ac016bedc"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/declarativeAgent.json",
+      "sha256": "0778698a4aa6fde735fc18fde7609bac32dcac3881e27d042dd7bf7f7a61bac7"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/productivity-plugin.json",
+      "sha256": "4e893095bdac5712144416b976093d1417ab8e82730b14d9548f2f4325da0771"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/velora-hcm-agent.zip",
+      "sha256": "1083f493c15ae5e5fe58c28f80d2550305697ae2d29c8060337a4356de514626"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/facilitator-plugin.json",
+      "sha256": "1372c4a306e2da4d7f2e35a9994a33a5f1e30091ada16443ff68f151b68b0860"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/mcp-tools.json",
+      "sha256": "87fab3512d1374440a184381330ae4a4e0670bd532bdb8f30a6c70f65bd3e47e"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/instruction.txt",
+      "sha256": "951df41e50bed5320b3f7fa7ed12070d54b4bce8299c80b8e0b644c27f9f260d"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/s4hana-mcp-tools.json",
+      "sha256": "0a8fc0ef8de93e6a415f487917dcb4de4139d70bc2c2a5ea8de1d1a91983b6f1"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/s4hana-plugin.json",
+      "sha256": "1d45fdcfc35c508921b95c57851d4838f35406d857184c3dfca8f5b2faa389a9"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/sac-plugin.json",
+      "sha256": "47f3f7b0f2938c2d3f9b1793ab89aa0d8c11d99c57031ba3981418b66817f792"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/color.png",
+      "sha256": "506b22571971cdafc70b33b6f91730a8441047de0813b94d90f54ad37e58d640"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/manifest.json",
+      "sha256": "47fc1075a3243fe3d8e870c1ed3a70fe5b43da1223f90501cf80e8b1829c18b6"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/outline.png",
+      "sha256": "53e34ba760b625fdce4f416c04704de137a0ed4d10daaecdeb4dddce838f5bfe"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/ai-plugin.json",
+      "sha256": "3649f27c1fb6fad8c7ecd3a142d8bcccd87cc3b06d315e0c3fe891692d21f3ff"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/sac-mcp-tools.json",
+      "sha256": "1d993f356e6047f0b1b5f1d59806456c99b811eaa4351d9f65ee1f8897b10b04"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/declarativeAgent.json",
+      "sha256": "d1840a9bbb45c405c03f2734fa1084d4143d307f465cf1528140ae1e9aee9b4a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/productivity-plugin.json",
+      "sha256": "c7c82ee202add9fb5ee2eb5d4fba0fdfa506cddf2dfc1d946c64212871df76e4"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/peer-benchmark.json",
+      "sha256": "1e9b139b007ef32385fd6831fd149f867293f4bcc2193f95b29d1760d6dc05fb"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/customer-master.json",
+      "sha256": "4b6d27441c0858375b9e0fc34a88543fdd415e90a8fed9172cc0edc295592390"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/receivables-aging.json",
+      "sha256": "6b891cbd5ffafe7e9cf0bb338bd461a503aca46375ea50c4b1d22564cffd7c48"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/end-of-day.json",
+      "sha256": "ded02b53311b80016dd2411845eb50a237dcbb146ae445bc7fd94550bfc491a1"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/cost-center-master.json",
+      "sha256": "a3aa9de161688cc1e8ad516fc94cb7bedcb005b1fd64514e4ee27d46b69fa010"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/proactive-recommendation.json",
+      "sha256": "f4b33daafde19b3d5b98e5353d5023e0b3da2198f4be2b8f978e83517414f7b5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/meeting-intelligence.json",
+      "sha256": "af6b2f7b49a5e8bc1713c8b20bcc826b91cc874cb636f705cc8f38e7f4b88da5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/headcount.json",
+      "sha256": "b3b7dd88e5b3cf6110262aa94eae6fe14f373600e82bbc52c9d67bd55e90d09b"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/decision-trace.json",
+      "sha256": "5464b5e19a1717cf3a69674ffe475af2274cdcbacd0419686f3cdd2f5fe10b21"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-variance.json",
+      "sha256": "5670ce9249ddfb9e58f62f5fa9d49fdd959aef49625f5034e59913c6d4acb43e"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-consumption.json",
+      "sha256": "a2e7d712e22101667f15599f8eab4b5a3a8a7ab3a503acc93b8a3a62526da7d9"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/profit-center-master.json",
+      "sha256": "463cc91255f00d85af1282ffe8410296365fec08dfa348e4fd0877eb825ea0cc"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/executive-brief.json",
+      "sha256": "0e852ce56be190b1db0a0f3ebb169ff1e9bcede520ea7dc85e2a91a3c12a571a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/emiratisation.json",
+      "sha256": "85037d86d99164fadb21c90fe5fff2c89a44039fbf52c391b373bfd552e8160f"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/payables-aging.json",
+      "sha256": "02229e69ae43d4e1a0398c3f7ad5b41f578b708b4653c2e4126a7d1395d569f4"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/follow-ups.json",
+      "sha256": "09b0aeb8b931c23375374e1b92adafe458f271f60ad2e7a4622f923274302a0d"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/profit-and-loss.json",
+      "sha256": "828ba277fbb7c447d739cd71db1cbaca1c68f7db0ba50b79800ffe4a62802afe"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-movements.json",
+      "sha256": "12506d813abb53556a48fc703aab3f80835fdeb63375fda703197d42208c286c"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/workforce-overview.json",
+      "sha256": "b43e52d6e3a663b1b48e2e8f2738f73de245a791cf0194e7b8147a5b4cf3cc03"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/email-snapshot.json",
+      "sha256": "ec490fbfe1a56c41c4b1d0aa9d49a6e562cf214ae2b4bce3f3f55a2c6d0ffca5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/sap-result.json",
+      "sha256": "1ab87633388d4ad14b0c84b57c4e832df153e2a081ce3c59b096c377dcdde0c7"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/daily-plan.json",
+      "sha256": "d5591069f512995c01f5dc4f1e20e0f20405a45f237ff5a3dbd5052c873b3d5c"
+    }
+  ]
+}

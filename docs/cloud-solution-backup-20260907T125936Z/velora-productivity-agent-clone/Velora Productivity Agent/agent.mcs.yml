@@ -1,0 +1,10 @@
+mcs.metadata:
+  componentName: Velora Productivity Agent
+  description: Handles authorized Microsoft 365 work for Velora, including email, calendar, meetings, Teams messages, Planner tasks, Work IQ retrieval, and daily morning briefings.
+kind: GptComponentMetadata
+displayName: Velora Productivity Agent
+instructions:
+gptCapabilities: {}
+aISettings:
+  model:
+    modelNameHint: Opus48

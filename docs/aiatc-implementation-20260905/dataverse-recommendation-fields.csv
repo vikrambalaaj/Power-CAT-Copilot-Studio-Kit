@@ -1,0 +1,35 @@
+table,logical_column_proposal,type,required,business_description
+cre2f_kpirecommendationrule,cre2f_rulecode,Text 100,Yes,Stable business rule identifier
+cre2f_kpirecommendationrule,cre2f_version,Text 30,Yes,Immutable published version
+cre2f_kpirecommendationrule,cre2f_name,Text 200,Yes,Business-facing rule title
+cre2f_kpirecommendationrule,cre2f_kpi,Lookup: KPI definition,Yes,What is being measured
+cre2f_kpirecommendationrule,cre2f_organizationscope,Lookup: approved organization scope,Yes,Which company or division this applies to
+cre2f_kpirecommendationrule,cre2f_category,Choice risk/opportunity/benchmark,Yes,Alert category
+cre2f_kpirecommendationrule,cre2f_comparator,Choice lt/lte/gt/gte/outside_range,Yes,Approved comparison operation
+cre2f_kpirecommendationrule,cre2f_threshold,Decimal,Conditional,Approved limit; required for scalar comparisons
+cre2f_kpirecommendationrule,cre2f_upperthreshold,Decimal,Conditional,Upper bound for range comparison
+cre2f_kpirecommendationrule,cre2f_unit,Choice number/percent/percentage_points/currency/days,Yes,Must match KPI or approved derived measure
+cre2f_kpirecommendationrule,cre2f_currency,Text ISO code,Conditional,Required for monetary limits
+cre2f_kpirecommendationrule,cre2f_targetsource,Lookup: source catalog,Yes,Where approved target or limit came from
+cre2f_kpirecommendationrule,cre2f_comparisonwindow,Choice snapshot/day/month/YTD/rolling,Yes,Period covered by this rule
+cre2f_kpirecommendationrule,cre2f_windowlength,Whole number,Conditional,Length for rolling period
+cre2f_kpirecommendationrule,cre2f_minimumobservations,Whole number,Yes,Minimum valid inputs before comparison
+cre2f_kpirecommendationrule,cre2f_consecutivebreaches,Whole number,Yes,How many valid successive breaches before an alert
+cre2f_kpirecommendationrule,cre2f_clearthreshold,Decimal,Conditional,Recovery boundary to prevent repeated opening/closing
+cre2f_kpirecommendationrule,cre2f_cooldownminutes,Whole number,Yes,Minimum gap before repeat notification
+cre2f_kpirecommendationrule,cre2f_severity,Choice informational/moderate/high,Yes,Business urgency
+cre2f_kpirecommendationrule,cre2f_priority,Whole number,Yes,Ordering among applicable rules
+cre2f_kpirecommendationrule,cre2f_recommendationtemplate,Multiline text,Yes,Approved suggested action using allowlisted placeholders
+cre2f_kpirecommendationrule,cre2f_explanationtemplate,Multiline text,Yes,Plain-language reason using evidence-backed values
+cre2f_kpirecommendationrule,cre2f_confidencepolicy,Lookup: quality policy,Yes,Source-quality conditions needed to issue advice
+cre2f_kpirecommendationrule,cre2f_maxsourceageminutes,Whole number,Yes,Maximum permitted source age
+cre2f_kpirecommendationrule,cre2f_requirescomplete,Boolean,Yes,Block partial-source recommendations
+cre2f_kpirecommendationrule,cre2f_owner,Dataverse owner,Yes,Accountable domain team
+cre2f_kpirecommendationrule,cre2f_approver,Lookup: user,Before publication,Who approved this version
+cre2f_kpirecommendationrule,cre2f_approvedon,Date/time UTC,Before publication,When approval happened
+cre2f_kpirecommendationrule,cre2f_effectivefrom,Date/time UTC,Yes,Start of applicability
+cre2f_kpirecommendationrule,cre2f_effectiveto,Date/time UTC,No,End of applicability
+cre2f_kpirecommendationrule,cre2f_state,Choice Draft/Approved/Active/Paused/Retired,Yes,Lifecycle
+cre2f_kpirecommendationrule,cre2f_changereason,Multiline text,Yes,Why this version was introduced
+cre2f_kpirecommendationrule,cre2f_schedule,Lookup: schedule configuration,Yes,Approved run timing and time zone
+cre2f_kpirecommendationrule,cre2f_audiencepolicy,Lookup: delivery policy,Yes,Authorized recipients/channel; never arbitrary model addresses

@@ -10,6 +10,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY facilitator_mcp/ facilitator_mcp/
+COPY shared_mcp/ shared_mcp/
 COPY run_server.py .
 
 EXPOSE 8080

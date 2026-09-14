@@ -184,6 +184,11 @@ az containerapp create \
         S4_USERNAME="xbhaskarraj" \
         S4_PASSWORD="secretref:s4-password" \
         S4_API_URL="$S4_PROD_URL" \
+        S4_AR_ENTITY="ARageingData" \
+        S4_AP_ENTITY="APageingData" \
+        S4_BUDGET_TRANSFER_ENTITY="BudgetTransfer" \
+        S4_BUDGET_CONSUMPTION_ENTITY="BudgetConsumData" \
+        S4_SAP_CLIENT="100" \
         S4_VERIFY_TLS="true" \
         AZURE_STORAGE_MOUNT_PATH="${MOUNT_PATH}/s4" \
     --output table

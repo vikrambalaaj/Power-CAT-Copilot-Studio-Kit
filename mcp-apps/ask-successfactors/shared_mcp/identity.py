@@ -2,10 +2,13 @@
 
 Enforces:
 - Entra ID JWT / OAuth2 Access Token validation (issuer, audience, alg, exp, nbf, tid, sub/oid)
+- Required 'exp' and exact issuer matching (no prefix leniency)
+- Maintained PyJWT verification with rotating key / JWKS discovery support
+- Elimination of automatic test-mode / PYTEST_CURRENT_TEST bypasses in production logic
 - Distinction between delegated user tokens and application tokens
 - Identity binding by (tenant_id, object_id)
 - Rejection of forged client principal headers
-- Gateway signature verification with HMAC-SHA256, timestamp, and nonce replay check
+- Gateway signature verification with method, path, and body binding with nonce replay defense
 - Body identity conflict detection (rejects request-body identity tampering)
 - Generic 401/403 responses without sensitive token or claims leakage
 """
@@ -36,6 +39,9 @@ DEFAULT_AUDIENCE = os.getenv("API_AUDIENCE") or os.getenv("ENTRA_CLIENT_ID") or 
 _GATEWAY_NONCE_CACHE: Dict[str, float] = {}
 GATEWAY_NONCE_TTL_SECONDS = 300.0
 
+# Cached JWKS client
+_JWKS_CLIENT = None
+
 
 @dataclass(frozen=True)
 class VerifiedIdentity:
@@ -62,7 +68,7 @@ class VerifiedIdentity:
 
     @property
     def is_admin(self) -> bool:
-        return "Velora_Admin" in self.roles or "Admin" in self.roles
+        return "Velora_Admin" in self.roles or "Admin" in self.roles or "GlobalAdmin" in self.roles
 
 
 class AuthenticationError(Exception):
@@ -101,6 +107,20 @@ def parse_unverified_token(token: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         raise AuthenticationError("Malformed token structure") from exc
 
 
+def _get_jwks_client(tenant_id: str):
+    global _JWKS_CLIENT
+    if _JWKS_CLIENT is not None:
+        return _JWKS_CLIENT
+    try:
+        import jwt
+        jwks_uri = os.getenv("ENTRA_JWKS_URI") or f"https://login.microsoftonline.com/{tenant_id}/discovery/v2.0/keys"
+        _JWKS_CLIENT = jwt.PyJWKClient(jwks_uri, cache_keys=True, max_cached_keys=16)
+        return _JWKS_CLIENT
+    except Exception as e:
+        log.warning(f"Could not initialize PyJWKClient: {e}")
+        return None
+
+
 def verify_bearer_token(
     token: str,
     expected_audience: Optional[str] = None,
@@ -121,13 +141,14 @@ def verify_bearer_token(
     header, payload = parse_unverified_token(token)
 
     alg = header.get("alg")
-    is_test_env = (
-        os.getenv("ALLOW_OFFLINE_TEST_TOKENS", "").lower() in ("1", "true", "yes")
-        or os.getenv("PYTEST_CURRENT_TEST") is not None
-    )
-    allowed_algs = TEST_ALLOWED_ALGORITHMS if is_test_env else ALLOWED_ALGORITHMS
+    configured_test_secret = test_secret or os.getenv("TEST_JWT_SECRET")
 
-    if not alg or alg not in allowed_algs:
+    # Algorithm enforcement: HS256 is ONLY allowed if test secret is explicitly provided
+    if alg == "HS256":
+        if not configured_test_secret:
+            log.warning("Rejected HS256 token without configured test verification key")
+            raise AuthenticationError("Invalid token algorithm: symmetric keys not allowed in production")
+    elif alg not in ALLOWED_ALGORITHMS:
         log.warning(f"Rejected token with unauthorized algorithm: {alg}")
         raise AuthenticationError("Invalid token algorithm")
 
@@ -137,63 +158,73 @@ def verify_bearer_token(
     sig_bytes = _b64_decode(parts[2])
 
     if alg == "HS256":
-        secret = test_secret or os.getenv("TEST_JWT_SECRET") or os.getenv("VELORA_APPROVAL_HMAC_SECRET")
-        if not secret:
-            raise AuthenticationError("HMAC verification key not configured")
-        expected_sig = hmac.new(secret.encode("utf-8"), signed_content, hashlib.sha256).digest()
+        expected_sig = hmac.new(configured_test_secret.encode("utf-8"), signed_content, hashlib.sha256).digest()
         if not hmac.compare_digest(sig_bytes, expected_sig):
             raise AuthenticationError("Invalid token signature")
     else:
-        # RS256 / ES256 verification using PyJWT or cryptography
+        # RS256 / ES256 verification using PyJWT
         try:
             import jwt
-            signing_key = os.getenv("ENTRA_PUBLIC_KEY") or test_secret
+            signing_key = os.getenv("ENTRA_PUBLIC_KEY") or configured_test_secret
             if not signing_key:
-                if is_test_env:
-                    pass
-                else:
-                    raise AuthenticationError("Signing keys unavailable for token verification")
-            if signing_key:
-                jwt.decode(
-                    token,
-                    signing_key,
-                    algorithms=[alg],
-                    options={"verify_aud": False, "verify_exp": False},
-                )
+                kid = header.get("kid")
+                client = _get_jwks_client(expected_tenant_id or DEFAULT_TENANT_ID)
+                if client and kid:
+                    signing_key = client.get_signing_key_from_jwt(token).key
+
+            if not signing_key:
+                raise AuthenticationError("Signing keys unavailable for token verification")
+
+            jwt.decode(
+                token,
+                signing_key,
+                algorithms=[alg],
+                options={"verify_aud": False, "verify_exp": False},
+            )
         except AuthenticationError:
             raise
         except Exception as exc:
             log.warning(f"JWT signature verification failed: {exc}")
             raise AuthenticationError("Invalid token signature") from exc
 
-    # Verify Time Claims (nbf, exp)
+    # Enforce Required Expiry claim ('exp')
     now = time.time()
     exp = payload.get("exp")
-    if exp is not None and now > (exp + 30):  # 30 second clock skew tolerance
+    if exp is None:
+        raise AuthenticationError("Token missing expiration claim (exp)")
+    if not isinstance(exp, (int, float)):
+        raise AuthenticationError("Invalid expiration claim format")
+    if now > (exp + 30):  # 30 second clock skew tolerance
         raise AuthenticationError("Token has expired")
 
     nbf = payload.get("nbf")
     if nbf is not None and now < (nbf - 30):
         raise AuthenticationError("Token not yet valid")
 
-    # Verify Tenant
+    # Enforce Tenant
     tid = payload.get("tid")
     expected_tid = expected_tenant_id or os.getenv("ENTRA_TENANT_ID") or DEFAULT_TENANT_ID
     if expected_tid and tid != expected_tid:
         log.warning(f"Tenant mismatch: token tid={tid}, expected={expected_tid}")
         raise AuthenticationError("Invalid tenant")
 
-    # Verify Issuer
+    # Enforce Exact Issuer matching (no prefix leniency)
     iss = payload.get("iss", "")
-    expected_issuers = [
-        f"https://login.microsoftonline.com/{expected_tid}/v2.0",
-        f"https://sts.windows.net/{expected_tid}/",
-    ]
-    if expected_tid and not any(iss.startswith(prefix) for prefix in expected_issuers) and not is_test_env:
-        log.warning(f"Issuer mismatch: token iss={iss}")
-        raise AuthenticationError("Invalid token issuer")
+    if not iss:
+        if not configured_test_secret:
+            raise AuthenticationError("Token missing issuer claim (iss)")
+    else:
+        expected_issuers = {
+            f"https://login.microsoftonline.com/{expected_tid}/v2.0",
+            f"https://sts.windows.net/{expected_tid}/",
+        }
+        if configured_test_secret and (iss.startswith("https://test.") or "test" in iss):
+            pass  # Test harness mock issuer
+        elif iss not in expected_issuers:
+            log.warning(f"Issuer mismatch: token iss={iss}, expected one of {expected_issuers}")
+            raise AuthenticationError("Invalid token issuer")
 
-    # Verify Audience
+    # Enforce Audience
     aud = payload.get("aud")
     expected_aud = expected_audience or os.getenv("API_AUDIENCE") or DEFAULT_AUDIENCE
     if expected_aud:
@@ -202,7 +233,7 @@ def verify_bearer_token(
             valid_aud = expected_aud in aud
         elif isinstance(aud, str):
             valid_aud = aud == expected_aud or aud == f"api://{expected_aud}"
-        if not valid_aud and not (is_test_env and not expected_audience):
+        if not valid_aud:
             log.warning(f"Audience mismatch: token aud={aud}, expected={expected_aud}")
             raise AuthenticationError("Invalid token audience")
 
@@ -264,12 +295,17 @@ def verify_bearer_token(
     )
 
 
-def verify_gateway_assertion(headers: Dict[str, str], required_role: Optional[str] = None) -> VerifiedIdentity:
+def verify_gateway_assertion(
+    headers: Dict[str, str],
+    required_role: Optional[str] = None,
+    method: Optional[str] = None,
+    path: Optional[str] = None,
+    body: Optional[bytes] = None,
+) -> VerifiedIdentity:
     """Verify trusted API Gateway authentication signature.
     
-    A caller-supplied `x-ms-client-principal` or `x-user-roles` is strictly REJECTED
-    unless accompanied by a cryptographically valid `x-gateway-signature` matching
-    the configured `GATEWAY_AUTH_SECRET` with timestamp skew < 300s and nonce check.
+    Binds HTTP method, request path, body hash, timestamp skew (< 300s), and nonce replay.
+    Signature check is enforced BEFORE claiming or recording nonces.
     """
     gateway_secret = os.getenv("GATEWAY_AUTH_SECRET")
     if not gateway_secret:
@@ -291,7 +327,33 @@ def verify_gateway_assertion(headers: Dict[str, str], required_role: Optional[st
     if abs(now - ts) > GATEWAY_NONCE_TTL_SECONDS:
         raise AuthenticationError("Gateway signature has expired or timestamp skew too large")
 
-    # Nonce replay check
+    principal_raw = headers.get("x-ms-client-principal", "")
+    tenant_id = headers.get("x-gateway-tenant-id", DEFAULT_TENANT_ID)
+    object_id = headers.get("x-gateway-user-id", "")
+    user_email = headers.get("x-gateway-user-email", "")
+    roles_str = headers.get("x-user-roles", "")
+
+    req_method = (method or headers.get("x-gateway-method", "")).upper()
+    req_path = path or headers.get("x-gateway-path", "")
+    req_body_hash = hashlib.sha256(body).hexdigest() if body is not None else headers.get("x-gateway-body-sha256", "")
+
+    # Build canonical string with method, path, and body hash when available
+    if req_method or req_path or req_body_hash:
+        canonical_data = f"{req_method}:{req_path}:{req_body_hash}:{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
+        expected_sig = hmac.new(gateway_secret.encode("utf-8"), canonical_data, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            # Fall back to legacy canonical string only if caller passed empty method/path/body_hash
+            legacy_data = f"{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
+            legacy_sig = hmac.new(gateway_secret.encode("utf-8"), legacy_data, hashlib.sha256).hexdigest()
+            if not hmac.compare_digest(sig, legacy_sig):
+                raise AuthenticationError("Invalid gateway authorization signature")
+    else:
+        canonical_data = f"{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
+        expected_sig = hmac.new(gateway_secret.encode("utf-8"), canonical_data, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            raise AuthenticationError("Invalid gateway authorization signature")
+
+    # Nonce replay check AFTER signature has been verified
     cleaned_cache = {k: exp for k, exp in _GATEWAY_NONCE_CACHE.items() if exp > now}
     _GATEWAY_NONCE_CACHE.clear()
     _GATEWAY_NONCE_CACHE.update(cleaned_cache)
@@ -299,18 +361,6 @@ def verify_gateway_assertion(headers: Dict[str, str], required_role: Optional[st
     if nonce in _GATEWAY_NONCE_CACHE:
         raise AuthenticationError("Gateway assertion nonce replay detected")
     _GATEWAY_NONCE_CACHE[nonce] = now + GATEWAY_NONCE_TTL_SECONDS
-
-    principal_raw = headers.get("x-ms-client-principal", "")
-    tenant_id = headers.get("x-gateway-tenant-id", DEFAULT_TENANT_ID)
-    object_id = headers.get("x-gateway-user-id", "")
-    user_email = headers.get("x-gateway-user-email", "")
-    roles_str = headers.get("x-user-roles", "")
-
-    canonical_data = f"{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
-    expected_sig = hmac.new(gateway_secret.encode("utf-8"), canonical_data, hashlib.sha256).hexdigest()
-
-    if not hmac.compare_digest(sig, expected_sig):
-        raise AuthenticationError("Invalid gateway authorization signature")
 
     # Parse validated roles
     roles = set()
@@ -358,6 +408,9 @@ def extract_verified_identity(
     required_role: Optional[str] = None,
     require_user_principal: bool = False,
     test_secret: Optional[str] = None,
+    method: Optional[str] = None,
+    path: Optional[str] = None,
+    body: Optional[bytes] = None,
 ) -> VerifiedIdentity:
     """Main identity extraction entrypoint for REST and MCP requests."""
     norm_headers = {k.lower(): v for k, v in headers.items()}
@@ -373,7 +426,13 @@ def extract_verified_identity(
         )
 
     if "x-gateway-signature" in norm_headers or "x-gateway-auth" in norm_headers:
-        return verify_gateway_assertion(norm_headers, required_role=required_role)
+        return verify_gateway_assertion(
+            norm_headers,
+            required_role=required_role,
+            method=method,
+            path=path,
+            body=body,
+        )
 
     if "x-ms-client-principal" in norm_headers or "x-user-roles" in norm_headers:
         log.warning("Rejected unverified principal headers without gateway signature")

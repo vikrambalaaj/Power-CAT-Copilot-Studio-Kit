@@ -1,3 +1,4 @@
+import os
 import json
 import asyncio
 import inspect
@@ -42,6 +43,16 @@ class FakeSettings:
 
 
 class ConnectionAdminRouteTests(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self._orig_trust = os.getenv("TRUST_EASYAUTH_CLIENT_PRINCIPAL")
+        os.environ["TRUST_EASYAUTH_CLIENT_PRINCIPAL"] = "true"
+
+    def tearDown(self):
+        if self._orig_trust is not None:
+            os.environ["TRUST_EASYAUTH_CLIENT_PRINCIPAL"] = self._orig_trust
+        else:
+            os.environ.pop("TRUST_EASYAUTH_CLIENT_PRINCIPAL", None)
+
     async def test_connection_test_uses_registered_admin_role(self):
         admin_service = MagicMock()
         admin_service.test_connection = AsyncMock(

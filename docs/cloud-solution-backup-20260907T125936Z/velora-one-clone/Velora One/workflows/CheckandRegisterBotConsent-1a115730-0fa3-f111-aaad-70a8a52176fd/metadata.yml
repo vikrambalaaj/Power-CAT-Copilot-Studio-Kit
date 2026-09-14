@@ -1,0 +1,32 @@
+﻿jsonFileName: workflows/CheckandRegisterBotConsent-1a115730-0fa3-f111-aaad-70a8a52176fd/workflow.json
+workflowId: 1a115730-0fa3-f111-aaad-70a8a52176fd
+name: Check and Register Bot Consent
+type: 1
+description: 
+subprocess: false
+category: 5
+mode: 0
+scope: 4
+onDemand: false
+triggerOnCreate: false
+triggerOnDelete: false
+asyncAutodelete: false
+syncWorkflowLogOnFailure: false
+stateCode: 1
+statusCode: 2
+runAs: 1
+isTransacted: true
+introducedVersion: 1.0
+isCustomizable:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: iscustomizableanddeletable
+businessProcessType: 0
+isCustomProcessingStepAllowedForOtherPublishers:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: canbedeleted
+modernFlowType: 1
+primaryEntity: none
+connectionReferences:
+- new_sharedcommondataserviceforapps_7e1a8

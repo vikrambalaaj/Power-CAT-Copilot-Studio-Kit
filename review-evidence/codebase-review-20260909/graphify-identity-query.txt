@@ -1,0 +1,23 @@
+Graph: /private/tmp/velora-graphify-review-20260909/graphify-out/graph.json (3545 nodes) | Traversal: BFS depth=2 | Start: ['verify_gateway_assertion()', 'verify_bearer_token()'] | 82 nodes found
+
+[!] TRUNCATED: showing 18 of 82 nodes (~650-token budget). The answer may be among the 64 cut nodes — raise the token budget (CLI: --budget) or narrow the query (e.g. context_filter=['call'], or get_node for a specific symbol).
+
+NODE verify_gateway_assertion() [src=mcp-apps/ask-facilitator/shared_mcp/identity.py loc=L298 community=]
+NODE verify_bearer_token() [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L124 community=]
+NODE ask-facilitator/shared_mcp/identity.py [src=mcp-apps/ask-facilitator/shared_mcp/identity.py loc=L1 community=]
+NODE ask-productivity/shared_mcp/identity.py [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L1 community=]
+NODE test_identity_boundary.py [src=mcp-apps/ask-productivity/test/test_identity_boundary.py loc=L1 community=]
+NODE AuthenticationError [src=mcp-apps/ask-facilitator/shared_mcp/identity.py loc=L74 community=]
+NODE AuthorizationError [src=mcp-apps/ask-facilitator/shared_mcp/identity.py loc=L82 community=]
+NODE VerifiedIdentity [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L47 community=]
+NODE VerifiedIdentity [src=mcp-apps/ask-facilitator/shared_mcp/identity.py loc=L47 community=]
+NODE extract_verified_identity() [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L405 community=]
+NODE extract_verified_identity() [src=mcp-apps/ask-facilitator/shared_mcp/identity.py loc=L405 community=]
+NODE AuthenticationError [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L74 community=]
+NODE AuthorizationError [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L82 community=]
+NODE parse_unverified_token() [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L97 community=]
+NODE _b64_decode() [src=mcp-apps/ask-productivity/shared_mcp/identity.py loc=L90 community=]
+NODE .test_reject_application_token_on_user_only_operation() [src=mcp-apps/ask-productivity/test/test_identity_boundary.py loc=L155 community=]
+NODE .test_reject_expired_token() [src=mcp-apps/ask-productivity/test/test_identity_boundary.py loc=L77 community=]
+NODE .test_reject_missing_required_role() [src=mcp-apps/ask-productivity/test/test_identity_boundary.py loc=L130 community=]
+... (truncated — 64 more nodes cut by ~650-token budget. Narrow with context_filter=['call'] or use get_node for a specific symbol)

@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: Velora SAC Analytics MCP - Velora SAC Analytics MCP
+kind: TaskDialog
+modelDisplayName: Velora SAC Analytics MCP
+modelDescription: SAP Analytics Cloud (SAC) MCP server for executive corporate KPIs, EBITDA, operating margin, BI stories, and planning model analytics.
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_cre2f-5fvelora-20sac-20analytics-20mcp-5fa2a49f89a81f4c99.182b4bac05844d20a8189f3f8da4dd11
+  connectionProperties:
+    mode: Maker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeServer

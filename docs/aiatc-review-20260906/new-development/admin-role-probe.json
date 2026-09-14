@@ -1,0 +1,11 @@
+{
+  "{}": [
+    "Velora_Admin"
+  ],
+  "{'x-user-roles': 'Velora_Admin'}": [
+    "Velora_Admin"
+  ],
+  "{'x-user-roles': 'Executive'}": [
+    "Executive"
+  ]
+}

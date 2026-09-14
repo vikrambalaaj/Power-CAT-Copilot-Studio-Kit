@@ -1,0 +1,30 @@
+[
+  {
+    "file": "mcp-apps/ask-facilitator/facilitator-connector-swagger.json",
+    "operations": 7,
+    "security_definitions": [],
+    "global_security": null,
+    "authorization_header_declared": false
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac-connector-swagger.json",
+    "operations": 5,
+    "security_definitions": [],
+    "global_security": null,
+    "authorization_header_declared": false
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4-connector-swagger.json",
+    "operations": 6,
+    "security_definitions": [],
+    "global_security": null,
+    "authorization_header_declared": false
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity-connector-swagger.json",
+    "operations": 2,
+    "security_definitions": [],
+    "global_security": null,
+    "authorization_header_declared": false
+  }
+]

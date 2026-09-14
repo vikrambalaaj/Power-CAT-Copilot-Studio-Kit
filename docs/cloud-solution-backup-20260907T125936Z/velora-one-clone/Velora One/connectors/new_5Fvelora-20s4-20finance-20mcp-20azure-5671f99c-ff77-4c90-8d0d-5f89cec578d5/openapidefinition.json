@@ -1,0 +1,40 @@
+﻿{
+  "swagger": "2.0",
+  "info": {
+    "title": "Velora S4 Finance MCP Azure",
+    "description": "SAP S/4HANA Finance MCP running on Azure Container Apps image 1.1.6.",
+    "version": "1.0.0"
+  },
+  "host": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/mcp": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Immediate Response"
+          }
+        },
+        "x-ms-agentic-protocol": "mcp-streamable-1.0",
+        "operationId": "InvokeServer",
+        "summary": "Velora S4 Finance MCP Azure",
+        "description": "SAP S/4HANA Finance MCP running on Azure Container Apps image 1.1.6."
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ]
+}

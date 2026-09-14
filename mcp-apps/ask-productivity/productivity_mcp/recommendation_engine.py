@@ -23,6 +23,15 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from .evidence_contracts import (
+    ClaimKind,
+    ConfidenceAssessment,
+    ConfidenceLabel,
+    EvidenceSource,
+    MaterialClaim,
+)
+from .confidence_policy import evaluate_confidence
+
 log = logging.getLogger("recommendation_engine")
 
 
@@ -127,6 +136,12 @@ class RecommendationRecord:
     status: RecommendationStatus
     duplicate_key: str
     snapshot_id: str
+    observation: str = ""
+    business_implication: str = ""
+    severity: str = "high"
+    priority: int = 1
+    supporting_claims: List[Dict[str, Any]] = field(default_factory=list)
+    supporting_sources: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -308,6 +323,13 @@ class DurableOutboxStore:
                         updated_at TEXT NOT NULL
                     );
                 """)
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS cooldowns (
+                        cooldown_key TEXT PRIMARY KEY,
+                        expires_at REAL NOT NULL,
+                        updated_at TEXT NOT NULL
+                    );
+                """)
                 conn.commit()
         except Exception as ex:
             log.warning(f"outbox_db_init_warning error={ex}")
@@ -353,6 +375,40 @@ class DurableOutboxStore:
                 ep_cur = conn.execute("SELECT episode_key, episode_value FROM breach_episodes")
                 for ep_row in ep_cur.fetchall():
                     self._episodes[ep_row["episode_key"]] = ep_row["episode_value"]
+
+                rec_cur = conn.execute("SELECT * FROM recommendations")
+                for rec_row in rec_cur.fetchall():
+                    try:
+                        data = json.loads(rec_row["payload"])
+                        r = RecommendationRecord(
+                            recommendation_id=data["recommendation_id"],
+                            rule_code=data["rule_code"],
+                            rule_version=data["rule_version"],
+                            kpi_code=data["kpi_code"],
+                            organization_scope=data["organization_scope"],
+                            category=data["category"],
+                            observed_value=Decimal(str(data["observed_value"])),
+                            threshold=Decimal(str(data["threshold"])),
+                            impact=data["impact"],
+                            explanation=data["explanation"],
+                            suggested_action=data["suggested_action"],
+                            confidence=data.get("confidence", "High"),
+                            confidence_reason=data.get("confidence_reason", ""),
+                            first_detected=data.get("first_detected", ""),
+                            last_detected=data.get("last_detected", ""),
+                            status=RecommendationStatus(data["status"]),
+                            duplicate_key=data["duplicate_key"],
+                            snapshot_id=data["snapshot_id"],
+                            observation=data.get("observation", ""),
+                            business_implication=data.get("business_implication", ""),
+                            severity=data.get("severity", "high"),
+                            priority=int(data.get("priority", 1)),
+                            supporting_claims=data.get("supporting_claims", []),
+                            supporting_sources=data.get("supporting_sources", []),
+                        )
+                        self._recommendations[r.recommendation_id] = r
+                    except Exception:
+                        pass
         except Exception as ex:
             log.warning(f"db_load_warning error={ex}")
 
@@ -880,7 +936,9 @@ class DurableOutboxStore:
                     """
                     INSERT INTO recommendations (recommendation_id, duplicate_key, payload, created_at)
                     VALUES (?, ?, ?, ?)
-                    ON CONFLICT(duplicate_key) DO NOTHING
+                    ON CONFLICT(duplicate_key) DO UPDATE SET
+                        payload = excluded.payload,
+                        recommendation_id = excluded.recommendation_id
                     """,
                     (rec.recommendation_id, rec.duplicate_key, json.dumps(asdict(rec), default=str), now_iso),
                 )
@@ -951,6 +1009,49 @@ class DurableOutboxStore:
         except Exception:
             return list(self._items.values())
 
+    def set_cooldown(self, cooldown_key: str, expires_at: float) -> None:
+        now_iso = datetime.now(timezone.utc).isoformat()
+        try:
+            with self._get_connection() as conn:
+                conn.execute("""
+                    INSERT INTO cooldowns (cooldown_key, expires_at, updated_at)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(cooldown_key) DO UPDATE SET expires_at = excluded.expires_at, updated_at = excluded.updated_at;
+                """, (cooldown_key, expires_at, now_iso))
+                conn.commit()
+        except Exception as ex:
+            log.warning(f"set_cooldown_failed error={ex}")
+
+    def is_cooldown_active(self, cooldown_key: str, now: Optional[float] = None) -> bool:
+        check_time = now if now is not None else time.time()
+        try:
+            with self._get_connection() as conn:
+                cur = conn.execute("SELECT expires_at FROM cooldowns WHERE cooldown_key = ?;", (cooldown_key,))
+                row = cur.fetchone()
+                if not row:
+                    return False
+                return float(row["expires_at"]) > check_time
+        except Exception:
+            return False
+
+    def get_cooldown(self, cooldown_key: str) -> Optional[float]:
+        try:
+            with self._get_connection() as conn:
+                cur = conn.execute("SELECT expires_at FROM cooldowns WHERE cooldown_key = ?;", (cooldown_key,))
+                row = cur.fetchone()
+                return float(row["expires_at"]) if row else None
+        except Exception:
+            return None
+
+    def clear_cooldown(self, cooldown_key: str) -> None:
+        try:
+            with self._get_connection() as conn:
+                conn.execute("DELETE FROM cooldowns WHERE cooldown_key = ?;", (cooldown_key,))
+                conn.commit()
+        except Exception as ex:
+            log.warning(f"clear_cooldown_failed error={ex}")
+
+
 
 class RecommendationEngine:
     """Operational scanner evaluating rules deterministically with deduplication, rule governance, and outbox dispatch."""
@@ -961,9 +1062,53 @@ class RecommendationEngine:
         outbox_dir: Optional[str] = None,
         tenant_id: str = "velora-aviation",
     ):
-        self.rules: Dict[str, KPIRecommendationRule] = {
-            r.rule_code: r for r in (rules or DEFAULT_RULES)
-        }
+        if rules is not None:
+            self.rules: Dict[str, KPIRecommendationRule] = {
+                r.rule_code: r for r in rules
+            }
+        else:
+            # Query active approved rules from Business Repository (W08 requirement 1: zero default seed fallback)
+            from .business_repository import get_business_repository_client
+            self.rules = {}
+            try:
+                repo_client = get_business_repository_client()
+                active_rule_dicts = repo_client.rules.list_active_rules(tenant_id)
+                for rd in active_rule_dicts:
+                    comp_str = str(rd.get("comparator", "gt")).lower()
+                    try:
+                        comp = Comparator(comp_str)
+                    except Exception:
+                        comp = Comparator.GT
+                    r = KPIRecommendationRule(
+                        rule_code=rd["rule_code"],
+                        rule_version=rd.get("rule_version", "1.0.0"),
+                        name=rd.get("name", rd["rule_code"]),
+                        kpi_code=rd.get("kpi") or rd.get("kpi_code", ""),
+                        organization_scope=rd.get("organization_scope", "1000"),
+                        category=rd.get("category", "RISK"),
+                        comparator=comp,
+                        threshold=Decimal(str(rd.get("threshold", "0.00"))),
+                        upper_threshold=Decimal(str(rd["upper_threshold"])) if rd.get("upper_threshold") is not None else None,
+                        clear_threshold=Decimal(str(rd["clear_threshold"])) if rd.get("clear_threshold") is not None else None,
+                        unit=rd.get("unit", "currency"),
+                        currency=rd.get("currency", "AED"),
+                        comparison_window=rd.get("comparison_window", "snapshot"),
+                        cooldown_minutes=int(rd.get("cooldown_minutes", 60)),
+                        severity=rd.get("severity", "high"),
+                        priority=int(rd.get("priority", 1)),
+                        recommendation_template=rd.get("recommendation_template", ""),
+                        explanation_template=rd.get("explanation_template", ""),
+                        requires_complete=bool(rd.get("requires_complete", True)),
+                        state=RuleState.ACTIVE,
+                        owner=rd.get("owner", "Finance Operations"),
+                        effective_from=rd.get("effective_from", "2026-01-01T00:00:00Z"),
+                        effective_to=rd.get("effective_to"),
+                    )
+                    self.rules[r.rule_code] = r
+            except Exception as ex:
+                log.info(f"business_repo_rules_empty_or_unavailable error={ex}")
+                self.rules = {}
+
         self.tenant_id = tenant_id
         self.outbox = DurableOutboxStore(outbox_dir)
         self.active_recommendations: Dict[str, RecommendationRecord] = {
@@ -987,7 +1132,17 @@ class RecommendationEngine:
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
 
     def evaluate_snapshot(self, snapshot: KPISnapshot) -> List[RecommendationRecord]:
-        """Evaluate snapshot against applicable active rules with governance, hysteresis, and deduplication (F08)."""
+        """Evaluate snapshot against applicable active rules with governance, hysteresis, and deduplication (F08 / W08)."""
+        # Reject non-finite values (W08 requirement 5)
+        if snapshot.value is None or not isinstance(snapshot.value, Decimal) or not snapshot.value.is_finite():
+            log.warning(f"rejected_nonfinite_snapshot kpi={snapshot.kpi_code} val={snapshot.value}")
+            return []
+
+        # W08 requirement 2: Do not enable budget recommendations while code reports unapproved mapping
+        if getattr(snapshot, "unapproved_mapping", False) or getattr(snapshot, "evidence_ref", "") == "UNAPPROVED_MAPPING":
+            log.info(f"unapproved_mapping_skipped kpi={snapshot.kpi_code}")
+            return []
+
         now_dt = datetime.now(timezone.utc)
         now_iso = now_dt.isoformat()
         results: List[RecommendationRecord] = []
@@ -1000,7 +1155,16 @@ class RecommendationEngine:
         ]
 
         for rule in applicable_rules:
-            # 0. Completeness requirement enforcement (A06 / T33)
+            # Category validation (W08 requirement 4: restrict to RISK, OPPORTUNITY, RECOMMENDATION, BENCHMARK)
+            if rule.category not in ("RISK", "OPPORTUNITY", "RECOMMENDATION", "BENCHMARK"):
+                log.warning(f"unsupported_rule_category rule={rule.rule_code} cat={rule.category}")
+                continue
+            if rule.category == "BENCHMARK":
+                # W08 requirement 4: no benchmark without W14 comparable data
+                log.info(f"benchmark_recommendation_requires_w14_data rule={rule.rule_code}")
+                continue
+
+            # 0. Completeness requirement enforcement (A06 / T33 / W08)
             if getattr(rule, "requires_complete", False) and str(snapshot.completeness).upper() != "COMPLETE":
                 log.info(f"rule_requires_complete_skipped rule={rule.rule_code} completeness={snapshot.completeness}")
                 continue
@@ -1024,7 +1188,7 @@ class RecommendationEngine:
                 except Exception:
                     pass
 
-            # 2. Unit and Currency compatibility enforcement (F08)
+            # 2. Unit and Currency compatibility enforcement (F08 / W08)
             if rule.unit and snapshot.unit and rule.unit.lower() != snapshot.unit.lower():
                 log.warning(f"rule_unit_mismatch rule={rule.rule_code} rule_unit={rule.unit} snapshot_unit={snapshot.unit}")
                 continue
@@ -1033,12 +1197,13 @@ class RecommendationEngine:
                 if rule.currency.upper() != snapshot.currency.upper():
                     log.warning(f"rule_currency_mismatch rule={rule.rule_code} rule_curr={rule.currency} snapshot_curr={snapshot.currency}")
                     continue
+
             cooldown_key = f"{rule.rule_code}:{snapshot.organization_scope}:{snapshot.kpi_code}"
             val = snapshot.value
             thresh = rule.threshold
             is_breached = False
 
-            # Deterministic comparator evaluation
+            # Deterministic comparator evaluation across all supported types
             if rule.comparator == Comparator.GT:
                 is_breached = val > thresh
             elif rule.comparator == Comparator.GTE:
@@ -1060,7 +1225,16 @@ class RecommendationEngine:
             existing = self.active_recommendations.get(dedup_key)
 
             if is_breached:
-                impact_text = f"Severity: {rule.severity.upper()} — Risk threshold breach"
+                # Meaningful category impact (W08 requirement 4)
+                if rule.category == "RISK":
+                    impact_text = f"Risk Alert [{rule.severity.upper()}]: {rule.name} breached limit of {thresh} {rule.unit or ''}"
+                elif rule.category == "OPPORTUNITY":
+                    impact_text = f"Opportunity Identified [{rule.severity.upper()}]: {rule.name} favorable variance vs baseline of {thresh} {rule.unit or ''}"
+                elif rule.category == "RECOMMENDATION":
+                    impact_text = f"Operational Advisory [{rule.severity.upper()}]: {rule.name} recommended threshold of {thresh} {rule.unit or ''}"
+                else:
+                    impact_text = f"Executive Alert [{rule.severity.upper()}]: {rule.name}"
+
                 explanation = rule.explanation_template.format(value=val, threshold=thresh)
                 action = rule.recommendation_template
 
@@ -1068,16 +1242,49 @@ class RecommendationEngine:
                     # Continuing breach: update timestamp and observed value, suppress duplicate alert
                     existing.last_detected = now_iso
                     existing.observed_value = val
+                    self.outbox.save_recommendation(existing)
                     results.append(existing)
                     continue
 
-                # 3. Cooldown check for new alert generation (F08)
-                last_fired = self.cooldown_tracker.get(cooldown_key)
-                if last_fired:
-                    elapsed_min = (time.time() - last_fired) / 60.0
-                    if elapsed_min < rule.cooldown_minutes:
-                        log.info(f"rule_cooldown_active rule={rule.rule_code} elapsed={elapsed_min:.1f}m cooldown={rule.cooldown_minutes}m")
-                        continue
+                # 3. Cooldown check for new alert generation (F08 / W03 persisted)
+                if self.outbox.is_cooldown_active(cooldown_key):
+                    log.info(f"rule_cooldown_active rule={rule.rule_code} cooldown_key={cooldown_key}")
+                    continue
+
+                # W01 Confidence evaluation (W08 requirement 5)
+                source_rec = EvidenceSource(
+                    sourceId=snapshot.snapshot_id,
+                    system="S4HANA",
+                    businessTitle=f"KPI Snapshot {snapshot.kpi_code}",
+                    retrievedAt=snapshot.retrieved_at or now_iso,
+                    sourceUpdatedAt=snapshot.source_updated_time if snapshot.source_updated_time else None,
+                    measurementPeriod=snapshot.period,
+                    scope=snapshot.organization_scope,
+                    currency=snapshot.currency,
+                    unit=snapshot.unit,
+                    contentHash=snapshot.input_hash,
+                )
+                is_comp = str(snapshot.completeness).upper() == "COMPLETE"
+                conf_assessment = evaluate_confidence(
+                    sources=[source_rec],
+                    now=now_dt,
+                    is_authoritative_single_source=True,
+                    is_materially_complete=is_comp,
+                )
+                conf_label = conf_assessment.label.value if hasattr(conf_assessment.label, "value") else str(conf_assessment.label)
+                conf_reason = conf_assessment.reason
+
+                obs_text = f"Observed {snapshot.kpi_code} value of {val} {snapshot.unit or ''} for scope {snapshot.organization_scope} ({snapshot.period})."
+                claim = MaterialClaim(
+                    claimId=f"CLM-{hashlib.sha256(f'{snapshot.snapshot_id}:{val}'.encode()).hexdigest()[:12]}",
+                    kind=ClaimKind.RECOMMENDATION,
+                    text=obs_text,
+                    numericValue=val,
+                    unit=snapshot.unit or snapshot.currency or "",
+                    currency=snapshot.currency or "",
+                    sourceIds=[snapshot.snapshot_id, snapshot.evidence_ref],
+                    confidenceAssessment=conf_assessment,
+                )
 
                 # New breach
                 rec_id = f"REC-{hashlib.md5(f'{dedup_key}:{now_iso}'.encode()).hexdigest()[:12]}"
@@ -1093,26 +1300,34 @@ class RecommendationEngine:
                     impact=impact_text,
                     explanation=explanation,
                     suggested_action=action,
-                    confidence="High",
-                    confidence_reason=f"Deterministic calculation backed by source evidence {snapshot.evidence_ref}",
+                    confidence=conf_label,
+                    confidence_reason=conf_reason,
                     first_detected=now_iso,
                     last_detected=now_iso,
                     status=RecommendationStatus.ACTIVE_BREACH,
                     duplicate_key=dedup_key,
                     snapshot_id=snapshot.snapshot_id,
+                    observation=obs_text,
+                    business_implication=explanation,
+                    severity=rule.severity,
+                    priority=rule.priority,
+                    supporting_claims=[claim.model_dump()],
+                    supporting_sources=[source_rec.model_dump()],
                 )
                 self.active_recommendations[dedup_key] = rec
                 self.recommendations_by_id[rec.recommendation_id] = rec
+                cooldown_expiry = time.time() + (rule.cooldown_minutes * 60.0)
+                self.outbox.set_cooldown(cooldown_key, cooldown_expiry)
                 self.cooldown_tracker[cooldown_key] = time.time()
                 self.outbox.save_recommendation(rec)
                 self.outbox.save_episodes(self.breach_episodes)
                 results.append(rec)
 
-                # Enqueue into durable delivery outbox
+                # Enqueue into durable delivery outbox if authorized recipient exists
                 self._enqueue_notification(rec)
 
             else:
-                # Check hysteresis clear threshold to prevent alert flapping
+                # Check hysteresis clear threshold across all comparators including OUTSIDE_RANGE
                 if existing and existing.status == RecommendationStatus.ACTIVE_BREACH:
                     clear_thresh = rule.clear_threshold if rule.clear_threshold is not None else thresh
                     cleared = False
@@ -1120,6 +1335,9 @@ class RecommendationEngine:
                         cleared = val <= clear_thresh
                     elif rule.comparator in {Comparator.LT, Comparator.LTE}:
                         cleared = val >= clear_thresh
+                    elif rule.comparator == Comparator.OUTSIDE_RANGE:
+                        upper = rule.upper_threshold or thresh
+                        cleared = (val >= thresh and val <= upper)
 
                     if cleared:
                         existing.status = RecommendationStatus.RECOVERED
@@ -1128,20 +1346,36 @@ class RecommendationEngine:
                         ep_num = int(episode.replace("ep", "") or "1") + 1
                         self.breach_episodes[cooldown_key] = f"ep{ep_num}"
                         self.outbox.save_episodes(self.breach_episodes)
-                        # Reset cooldown on recovery so new episode can re-arm (F08)
+                        self.outbox.save_recommendation(existing)
+                        # Reset cooldown on recovery so new episode can re-arm (F08 / W03)
+                        self.outbox.clear_cooldown(cooldown_key)
                         self.cooldown_tracker.pop(cooldown_key, None)
                         log.info(f"recommendation_cleared_by_hysteresis key={dedup_key} val={val}")
 
         return results
 
-    def _enqueue_notification(self, rec: RecommendationRecord, recipient: str = "balaadm@velora.ae") -> None:
-        raw = f"{self.tenant_id}:{rec.recommendation_id}:{recipient}:EMAIL"
+    def _enqueue_notification(self, rec: RecommendationRecord, recipient: Optional[str] = None) -> None:
+        """Enqueue delivery item only when an authorized recipient is specified (W08 requirement 6)."""
+        target_recipient = recipient
+        if not target_recipient:
+            rule = self.rules.get(rec.rule_code)
+            if rule:
+                owner = getattr(rule, "owner", "")
+                if "@" in owner:
+                    target_recipient = owner
+                elif owner:
+                    target_recipient = f"{owner.lower().replace(' ', '.')}@velora.ae"
+        if not target_recipient:
+            log.info(f"no_authorized_notification_recipient_suppressed rec_id={rec.recommendation_id}")
+            return
+
+        raw = f"{self.tenant_id}:{rec.recommendation_id}:{target_recipient}:EMAIL"
         dedup_key = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
         delivery_id = f"DLV-{dedup_key[:16]}"
         item = NotificationDeliveryRecord(
             delivery_id=delivery_id,
             recommendation_id=rec.recommendation_id,
-            recipient=recipient,
+            recipient=target_recipient,
             channel="EMAIL",
             status=DeliveryStatus.PENDING,
             deduplication_key=dedup_key,
@@ -1153,6 +1387,26 @@ class RecommendationEngine:
             log.info(f"recommendation_enqueued_in_outbox delivery_id={delivery_id} rec_id={rec.recommendation_id}")
         else:
             log.info(f"recommendation_duplicate_suppressed delivery_id={delivery_id} rec_id={rec.recommendation_id}")
+
+    def scan_and_evaluate_snapshots(
+        self,
+        snapshots: List[KPISnapshot],
+        recipient: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Scheduled scan phase evaluating snapshots separate from outbox dispatch (W08 requirement 7)."""
+        all_recs: List[RecommendationRecord] = []
+        for snap in snapshots:
+            recs = self.evaluate_snapshot(snap)
+            for r in recs:
+                if recipient:
+                    self._enqueue_notification(r, recipient=recipient)
+                all_recs.append(r)
+        return {
+            "status": "SUCCESS",
+            "snapshots_evaluated": len(snapshots),
+            "recommendations_generated": len(all_recs),
+            "recommendations": all_recs,
+        }
 
     def dispatch_outbox(
         self,
@@ -1256,3 +1510,15 @@ class RecommendationEngine:
                 )
 
         return delivered_count
+
+
+def get_outbox_store(outbox_dir: Optional[str] = None, db_path: Optional[str] = None):
+    """Factory returning PostgreSQL outbox in production or SQLite DurableOutboxStore in development/test."""
+    db_url = os.getenv("DATABASE_URL", "")
+    if db_url.startswith("postgresql://") or db_url.startswith("postgres://"):
+        try:
+            from .postgres_outbox_store import PostgresOutboxStore
+            return PostgresOutboxStore(connection_url=db_url)
+        except Exception as ex:
+            log.warning(f"Could not connect to PostgresOutboxStore via DATABASE_URL: {ex}; falling back to DurableOutboxStore")
+    return DurableOutboxStore(outbox_dir=outbox_dir, db_path=db_path)

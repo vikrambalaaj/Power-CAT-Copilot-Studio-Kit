@@ -1,0 +1,937 @@
+{
+  "time_utc": "2026-09-08T17:54:57.323326+00:00",
+  "files": [
+    {
+      "path": "mcp-apps/requirements-test.txt",
+      "sha256": "472e14eb2980668a53f9b7edc6a0f1518736f9120fbcce780135481f9aef70ac"
+    },
+    {
+      "path": "mcp-apps/docker-compose.yml",
+      "sha256": "e857d7e255e156caa7b5700f725ae10df7177270ed667e81b28ef24526369243"
+    },
+    {
+      "path": "mcp-apps/test_target_credential_architecture.py",
+      "sha256": "aeeda60378d2f179fe5491069c8fe2ebc7e2375143e7c6cb6bfeaf5ea87247b2"
+    },
+    {
+      "path": "mcp-apps/deploy/storage-and-queues.bicep",
+      "sha256": "972968b06555be7e1fd5de5bbe632eb8805d0d4b48e09ba1c371bba1f9390864"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/Dockerfile",
+      "sha256": "95ba52809114556a81f51e264bc83e9754bc5393d085bfbbcfb028846635778a"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/package-lock.json",
+      "sha256": "8ff8a68aa60452b0f4c5eae0b646963d62e5e47451f3b1847cf9245d450e9fa7"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/package.json",
+      "sha256": "47476b3647b9b4665248ebd6f298d312356105a3239d75e73e66371e46fedae6"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/manifest.yml",
+      "sha256": "dc9029c310f542926300c83cba6f074c0c21a6a9751f34223263f411f9be8b40"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/tsconfig.json",
+      "sha256": "980562246967c5dc0977f9968ea5b8fdfa087b4af073998303e365462db1d4c4"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/requirements.txt",
+      "sha256": "d778318ae20c6a756d1777a500e5c5c05896b99e62634d2cb7962d121ddf71ed"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/Dockerfile",
+      "sha256": "e47ad56462844c251217cb27522945eca6883f976c16d2a5963065c4aefb1794"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/manifest.yml",
+      "sha256": "63d9ca701bb67c36fe232b363d7a60774451e5c6420accf438406f23097814ef"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator-connector-swagger.json",
+      "sha256": "bd199a7b8cb026d586b8e890d578d38bbbf456a7bb639f5181527bf16784e89f"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/run_server.py",
+      "sha256": "e6e2c77f81a142fe04f2cfdfc04f1c42c0fe69439e2a26689fd279d287904acb"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/requirements.txt",
+      "sha256": "96d55444a911d816af1b0ce0017d89fcce5e83b3cab2c88244edd452c94fd5bd"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/Dockerfile",
+      "sha256": "4b7566033c218ba517bd64ce783697e28a60a86ada453c132531975391c2ffc5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/runtime.txt",
+      "sha256": "02d287dbf3943b450426d17b92e79f16ce8ff12560874a55aabcb49b48c663c4"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/pyproject.toml",
+      "sha256": "fefc5fa29b55c2789b13ae4ff14c180e9dc92a02ae09f89c502e46e1ea0437e5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/.dockerignore",
+      "sha256": "6ab95b1925a183865baf1fc71775fad7062e0f81f25a5e36eb73388563af056a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/manifest.yml",
+      "sha256": "195ac2ee75a663ed5fb77795bf261ec014d33d97eb945c816ef8f2a001e5fe24"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac-connector-swagger.json",
+      "sha256": "689f39cfb2ad4ca25cc24c412a713cfbf508440ada6c17049701f8c129992c9f"
+    },
+    {
+      "path": "mcp-apps/ask-sac/requirements.txt",
+      "sha256": "4d72c0a5e7fec68e65a92a34df69945cb52d20fc7fc891a5846bb3e59a609fd4"
+    },
+    {
+      "path": "mcp-apps/ask-sac/Dockerfile",
+      "sha256": "845712f23c7494458123dc47fd02626ce0d3665bf4310c0fc50301300ae626e0"
+    },
+    {
+      "path": "mcp-apps/ask-sac/pyproject.toml",
+      "sha256": "73a113d7bc3237062b6ac380e368ef70e48629b2592884eea5f16a88e133dd0e"
+    },
+    {
+      "path": "mcp-apps/ask-sac/manifest.yml",
+      "sha256": "25f9b86728668773833c84b2996ac2d0bd3693a8ad585a64396d02ed30696ae4"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/requirements.txt",
+      "sha256": "d778318ae20c6a756d1777a500e5c5c05896b99e62634d2cb7962d121ddf71ed"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/Dockerfile",
+      "sha256": "bb182a8dbcce57f5bfd024c85d1a2d2463e574968317f4506fdcbffd9a423ff1"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/pyproject.toml",
+      "sha256": "bce0a004c612ffcb138974eb88afa301f4e12f765bd239c3416ba7576496ab40"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4-connector-swagger.json",
+      "sha256": "0cd48ae7edf432952a82d204ecdc37720b9b8ed9b7c68a28ff62afa8dbcb690e"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/manifest.yml",
+      "sha256": "5a688b9519e9e2bf25b387d2313924444f54fa10a535d051a76ddc0540ea667a"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/requirements.txt",
+      "sha256": "6b4e76a22ec34adce599a813af0b259fd6e6cf1a062381e68f0d6449184c4b63"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/Dockerfile",
+      "sha256": "446aa750621cb964329b9bd0a37156395c4bdc9a39558cfac9995f95bfef31c8"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/runtime.txt",
+      "sha256": "02d287dbf3943b450426d17b92e79f16ce8ff12560874a55aabcb49b48c663c4"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/pyproject.toml",
+      "sha256": "4baab228d91bf21eb1bd776ef9ecc661a55ebb2045e4a8c986a55de4ea468667"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity-connector-swagger.json",
+      "sha256": "9a82daf6891010290a5350d0b2cfca2cf581a2a30c3d9c7804de5035be1bf037"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/manifest.yml",
+      "sha256": "06777d31d8ee1d9d4e678644de29f54817b32d26924f52d0d7d6c28401d6947a"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/run_server.py",
+      "sha256": "9223c0a067d4845bfe8bad4c1b7344470c88c857c322fb87f18d942494337cf8"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_dataverse_foundation.py",
+      "sha256": "69f03e955928a22bdff9a4f247e2742af58a7c8de0c667aa52f80f880339db42"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_two_step_pattern.py",
+      "sha256": "06e14caad799fa6a74cf8ee593320c5e393308f4fd5fe92cde27e49762f205c5"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_four_failed_cases.py",
+      "sha256": "31b544e8874a142e8cb351fd5544c24883dd9d0a055b366f63aab084693cf9db"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_daily_briefing.py",
+      "sha256": "3308a203aecbb0298129b04980eab456fa6caaecf43fe283e82f33779aa29b73"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_m365_writes.py",
+      "sha256": "62328e3a2b8372d5aa0fbfbb8bd6b381c8ff78f78da166747a063ee1af095a8d"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_notification_claims.py",
+      "sha256": "2721eeaaaec24ee1e20fc5feb72f3be86d247a737b626d88ff8e187b6a4efd42"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_m365_reads.py",
+      "sha256": "27458b16d279ff74eca9b79fadf5da1506b96a13a7673c76ad9d8e8ca952018e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_recommendation_engine.py",
+      "sha256": "0cef4b9f90fa16bdaa422a6a3fce36556d5342479cc1249226eb9637eedc4126"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_federated_auth_isolation.py",
+      "sha256": "79a801a147d175a63387bf83310ed3ec29ee70c34d2a62ea6f4f6301c036d85f"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+      "sha256": "d9d3f418ab4d01957335b09dfda8320162346b0cc3c9d22ca7643e31d616cf9e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_identity_boundary.py",
+      "sha256": "3976f70fd7af977994fbac6f2f700f576250c1db131535838e4bbc5a5bf4be05"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_operation_state_machine.py",
+      "sha256": "6d108e564f570c2ad69bdb67969260197f19359aa4c52aa9333da06623c901fb"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/test/test_handoff_contract.py",
+      "sha256": "9229aeecb511879a2b9602de9428bae830e76aa3a3fa977e183495c8ea53b318"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/deploy/containerapp.bicep",
+      "sha256": "d73f13874a5d2a23003f528001b7b2eeca27b3d2c6d3eadf4b690678920d3fcf"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+      "sha256": "dffd748db4454515e3309b4ba3f5b3092ef41189e064805c2a12a2ba2ddd8c8e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/server.py",
+      "sha256": "bc9e833a584cb87dea19049382830d5dadb61d63f5f3187306d8064ea25e362f"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+      "sha256": "512437c6e0ec6a55d804d91843e3db30752698a68551084bed0329ccf8fc7331"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+      "sha256": "8fdb08c3afa8cf92c7a8adcad6f72238efcc90d6024b70f418ccc3bf652f4404"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+      "sha256": "f5251f38c45928e9e61387856ed6d340a4a76eb52b68bd87791a090906567af2"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+      "sha256": "8c38895c05507ca6b519eab0e24bcfb46f3376fb20ac2515539a275f0b906aa0"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+      "sha256": "a98c2b8262e01e98b623b37905df2fdc4002cdf7e6b86be15de31340375ee87e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+      "sha256": "8e7503b86c410366f327bff835f81e58d69d3fc798bedba94d08ea516207fdb6"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/__init__.py",
+      "sha256": "fef7e0a6dde5d9ba24e3d8d76951abbc46bf89c6bc2462ea80e2652f0024654c"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+      "sha256": "e00f9aa1cb404b16c9cc82710004a99136365137ed8d0f2f95fc717476eb6ada"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+      "sha256": "126bcf74eb2e71470c86209d3ee2b9673869677fab1c7fdc3712d5a31d8cf395"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+      "sha256": "48d86940e76ccf99eebfa4a1c0e0b72aadf89abe0c613e476a31edf5c98852e5"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/shared_mcp/__init__.py",
+      "sha256": "e2e4927cb2372e0475fa6baca10f847779aacd86aa79af11eb14c95036bbb996"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/shared_mcp/logger.py",
+      "sha256": "4ce6e60acb7d54c024c5aab37039ecef80e7b4abc1477e7018beafb659059a5a"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/instruction.txt",
+      "sha256": "c0f4e87b4810177fbae5257ffc47a5fc1caf0589e2678610248b6a25527cc19d"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/manifest.json",
+      "sha256": "a839588487494d8070d5ee46248e389a65abe05fa7e241ffa99728050a572c6e"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/declarativeAgent.json",
+      "sha256": "0778698a4aa6fde735fc18fde7609bac32dcac3881e27d042dd7bf7f7a61bac7"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/agent/appPackage/productivity-plugin.json",
+      "sha256": "4e893095bdac5712144416b976093d1417ab8e82730b14d9548f2f4325da0771"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/test/test_financial_error_propagation.py",
+      "sha256": "85e6cc6bb0a6090fc8c6e641b8ccfdbe90ed897dbf1b4f4ac88bb4996ce53e1e"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/test/test_reviewer_findings.py",
+      "sha256": "28a9debc31b1ef36e7216de93b17fcca77cb40a1bf1864b1579f0f1694873f84"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/test/test_app.py",
+      "sha256": "4cded3424d968c61fe6b888c56cd4e4c14a8aca4fb0e68aa19aee7cddd3088bd"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/deploy/containerapp.bicep",
+      "sha256": "46f4baab6df5750ad04e2fdf7431541cff576ea7f5ec242b39ed7a14a87cd906"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+      "sha256": "6180cf76f2d4b5ad72cedf238e563040da5bf3d708ac4528b9418ba151dd44c2"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/deploy/deploy-s4hana-image.yml",
+      "sha256": "3560129ef495d9312aaf32b01b5712dd1c07a3597077b77c0470b77bab705681"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+      "sha256": "c550bcb32ef9bfcb1e7da4bcbc8e30937b0aeaf75325454a181136073e3f5bed"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+      "sha256": "a75c90ee17d3d4104f8936f67267c4ec0d5162937cdacffa68610b59787caea2"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+      "sha256": "ba11d2bbaf8ae4f9a2e3eda1a76d507ef2033bf3f4504436bbb69b475ef0dafb"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+      "sha256": "ae0a20b291d811db2fe431f077e8fcd863f916825aad0c9a67d6aa93cb78a6d5"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+      "sha256": "932ab6ee1e32f549a30f48da9f3b09ba32c0a8d182a0a90d740600c10be829b6"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+      "sha256": "4fbc20900e2c10f53a77a33d654e13ecbd4b0e562fe1ab0ef753363a3ace0ca9"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/__init__.py",
+      "sha256": "ee7279a4fc27cd82a88155282f2c5a4477d580879260e24738a76e4bdb4bbc5f"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+      "sha256": "b5d0a45262964347967f66b38e9cc785289e1755ddb6e4f16e970a91e8ab8360"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+      "sha256": "2af163b49e9e49ed39a8536e0b0ce3f18bdcc813f695f04216bfa56e29c32d59"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+      "sha256": "e648a22e816d2585bd07c1dc0e8c23b3f74110f0c019738cb8b848d2ab39916e"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4hana_mcp/__main__.py",
+      "sha256": "69427e5b84bc4c9be4383eb20ce54875d09728ed84cb754e880c935e5a6fc35a"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/shared_mcp/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "mcp-apps/ask-sac/test/test_app.py",
+      "sha256": "b19552080a4e026c486003c83de97086fc44bc93b9b3031a7b13f5ed58cf3406"
+    },
+    {
+      "path": "mcp-apps/ask-sac/deploy/containerapp.bicep",
+      "sha256": "cd908e929790f6bf42226b3547532e66dfaa3c2841b1ca7ea90a0d50dde9930d"
+    },
+    {
+      "path": "mcp-apps/ask-sac/deploy/generate_plugin.py",
+      "sha256": "c556d681acc8f601cf6ac7828aadfac5434454f367cee7ca794cc0eacf4410e5"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/server.py",
+      "sha256": "713cc0ae6ab99608d4c1b63a08bf066e8f0d3d8ffc21569f7bd863f85a6731b7"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/adaptive_cards.py",
+      "sha256": "b7e7b3f28d1b5de46995fd87499716522eadd15c57d5b8c4f89b68422ee88460"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/client.py",
+      "sha256": "0c31a0851e6af1fe172d0bcc73c64f51a99d49951b90702cf5bcc267f4f3faa1"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/tools.py",
+      "sha256": "f45c44d644210e0515f285c55be92aaa4861040d452b2bdf5fe7fcbd6baaba66"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/cache.py",
+      "sha256": "665360a4c5ccb52445f5da493dc025e40a0b23022a08e59cf90a804b3331a2e8"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/__init__.py",
+      "sha256": "d5ffc149fb12b2f5c30e82dde2b98436c4c09e2d347a014ea768d3376d5dda30"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/settings.py",
+      "sha256": "d70e5bb1248ec4397180dab400d45363c79fb12bfbe5e4935934deffaef5640d"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/__main__.py",
+      "sha256": "1e4be7324dc866e0f41dce97cde7318625d3be150c964c51a634359a36f7d04d"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_validate_against_headcount_report.py",
+      "sha256": "2476ccf40ba689bd5b5c65936c3d8b929f849814f018e3177056b45428121a63"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_consent_greeting.py",
+      "sha256": "44679e0f4a3346989ab29c4f7220fd27924389377b16178758460836507b4475"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_dataverse_audit_and_memory.py",
+      "sha256": "879077e8d33af0d35cb91ca688804d8b1a6cee3a198bb0b30c20f8eedd271fd0"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_consent_and_greeting.py",
+      "sha256": "08c354aa3d8f5c6d3370a0b02c73d5f5b5d1089ed0adfe4d0e822cf58660451a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_connection_manager.py",
+      "sha256": "f829aa54aea37a703a28f70f6831ebbfb7b9cde2971fbd809628754450b29612"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_audit_durability.py",
+      "sha256": "ff2f7559b6e8a4296652ad60736b34f35e7047cf907203295abf6f832cf68785"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_federated_auth_isolation.py",
+      "sha256": "7ecb74f9141ff1b49ff664f668569422a4b38de23cb2b168fafb916e4ceb378f"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_cache_and_concurrency.py",
+      "sha256": "391bbe0e6f58ed6ee38167b71a8499fe33f384b7c20dd85018b3d62b33ddd747"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_consent_persistence_and_gate.py",
+      "sha256": "a576b91cd43855d2a1fe68294998a5a646eac795697c9d10e206be1a1200216d"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_leavers_attrition_trend.py",
+      "sha256": "563e20a8a7b70ec7291f3cdc4ed487f7b24cdca80c91d794b3d85eb8b954208b"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_policy_and_drilldown.py",
+      "sha256": "dc03e416204a3a5279e76403d62c0baf89f2739f5bad51a71a19a365e556fcb2"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/test/test_app.py",
+      "sha256": "3fc7123578537df95e579beb0f1f0e19e63e14c29d8a9e254ab4dbfdac47104c"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+      "sha256": "8bf09cd3864b9b1de2e8f667d00674faa6a16606aada731da7f73360ac79b41c"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/deploy/containerapp.bicep",
+      "sha256": "bd3c85a97954c5dad0688528a266f8d48268f87d144a4791dc6ff894f4e78851"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/deploy/copilot-workforce-card-openapi.json",
+      "sha256": "a89010d5c81f299a21506d1b042c1519d3754dc4caab58886dda681109db8ab1"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+      "sha256": "208995c413890ffa1e6068a5c1556473c2ee21c08c82c3dba9ddabdbbf0b694d"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/automation/trigger-payload.schema.json",
+      "sha256": "cc641d706fefe5b4a93c376698901243b9fb4686b3282ba6e572a5bc2d520533"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/automation/scheduled-prompts.json",
+      "sha256": "bb8b3499c0bf0db5b1920ffe83c25daee150d7c20feb6e18b660f1e0a325c196"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+      "sha256": "c1a84eb9bc0a51287d81a9a261f8592d3d85fe2f97611160a61cf1a5d1651615"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+      "sha256": "b3efd80d653bb96ba5bb77dd27a0af44592ef27a0892a12934a21aac39e93d7a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+      "sha256": "eff12ca860b1bb00a3f239e998ff19221bc3cca0f54a13c5f5429abc3f2007ef"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+      "sha256": "16d049eaacc60d280bc0d2e07e48d8aa1f1b54f106b1dd8a1379d916aa0e60e7"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+      "sha256": "d55389e7ea4052ca5dcba3645887dc20e97a286b4a5c7665c495d074d84d9e7f"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+      "sha256": "336749c6a6b9567d5a0652b47b6f53a1a1abb4305d496f2bd76d7037fca972e3"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+      "sha256": "1c4b6cb104ca68d6dd9d8661e28ba0262f8669f5ed75bba3dcd003d24c8a5fd3"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+      "sha256": "17ec7112d7713fb2cc1bb72d4ea63780705340d230ce5db0072257b69211b901"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/__init__.py",
+      "sha256": "14be812d56bdd70170652702b8c599a7c3f89708d6876a3b4f6e99023ce1ee6a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+      "sha256": "5fa3ff877e3a0e482f9d51200ebed4ee36f4b2865d29336c21cf118c8d35fb9c"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+      "sha256": "38dc40d3b23f66fb3517948ad65d8454bf008d07de8354949c87fe0477ad84f6"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+      "sha256": "9e9cd7baab65549fa505dd1a428d03d75eeefcd43bb97f848ce8d8e4571d6d90"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+      "sha256": "95872e652df5b7bcace77a3f2fa527e083a40f911c051c251931a7bdf674f6e5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+      "sha256": "740c589daca6b6a6c4a8460869bc72ca934e54a5e097e37ddbda0cfa1f434077"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/__main__.py",
+      "sha256": "29cf54bd9f163a41403c2c0e2ff37818568301b5dbdaac4b1547af0e2e78e81f"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+      "sha256": "01c5feed922ec27d16f3e7ce8f87c2452d2a8a369af215af6bd5ef5c8609401b"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+      "sha256": "20a4f95f6bb8f6db905ab251c4889d0c42d50a32470e4986819929a5c8b255df"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+      "sha256": "77000eead6ded35efb9f1fdd96c18359d72824d6946f8382db4255f6ef4edcd1"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+      "sha256": "9bbed85a38c3f839b4bd4a2e24ef3fbee4104c3b029b6ab0bd497de5aad2e9bc"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/auth.py",
+      "sha256": "87d112dad7367a4b519a73f67e0fe07a5446f5b8cda4ecd88512c477792e2340"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/__init__.py",
+      "sha256": "72033621e0c6b0a2b0d4d7faaf673af7c4f27cd2bd5e417e50f2cd98288e6133"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/telemetry.py",
+      "sha256": "70e434a66c08507d394bfe912a79a0f6946d958c38394443162fc5eb9bffd246"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/logger.py",
+      "sha256": "489816886f71b2e773e10011444c78891389a4321fea1cbc29079ce358eabd31"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/http.py",
+      "sha256": "5f2f14deaefcb11dc8fb482be46f07add196773b6a55604f82eb654ca24995bc"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/file_logger.py",
+      "sha256": "a4c433211b53c0fcf9c3c637922a5f0009fb4db8c9048edbbf082bbff115a934"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/facilitator-plugin.json",
+      "sha256": "1372c4a306e2da4d7f2e35a9994a33a5f1e30091ada16443ff68f151b68b0860"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/mcp-tools.json",
+      "sha256": "87fab3512d1374440a184381330ae4a4e0670bd532bdb8f30a6c70f65bd3e47e"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/instruction.txt",
+      "sha256": "36de53608c57c58cd6af8e275f416655dd78c3945e7e87fc5d2b1c678a43a756"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/s4hana-mcp-tools.json",
+      "sha256": "0a8fc0ef8de93e6a415f487917dcb4de4139d70bc2c2a5ea8de1d1a91983b6f1"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/s4hana-plugin.json",
+      "sha256": "1d45fdcfc35c508921b95c57851d4838f35406d857184c3dfca8f5b2faa389a9"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/sac-plugin.json",
+      "sha256": "47f3f7b0f2938c2d3f9b1793ab89aa0d8c11d99c57031ba3981418b66817f792"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/manifest.json",
+      "sha256": "47fc1075a3243fe3d8e870c1ed3a70fe5b43da1223f90501cf80e8b1829c18b6"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/ai-plugin.json",
+      "sha256": "3649f27c1fb6fad8c7ecd3a142d8bcccd87cc3b06d315e0c3fe891692d21f3ff"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/sac-mcp-tools.json",
+      "sha256": "1d993f356e6047f0b1b5f1d59806456c99b811eaa4351d9f65ee1f8897b10b04"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/declarativeAgent.json",
+      "sha256": "d1840a9bbb45c405c03f2734fa1084d4143d307f465cf1528140ae1e9aee9b4a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/productivity-plugin.json",
+      "sha256": "c7c82ee202add9fb5ee2eb5d4fba0fdfa506cddf2dfc1d946c64212871df76e4"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/peer-benchmark.json",
+      "sha256": "1e9b139b007ef32385fd6831fd149f867293f4bcc2193f95b29d1760d6dc05fb"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/customer-master.json",
+      "sha256": "4b6d27441c0858375b9e0fc34a88543fdd415e90a8fed9172cc0edc295592390"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/receivables-aging.json",
+      "sha256": "6b891cbd5ffafe7e9cf0bb338bd461a503aca46375ea50c4b1d22564cffd7c48"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/end-of-day.json",
+      "sha256": "ded02b53311b80016dd2411845eb50a237dcbb146ae445bc7fd94550bfc491a1"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/cost-center-master.json",
+      "sha256": "a3aa9de161688cc1e8ad516fc94cb7bedcb005b1fd64514e4ee27d46b69fa010"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/proactive-recommendation.json",
+      "sha256": "f4b33daafde19b3d5b98e5353d5023e0b3da2198f4be2b8f978e83517414f7b5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/meeting-intelligence.json",
+      "sha256": "af6b2f7b49a5e8bc1713c8b20bcc826b91cc874cb636f705cc8f38e7f4b88da5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/headcount.json",
+      "sha256": "b3b7dd88e5b3cf6110262aa94eae6fe14f373600e82bbc52c9d67bd55e90d09b"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/decision-trace.json",
+      "sha256": "5464b5e19a1717cf3a69674ffe475af2274cdcbacd0419686f3cdd2f5fe10b21"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-variance.json",
+      "sha256": "5670ce9249ddfb9e58f62f5fa9d49fdd959aef49625f5034e59913c6d4acb43e"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-consumption.json",
+      "sha256": "a2e7d712e22101667f15599f8eab4b5a3a8a7ab3a503acc93b8a3a62526da7d9"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/profit-center-master.json",
+      "sha256": "463cc91255f00d85af1282ffe8410296365fec08dfa348e4fd0877eb825ea0cc"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/executive-brief.json",
+      "sha256": "0e852ce56be190b1db0a0f3ebb169ff1e9bcede520ea7dc85e2a91a3c12a571a"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/emiratisation.json",
+      "sha256": "85037d86d99164fadb21c90fe5fff2c89a44039fbf52c391b373bfd552e8160f"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/payables-aging.json",
+      "sha256": "02229e69ae43d4e1a0398c3f7ad5b41f578b708b4653c2e4126a7d1395d569f4"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/follow-ups.json",
+      "sha256": "09b0aeb8b931c23375374e1b92adafe458f271f60ad2e7a4622f923274302a0d"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/profit-and-loss.json",
+      "sha256": "828ba277fbb7c447d739cd71db1cbaca1c68f7db0ba50b79800ffe4a62802afe"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/budget-movements.json",
+      "sha256": "12506d813abb53556a48fc703aab3f80835fdeb63375fda703197d42208c286c"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/workforce-overview.json",
+      "sha256": "b43e52d6e3a663b1b48e2e8f2738f73de245a791cf0194e7b8147a5b4cf3cc03"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/email-snapshot.json",
+      "sha256": "ec490fbfe1a56c41c4b1d0aa9d49a6e562cf214ae2b4bce3f3f55a2c6d0ffca5"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/sap-result.json",
+      "sha256": "1ab87633388d4ad14b0c84b57c4e832df153e2a081ce3c59b096c377dcdde0c7"
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/daily-plan.json",
+      "sha256": "d5591069f512995c01f5dc4f1e20e0f20405a45f237ff5a3dbd5052c873b3d5c"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/test/test_facilitator_governance.py",
+      "sha256": "0bd82df04446dbcd0088c7749871bab044a34636ca6e7b2238d5e7a8c2ee50e4"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/test/test_app.py",
+      "sha256": "cf393aebc1bfd79662114e86272b7ce2eac50e712f7f6c7247c3fcd257c5f552"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/deploy/containerapp.bicep",
+      "sha256": "c7851e09d1c4957f65abe6225712118388085abb9e7f4438288e1ce8c35bee13"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+      "sha256": "1cefdb89a7f9cde12ea06bcf5c7c77080848210dba138ddfe76720dfe57a4875"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+      "sha256": "d5a00a03e182e82d2d210b55b241f03a106a146df141bcc706e10242de39b356"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator_mcp/__init__.py",
+      "sha256": "54cc6788e1c41ac49c051dcab919c896c815f6001c887ec9bc45884629a220dd"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator_mcp/__main__.py",
+      "sha256": "7f522d166c9e171592b4a6ef36ca445536583e31a61afe92d5942ebde86f156c"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/shared_mcp/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/copilot-studio/openapi-schema.json",
+      "sha256": "59ebb8b30e1e5f6c1b7194186ebebe1c4ae5e874c6703637aa48cc9eb1d42329"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/copilot-studio/ask-with-card-powerfx.txt",
+      "sha256": "ac2f1ca39e02883893fe8818390cb6d1fa308abc9ec965200713ef9b8d6f9145"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/test/card-service.test.ts",
+      "sha256": "003f8c411cd183b68d39e10bb6660bdeb0a48da50d35aef00954e63aa3da8770"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/index.js",
+      "sha256": "85e1c75a9235ca0a975c9e75666c9950ec588c70dc1e8a648d3d72de2289c8e7"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/webchat-client/card-guard-middleware.ts",
+      "sha256": "9ad34142c9e2cc6625c4c4d6c9b6c3a3b1f4e92acd38e0dca6c0dd306c87c49c"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/index.ts",
+      "sha256": "79bbf89f91b501cf8f6df86c7db3bbffe05712a561363e594e4b36924fcc44f9"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/security/idempotency-signer.ts",
+      "sha256": "64d78d2624cb910f6746e3628596ae4ed5947231a5dde1fefec5834107793f6e"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/templates/approval-card.json",
+      "sha256": "fd3772bc6b526fa3a4a82fed644660297aa40b1401b6b988c387bc14669248e0"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/templates/input-form-card.json",
+      "sha256": "39d1b8b31fcd9bbc30837ad0ade7f1c9b6bf8a8c7fe33a0dd6dbf7d6f3c9575a"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/templates/metrics-card.json",
+      "sha256": "54cba7d8ec59dfef42231f1940d349537c389090a242b870142b195793cbbdf5"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/templates/fact-grid-card.json",
+      "sha256": "2aa6ba3974060d4ea7185acffcc12673072dee18992db980bc72ff202a69c263"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/engine/fallback-generator.ts",
+      "sha256": "677190c52399771b289ae1c1f2d1316a91704603a8edf5cc2cba64db548c2937"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/engine/template-evaluator.ts",
+      "sha256": "bfc0368c4065538cc0b5242ccafcf9f16e4d70552e04a46f5fd1a0c261fb68b3"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/engine/validator-sanitizer.ts",
+      "sha256": "e14c318040b18074e5ffaa1c4b4be0a50d1beed2aabb12595ff716a038c2ad55"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/src/engine/template-registry.ts",
+      "sha256": "e5c48e0b8612b75f854690d28b61796f45d9637f3774a790a40a68d1ac6bbebf"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/security/idempotency-signer.js",
+      "sha256": "7f155b6d7694bda7ae740130db1cf2ae386c9d92626125bf5637dedb302ab26d"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/templates/approval-card.json",
+      "sha256": "fd3772bc6b526fa3a4a82fed644660297aa40b1401b6b988c387bc14669248e0"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/templates/input-form-card.json",
+      "sha256": "39d1b8b31fcd9bbc30837ad0ade7f1c9b6bf8a8c7fe33a0dd6dbf7d6f3c9575a"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/templates/metrics-card.json",
+      "sha256": "54cba7d8ec59dfef42231f1940d349537c389090a242b870142b195793cbbdf5"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/templates/fact-grid-card.json",
+      "sha256": "2aa6ba3974060d4ea7185acffcc12673072dee18992db980bc72ff202a69c263"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/engine/template-evaluator.js",
+      "sha256": "79984e9b81ddf38fa56844a83d94b354e343e9b50294062b2aa9eed6f80838f8"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/engine/fallback-generator.js",
+      "sha256": "ad1f752abee6224616acf21614885000e989217ab88f4920e2404991fe87ff36"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/engine/template-registry.js",
+      "sha256": "4cbf33d98d0e7f5ad6d771cf0b9270407ea710071b49e42dcb7b1387c13f0334"
+    },
+    {
+      "path": "mcp-apps/dynamic-adaptive-card-service/dist/engine/validator-sanitizer.js",
+      "sha256": "54cd097747aa555a17d5aa8a4ddf1c86e6fbde7340386b8d8c586d898f2c4008"
+    },
+    {
+      "path": "deploy/generate_connectors_swagger.py",
+      "sha256": "1d067d8f35d62bbda5cc295a73f5b89097aeba96d0f4d09764652801004eca9d"
+    },
+    {
+      "path": "deploy/build_velora_executive_platform_solution.py",
+      "sha256": "17b1e1e2f71924e35c0fe8ea33dd0330788519dc2e9331b98dd0897fcf0b3406"
+    },
+    {
+      "path": "deploy/enrich_plugins_with_states.py",
+      "sha256": "2dd2c00474f329a87b5f377b6d1ee64ad879c01eaed559388890bdd5af6155a6"
+    },
+    {
+      "path": "deploy/repair_dataverse_schema.py",
+      "sha256": "031aeb3ed4c063f56069c57d4f42fafbf30114325e149ee979e31e9e3b87c479"
+    },
+    {
+      "path": "deploy/test_all_live_systems_and_audit.py",
+      "sha256": "f92d43daa44b5654b586090e38109aa6c8bc99b1603268c87333cc598bddb169"
+    },
+    {
+      "path": "deploy/solution/[Content_Types].xml",
+      "sha256": "ac5602c08ccce9d61d27cc09aea00690fa2a88a9ebe159eb9b7a4fbad0a97793"
+    },
+    {
+      "path": "deploy/solution/audit_cloud_flows.json",
+      "sha256": "21823bdcda670c8e201823f8ea666ff93cd6532d9e97d255ace40f8734d6730f"
+    },
+    {
+      "path": "deploy/solution/customizations.xml",
+      "sha256": "9f41eb536649a4eb7d035849f0806f15945e9f7c4ff1339e7920948182713a07"
+    },
+    {
+      "path": "deploy/solution/solution.xml",
+      "sha256": "134a96a0410861fa0ecf6cac0420d5a8245978abb5d3ad1e0f7e09a6012c5ecc"
+    },
+    {
+      "path": "deploy/cleanup/test_remove_runtime_demo_data.py",
+      "sha256": "c519f259b326a99b43ffb3bb97ef4819d4ca496aa80e318c05532dc449dd8d14"
+    },
+    {
+      "path": "deploy/cleanup/remove_runtime_demo_data.py",
+      "sha256": "a914b5e541b55900fa6025b69c712eb84c4597c8217e88077fe6cd5e458c2b5b"
+    },
+    {
+      "path": ".github/workflows/deploy-pages.yml",
+      "sha256": "0e44c00e5c3c24d0f84a9a76480cc74479cb540beda48318b1a77e466f585c89"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "sha256": "93f15973dc194c156e98cba0c276aaabb461043ff3b5cd0fffae9911ae2453c4"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "931fc0e689652159ccf2db280cb3ed4ad580bec273f15f2804a9c8afe2937667"
+    },
+    {
+      "path": "docs/deploy/CONTROL_FIX_MATRIX.md",
+      "sha256": "b311317d6c1cd02cb43eb8b4aefa456cd9e74c24a3d4a0aee5810b97b6e9c663"
+    }
+  ]
+}

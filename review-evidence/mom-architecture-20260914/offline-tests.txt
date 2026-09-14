@@ -1,0 +1,30 @@
+test_deduplication_on_continuous_breach (test_recommendation_engine.TestRecommendationEngine.test_deduplication_on_continuous_breach) ... ok
+test_default_rules_registered (test_recommendation_engine.TestRecommendationEngine.test_default_rules_registered) ... ok
+test_durable_outbox_restart_recovery (test_recommendation_engine.TestRecommendationEngine.test_durable_outbox_restart_recovery) ... ok
+test_evaluate_rule_breach_and_recommendation_generation (test_recommendation_engine.TestRecommendationEngine.test_evaluate_rule_breach_and_recommendation_generation) ... ok
+test_f08_delivery_acceptance_gate_rejects_simulated (test_recommendation_engine.TestRecommendationEngine.test_f08_delivery_acceptance_gate_rejects_simulated)
+F08: Delivery gate rejects marking simulated sends as DELIVERED when live delivery is required. ... ok
+test_f08_full_engine_restart_recovery_and_dispatch (test_recommendation_engine.TestRecommendationEngine.test_f08_full_engine_restart_recovery_and_dispatch)
+F08: Engine restart recovers both deliveries AND recommendations; dispatch succeeds without 'not found' failure. ... ok
+test_f08_rule_governance_effective_dates_and_unit_currency (test_recommendation_engine.TestRecommendationEngine.test_f08_rule_governance_effective_dates_and_unit_currency)
+F08: Evaluator enforces effective_from/effective_to, unit, and currency compatibility. ... ok
+test_hysteresis_clear_and_rearm (test_recommendation_engine.TestRecommendationEngine.test_hysteresis_clear_and_rearm) ... ok
+test_bounded_retries_on_pre_submission_failure (test_notification_claims.TestNotificationClaimsAndReconciliation.test_bounded_retries_on_pre_submission_failure)
+Bounded retries for verified failures: retried until max_attempts, then marked FAILED. ... ok
+test_delivery_guarantee_honesty_documented (test_notification_claims.TestNotificationClaimsAndReconciliation.test_delivery_guarantee_honesty_documented)
+Verify delivery guarantee contract is explicitly documented on DurableOutboxStore. ... ok
+test_lease_expires_during_slow_provider_call_raises_stale_worker_error (test_notification_claims.TestNotificationClaimsAndReconciliation.test_lease_expires_during_slow_provider_call_raises_stale_worker_error)
+Lease expires during a slow provider call: stale worker's attempt to update raises StaleWorkerError. ... ok
+test_provider_accepts_then_worker_crashes_moved_to_reconciling (test_notification_claims.TestNotificationClaimsAndReconciliation.test_provider_accepts_then_worker_crashes_moved_to_reconciling)
+Provider accepts, but worker crashes before saving response: state is SUBMITTING, moved to RECONCILING, never auto-resends. ... ok
+test_restart_preserves_cooldown_and_episode_state (test_notification_claims.TestNotificationClaimsAndReconciliation.test_restart_preserves_cooldown_and_episode_state)
+Restart preserves cooldown episodes and recommendation deduplication across instance reboot. ... ok
+test_two_workers_compete_for_one_delivery (test_notification_claims.TestNotificationClaimsAndReconciliation.test_two_workers_compete_for_one_delivery)
+Two workers compete for one delivery: exactly one claims it, the other gets 0. ... ok
+test_worker_crashes_before_submission (test_notification_claims.TestNotificationClaimsAndReconciliation.test_worker_crashes_before_submission)
+Worker crashes before submission: lease expires and second worker claims and executes. ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.875s
+
+OK

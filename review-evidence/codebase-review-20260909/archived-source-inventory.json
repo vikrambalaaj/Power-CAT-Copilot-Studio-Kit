@@ -1,0 +1,401 @@
+[
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "deploy/regen_manifests.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "title_case",
+      "_simplify_prop",
+      "clean_schema",
+      "build_entries",
+      "validate_written",
+      "main"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "sf_crm_mcp/__init__.py",
+    "python_syntax": "PASS",
+    "functions": []
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "sf_crm_mcp/__main__.py",
+    "python_syntax": "PASS",
+    "functions": []
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "sf_crm_mcp/salesforce_client.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_xml_escape",
+      "_log_sf_http",
+      "get_client",
+      "clear_token_cache",
+      "__init__",
+      "__init__",
+      "_base_url",
+      "_authenticate",
+      "_headers",
+      "_request",
+      "_raise_for_error",
+      "query",
+      "create",
+      "update",
+      "delete",
+      "invoke_action",
+      "convert_lead_soap",
+      "_txt"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "sf_crm_mcp/salesforce_server.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "crm_widget",
+      "_validate_env",
+      "main"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "sf_crm_mcp/salesforce_settings.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "get_settings",
+      "reset_settings_cache"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "sf_crm_mcp/salesforce_tools.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_sq",
+      "_get_schema",
+      "_build_where_clauses",
+      "_now_iso",
+      "_time_ago",
+      "_filter_signature",
+      "_cache_get",
+      "_cache_set",
+      "_cache_invalidate",
+      "_error_result",
+      "_sf_api_alert",
+      "_flatten_record",
+      "_fetch_entity",
+      "_list_summary",
+      "_fetch_leads",
+      "_fetch_opportunities",
+      "_fetch_accounts",
+      "_fetch_contacts",
+      "_fetch_cases",
+      "_fetch_tasks",
+      "_fetch_campaigns",
+      "sf__get_leads",
+      "sf__create_lead",
+      "sf__update_lead",
+      "sf__get_opportunities",
+      "sf__create_opportunity",
+      "sf__update_opportunity",
+      "sf__get_opportunity_products",
+      "sf__get_opportunity_contact_roles",
+      "sf__get_accounts",
+      "_resolve_account",
+      "_account_not_found_msg",
+      "_account_not_found_alert",
+      "_resolve_who",
+      "_resolve_what",
+      "_who_not_found_alert",
+      "_resolve_contact",
+      "_contact_not_found_alert",
+      "_what_not_found_alert",
+      "sf__create_account",
+      "sf__update_account",
+      "sf__get_contacts",
+      "sf__create_contact",
+      "sf__update_contact",
+      "sf__get_cases",
+      "sf__create_case",
+      "sf__update_case",
+      "sf__get_case_activity",
+      "sf__get_tasks",
+      "sf__create_task",
+      "sf__update_task",
+      "sf__convert_lead",
+      "sf__get_pipeline_dashboard",
+      "sf__get_campaigns",
+      "sf__create_campaign",
+      "sf__update_campaign",
+      "sf__get_pending_approvals",
+      "_approval_action",
+      "sf__approve_record",
+      "sf__reject_record",
+      "sf__show_create_form",
+      "show_leads_prompt",
+      "show_opportunities_prompt",
+      "manage_crm_prompt"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "shared_mcp/__init__.py",
+    "python_syntax": "PASS",
+    "functions": []
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "shared_mcp/auth.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "get_bearer_token"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "shared_mcp/file_logger.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_trim",
+      "cap_rows",
+      "_write",
+      "_emit_console",
+      "log_event",
+      "_result_payload",
+      "log_tool",
+      "wrap_specs_logging",
+      "decorator",
+      "wrapper"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "shared_mcp/http.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "create_async_client"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "shared_mcp/logger.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "get_logger"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "member": "shared_mcp/telemetry.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_parse_conn_str",
+      "_ms_to_duration",
+      "_payload",
+      "_ship",
+      "track_tool",
+      "wrap_specs",
+      "decorator",
+      "wrapper"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "deploy/regen_manifests.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "title_case",
+      "_simplify_prop",
+      "clean_schema",
+      "build_entries",
+      "validate_written",
+      "main"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "servicenow_mcp/__init__.py",
+    "python_syntax": "PASS",
+    "functions": []
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "servicenow_mcp/__main__.py",
+    "python_syntax": "PASS",
+    "functions": []
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "servicenow_mcp/servicenow_client.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_load_env",
+      "clear_token_cache",
+      "_val",
+      "get_servicenow_token",
+      "servicenow_request",
+      "_log_sn_http"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "servicenow_mcp/servicenow_server.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "servicenow_widget",
+      "_validate_env",
+      "main"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "servicenow_mcp/servicenow_settings.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "get_settings",
+      "reset_settings_cache"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "servicenow_mcp/servicenow_tools.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_now_iso",
+      "_cache_get",
+      "_cache_set",
+      "_cache_invalidate",
+      "_normalize_category",
+      "_normalize_risk",
+      "_normalize_risk_filter",
+      "_normalize_state",
+      "_normalize_incident_state",
+      "_normalize_change_state",
+      "_normalize_problem_state",
+      "_normalize_hr_state",
+      "_normalize_request_state",
+      "_normalize_priority",
+      "_build_sn_query",
+      "_map_record",
+      "_fetch_table",
+      "_error_result",
+      "_sn_escape",
+      "_fetch_incidents",
+      "_fetch_requests",
+      "_fetch_problems",
+      "_fetch_hr_cases",
+      "_text_search",
+      "_fetch_approvals",
+      "_is_sys_id",
+      "_resolve_cache_get",
+      "_resolve_cache_set",
+      "_sn_like_escape",
+      "_resolve_user",
+      "_resolve_users_batched",
+      "_resolve_hr_service",
+      "_user_not_found_msg",
+      "_hr_service_not_found_msg",
+      "_user_not_found_alert",
+      "_multi_fk_not_found_alert",
+      "sn__get_users",
+      "sn__get_hr_services",
+      "sn__get_incidents",
+      "sn__get_requests",
+      "sn__get_request_items",
+      "sn__get_change_requests",
+      "sn__get_problems",
+      "sn__get_pending_approvals",
+      "sn__get_service_catalog_items",
+      "sn__get_knowledge_articles",
+      "sn__create_incident",
+      "sn__create_request",
+      "sn__create_change_request",
+      "sn__update_change_request",
+      "sn__update_incident",
+      "sn__update_request",
+      "sn__update_request_item",
+      "sn__update_problem",
+      "sn__create_problem",
+      "sn__resolve_incident",
+      "_build_prefill",
+      "sn__create_incident_form",
+      "sn__create_request_form",
+      "sn__create_change_request_form",
+      "sn__create_problem_form",
+      "sn__create_hr_case_form",
+      "sn__get_change_tasks",
+      "sn__get_hr_cases",
+      "sn__create_hr_case",
+      "sn__update_hr_case",
+      "sn__approve_record",
+      "sn__reject_record",
+      "prompt_show_incidents",
+      "prompt_show_requests",
+      "prompt_incident_summary"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "shared_mcp/__init__.py",
+    "python_syntax": "PASS",
+    "functions": []
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "shared_mcp/auth.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "get_bearer_token"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "shared_mcp/file_logger.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_trim",
+      "cap_rows",
+      "_write",
+      "_emit_console",
+      "log_event",
+      "_result_payload",
+      "log_tool",
+      "wrap_specs_logging",
+      "decorator",
+      "wrapper"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "shared_mcp/http.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "create_async_client"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "shared_mcp/logger.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "get_logger"
+    ]
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "member": "shared_mcp/telemetry.py",
+    "python_syntax": "PASS",
+    "functions": [
+      "_parse_conn_str",
+      "_ms_to_duration",
+      "_payload",
+      "_ship",
+      "track_tool",
+      "wrap_specs",
+      "decorator",
+      "wrapper"
+    ]
+  }
+]

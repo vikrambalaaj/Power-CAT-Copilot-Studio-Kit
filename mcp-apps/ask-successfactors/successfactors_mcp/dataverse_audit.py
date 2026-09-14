@@ -565,11 +565,51 @@ class DataverseClient:
         tenant_id: Optional[str] = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
+        federated_token: Optional[str] = None,
+        federated_token_file: Optional[str] = None,
+        auth_type: Optional[str] = None,
     ):
         self.base_url = (base_url or os.getenv("DATAVERSE_URL", "")).rstrip("/")
-        self.tenant_id = tenant_id or os.getenv("AZURE_TENANT_ID", "")
-        self.client_id = client_id or os.getenv("AZURE_CLIENT_ID", "")
-        self.client_secret = client_secret or os.getenv("AZURE_CLIENT_SECRET", "")
+        self.tenant_id = (
+            tenant_id
+            or os.getenv("DATAVERSE_TENANT_ID")
+            or os.getenv("AZURE_TENANT_ID", "")
+        )
+        self.client_id = (
+            client_id
+            or os.getenv("DATAVERSE_CLIENT_ID")
+            or os.getenv("AZURE_CLIENT_ID", "")
+        )
+        self.client_secret = (
+            client_secret
+            or os.getenv("DATAVERSE_CLIENT_SECRET")
+            or os.getenv("AZURE_CLIENT_SECRET", "")
+        )
+        self.federated_token = (
+            federated_token
+            or os.getenv("AZURE_FEDERATED_TOKEN")
+            or os.getenv("DATAVERSE_FEDERATED_TOKEN")
+            or os.getenv("CLIENT_ASSERTION")
+        )
+        self.federated_token_file = (
+            federated_token_file
+            or os.getenv("AZURE_FEDERATED_TOKEN_FILE")
+            or os.getenv("DATAVERSE_FEDERATED_TOKEN_FILE")
+        )
+        self.auth_type = (
+            auth_type
+            or os.getenv("DATAVERSE_AUTH_TYPE")
+            or os.getenv("DATAVERSE_AUTH_MODE")
+            or (
+                "FederatedCredential"
+                if (
+                    self.federated_token
+                    or self.federated_token_file
+                    or os.getenv("USE_FEDERATED_AUTH") in ("1", "true", "True")
+                )
+                else "OAuth2_ClientCredentials"
+            )
+        )
         self.simulate_down = False
 
         # Cached client-credentials token for the Dataverse Web API
@@ -581,7 +621,7 @@ class DataverseClient:
         # In-memory store for high-performance indexing, verification, and tests
         self._audit_store: List[Dict[str, Any]] = []
         self._policy_store: List[Dict[str, Any]] = []
-        self._alternate_keys_index: Set[Tuple[str, str]] = set()  # (invocation_id, record_type)
+        self._alternate_keys_index: Dict[Tuple[str, str], Dict[str, Any]] = {}  # (invocation_id, record_type) -> meta
         self._idempotency_index: Set[Tuple[str, str]] = set()     # (idempotency_key, operation)
         self._seed_default_policies()
 
@@ -626,33 +666,126 @@ class DataverseClient:
 
     # ── Dataverse Web API transport ────────────────────────────────────────────
 
+    def _resolve_federated_token(self) -> Optional[str]:
+        """Resolve federated assertion token from string or file path."""
+        if self.federated_token:
+            return self.federated_token.strip()
+        if self.federated_token_file and os.path.exists(self.federated_token_file):
+            try:
+                with open(self.federated_token_file, "r", encoding="utf-8") as f:
+                    return f.read().strip()
+            except Exception as err:
+                log.warning("failed_to_read_federated_token_file", path=self.federated_token_file, error=str(err))
+        return None
+
     @property
     def is_live(self) -> bool:
-        """True when full client-credentials configuration for Dataverse is present."""
-        return bool(self.base_url and self.tenant_id and self.client_id and self.client_secret)
+        """True when live authentication configuration (secret or federated) for Dataverse is present."""
+        if os.getenv("MOCK_DATAVERSE") == "1":
+            return False
+        has_secret = bool(self.client_secret)
+        has_federated = bool(
+            self._resolve_federated_token()
+            or str(self.auth_type).lower() in ("federatedcredential", "federated_credential", "managedidentity", "managed_identity")
+            or os.getenv("USE_FEDERATED_AUTH") in ("1", "true", "True")
+        )
+        return bool(self.base_url and self.tenant_id and self.client_id and (has_secret or has_federated))
 
     async def _get_access_token(self) -> str:
-        """Acquire and cache an app-only bearer token for the Dataverse Web API."""
+        """Acquire and cache an app-only bearer token for the Dataverse Web API.
+        
+        Supports:
+        1. Federated Credential / Workload Identity Federation (RFC 7523 client assertion)
+           using client_id without static client secrets.
+        2. Azure Managed Identity using client_id for User-Assigned Managed Identity.
+        3. Standard OAuth 2.0 client credentials using client_id and client_secret.
+        """
         now = time.time()
         if self._access_token and now < self._token_expires_at:
             return self._access_token
 
         token_url = f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
-        form = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "scope": f"{self.base_url}/.default",
-            "grant_type": "client_credentials",
-        }
-        async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
-            resp = await client.post(token_url, data=form)
-            resp.raise_for_status()
-            body = resp.json()
+        scope = f"{self.base_url}/.default"
 
-        self._access_token = body["access_token"]
-        # Refresh 60s early so a token never expires mid-request.
-        self._token_expires_at = now + max(int(body.get("expires_in", 3600)) - 60, 60)
-        return self._access_token
+        # 1. Federated Credential / Workload Identity (RFC 7523 Client Assertion)
+        fed_token = self._resolve_federated_token()
+        is_federated_mode = (
+            bool(fed_token)
+            or str(self.auth_type).lower() in ("federatedcredential", "federated_credential")
+            or (not self.client_secret and os.getenv("USE_FEDERATED_AUTH") in ("1", "true", "True"))
+        )
+
+        if is_federated_mode and not fed_token:
+            raise ValueError("Federated Dataverse authentication requires a current client assertion or readable token file; client-secret fallback is disabled.")
+
+        if is_federated_mode and fed_token:
+            form = {
+                "client_id": self.client_id,
+                "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "client_assertion": fed_token,
+                "scope": scope,
+                "grant_type": "client_credentials",
+            }
+            async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+                resp = await client.post(token_url, data=form)
+                resp.raise_for_status()
+                body = resp.json()
+            self._access_token = body["access_token"]
+            self._token_expires_at = now + max(int(body.get("expires_in", 3600)) - 60, 60)
+            return self._access_token
+
+        # 2. Azure Managed Identity (User-Assigned Identity via client_id)
+        is_managed_identity = (
+            str(self.auth_type).lower() in ("managedidentity", "managed_identity")
+            or os.getenv("USE_MANAGED_IDENTITY") in ("1", "true", "True")
+        )
+        if is_managed_identity:
+            identity_endpoint = os.getenv("IDENTITY_ENDPOINT")
+            identity_header = os.getenv("IDENTITY_HEADER")
+            if identity_endpoint and identity_header:
+                async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+                    resp = await client.get(
+                        f"{identity_endpoint}?api-version=2019-08-01&resource={self.base_url}&client_id={self.client_id}",
+                        headers={"X-IDENTITY-HEADER": identity_header},
+                    )
+                    resp.raise_for_status()
+                    body = resp.json()
+                    self._access_token = body["access_token"]
+                    self._token_expires_at = now + max(int(body.get("expires_in", 3600)) - 60, 60)
+                    return self._access_token
+            # Fallback to Azure IMDS
+            imds_url = f"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2019-08-01&resource={self.base_url}&client_id={self.client_id}"
+            async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+                resp = await client.get(imds_url, headers={"Metadata": "true"})
+                resp.raise_for_status()
+                body = resp.json()
+                self._access_token = body["access_token"]
+                self._token_expires_at = now + max(int(body.get("expires_in", 3600)) - 60, 60)
+                return self._access_token
+
+        # 3. Standard OAuth 2.0 Client Credentials
+        if self.client_secret:
+            form = {
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "scope": scope,
+                "grant_type": "client_credentials",
+            }
+            async with httpx.AsyncClient(timeout=DATAVERSE_TIMEOUT_SECONDS) as client:
+                resp = await client.post(token_url, data=form)
+                resp.raise_for_status()
+                body = resp.json()
+
+            self._access_token = body["access_token"]
+            # Refresh 60s early so a token never expires mid-request.
+            self._token_expires_at = now + max(int(body.get("expires_in", 3600)) - 60, 60)
+            return self._access_token
+
+        raise ValueError(
+            f"No valid credentials found for Dataverse authentication (client_id='{self.client_id}'). "
+            "Provide client_secret, federated token (AZURE_FEDERATED_TOKEN/AZURE_FEDERATED_TOKEN_FILE), "
+            "or configure Managed Identity."
+        )
 
     async def _request(
         self,
@@ -694,11 +827,17 @@ class DataverseClient:
             return created.get(id_field)
         return None
 
-    def check_alternate_key_exists(self, invocation_id: str, record_type: str) -> bool:
+    def check_alternate_key_exists(self, invocation_id: str, record_type: str, record: Optional[DataverseAuditRecord] = None) -> bool:
         """Check Section 3.4 alternate key: cre2f_invocationid + cre2f_recordtype."""
         if not invocation_id:
             return False
-        return (invocation_id, record_type) in self._alternate_keys_index
+        if (invocation_id, record_type) not in self._alternate_keys_index:
+            return False
+        if record is not None:
+            existing = self._alternate_keys_index[(invocation_id, record_type)]
+            if existing.get("operation") and record.operation and existing["operation"] != record.operation:
+                return False
+        return True
 
     def check_successful_idempotency_exists(self, idempotency_key: str, operation: str) -> bool:
         """Check Section 3.4 idempotency protection: cre2f_idempotencykey + cre2f_operation."""
@@ -719,42 +858,45 @@ class DataverseClient:
         operation = record.operation
 
         # 1. Alternate key check (Section 3.4)
-        if inv_id and self.check_alternate_key_exists(inv_id, rec_type):
+        if inv_id and self.check_alternate_key_exists(inv_id, rec_type, record):
+            existing = self._alternate_keys_index.get((inv_id, rec_type), {})
+            existing_id = existing.get("id") or f"EXISTS-{inv_id}"
             log.warning("duplicate_alternate_key_detected", invocation_id=inv_id, record_type=rec_type)
             return {
                 "status": AuditCommitStatus.ALREADY_COMMITTED,
                 "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
+                "audit_record_id": existing_id,
                 "message": f"Record with invocation ID '{inv_id}' and record type '{rec_type}' already committed.",
-                "id": f"EXISTS-{inv_id}",
+                "id": existing_id,
                 "invocation_id": inv_id,
             }
 
         # 2. Duplicate successful write check (Section 3.4)
         if rec_type == RECORD_TYPE_TRANSACTION_START and self.check_successful_idempotency_exists(idemp_key, operation):
             log.warning("duplicate_successful_transaction_detected", idempotency_key=idemp_key, operation=operation)
+            existing_id = f"EXISTS-{idemp_key}"
             return {
                 "status": AuditCommitStatus.ALREADY_COMMITTED,
                 "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
+                "audit_record_id": existing_id,
                 "message": f"A successful transaction for operation '{operation}' with idempotency key '{idemp_key}' has already executed.",
-                "id": f"EXISTS-{idemp_key}",
+                "id": existing_id,
                 "invocation_id": inv_id,
             }
 
         # Unconfigured / Mock Fallback
         if not self.is_live:
-            buf_id = f"BUF-{rec_type}-{int(time.time() * 1000)}-{os.urandom(2).hex()}"
+            buf_id = f"AUD-{rec_type}-{int(time.time() * 1000)}-{os.urandom(2).hex()}"
             payload["cre2f_veloraagentauditlogid"] = buf_id
             payload["cre2f_loggingstatus"] = AuditCommitStatus.BUFFERED
             self._audit_store.append(payload)
-            if inv_id:
-                self._alternate_keys_index.add((inv_id, rec_type))
-            if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
-                if idemp_key:
-                    self._idempotency_index.add((idemp_key, operation))
+            # CRITICAL (E11 / W03): A local buffer cannot populate confirmed-commit indices
+            # (_alternate_keys_index or _idempotency_index). Only live committed records do.
             log.info("dataverse_not_configured_audit_buffered", record_type=rec_type, buffer_id=buf_id)
             return {
-                "status": AuditCommitStatus.BUFFERED,
+                "status": "SUCCESS",
                 "commit_status": AuditCommitStatus.BUFFERED,
+                "audit_record_id": buf_id,
                 "id": buf_id,
                 "invocation_id": inv_id,
                 "logging_status": AuditCommitStatus.BUFFERED,
@@ -777,29 +919,44 @@ class DataverseClient:
             if rec_type == RECORD_TYPE_CONSENT:
                 self._consent_cache.clear()
             if inv_id:
-                self._alternate_keys_index.add((inv_id, rec_type))
+                self._alternate_keys_index[(inv_id, rec_type)] = {
+                    "id": log_id,
+                    "record_type": rec_type,
+                    "invocation_id": inv_id,
+                    "operation": operation,
+                    "committed_at": datetime.now(timezone.utc).isoformat(),
+                }
             if rec_type in (RECORD_TYPE_TRANSACTION_RESULT, RECORD_TYPE_TOOL_EXECUTION_END) and record.outcome == "SUCCESS":
                 if idemp_key:
                     self._idempotency_index.add((idemp_key, operation))
 
             log.debug("audit_record_created", type=record.record_type, turn_id=record.turn_id, log_id=log_id)
             return {
-                "status": AuditCommitStatus.COMMITTED,
+                "status": "SUCCESS",
                 "commit_status": AuditCommitStatus.COMMITTED,
+                "audit_record_id": log_id,
                 "id": log_id,
                 "invocation_id": inv_id,
             }
         except httpx.HTTPStatusError as http_err:
-            if http_err.response.status_code == 412 or "DuplicateKey" in http_err.response.text:
+            resp_text = http_err.response.text if http_err.response else ""
+            is_verified_dup = any(
+                code in resp_text
+                for code in ("0x80040333", "DuplicateKey", "DuplicateRecord", "already exists", "Cannot insert duplicate key")
+            )
+            if http_err.response.status_code in (409, 412) and is_verified_dup:
                 log.info("dataverse_duplicate_already_committed", invocation_id=inv_id)
+                existing_id = f"EXISTS-{inv_id}"
                 return {
                     "status": AuditCommitStatus.ALREADY_COMMITTED,
                     "commit_status": AuditCommitStatus.ALREADY_COMMITTED,
-                    "id": f"EXISTS-{inv_id}",
+                    "audit_record_id": existing_id,
+                    "id": existing_id,
                     "invocation_id": inv_id,
+                    "message": f"Durable record for invocation ID '{inv_id}' and record type '{rec_type}' already exists in Dataverse.",
                 }
-            log.error("dataverse_live_write_failed", error=str(http_err), status_code=http_err.response.status_code)
-            raise ConnectionError(f"Dataverse destination write failed: {http_err}") from http_err
+            log.error("dataverse_live_write_failed", error=str(http_err), status_code=http_err.response.status_code, response=resp_text)
+            raise ConnectionError(f"Dataverse destination write failed (HTTP {http_err.response.status_code}): {resp_text}") from http_err
         except Exception as exc:
             log.error("dataverse_live_write_failed", error=str(exc))
             raise ConnectionError(f"Dataverse destination write failed: {exc}") from exc

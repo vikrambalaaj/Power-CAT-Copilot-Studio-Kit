@@ -76,6 +76,10 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'ALLOW_ANONYMOUS', value: 'false' }
             { name: 'ALLOWED_HOSTS', value: allowedHosts }
             { name: 'PUBLIC_BASE_URL', value: publicBaseUrl }
+            { name: 'GRAPH_CLIENT_ID', value: m365ClientId }
+            { name: 'GRAPH_TENANT_ID', value: m365TenantId }
+            { name: 'GRAPH_CLIENT_SECRET', secretRef: 'm365-client-secret' }
+            { name: 'GRAPH_API_URL', value: 'https://graph.microsoft.com/v1.0' }
             { name: 'M365_CLIENT_ID', value: m365ClientId }
             { name: 'M365_CLIENT_SECRET', secretRef: 'm365-client-secret' }
             { name: 'M365_TENANT_ID', value: m365TenantId }
@@ -117,5 +121,88 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
   }
 }
 
+resource workerJob 'Microsoft.App/jobs@2024-03-01' = {
+  name: '${appName}-worker-job'
+  location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityId}': {}
+    }
+  }
+  properties: {
+    environmentId: managedEnvironmentId
+    configuration: {
+      triggerType: 'Schedule'
+      scheduleTriggerConfig: {
+        cronExpression: '* * * * *'
+        parallelism: 1
+        replicaCompletionCount: 1
+      }
+      replicaTimeout: 300
+      replicaRetryLimit: 1
+      registries: [
+        {
+          server: registryServer
+          identity: userAssignedIdentityId
+        }
+      ]
+      secrets: [
+        { name: 'mcp-api-key', keyVaultUrl: mcpApiKeySecretUrl, identity: userAssignedIdentityId }
+        { name: 'm365-client-secret', keyVaultUrl: m365ClientSecretUrl, identity: userAssignedIdentityId }
+        { name: 'dataverse-client-secret', keyVaultUrl: dataverseClientSecretUrl, identity: userAssignedIdentityId }
+      ]
+    }
+    template: {
+      volumes: !empty(storageVolumeName) ? [
+        {
+          name: storageVolumeName
+          storageType: 'AzureFile'
+          storageName: storageVolumeName
+        }
+      ] : []
+      containers: [
+        {
+          name: 'worker'
+          image: image
+          command: [
+            'python'
+            '-m'
+            'productivity_mcp.worker'
+          ]
+          resources: {
+            cpu: json('0.5')
+            memory: '1Gi'
+          }
+          volumeMounts: !empty(storageVolumeName) ? [
+            {
+              volumeName: storageVolumeName
+              mountPath: volumeMountPath
+            }
+          ] : []
+          env: [
+            { name: 'ALLOW_ANONYMOUS', value: 'false' }
+            { name: 'GRAPH_CLIENT_ID', value: m365ClientId }
+            { name: 'GRAPH_TENANT_ID', value: m365TenantId }
+            { name: 'GRAPH_CLIENT_SECRET', secretRef: 'm365-client-secret' }
+            { name: 'M365_CLIENT_ID', value: m365ClientId }
+            { name: 'M365_CLIENT_SECRET', secretRef: 'm365-client-secret' }
+            { name: 'M365_TENANT_ID', value: m365TenantId }
+            { name: 'AZURE_CLIENT_ID', value: m365ClientId }
+            { name: 'AZURE_CLIENT_SECRET', secretRef: 'm365-client-secret' }
+            { name: 'AZURE_TENANT_ID', value: m365TenantId }
+            { name: 'DATAVERSE_URL', value: dataverseUrl }
+            { name: 'DATAVERSE_CLIENT_SECRET', secretRef: 'dataverse-client-secret' }
+            { name: 'VELORA_OUTBOX_DIR', value: '${volumeMountPath}/outbox' }
+            { name: 'AZURE_STORAGE_MOUNT_PATH', value: '${volumeMountPath}/outbox' }
+            { name: 'VELORA_SUBSCRIPTION_DB', value: '${volumeMountPath}/velora_subscriptions.db' }
+          ]
+        }
+      ]
+    }
+  }
+}
+
 output fqdn string = app.properties.configuration.ingress.fqdn
 output deployedImage string = image
+output workerJobName string = workerJob.name

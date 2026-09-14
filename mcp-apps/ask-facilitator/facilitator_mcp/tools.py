@@ -6,46 +6,57 @@ import hashlib
 import html
 import hmac
 import json
+import logging
 import os
 import re
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+
+from .finance_snapshot_service import generate_finance_snapshot, evaluate_finance_snapshot
+from .institutional_memory import ingest_institutional_record, get_vendor_history
+from .decision_service import evaluate_vendor_options as _evaluate_vendor_options, get_historical_decision
+
+log = logging.getLogger(__name__)
 
 FACILITATOR_AUTO_SEND_GUIDE = (
-    'To make your Facilitator Copilot agent automatically send emails, you need to add an automated workflow tool '
-    'using Power Automate or a custom Outlook connector inside Microsoft Copilot Studio.\n'
-    'Here is how to set up and configure the auto-send email capability.\n'
-    '🛠️ Step 1: Add the Automation Tool\n'
+    'To make your Facilitator Copilot agent send emails, you must configure a governed workflow '
+    'using Microsoft Copilot Studio with mandatory human-in-the-loop confirmation.\n'
+    'Here is how to set up and configure the approved email dispatch capability.\n'
+    '🛠️ Step 1: Add the Action Tool\n'
     'Open your agent inside Microsoft Copilot Studio.\n'
     'Navigate to the Actions (or Tools) tab from the left menu.\n'
     'Click Add an action.\n'
-    'Search for Outlook or Power Automate.\n'
-    'Select the Send an email (V2) action from the Office 365 Outlook connector. [1]\n'
+    'Select the Send an email (V2) action from the Office 365 Outlook connector.\n'
     '📋 Step 2: Configure the Input Parameters\n'
-    'For the Facilitator agent to send the email without asking the user for basic details every time, you must map the input fields to variables captured during the meeting or chat:\n'
-    'To: Map this to the attendee\'s email variable or a specific fallback email address.\n'
-    'Subject: Set a dynamic string (e.g., Meeting Summary: [Topic]).\n'
-    'Body: Map this to the AI-generated summary text or meeting notes variable captured by the Facilitator.\n'
-    '⚡ Step 3: Trigger the Email Automatically\n'
-    'To bypass asking the user for confirmation and make it a true "auto-send" feature:\n'
-    'Open the specific conversational topic or trigger phase (e.g., "End of Meeting").\n'
-    'Insert the Send an email (V2) action node directly into the workflow canvas.\n'
-    'Toggle the Pre-fill / Auto-execute settings to active.\n'
-    'Ensure the Review before sending option is turned off so the agent executes the action instantly. [2]\n'
-    'Would you like me to:\n'
-    'Draft the exact prompt instructions to tell the Facilitator when it should trigger the email?\n'
-    'Guide you on how to format the AI-generated meeting notes inside the email body?\n'
-    '[1] https://learn.microsoft.com/en-us/dynamics365/supply-chain/procurement/procurement-agent-supplier-com-setup\n'
-    '[2] https://www.youtube.com/watch?v=HJj8STkKj2k'
+    'Map the preview fields so the executive can review before sending:\n'
+    'To: Map this to the verified attendee email variable.\n'
+    'Subject: Set a structured subject (e.g., Executive Meeting Summary: [Topic]).\n'
+    'Body: Map this to the AI-generated summary draft for human confirmation.\n'
+    '⚡ Step 3: Enforce Human Confirmation\n'
+    'To ensure executive control and prevent unintended email dispatch:\n'
+    'Ensure the "Review before sending" option is strictly TURNED ON.\n'
+    'The agent presents an Adaptive Card preview with explicit Send / Cancel action buttons.\n'
+    'No automated background email dispatch is permitted without executive preview and confirmation.\n'
 )
 
-ENTRA_TENANT_ID = os.environ.get('ENTRA_TENANT_ID', '7d167021-f5e9-4331-9b75-d44d55a1ce9b')
-ENTRA_CLIENT_ID = os.environ.get('ENTRA_CLIENT_ID', '5d178cb2-251e-436c-b2ec-5f36021d2cf8')
-ENTRA_CLIENT_SECRET = os.environ.get('ENTRA_CLIENT_SECRET', '')
-SVC_SENDER_EMAIL = os.environ.get('SVC_SENDER_EMAIL', 'svc_aiagent@velora.ae')
+try:
+    from dotenv import load_dotenv
+    _fac_env = Path(__file__).resolve().parent.parent / ".env"
+    if _fac_env.exists():
+        load_dotenv(_fac_env)
+    else:
+        load_dotenv()
+except Exception:
+    pass
+
+ENTRA_TENANT_ID = os.environ.get('ENTRA_TENANT_ID') or os.environ.get('AZURE_TENANT_ID') or '7d167021-f5e9-4331-9b75-d44d55a1ce9b'
+ENTRA_CLIENT_ID = os.environ.get('ENTRA_CLIENT_ID') or os.environ.get('AZURE_CLIENT_ID') or 'c659609b-76db-49b1-8470-3205a6c35ecb'
+ENTRA_CLIENT_SECRET = os.environ.get('ENTRA_CLIENT_SECRET') or os.environ.get('AZURE_CLIENT_SECRET') or ''
+SVC_SENDER_EMAIL = os.environ.get('SVC_SENDER_EMAIL') or os.environ.get('M365_USER_EMAIL') or 'svc_aiagent@velora.ae'
 
 _DEFAULT_FACILITATOR_DIR = (
     os.environ.get('AZURE_STORAGE_MOUNT_PATH')
@@ -274,44 +285,85 @@ def send_executive_email_via_graph(
         }
 
     # 3. Dispatch via Graph API
-    token_url = f'https://login.microsoftonline.com/{ENTRA_TENANT_ID}/oauth2/v2.0/token'
-    token_data = (
-        f'client_id={ENTRA_CLIENT_ID}&scope=https://graph.microsoft.com/.default&client_secret={ENTRA_CLIENT_SECRET}&grant_type=client_credentials'
-    ).encode('utf-8')
-    token_req = urllib.request.Request(token_url, data=token_data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
-    with urllib.request.urlopen(token_req, timeout=10) as token_resp:
-        token_obj = json.loads(token_resp.read().decode('utf-8'))
-        access_token = token_obj['access_token']
+    try:
+        token_url = f'https://login.microsoftonline.com/{ENTRA_TENANT_ID}/oauth2/v2.0/token'
+        token_data = (
+            f'client_id={ENTRA_CLIENT_ID}&scope=https://graph.microsoft.com/.default&client_secret={ENTRA_CLIENT_SECRET}&grant_type=client_credentials'
+        ).encode('utf-8')
+        token_req = urllib.request.Request(token_url, data=token_data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+        with urllib.request.urlopen(token_req, timeout=10) as token_resp:
+            token_obj = json.loads(token_resp.read().decode('utf-8'))
+            access_token = token_obj['access_token']
 
-    send_url = f'https://graph.microsoft.com/v1.0/users/{SVC_SENDER_EMAIL}/sendMail'
-    message_payload = {
-        'message': {
+        send_url = f'https://graph.microsoft.com/v1.0/users/{SVC_SENDER_EMAIL}/sendMail'
+        message_payload = {
+            'message': {
+                'subject': subject,
+                'body': {'contentType': 'HTML', 'content': body_html},
+                'toRecipients': [{'emailAddress': {'address': addr.strip()}} for addr in to_recipients],
+                'ccRecipients': [{'emailAddress': {'address': addr.strip()}} for addr in cc_recipients or []],
+            },
+            'saveToSentItems': 'true',
+        }
+        req = urllib.request.Request(
+            send_url,
+            data=json.dumps(message_payload).encode('utf-8'),
+            headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
+            method='POST',
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            status_code = resp.status
+            request_id = resp.headers.get('request-id') if hasattr(resp, 'headers') and resp.headers else f'GRAPH-REQ-{int(time.time() * 1000)}'
+
+        return {
+            'status': 'EMAIL_SENT',
+            'sender': SVC_SENDER_EMAIL,
+            'to': to_recipients,
+            'cc': cc_recipients or [],
             'subject': subject,
-            'body': {'contentType': 'HTML', 'content': body_html},
-            'toRecipients': [{'emailAddress': {'address': addr.strip()}} for addr in to_recipients],
-            'ccRecipients': [{'emailAddress': {'address': addr.strip()}} for addr in cc_recipients or []],
-        },
-        'saveToSentItems': 'true',
-    }
-    req = urllib.request.Request(
-        send_url,
-        data=json.dumps(message_payload).encode('utf-8'),
-        headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
-        method='POST',
-    )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        status_code = resp.status
-
-    return {
-        'status': 'EMAIL_SENT',
-        'sender': SVC_SENDER_EMAIL,
-        'to': to_recipients,
-        'cc': cc_recipients or [],
-        'subject': subject,
-        'graph_http_status': status_code,
-        'timestamp': datetime.now(timezone.utc).isoformat(),
-        'delivery_mode': 'MICROSOFT_GRAPH_SERVICE_PRINCIPAL',
-    }
+            'message_id': None,
+            'web_link': None,
+            'requestId': request_id,
+            'graph_http_status': status_code,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'delivery_mode': 'MICROSOFT_GRAPH_LIVE',
+        }
+    except urllib.error.HTTPError as he:
+        err_body = ''
+        try:
+            err_body = he.read().decode('utf-8')
+        except Exception:
+            pass
+        log.error(f"Graph API sendMail error ({he.code}): {he.reason}. Returning truthful failure receipt.")
+        return {
+            'status': 'FAILED',
+            'sender': SVC_SENDER_EMAIL,
+            'to': to_recipients,
+            'cc': cc_recipients or [],
+            'subject': subject,
+            'message_id': None,
+            'web_link': None,
+            'graph_http_status': he.code,
+            'graph_error': he.reason,
+            'graph_response': err_body,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'delivery_mode': 'MICROSOFT_GRAPH_LIVE',
+            'error': f'Microsoft Graph sendMail failed HTTP {he.code}: {he.reason}',
+        }
+    except Exception as e:
+        log.error(f"Graph API sendMail failed: {e}. Returning truthful failure receipt.")
+        return {
+            'status': 'FAILED',
+            'sender': SVC_SENDER_EMAIL,
+            'to': to_recipients,
+            'cc': cc_recipients or [],
+            'subject': subject,
+            'message_id': None,
+            'web_link': None,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'delivery_mode': 'MICROSOFT_GRAPH_LIVE',
+            'error': str(e),
+        }
 
 
 def draft_meeting_summary_email(
@@ -360,20 +412,188 @@ def draft_meeting_summary_email(
 
 def configure_auto_send_policy(
     agent_name: str = 'Facilitator Copilot',
-    require_confirmation: bool = False,
+    require_confirmation: bool = True,
     default_recipients: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """Configure auto-send and workflow policies for the Facilitator agent."""
+    if not require_confirmation:
+        # Strict enforcement: bypassing user review is disallowed in production (WP03, AIDEV-06)
+        log.warning("Attempted to configure auto-send policy with require_confirmation=False; forced to True")
+        require_confirmation = True
+
     return {
         'agent': agent_name,
         'policy': {
-            'auto_send_enabled': True,
-            'bypass_user_review': not require_confirmation,
+            'auto_send_enabled': False,  # Direct auto-send without human confirmation is prohibited
+            'bypass_user_review': False,  # Review bypass is strictly disabled
+            'require_confirmation': True,
             'default_recipients': default_recipients or ['leadership@velora.ae'],
             'trigger_event': 'End_of_Meeting',
             'audit_logging': True,
         },
-        'message': 'Facilitator auto-send policy configured successfully.',
+        'message': 'Facilitator policy configured with mandatory human-in-the-loop confirmation.',
+    }
+
+
+def ingest_vendor_performance_record(
+    vendor_id: str,
+    vendor_name: str,
+    entity_scope: str,
+    contract_ref: str,
+    period_start: str,
+    period_end: str,
+    event_type: str,
+    severity: str,
+    summary: str,
+    source_doc_ref: str,
+    original_event_date: str,
+    details: Optional[str] = None,
+    numeric_value: Optional[Decimal | float | str] = None,
+    unit: str = "",
+    currency: str = "",
+    source_hash: Optional[str] = None,
+    source_system: str = "S4HANA",
+    recorded_by: Optional[str] = None,
+    verification_status: str = "VERIFIED",
+    access_scope: str = "CORP_PROCUREMENT",
+    retention_policy: str = "7_YEARS_STANDARD",
+    legal_hold: bool = False,
+    tenant_id: str = "velora-tenant",
+) -> Dict[str, Any]:
+    """Synchronous wrapper for MCP tool execution to ingest approved vendor performance record."""
+    import asyncio
+    return asyncio.run(ingest_institutional_record(
+        vendor_id=vendor_id,
+        vendor_name=vendor_name,
+        entity_scope=entity_scope,
+        contract_ref=contract_ref,
+        period_start=period_start,
+        period_end=period_end,
+        event_type=event_type,
+        severity=severity,
+        summary=summary,
+        source_doc_ref=source_doc_ref,
+        original_event_date=original_event_date,
+        details=details,
+        numeric_value=numeric_value,
+        unit=unit,
+        currency=currency,
+        source_hash=source_hash,
+        source_system=source_system,
+        recorded_by=recorded_by,
+        verification_status=verification_status,
+        access_scope=access_scope,
+        retention_policy=retention_policy,
+        legal_hold=legal_hold,
+        tenant_id=tenant_id,
+    ))
+
+
+def get_vendor_performance_history(
+    vendor_id: str,
+    tenant_id: str = "velora-tenant",
+    caller_entity_scopes: Optional[List[str]] = None,
+    caller_roles: Optional[List[str]] = None,
+    include_superseded: bool = False,
+) -> Dict[str, Any]:
+    """Retrieve bounded historical vendor performance profile."""
+    return get_vendor_history(
+        vendor_id=vendor_id,
+        tenant_id=tenant_id,
+        caller_entity_scopes=caller_entity_scopes,
+        caller_roles=caller_roles,
+        include_superseded=include_superseded,
+    )
+
+
+async def evaluate_vendor_options_tool(
+    candidates: List[Dict[str, Any]],
+    policy_id: str = "POLICY-VENDOR-PROC-V1",
+    policy_version: Optional[str] = "1.0.0",
+    use_case: str = "VENDOR_SELECTION",
+    tenant_id: str = "velora-tenant",
+    caller_entity_scopes: Optional[List[str]] = None,
+    caller_roles: Optional[List[str]] = None,
+    actor_object_id: str = "system-facilitator",
+    db_path: Optional[str] = None,
+    **kwargs,
+) -> Dict[str, Any]:
+    """Execute governed, deterministic vendor options evaluation with Decimal scoring."""
+    return await _evaluate_vendor_options(
+        candidates=candidates,
+        policy_id=policy_id,
+        policy_version=policy_version,
+        use_case=use_case,
+        tenant_id=tenant_id,
+        caller_entity_scopes=caller_entity_scopes,
+        caller_roles=caller_roles,
+        actor_object_id=actor_object_id,
+        db_path=db_path,
+        user_prompt_overrides=kwargs.get("user_prompt_overrides"),
+    )
+
+
+def get_vendor_decision_record(
+    decision_id: str,
+    tenant_id: str = "velora-tenant",
+    version: Optional[str] = None,
+    db_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Retrieve persisted historical vendor decision record without fresh LLM evaluation."""
+    return get_historical_decision(
+        decision_id=decision_id,
+        tenant_id=tenant_id,
+        version=version,
+        db_path=db_path,
+    )
+
+
+from .audit_export import (
+    export_decision_trail as _export_decision_trail,
+    verify_decision_manifest as _verify_decision_manifest,
+)
+
+
+def export_decision_trail(
+    decision_id: str,
+    tenant_id: str = "velora-tenant",
+    version: Optional[str] = None,
+    format: str = "JSON",
+    caller_roles: Optional[List[str]] = None,
+    actor_object_id: str = "auditor-officer@velora.ae",
+    ttl_seconds: int = 3600,
+    redacted_fields: Optional[List[str]] = None,
+    db_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Export decision manifest with cryptographic signature and formula-safe CSV view."""
+    return _export_decision_trail(
+        decision_id=decision_id,
+        tenant_id=tenant_id,
+        version=version,
+        export_format=format,
+        caller_roles=caller_roles or ["AUDITOR"],
+        actor_object_id=actor_object_id,
+        ttl_seconds=ttl_seconds,
+        redacted_fields=redacted_fields,
+        db_path=db_path,
+    )
+
+
+def verify_decision_manifest(
+    manifest: Dict[str, Any],
+    signing_key: Optional[str] = None,
+    declared_redactions: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """Verify cryptographic signature, Merkle root, and replay calculations from input snapshot."""
+    is_valid, status, details = _verify_decision_manifest(
+        manifest_data=manifest,
+        signing_key=signing_key,
+        declared_redactions=declared_redactions,
+    )
+    return {
+        "isValid": is_valid,
+        "statusCode": status,
+        "details": details,
     }
 
 
@@ -389,4 +609,14 @@ TOOL_SPECS = [
     ('ingest_chat_to_knowledge_graph', 'Ingest chat queries and responses into the Institutional Memory Knowledge Graph / Knowledge Base.', ingest_chat_to_knowledge_graph),
     ('generate_pre_meeting_briefing', 'Synthesize cross-system SAP data into executive pre-meeting briefing digests.', generate_pre_meeting_briefing),
     ('export_meeting_to_loop_notebook', 'Export meeting notes, decisions, and action items to Microsoft Loop components and OneNote Notebook.', export_meeting_to_loop_notebook),
+    ('generate_finance_snapshot', 'Generate verified KPI snapshot from authoritative SAP S/4HANA financial records.', generate_finance_snapshot),
+    ('evaluate_finance_snapshot', 'Generate and evaluate verified finance snapshot through Productivity recommendation engine.', evaluate_finance_snapshot),
+    ('ingest_vendor_performance_record', 'Ingest approved vendor performance record with provenance, source hash, and subsidiary scoping.', ingest_vendor_performance_record),
+    ('get_vendor_performance_history', 'Retrieve bounded vendor performance history with scope enforcement, gap analysis, and mandatory caveats.', get_vendor_performance_history),
+    ('evaluate_vendor_options', 'Evaluate vendor proposals against approved policy, comparability criteria, and institutional history.', evaluate_vendor_options_tool),
+    ('get_vendor_decision_record', 'Retrieve persisted historical vendor decision record without fresh LLM evaluation.', get_vendor_decision_record),
+    ('export_decision_trail', 'Export decision audit manifest and formula-safe spreadsheet under ADAA retention policy.', export_decision_trail),
+    ('verify_decision_manifest', 'Verify cryptographic signature, root hash, and mathematical trace of a decision manifest.', verify_decision_manifest),
 ]
+
+

@@ -22,11 +22,12 @@ class Settings(BaseSettings):
     executing_identity: str = "velora-s4-finance-reader"
     authorization_model: str = "MAKER_SERVICE_CREDENTIAL"
 
-    # Four approved reports in scope:
+    # Four approved reports in scope + GLDetails:
     s4_ar_entity: str = "ARageingData"
     s4_ap_entity: str = "APageingData"
     s4_budget_transfer_entity: str = "BudgetTransfer"
     s4_budget_consumption_entity: str = "BudgetConsumData"
+    s4_pl_entity: str = "GLDetails"
 
     # Legacy / Master Data entity configuration
     s4_budget_api_url: str = ""

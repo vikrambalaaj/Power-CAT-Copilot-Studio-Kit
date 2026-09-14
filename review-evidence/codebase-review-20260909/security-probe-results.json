@@ -1,0 +1,81 @@
+[
+  {
+    "probe": "production_test_key_and_wrong_issuer",
+    "observed": "ACCEPTED",
+    "expected": "REJECT"
+  },
+  {
+    "probe": "legacy_signature_with_changed_request",
+    "observed": "ACCEPTED",
+    "expected": "REJECT"
+  },
+  {
+    "probe": "postgres_store_interface",
+    "observed": {
+      "sqlite_methods": [
+        "claim_execution",
+        "complete_execution",
+        "confirm_approval",
+        "fail_execution",
+        "get_operation_by_approval_id",
+        "prepare_operation"
+      ],
+      "postgres_methods": [
+        "prepare_operation"
+      ]
+    },
+    "expected": "Equivalent complete approval lifecycle"
+  },
+  {
+    "probe": "live_name_resolution_without_provider",
+    "observed": [
+      [
+        "ahmed.nuaimi@velora.ae"
+      ],
+      [],
+      []
+    ],
+    "expected": "Provider resolution or unavailable; no hardcoded person"
+  },
+  {
+    "probe": "productivity_mcp.dataverse_audit.missing_assertion",
+    "observed": "ValueError",
+    "expected": "Raise before token request; no secret fallback"
+  },
+  {
+    "probe": "successfactors_mcp.dataverse_audit.missing_assertion",
+    "observed": "ValueError",
+    "expected": "Raise before token request; no secret fallback"
+  },
+  {
+    "probe": "buffered_duplicate_commit_status",
+    "observed": {
+      "first": "BUFFERED",
+      "retry": "ALREADY_COMMITTED"
+    },
+    "expected": "Both BUFFERED until durable provider commit"
+  },
+  {
+    "probe": "facilitator_mcp_wrapper_without_identity",
+    "observed": "HANDLER_REACHED",
+    "expected": "Reject missing identity before handler"
+  },
+  {
+    "probe": "facilitator_nonempty_approval",
+    "observed": {
+      "status": "EMAIL_SENT_SIMULATED",
+      "delivery_mode": "GOVERNED_SIMULATION_FALLBACK",
+      "invented_message_id": true,
+      "invented_link": true
+    },
+    "expected": "Reject invalid approval before provider token request"
+  },
+  {
+    "probe": "buffered_write_retry_permission",
+    "observed": {
+      "first": false,
+      "retry": true
+    },
+    "expected": "Both false without durable commit"
+  }
+]

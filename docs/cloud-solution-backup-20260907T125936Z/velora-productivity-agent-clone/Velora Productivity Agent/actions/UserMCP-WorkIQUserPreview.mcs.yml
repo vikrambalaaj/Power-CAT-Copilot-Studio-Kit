@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: User MCP - Work IQ User (Preview)
+kind: TaskDialog
+modelDisplayName: Work IQ User (Preview)
+modelDescription: "Work IQ MCP server for Microsoft 365 User operations. This feature is in preview and is part of the Work IQ tools, providing shared work intelligence and actions for agents. Availability and capabilities are subject to change. Learn more: https://aka.ms/AboutWorkIQ"
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: cre2f_VeloraProductivityAgent.shared_a365memcp.85d1c33466bb4cb8919c95b0a6006268
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: mcp_MeServer

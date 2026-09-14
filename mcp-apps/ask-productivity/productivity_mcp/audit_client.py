@@ -8,7 +8,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import json
+import sqlite3
+import time
+
 from .dataverse_audit import (
+    AuditCommitStatus,
     DataverseAuditRecord,
     DataverseClient,
     get_dataverse_client,
@@ -28,15 +33,95 @@ from shared_mcp.logger import get_logger
 log = get_logger("productivity_audit")
 
 
+class AuditReconciliationQueue:
+    """Durable reconciliation queue for audit records that could not be committed immediately."""
+
+    def __init__(self, db_path: Optional[str] = None):
+        self.db_path = db_path or os.getenv("VELORA_AUDIT_RECONCILIATION_DB", "audit_reconciliation.db")
+        self._init_db()
+
+    def _init_db(self) -> None:
+        parent_dir = os.path.dirname(self.db_path)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS audit_reconciliation_queue (
+                    id TEXT PRIMARY KEY,
+                    record_type TEXT NOT NULL,
+                    invocation_id TEXT,
+                    idempotency_key TEXT,
+                    payload TEXT NOT NULL,
+                    reason TEXT,
+                    retry_count INTEGER DEFAULT 0,
+                    created_at TEXT NOT NULL,
+                    status TEXT DEFAULT 'PENDING'
+                )
+            """)
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_audit_rec_status ON audit_reconciliation_queue(status)")
+
+    def enqueue(self, record: DataverseAuditRecord, reason: str = "") -> str:
+        rec_id = f"REC-Q-{int(time.time() * 1000)}-{os.urandom(3).hex()}"
+        payload_json = json.dumps(record.to_dataverse_payload())
+        now_iso = datetime.now(timezone.utc).isoformat()
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                """
+                INSERT INTO audit_reconciliation_queue (id, record_type, invocation_id, idempotency_key, payload, reason, retry_count, created_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, 0, ?, 'PENDING')
+                """,
+                (rec_id, record.record_type, record.invocation_id, record.idempotency_key, payload_json, reason, now_iso),
+            )
+        return rec_id
+
+    def get_pending_count(self) -> int:
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute("SELECT COUNT(*) FROM audit_reconciliation_queue WHERE status = 'PENDING'")
+            return cur.fetchone()[0]
+
+    async def reconcile_pending(self, dv_client: DataverseClient, max_items: int = 50) -> Dict[str, Any]:
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT * FROM audit_reconciliation_queue WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT ?",
+                (max_items,),
+            ).fetchall()
+
+        reconciled = 0
+        failed = 0
+        for row in rows:
+            try:
+                payload = json.loads(row["payload"])
+                await dv_client._create_live_audit_row(payload)
+                with sqlite3.connect(self.db_path) as conn:
+                    conn.execute("UPDATE audit_reconciliation_queue SET status = 'RECONCILED' WHERE id = ?", (row["id"],))
+                reconciled += 1
+            except Exception as ex:
+                failed += 1
+                with sqlite3.connect(self.db_path) as conn:
+                    conn.execute(
+                        "UPDATE audit_reconciliation_queue SET retry_count = retry_count + 1, reason = ? WHERE id = ?",
+                        (str(ex), row["id"]),
+                    )
+        return {"reconciled": reconciled, "failed": failed, "remaining": self.get_pending_count()}
+
+
 class ProductivityAuditService:
     """Provides high-level audit governance methods for Microsoft 365 reads and writes."""
 
-    def __init__(self, dv_client: Optional[DataverseClient] = None):
+    def __init__(self, dv_client: Optional[DataverseClient] = None, reconciliation_db_path: Optional[str] = None):
         self.dv_client = dv_client or get_dataverse_client()
         self.agent_name = "Velora Productivity Agent"
         self.agent_version = os.getenv("VeloraAgentVersion", "1.0.0")
         self.environment = os.getenv("VeloraEnvironmentName", "Velora-AgenticAD-Dev")
         self.audit_enabled = os.getenv("VeloraAuditEnabled", "true").lower() in ("true", "1", "yes")
+        self.reconciliation_queue = AuditReconciliationQueue(db_path=reconciliation_db_path)
+
+    def get_reconciliation_pending_count(self) -> int:
+        return self.reconciliation_queue.get_pending_count()
+
+    async def reconcile_pending_audits(self, max_items: int = 50) -> Dict[str, Any]:
+        return await self.reconciliation_queue.reconcile_pending(self.dv_client, max_items=max_items)
 
     async def audit_read_tool_execution(
         self,
@@ -83,10 +168,20 @@ class ProductivityAuditService:
         )
         try:
             res = await self.dv_client.create_audit_record(rec)
-            return res.get("id", "PERSISTED")
+            commit_status = res.get("commit_status") or res.get("status")
+            if commit_status in (AuditCommitStatus.COMMITTED, "COMMITTED"):
+                return res.get("audit_record_id") or res.get("id") or "PERSISTED"
+            # If merely buffered because Dataverse is offline/unconfigured, enqueue to durable reconciliation
+            self.reconciliation_queue.enqueue(rec, reason=f"dataverse_status_{commit_status}")
+            return "QUEUED_FOR_RECONCILIATION"
         except Exception as ex:
             log.warning("async_read_audit_failed_reconcile_later", error=str(ex), tool=tool_name)
-            return "QUEUED_FOR_RECONCILIATION"
+            try:
+                self.reconciliation_queue.enqueue(rec, reason=str(ex))
+                return "QUEUED_FOR_RECONCILIATION"
+            except Exception as q_err:
+                log.error("reconciliation_queue_enqueue_failed", error=str(q_err))
+                return "FAILED_UNQUEUED"
 
     async def audit_stage_a_preview(
         self,
@@ -131,10 +226,13 @@ class ProductivityAuditService:
         )
         try:
             res = await self.dv_client.create_audit_record(rec)
-            return {"status": "SUCCESS", "id": res.get("id", "")}
+            commit_status = res.get("commit_status", AuditCommitStatus.COMMITTED if self.dv_client.is_live else AuditCommitStatus.BUFFERED)
+            rec_id = res.get("audit_record_id") or res.get("id", "")
+            return {"status": "SUCCESS", "commit_status": commit_status, "id": rec_id, "audit_record_id": rec_id}
         except Exception as ex:
             log.warning("stage_a_preview_audit_warn", error=str(ex))
-            return {"status": "BUFFERED", "id": "LOCAL-PREVIEW-AUD"}
+            q_id = self.reconciliation_queue.enqueue(rec, reason=str(ex))
+            return {"status": "BUFFERED", "commit_status": AuditCommitStatus.BUFFERED, "id": q_id, "audit_record_id": q_id}
 
     async def start_stage_b_write_fail_closed(
         self,

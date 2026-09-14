@@ -30,65 +30,38 @@ class TestFacilitatorServer(unittest.TestCase):
     def test_query_user_history_from_dataverse(self):
         # Query for balaadm@velora.ae
         res = query_user_history_from_dataverse(user_email="balaadm@velora.ae", limit=5)
-        self.assertEqual(res["status"], "SUCCESS")
-        self.assertEqual(res["user_email"], "balaadm@velora.ae")
-        self.assertTrue(res["user_isolation_enforced"])
-        self.assertGreaterEqual(res["returned_records_count"], 2)
-        
-        # Verify all returned records belong strictly to balaadm@velora.ae
-        for entry in res["history_timeline"]:
-            self.assertIn(entry["system"], ["SuccessFactors", "S4HANA"])
-            self.assertNotIn("otheruser@velora.ae", entry["summary"])
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
+        self.assertIn("verified live integration", res["message"])
 
     def test_query_user_history_isolation(self):
         # Query for otheruser@velora.ae
         res = query_user_history_from_dataverse(user_email="otheruser@velora.ae", limit=5)
-        self.assertEqual(res["status"], "SUCCESS")
-        self.assertEqual(res["returned_records_count"], 1)
-        self.assertEqual(res["history_timeline"][0]["operation"], "READ_CARGO_OPERATIONS")
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     def test_sync_dataverse_logs_to_memory(self):
         res = sync_dataverse_logs_to_memory(user_email="balaadm@velora.ae", limit=2)
-        self.assertEqual(res["status"], "DATAVERSE_MEMORY_SYNCED")
-        self.assertEqual(res["user_email"], "balaadm@velora.ae")
-        self.assertGreaterEqual(res["active_knowledge_graph_size"], 2)
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     def test_get_calendar_meetings(self):
         res = get_calendar_meetings(timeframe="today")
-        self.assertEqual(res["status"], "SUCCESS")
-        self.assertGreaterEqual(res["total_meetings"], 1)
-        self.assertEqual(res["meetings"][0]["meeting_id"], "MTG-2026-0818-01")
-        self.assertIn("balaadm@velora.ae", res["meetings"][0]["attendees"])
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     @patch("facilitator_mcp.tools.send_executive_email_via_graph")
     def test_process_calendar_meeting_workflow_post_meeting(self, mock_send):
-        mock_send.return_value = {
-            "status": "EMAIL_SENT",
-            "sender": "svc_aiagent@velora.ae",
-            "graph_http_status": 202
-        }
-
         res = process_calendar_meeting_workflow(
             meeting_subject="Executive Strategy & Operational Alignment",
             phase="POST_MEETING",
             key_decisions=["Approved automated calendar wrapup"],
             action_items=[{"task": "Deploy to BTP", "owner": "Bala", "due": "2026-08-18"}]
         )
-
-        self.assertEqual(res["workflow"], "POST_MEETING_AUTO_WRAPUP")
-        self.assertEqual(res["status"], "COMPLETED_AND_AUTO_DISPATCHED")
-        self.assertIn("balaadm@velora.ae", res["meeting_context"]["attendees"])
-        self.assertIn("LOOP-", res["loop_storage"]["loop_component_id"])
-        mock_send.assert_called_once()
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     def test_process_calendar_meeting_workflow_pre_meeting(self):
         res = process_calendar_meeting_workflow(
             meeting_subject="Weekly Ground Operations & Workforce Planning",
             phase="PRE_MEETING"
         )
-        self.assertEqual(res["workflow"], "PRE_MEETING_BRIEFING")
-        self.assertEqual(res["status"], "BRIEFING_DELIVERED_TO_INBOX")
-        self.assertIn("connector_synthesis", res["briefing_packet"])
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     def test_draft_meeting_summary_email(self):
         res = draft_meeting_summary_email(
@@ -105,10 +78,11 @@ class TestFacilitatorServer(unittest.TestCase):
         self.assertIn("Decided to automate audit logging", res["body_html"])
 
     def test_configure_auto_send_policy(self):
+        # Strict enforcement: review bypass is rejected and forced to require_confirmation=True
         res = configure_auto_send_policy(agent_name="Velora Facilitator", require_confirmation=False)
-        self.assertTrue(res["policy"]["auto_send_enabled"])
-        self.assertTrue(res["policy"]["bypass_user_review"])
-        self.assertEqual(res["policy"]["trigger_event"], "End_of_Meeting")
+        self.assertFalse(res["policy"]["auto_send_enabled"])
+        self.assertFalse(res["policy"]["bypass_user_review"])
+        self.assertTrue(res["policy"]["require_confirmation"])
 
     def test_ingest_chat_to_knowledge_graph(self):
         res = ingest_chat_to_knowledge_graph(
@@ -131,11 +105,7 @@ class TestFacilitatorServer(unittest.TestCase):
             meeting_date="2026-08-16",
             focus_areas=["Workforce", "Finance", "SAC BI"]
         )
-        self.assertEqual(res["status"], "BRIEFING_GENERATED")
-        self.assertIn("connector_synthesis", res["briefing_packet"])
-        self.assertIn("successfactors_hcm", res["briefing_packet"]["connector_synthesis"])
-        self.assertIn("s4hana_finance", res["briefing_packet"]["connector_synthesis"])
-        self.assertIn("sac_analytics", res["briefing_packet"]["connector_synthesis"])
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     def test_export_meeting_to_loop_notebook(self):
         res = export_meeting_to_loop_notebook(
@@ -145,10 +115,7 @@ class TestFacilitatorServer(unittest.TestCase):
             key_decisions=["Approved automated briefing synthesis and Loop storage."],
             action_items=[{"task": "Deploy updated Facilitator to BTP", "owner": "Bala", "due": "2026-08-16"}]
         )
-        self.assertEqual(res["status"], "SAVED_TO_LOOP_NOTEBOOK")
-        self.assertIn("LOOP-", res["loop_component_id"])
-        self.assertTrue(res["searchable_from_go_live"])
-        self.assertIn("OneNote://", res["notebook_location"])
+        self.assertEqual(res["status"], "SOURCE_UNAVAILABLE")
 
     def test_send_executive_email_via_graph_simulation(self):
         with patch("urllib.request.urlopen") as mock_urlopen:
@@ -163,10 +130,12 @@ class TestFacilitatorServer(unittest.TestCase):
                 MagicMock(__enter__=MagicMock(return_value=send_mock))
             ]
 
+            # With verified confirmation token, email dispatch proceeds through Graph
             res = send_executive_email_via_graph(
                 to_recipients=["leadership@velora.ae"],
                 subject="Test Executive Brief",
-                body_html="<p>Summary of decisions</p>"
+                body_html="<p>Summary of decisions</p>",
+                confirmation_token="CONFIRMED_BY_EXEC_123"
             )
 
             self.assertEqual(res["status"], "EMAIL_SENT")

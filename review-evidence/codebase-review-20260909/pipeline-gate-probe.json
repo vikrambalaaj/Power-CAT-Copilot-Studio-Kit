@@ -1,0 +1,17 @@
+{
+  "scope": "OFFLINE SYNTHETIC PROVIDER RESPONSES",
+  "errors": [
+    "Stage B failed: SYNTHETIC_STAGE_B_OUTAGE"
+  ],
+  "scores": {
+    "patternScore": 0,
+    "instructionScore": 100,
+    "overallScore": 100,
+    "passed": true,
+    "threshold": 60,
+    "stageBPatternCount": 0,
+    "stageBPassingCount": 0,
+    "stageCIssueCount": 0
+  },
+  "provider_calls": 2
+}

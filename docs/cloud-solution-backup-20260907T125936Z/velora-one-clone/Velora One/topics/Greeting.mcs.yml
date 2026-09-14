@@ -1,0 +1,134 @@
+mcs.metadata:
+  componentName: Greeting
+  description: This topic is triggered when the user greets the agent.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Greeting
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - Good afternoon
+      - Good morning
+      - Hello
+      - Hey
+      - Hi
+
+  actions:
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_checkGreetingConsent
+      input:
+        binding:
+          boolean: false
+          text: =System.User.Id
+
+      output:
+        binding:
+          is_consented: Topic.IsConsented
+
+      flowId: 1a115730-0fa3-f111-aaad-70a8a52176fd
+
+    - kind: ConditionGroup
+      id: conditionGroup_greetingConsent
+      conditions:
+        - id: conditionItem_greetingNotConsented
+          condition: =Topic.IsConsented = false
+          actions:
+            - kind: Question
+              id: question_greetingConsentAgreement
+              alwaysPrompt: true
+              variable: init:Topic.GreetingConsentAccepted
+              prompt:
+                text:
+                  - "Welcome to Velora One. Before accessing enterprise workforce, financial, and executive productivity data, please review and accept the Velora Enterprise Confidentiality & Acceptable Use Policy."
+                attachments:
+                  - kind: AdaptiveCardTemplate
+                    cardContent: |-
+                      {
+                        "type": "AdaptiveCard",
+                        "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+                        "version": "1.5",
+                        "body": [
+                          {
+                            "type": "TextBlock",
+                            "text": "🛡️ Velora Confidentiality & Acceptable Use Policy",
+                            "weight": "Bolder",
+                            "size": "Medium",
+                            "color": "Accent"
+                          },
+                          {
+                            "type": "TextBlock",
+                            "text": "Notice Version: 2026.1 · Compliance: UAE Federal Decree-Law No. 45/2021",
+                            "size": "Small",
+                            "isSubtle": true,
+                            "spacing": "None"
+                          },
+                          {
+                            "type": "TextBlock",
+                            "text": "This AI Assistant provides access to Velora proprietary business metrics and authorized SAP SuccessFactors employee information. By proceeding, you acknowledge and agree that:\n• **Confidentiality:** All accessed workforce and financial data is strictly Velora Confidential.\n• **Authorized Use:** Data may only be used for legitimate, authorized business purposes within your executive role.\n• **Prohibition on Sharing:** Unauthorized copying, exporting, or external dissemination is strictly prohibited.\n• **Audit & Memory:** In accordance with data governance policies, all conversation turns, queries, and policy decisions are logged, and a 30-day personalized memory snapshot is maintained in Microsoft Dataverse for session continuity.",
+                            "wrap": true,
+                            "spacing": "Medium"
+                          }
+                        ]
+                      }
+              entity: BooleanPrebuiltEntity
+
+            - kind: ConditionGroup
+              id: conditionGroup_greetingConsentDecision
+              conditions:
+                - id: conditionItem_greetingAgreed
+                  condition: =Topic.GreetingConsentAccepted = true
+                  actions:
+                    - kind: InvokeFlowAction
+                      id: invokeFlowAction_registerGreetingConsent
+                      input:
+                        binding:
+                          boolean: true
+                          text: =System.User.Id
+
+                      output:
+                        binding:
+                          is_consented: Topic.IsConsented
+
+                      flowId: 1a115730-0fa3-f111-aaad-70a8a52176fd
+
+                    - kind: SendActivity
+                      id: sendActivity_greetingConsentConfirmed
+                      activity:
+                        text:
+                          - |-
+                            ✅ **Consent Recorded & Verified**
+                            Your acceptance has been registered in Microsoft Dataverse under Policy Version 2026.1.
+
+                            **Welcome to Velora One!** How can I assist you today? You can ask queries such as:
+                            • **Workforce Analytics:** *"What is the current headcount and Emiratisation rate?"* or *"Show joiners and leavers this quarter"*
+                            • **S/4HANA Finance:** *"Show overdue Accounts Receivable aging"* or *"Summarize budget vs actual consumption"*
+                            • **Executive Productivity:** *"What is on my calendar today?"* or *"Plan my day and prepare morning briefing"*
+
+              elseActions:
+                - kind: SendActivity
+                  id: sendActivity_greetingConsentDeclined
+                  activity:
+                    text:
+                      - "You have chosen not to accept the Velora Confidentiality & Acceptable Use Policy. Access to enterprise workforce and financial data remains restricted. If you change your mind, you can restart the session to review the policy again."
+
+                - kind: CancelAllDialogs
+                  id: cancelAllDialogs_greetingDeclined
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_greetingWelcomeBack
+          activity:
+            text:
+              - |-
+                Hello! Welcome back to **Velora One**.
+                Your enterprise data access consent is active (Policy Version 2026.1).
+
+                How may I help you today? You can ask queries about:
+                • **Workforce Analytics:** Headcount, Emiratisation, joiners, attrition
+                • **S/4HANA Finance:** Accounts Receivable, Accounts Payable, P&L, budget variance
+                • **Executive Productivity:** Outlook meetings, unread emails, Planner tasks
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_greetingDone

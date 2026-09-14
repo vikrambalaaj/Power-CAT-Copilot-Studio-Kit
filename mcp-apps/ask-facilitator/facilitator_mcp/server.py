@@ -27,6 +27,9 @@ MUTATING_TOOLS = {
     "export_meeting_to_loop_notebook",
     "process_calendar_meeting_workflow",
     "ingest_chat_to_knowledge_graph",
+    "ingest_vendor_performance_record",
+    "evaluate_vendor_options",
+    "export_decision_trail",
 }
 
 # Admin-only tools
@@ -60,8 +63,29 @@ mcp = FastMCP(
     ),
 )
 
+from shared_mcp.kill_switch import check_kill_switch, KillSwitchActiveError
+
+
+def _wrap_tool_handler(tool_name: str, fn):
+    async def wrapped(*args, **kwargs):
+        # Enforce kill switch evaluation
+        check_kill_switch(tool_name=tool_name)
+
+        if tool_name in ADMIN_ONLY_TOOLS:
+            # Body-supplied role or __caller_role__ must NEVER grant administration
+            kwargs.pop("__caller_role__", None)
+            caller_role = os.getenv("MCP_CALLER_ROLE", "")
+            if caller_role not in ("Velora_Admin", "GlobalAdmin", "Admin"):
+                raise PermissionError(f"Tool '{tool_name}' requires Velora_Admin or GlobalAdmin role.")
+        if asyncio.iscoroutinefunction(fn):
+            return await fn(*args, **kwargs)
+        return fn(*args, **kwargs)
+    wrapped.__name__ = fn.__name__
+    wrapped.__doc__ = fn.__doc__
+    return wrapped
+
 for name, description, handler in TOOL_SPECS:
-    mcp.tool(name=name, description=description)(handler)
+    mcp.tool(name=name, description=description)(_wrap_tool_handler(name, handler))
 
 
 async def health(_request):
@@ -99,8 +123,9 @@ async def handle_facilitator_tool_rest(request):
         return JSONResponse({"error": f"Tool '{path}' not found"}, status_code=404)
     name, _, handler = tool_entry
 
-    # 1. Enforce Authentication
-    allow_anon = os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1")
+    # 1. Enforce Authentication (never permit anonymous bypass in production)
+    is_prod = os.getenv("ENVIRONMENT", "").lower() == "production" or os.getenv("NODE_ENV") == "production"
+    allow_anon = (not is_prod) and (os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1"))
     identity = None
     if not allow_anon:
         try:
@@ -110,7 +135,17 @@ async def handle_facilitator_tool_rest(request):
         except AuthorizationError as e:
             return JSONResponse({"error": "Forbidden", "message": str(e)}, status_code=403)
 
-    # 2. Enforce HTTP method restriction: GET must not trigger mutating tools
+    # 2. Enforce Kill-Switch Check
+    try:
+        check_kill_switch(
+            tool_name=name,
+            client_id=identity.client_application_id if identity else None,
+            tenant_id=identity.tenant_id if identity else None,
+        )
+    except KillSwitchActiveError as k_err:
+        return JSONResponse({"error": "Forbidden", "message": k_err.message}, status_code=403)
+
+    # 3. Enforce HTTP method restriction: GET must not trigger mutating tools
     if request.method == "GET" and name in MUTATING_TOOLS:
         return JSONResponse(
             {
@@ -120,7 +155,7 @@ async def handle_facilitator_tool_rest(request):
             status_code=405,
         )
 
-    # 3. Enforce Role-Based Authorization
+    # 4. Enforce Role-Based Authorization
     if name in ADMIN_ONLY_TOOLS:
         if not identity or not identity.is_admin:
             return JSONResponse(

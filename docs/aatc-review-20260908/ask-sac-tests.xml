@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="4.375" timestamp="2026-09-08T21:41:08.531248+04:00" hostname="MacBookPro"><testcase classname="test.test_app.TestSACServer" name="test_get_sac_kpis" time="0.001"><failure message="AttributeError: 'SACSettings' object has no attribute 'demo_mode'">test/test_app.py:10: in setUp
+    self.original_demo_mode = settings.demo_mode
+                              ^^^^^^^^^^^^^^^^^^
+/tmp/velora-aatc-review-20260908-venv/lib/python3.11/site-packages/pydantic/main.py:1042: in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E   AttributeError: 'SACSettings' object has no attribute 'demo_mode'</failure></testcase><testcase classname="test.test_app.TestSACServer" name="test_get_sac_model_data" time="0.001"><failure message="AttributeError: 'SACSettings' object has no attribute 'demo_mode'">test/test_app.py:10: in setUp
+    self.original_demo_mode = settings.demo_mode
+                              ^^^^^^^^^^^^^^^^^^
+/tmp/velora-aatc-review-20260908-venv/lib/python3.11/site-packages/pydantic/main.py:1042: in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E   AttributeError: 'SACSettings' object has no attribute 'demo_mode'</failure></testcase><testcase classname="test.test_app.TestSACServer" name="test_get_sac_story_analytics" time="0.001"><failure message="AttributeError: 'SACSettings' object has no attribute 'demo_mode'">test/test_app.py:10: in setUp
+    self.original_demo_mode = settings.demo_mode
+                              ^^^^^^^^^^^^^^^^^^
+/tmp/velora-aatc-review-20260908-venv/lib/python3.11/site-packages/pydantic/main.py:1042: in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E   AttributeError: 'SACSettings' object has no attribute 'demo_mode'</failure></testcase></testsuite></testsuites>

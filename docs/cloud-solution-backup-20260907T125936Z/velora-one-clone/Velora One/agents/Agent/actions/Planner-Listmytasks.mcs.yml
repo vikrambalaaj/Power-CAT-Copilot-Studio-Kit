@@ -1,0 +1,17 @@
+mcs.metadata:
+  componentName: Planner - List my tasks
+kind: TaskDialog
+modelDisplayName: List my tasks
+modelDescription: List the tasks assigned to me.
+outputs:
+  - propertyName: value
+
+action:
+  kind: InvokeConnectorTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_planner.shared-planner-ccb1b932-963e-4256-b088-6bad4d1b96dd
+  connectionProperties:
+    mode: Invoker
+
+  operationId: ListMyTasks_V2
+
+outputMode: All

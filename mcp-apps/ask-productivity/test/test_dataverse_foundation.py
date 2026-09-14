@@ -1,8 +1,9 @@
 """Unit and integration tests for Dataverse Audit Foundation with Fail-Closed semantics."""
 import asyncio
+import os
 import unittest
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 from productivity_mcp.dataverse_audit import (
     DataverseAuditRecord,
@@ -25,6 +26,8 @@ from productivity_mcp.dataverse_audit import (
 
 class TestDataverseAuditFoundation(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        self._orig_mock_m365 = os.environ.pop("MOCK_M365", None)
+        self._orig_mock_dv = os.environ.pop("MOCK_DATAVERSE", None)
         self.dv_client = DataverseClient(
             base_url="https://example.crm.dynamics.com",
             tenant_id="tenant",
@@ -35,6 +38,16 @@ class TestDataverseAuditFoundation(unittest.IsolatedAsyncioTestCase):
             side_effect=lambda payload: f"00000000-0000-0000-0000-{len(self.dv_client._audit_store) + 1:012d}"
         )
         self.dv_client.clear_all_for_testing()
+
+    def tearDown(self):
+        if self._orig_mock_m365 is not None:
+            os.environ["MOCK_M365"] = self._orig_mock_m365
+        else:
+            os.environ.pop("MOCK_M365", None)
+        if self._orig_mock_dv is not None:
+            os.environ["MOCK_DATAVERSE"] = self._orig_mock_dv
+        else:
+            os.environ.pop("MOCK_DATAVERSE", None)
 
     async def test_all_12_record_types_valid(self):
         """Verify that all 12 required record types are supported and persisted."""
@@ -146,6 +159,72 @@ class TestDataverseAuditFoundation(unittest.IsolatedAsyncioTestCase):
         # Deterministic
         self.assertEqual(hashed, compute_approval_token_hash(raw_token))
 
+    async def test_federated_client_assertion_token_acquisition(self):
+        """Verify that DataverseClient uses client_id with federated token assertion (RFC 7523) without client_secret."""
+        captured_requests = []
+
+        class MockResponse:
+            def __init__(self, status_code=200, json_data=None):
+                self.status_code = status_code
+                self._json_data = json_data or {"access_token": "fed_access_token_123", "expires_in": 3600}
+                self.content = b'{"access_token": "fed_access_token_123"}'
+
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return self._json_data
+
+        class MockAsyncClient:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *args):
+                pass
+
+            async def post(self, url, data=None, **kwargs):
+                captured_requests.append({"url": url, "data": data})
+                return MockResponse()
+
+        with patch.dict(
+            os.environ,
+            {
+                "MOCK_M365": "0",
+                "MOCK_DATAVERSE": "0",
+                "AZURE_CLIENT_SECRET": "",
+                "DATAVERSE_CLIENT_SECRET": "",
+                "M365_CLIENT_SECRET": "",
+                "ENTRA_CLIENT_SECRET": "",
+            },
+        ):
+            client = DataverseClient(
+                base_url="https://org4b098979.crm15.dynamics.com",
+                tenant_id="9ce80a2a-2703-4502-b26e-d911a3f83418",
+                client_id="c659609b-76db-49b1-8470-3205a6c35ecb",
+                federated_token="sample-jwt-federated-assertion",
+                auth_type="FederatedCredential",
+            )
+
+            # Confirm is_live is True even without client_secret
+            self.assertTrue(client.is_live)
+            self.assertFalse(client.client_secret)
+
+            with patch("httpx.AsyncClient", MockAsyncClient):
+                token = await client._get_access_token()
+                self.assertEqual(token, "fed_access_token_123")
+
+        self.assertEqual(len(captured_requests), 1)
+        req = captured_requests[0]
+        self.assertIn("9ce80a2a-2703-4502-b26e-d911a3f83418", req["url"])
+        self.assertEqual(req["data"]["client_id"], "c659609b-76db-49b1-8470-3205a6c35ecb")
+        self.assertEqual(req["data"]["client_assertion_type"], "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
+        self.assertEqual(req["data"]["client_assertion"], "sample-jwt-federated-assertion")
+        self.assertEqual(req["data"]["grant_type"], "client_credentials")
+
 
 if __name__ == "__main__":
     unittest.main()
+

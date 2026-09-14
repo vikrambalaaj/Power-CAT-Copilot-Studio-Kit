@@ -1,0 +1,37 @@
+[
+  {
+    "file": "deploy/solution/env",
+    "dataverse_auth_mode": "FederatedCredential",
+    "configured_secret_names": [
+      "AZURE_CLIENT_SECRET",
+      "DATAVERSE_CLIENT_SECRET",
+      "DATAVERSE_ADMIN_CLIENT_SECRET",
+      "M365_CLIENT_SECRET",
+      "GRAPH_CLIENT_SECRET",
+      "ENTRA_CLIENT_SECRET"
+    ],
+    "federation_input_names": []
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/.env",
+    "dataverse_auth_mode": "FederatedCredential",
+    "configured_secret_names": [
+      "AZURE_CLIENT_SECRET",
+      "DATAVERSE_CLIENT_SECRET",
+      "DATAVERSE_ADMIN_CLIENT_SECRET",
+      "ENTRA_CLIENT_SECRET"
+    ],
+    "federation_input_names": []
+  },
+  {
+    "file": "mcp-apps/ask-productivity/.env",
+    "dataverse_auth_mode": "UNSET",
+    "configured_secret_names": [
+      "AZURE_CLIENT_SECRET",
+      "AZURE_CLIENT_SECRET_ID",
+      "M365_CLIENT_SECRET",
+      "VELORA_APPROVAL_HMAC_SECRET"
+    ],
+    "federation_input_names": []
+  }
+]

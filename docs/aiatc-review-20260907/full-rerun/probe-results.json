@@ -1,0 +1,218 @@
+[
+  {
+    "check": "invalid_amount_tool",
+    "observed": {
+      "status": "COMPLETE",
+      "calculation": {
+        "currency": "AED",
+        "total_open_signed": null,
+        "gross_debit": null,
+        "gross_credit": null,
+        "overdue_exposure": null,
+        "bucket_sum": null,
+        "buckets": {
+          "not_yet_due": {
+            "label": "Not yet due",
+            "amount": "0.00",
+            "count": 0
+          },
+          "due_today": {
+            "label": "Due today",
+            "amount": "0.00",
+            "count": 0
+          },
+          "bucket_1_30": {
+            "label": "1\u201330 days overdue",
+            "amount": "0.00",
+            "count": 0
+          },
+          "bucket_31_60": {
+            "label": "31\u201360 days overdue",
+            "amount": "0.00",
+            "count": 0
+          },
+          "bucket_61_90": {
+            "label": "61\u201390 days overdue",
+            "amount": "0.00",
+            "count": 0
+          },
+          "bucket_91_180": {
+            "label": "91\u2013180 days overdue",
+            "amount": "0.00",
+            "count": 0
+          },
+          "bucket_over_180": {
+            "label": "Over 180 days overdue",
+            "amount": "0.00",
+            "count": 0
+          },
+          "unaged": {
+            "label": "Age unavailable",
+            "amount": "0.00",
+            "count": 0
+          }
+        },
+        "top_parties": [],
+        "status": "ERROR",
+        "is_valid": false,
+        "error": "Invalid monetary amount in source record: 'not-money'",
+        "is_multi_currency": false
+      },
+      "text": "### SAP S/4HANA Accounts Receivable Aging Summary\n\u2022 **Company Code**: 1000\n\u2022 **Net Open Balance**: AED 0.00\n\u2022 **Gross Receivables (Debit)**: AED 0.00\n\u2022 **Credits / Prepayments**: AED 0.00\n\u2022 **Overdue Exposure (>0 days)**: AED 0.00\n\u2022 **Coverage**: 1 rows retrieved (declared: 1)\n\n**Aging Buckets**:\n  \u2022 Not yet due: AED 0.00 (0 items)\n  \u2022 Due today: AED 0.00 (0 items)\n  \u2022 1\u201330 days overdue: AED 0.00 (0 items)\n  \u2022 31\u201360 days overdue: AED 0.00 (0 items)\n  \u2022 61\u201390 days overdue: AED 0.00 (0 items)\n  \u2022 91\u2013180 days overdue: AED 0.00 (0 items)\n  \u2022 Over 180 days overdue: AED 0.00 (0 items)\n  \u2022 Age unavailable: AED 0.00 (0 items)\n\n**Top Customers by Balance**:\n  \u2022 None reported\n\n*Source: Finance's customer open-invoice report in SAP. Credits treated according to Finance policy.*"
+    }
+  },
+  {
+    "check": "numeric_money",
+    "observed": {
+      "rows": [
+        {
+          "OpenAmount": "9007199254740993.01"
+        }
+      ],
+      "count": 1,
+      "declared_count_present": true,
+      "pages": 1,
+      "complete": true,
+      "incomplete_reason": ""
+    }
+  },
+  {
+    "check": "budget_transfer_lines",
+    "observed": {
+      "rows": [
+        {
+          "BudgetChangeDocument": "001",
+          "BudgetChangeDocumentItem": "001",
+          "FundsCenter": "F",
+          "CommitmentItem": "C",
+          "BudgetAmountInTransactionCrcy": "100"
+        },
+        {
+          "BudgetChangeDocument": "001",
+          "BudgetChangeDocumentItem": "002",
+          "FundsCenter": "F",
+          "CommitmentItem": "C",
+          "BudgetAmountInTransactionCrcy": "200"
+        }
+      ],
+      "count": 2,
+      "declared_count_present": false,
+      "pages": 1,
+      "complete": true,
+      "incomplete_reason": ""
+    }
+  },
+  {
+    "check": "consumption_periods",
+    "observed": {
+      "rows": [
+        {
+          "FinancialManagementArea": "1000",
+          "FundsCenter": "F",
+          "CommitmentItem": "C",
+          "FinMgmtAreaPeriod": "001",
+          "BudgetAmountInFMACrcy": "100"
+        },
+        {
+          "FinancialManagementArea": "1000",
+          "FundsCenter": "F",
+          "CommitmentItem": "C",
+          "FinMgmtAreaPeriod": "002",
+          "BudgetAmountInFMACrcy": "200"
+        }
+      ],
+      "count": 2,
+      "declared_count_present": false,
+      "pages": 1,
+      "complete": true,
+      "incomplete_reason": ""
+    }
+  },
+  {
+    "check": "s4__get_receivables_aging",
+    "observed": {
+      "status": "COMPLETE",
+      "multi": true,
+      "summary": "### SAP S/4HANA Accounts Receivable Aging Summary (Multi-Currency)\n\u2022 **Company Code**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2)\n\n"
+    }
+  },
+  {
+    "check": "s4__get_payables_aging",
+    "observed": {
+      "status": "COMPLETE",
+      "multi": true,
+      "summary": "### SAP S/4HANA Accounts Payable Aging Summary (Multi-Currency)\n\u2022 **Company Code**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2)\n\n**B"
+    }
+  },
+  {
+    "check": "s4__get_budget_transfers",
+    "observed": {
+      "status": "COMPLETE",
+      "multi": true,
+      "summary": "### SAP S/4HANA Budget Movements Register (Multi-Currency)\n\u2022 **Funds Management Area**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2)\n"
+    }
+  },
+  {
+    "check": "s4__get_budget_consumption",
+    "observed": {
+      "status": "CONFIGURATION_REQUIRED",
+      "multi": true,
+      "summary": "### SAP S/4HANA Budget & Expenditure Report (Multi-Currency)\n\u2022 **Funds Management Area**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2"
+    }
+  },
+  {
+    "check": "fastmcp_names",
+    "observed": [
+      "s4__get_receivables_aging",
+      "s4__get_payables_aging",
+      "s4__get_budget_transfers",
+      "s4__get_budget_consumption",
+      "s4__get_customer_master",
+      "s4__get_cost_center_master",
+      "s4__get_profit_center_master"
+    ]
+  },
+  {
+    "check": "invalid_amount",
+    "observed": null
+  },
+  {
+    "check": "marker_string_serialization",
+    "observed": "{\"CustomerName\":\"__EXACT_DEC_123__\"}"
+  },
+  {
+    "check": "sibling_root_accepted",
+    "observed": false
+  },
+  {
+    "check": "streamable_initialize",
+    "observed": {
+      "http": 200,
+      "body": "event: message\r\ndata: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"experimental\":{},\"prompts\":{\"listChanged\":false},\"resources\":{\"subscribe\":false,\"listChanged\":fa"
+    }
+  },
+  {
+    "check": "partial_snapshot_recommendations",
+    "observed": 0
+  },
+  {
+    "check": "restart_recommendations",
+    "observed": 1
+  },
+  {
+    "check": "error_without_receipt_delivery",
+    "observed": {
+      "delivered": 0,
+      "states": [
+        "FAILED"
+      ]
+    }
+  },
+  {
+    "check": "loop_without_provider",
+    "observed": {
+      "status": "STORAGE_FAILED",
+      "link": null
+    }
+  }
+]

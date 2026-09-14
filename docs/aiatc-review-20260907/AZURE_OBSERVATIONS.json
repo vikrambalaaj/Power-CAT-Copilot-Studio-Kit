@@ -1,0 +1,24 @@
+{
+  "review_date": "2026-09-07",
+  "scope": "Read-only observations of the specified resource group and registry; not a global subscription inventory",
+  "resource_group": "az-vel-agenticad-execai-dev-uaen-rg",
+  "registry": "azvelaiagentexecaidevcruaen",
+  "repositories": ["velora-mcp-s4hana", "velora-mcp-sf"],
+  "container_apps": [
+    {
+      "name": "agenticad-execai-dev-uaen-ca-001",
+      "image": "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-s4hana:1.1.7",
+      "latest_ready_revision": "agenticad-execai-dev-uaen-ca-001--0000022",
+      "external_ingress": true,
+      "managed_identity_type": "None",
+      "volumes": []
+    }
+  ],
+  "limitations": [
+    "No live source query or business write performed",
+    "No deployment or infrastructure mutation performed",
+    "No image-content comparison establishing that tag 1.1.7 contains the latest working tree",
+    "No inspection of other resource groups or registries",
+    "No secret values requested or displayed"
+  ]
+}

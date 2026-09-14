@@ -1,0 +1,9 @@
+{
+  "version": "0.9.56",
+  "mode": "code-only AST; no LLM extraction",
+  "input_code_files": 312,
+  "raw_nodes": 3423,
+  "raw_edges": 7947,
+  "graph_sha256": "1a1660b19f90156e75c1990178729b78aaeeea4cde23d9730ca58e33343f3e65",
+  "note": "Graphify query output normalizes the graph and can show a different node count. Code/file-level edges are navigation evidence, not a complete call graph."
+}

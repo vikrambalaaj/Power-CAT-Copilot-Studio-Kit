@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: Velora Productivity API - Parent-to-child agent handoff router
+kind: TaskDialog
+inputs:
+  - kind: ManualTaskInput
+    propertyName: rootCorrelationId
+    value: =System.Conversation.Id
+
+  - kind: ManualTaskInput
+    propertyName: conversationId
+    value: =System.Conversation.Id
+
+  - kind: ManualTaskInput
+    propertyName: turnId
+    value: =Text(GUID())
+
+  - kind: ManualTaskInput
+    propertyName: userObjectId
+    value: User().Id
+
+  - kind: ManualTaskInput
+    propertyName: userEmail
+    value: User().Email
+
+modelDisplayName: Parent-to-child agent handoff router
+modelDescription: Execute Microsoft 365 reads and governed writes for Outlook mail and calendar, Teams messages, Planner tasks, Work IQ search, and the executive daily briefing. For every write, first call the matching PREPARE operation and show its preview. Call the matching APPROVED operation only after explicit user approval, passing the confirmation token. Use LIST_CALENDAR_EVENTS for calendar queries.
+outputs:
+  - propertyName: approvalRequired
+
+  - propertyName: auditStatus
+
+  - propertyName: confirmationToken
+
+  - propertyName: correlationId
+
+  - propertyName: previewDetails
+
+  - propertyName: resultSummary
+
+  - propertyName: status
+
+  - propertyName: structuredResult
+
+  - propertyName: warnings
+
+action:
+  kind: InvokeConnectorTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_cre2f-5fvelora-20productivity-20api-5fa2a49f89a81f4c99.83d6b694c3174e828efd94ca027ab8b3
+  connectionProperties:
+    mode: Invoker
+
+  operationId: HandleParentHandoff
+
+outputMode: All

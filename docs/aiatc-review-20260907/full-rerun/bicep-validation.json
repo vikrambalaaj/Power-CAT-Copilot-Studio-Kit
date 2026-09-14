@@ -1,0 +1,32 @@
+[
+  {
+    "file": "mcp-apps/deploy/storage-and-queues.bicep",
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "file": "mcp-apps/ask-sac/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "file": "mcp-apps/ask-productivity/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": ""
+  }
+]

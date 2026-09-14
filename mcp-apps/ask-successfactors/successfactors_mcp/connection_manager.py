@@ -45,6 +45,7 @@ class AuthType(str, enum.Enum):
     MANAGED_IDENTITY = "ManagedIdentity"
     CERTIFICATE = "Certificate"
     DELEGATED_BEARER = "DelegatedBearer"
+    FEDERATED_CREDENTIAL = "FederatedCredential"
 
 
 class ConnectionHealthStatus(str, enum.Enum):
@@ -129,10 +130,23 @@ class SecretStoreProvider:
             "DATAVERSE_CLIENT_SECRET_REF": (
                 "DATAVERSE_CLIENT_SECRET",
                 "AZURE_CLIENT_SECRET",
+                "DATAVERSE_FEDERATED_TOKEN",
+                "AZURE_FEDERATED_TOKEN",
             ),
-            "GRAPH_CLIENT_SECRET_REF": ("GRAPH_CLIENT_SECRET",),
-            "S4HANA_PASSWORD_REF": ("S4HANA_PASSWORD",),
-            "SAC_PASSWORD_REF": ("SAC_PASSWORD",),
+            "DATAVERSE_ADMIN_CLIENT_SECRET_REF": (
+                "DATAVERSE_ADMIN_CLIENT_SECRET",
+                "DATAVERSE_CLIENT_SECRET",
+                "AZURE_CLIENT_SECRET",
+                "DATAVERSE_FEDERATED_TOKEN",
+                "AZURE_FEDERATED_TOKEN",
+            ),
+            "GRAPH_CLIENT_SECRET_REF": (
+                "GRAPH_CLIENT_SECRET",
+                "M365_CLIENT_SECRET",
+                "AZURE_CLIENT_SECRET",
+            ),
+            "S4HANA_PASSWORD_REF": ("S4HANA_PASSWORD", "S4_PASSWORD"),
+            "SAC_PASSWORD_REF": ("SAC_PASSWORD", "SAC_SECRET"),
         }
         for fallback_env in fallback_mappings.get(secret_ref, ()):
             resolved = os.getenv(fallback_env, "")
@@ -192,6 +206,38 @@ class ConnectionManager:
         )
         self.register_connection(sf_conn, logical_reference="Velora SuccessFactors Connection")
 
+        # Resolve Dataverse authentication mode (OAuth2_ClientCredentials, FederatedCredential, or ManagedIdentity)
+        dv_auth_mode_env = (
+            os.getenv("DATAVERSE_AUTH_TYPE")
+            or os.getenv("DATAVERSE_AUTH_MODE")
+            or ""
+        ).strip().lower()
+
+        if dv_auth_mode_env in ("federatedcredential", "federated_credential", "federated", "workloadidentity", "workload_identity"):
+            dv_auth_type = AuthType.FEDERATED_CREDENTIAL
+        elif dv_auth_mode_env in ("managedidentity", "managed_identity"):
+            dv_auth_type = AuthType.MANAGED_IDENTITY
+        elif os.getenv("AZURE_FEDERATED_TOKEN_FILE") or os.getenv("AZURE_FEDERATED_TOKEN") or os.getenv("DATAVERSE_FEDERATED_TOKEN"):
+            dv_auth_type = AuthType.FEDERATED_CREDENTIAL
+        else:
+            dv_auth_type = AuthType.OAUTH2_CLIENT_CREDENTIALS
+
+        dv_admin_auth_mode_env = (
+            os.getenv("DATAVERSE_ADMIN_AUTH_TYPE")
+            or os.getenv("DATAVERSE_AUTH_TYPE")
+            or os.getenv("DATAVERSE_AUTH_MODE")
+            or ""
+        ).strip().lower()
+
+        if dv_admin_auth_mode_env in ("federatedcredential", "federated_credential", "federated", "workloadidentity", "workload_identity"):
+            dv_admin_auth_type = AuthType.FEDERATED_CREDENTIAL
+        elif dv_admin_auth_mode_env in ("managedidentity", "managed_identity"):
+            dv_admin_auth_type = AuthType.MANAGED_IDENTITY
+        elif os.getenv("AZURE_FEDERATED_TOKEN_FILE") or os.getenv("AZURE_FEDERATED_TOKEN") or os.getenv("DATAVERSE_FEDERATED_TOKEN"):
+            dv_admin_auth_type = AuthType.FEDERATED_CREDENTIAL
+        else:
+            dv_admin_auth_type = AuthType.OAUTH2_CLIENT_CREDENTIALS
+
         # 2. Dataverse Shared Connection (Audit & Policy Read)
         dv_shared = EnterpriseConnection(
             connection_id="CONN-DV-SHARED-001",
@@ -212,7 +258,7 @@ class ConnectionManager:
             ),
             dataverse_connection_reference="cre2f_cr_dataverse",
             secret_store_reference="DATAVERSE_CLIENT_SECRET_REF",
-            auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
+            auth_type=dv_auth_type,
             granted_scopes=["AuditLog.Create", "AuditLog.Read", "DisclosurePolicy.Read"],
             read_write_classification=ReadWriteClassification.READ_ONLY,
             agent_assignments=["velora-hcm-agent", "velora-executive-agent"],
@@ -228,13 +274,22 @@ class ConnectionManager:
             connection_name="Velora Dataverse Policy Admin Connection",
             connection_type=ConnectionType.DATAVERSE_ADMIN,
             environment=self.default_environment,
-            data_source_url=os.getenv("DATAVERSE_URL", "https://org123.crm4.dynamics.com"),
+            data_source_url=os.getenv("DATAVERSE_URL", "https://org4b098979.crm15.dynamics.com"),
             connection_owner="ciso.admin@velora.ae",
-            client_id=os.getenv("DATAVERSE_ADMIN_CLIENT_ID", "sp-velora-policy-admin"),
-            tenant_id=os.getenv("DATAVERSE_TENANT_ID", "velora-tenant-id"),
+            client_id=(
+                os.getenv("DATAVERSE_ADMIN_CLIENT_ID")
+                or os.getenv("DATAVERSE_CLIENT_ID")
+                or os.getenv("AZURE_CLIENT_ID")
+                or "sp-velora-policy-admin"
+            ),
+            tenant_id=(
+                os.getenv("DATAVERSE_TENANT_ID")
+                or os.getenv("AZURE_TENANT_ID")
+                or "velora-tenant-id"
+            ),
             dataverse_connection_reference="velora_cr_dataverse_admin",
             secret_store_reference="DATAVERSE_ADMIN_CLIENT_SECRET_REF",
-            auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
+            auth_type=dv_admin_auth_type,
             granted_scopes=["DisclosurePolicy.Admin", "DisclosurePolicy.Write"],
             read_write_classification=ReadWriteClassification.ADMIN_WRITE,
             agent_assignments=["velora-policy-admin"],
@@ -252,8 +307,18 @@ class ConnectionManager:
             environment=self.default_environment,
             data_source_url="https://graph.microsoft.com/v1.0",
             connection_owner="admin.it@velora.ae",
-            client_id=os.getenv("GRAPH_CLIENT_ID", "sp-velora-graph"),
-            tenant_id=os.getenv("GRAPH_TENANT_ID", "velora-tenant-id"),
+            client_id=(
+                os.getenv("GRAPH_CLIENT_ID")
+                or os.getenv("M365_CLIENT_ID")
+                or os.getenv("AZURE_CLIENT_ID")
+                or "sp-velora-graph"
+            ),
+            tenant_id=(
+                os.getenv("GRAPH_TENANT_ID")
+                or os.getenv("M365_TENANT_ID")
+                or os.getenv("AZURE_TENANT_ID")
+                or "velora-tenant-id"
+            ),
             dataverse_connection_reference="velora_cr_graph_mailbox",
             secret_store_reference="GRAPH_CLIENT_SECRET_REF",
             auth_type=AuthType.OAUTH2_CLIENT_CREDENTIALS,
@@ -538,12 +603,26 @@ class ConnectionManager:
                             logger.warning(f"Health probe failed for connection {conn.connection_id}: {probe_err}")
                             self.set_connection_status(conn.connection_id, ConnectionHealthStatus.AUTH_FAILED, str(probe_err))
                     else:
-                        # Default check: verify secret reference resolution
-                        secret = await self.secret_store.get_secret(conn.secret_store_reference)
-                        if secret:
-                            self.set_connection_status(conn.connection_id, ConnectionHealthStatus.HEALTHY)
+                        # Default check: verify secret reference resolution or federated identity
+                        if conn.auth_type in (AuthType.MANAGED_IDENTITY, AuthType.FEDERATED_CREDENTIAL):
+                            if conn.client_id:
+                                self.set_connection_status(conn.connection_id, ConnectionHealthStatus.HEALTHY)
+                            else:
+                                self.set_connection_status(
+                                    conn.connection_id,
+                                    ConnectionHealthStatus.CONFIG_INCOMPLETE,
+                                    "Missing client_id for federated or managed identity.",
+                                )
                         else:
-                            self.set_connection_status(conn.connection_id, ConnectionHealthStatus.CONFIG_INCOMPLETE, "Missing secret resolution.")
+                            secret = await self.secret_store.get_secret(conn.secret_store_reference)
+                            if secret:
+                                self.set_connection_status(conn.connection_id, ConnectionHealthStatus.HEALTHY)
+                            else:
+                                self.set_connection_status(
+                                    conn.connection_id,
+                                    ConnectionHealthStatus.CONFIG_INCOMPLETE,
+                                    "Missing secret resolution.",
+                                )
             except Exception as e:
                 logger.error(f"Error in connection health monitor loop: {e}", exc_info=True)
 

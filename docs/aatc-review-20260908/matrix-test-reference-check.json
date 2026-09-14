@@ -1,0 +1,130 @@
+[
+  {
+    "test_name": "test_30_day_memory_partition_and_user_isolation",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_buffered_sink_never_produces_committed_spool_marker",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_client_timeout",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_drilldown_truncation",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_email_send_requires_confirmation_token",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_expired_lease_transitions_to_outcome_unknown",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_financial_currency_mismatch",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_financial_missing_fields_contract_mismatch",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_gateway_assertion_replay_prevented",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_handoff_rejects_body_identity_conflict",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_handoff_rejects_missing_authorization",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_html_escaping_prevents_injection",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_ingest_chat_to_knowledge_graph",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_internal_exception_stack_masked",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_kill_switch_client_and_tenant",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_kill_switch_global_and_tool",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_memory_30_day_rolling_cutoff",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_non_admin_cannot_configure_policy",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_outbox_claim_deduplication",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_query_user_history_from_dataverse",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_recipient_policy_blocks_unauthorized_domain",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_rejects_expired_token",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_rejects_offline_tokens_in_prod",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_required_audit_fields_survive_round_trip",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_s4_pnl_strictly_unsupported",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_safe_error_masking",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_schema_validation",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_ssrf_blocks_cloud_metadata",
+    "exists_by_name": true
+  },
+  {
+    "test_name": "test_ssrf_blocks_private_rfc1918_unless_allowlisted",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_ssrf_rejects_plain_http",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_unauthenticated_request_rejected",
+    "exists_by_name": false
+  },
+  {
+    "test_name": "test_uncommitted_events_recovered_on_restart",
+    "exists_by_name": false
+  }
+]

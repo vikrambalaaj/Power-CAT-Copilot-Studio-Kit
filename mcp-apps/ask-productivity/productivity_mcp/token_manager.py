@@ -50,6 +50,11 @@ def compute_token_hash_for_dataverse(token: str) -> str:
     return hmac.new(secret.encode("utf-8"), token.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
+class InvalidTokenError(Exception):
+    """Raised when an approval confirmation token is invalid, expired, or tampered with."""
+    pass
+
+
 class TokenManager:
     """Manages generation, validation, and integrity checking of short-lived approval tokens."""
 
@@ -142,7 +147,7 @@ class TokenManager:
         sig_b64 = base64.urlsafe_b64encode(signature).decode("utf-8").rstrip("=")
         token = f"velora_appr.{payload_b64}.{sig_b64}"
 
-        # Persist operation in durable store in PREPARED state
+        # Persist operation in durable store in PREPARED state (Fail-Closed: never issue token if storage fails)
         try:
             self.operation_store.prepare_operation(
                 operation_type=canonical_op,
@@ -151,10 +156,12 @@ class TokenManager:
                 user_email=user_email,
                 proposed_payload=preview_data,
                 approval_id=token,
+                approval_token=token,
                 expiry_minutes=mins,
             )
         except Exception as exc:
-            log.warning(f"Could not persist operation to operation_store: {exc}")
+            log.error(f"Approval preparation persistence failed (fail-closed): {exc}")
+            raise RuntimeError(f"Approval preparation persistence failed: {exc}") from exc
 
         return token, expires_on_iso
 
@@ -166,6 +173,7 @@ class TokenManager:
         user_email: str,
         current_preview_data: Optional[Dict[str, Any]] = None,
         consume_nonce: bool = False,
+        tenant_id: Optional[str] = None,
     ) -> Tuple[bool, str, Dict[str, Any]]:
         """Verify token cryptographic signature, expiry, user identity, and preview checksum."""
         if not token or not token.startswith("velora_appr."):
@@ -215,6 +223,11 @@ class TokenManager:
 
         if canonical_token_op != canonical_expected_op:
             return False, f"Token operation mismatch: issued for '{token_op}', presented for '{expected_operation}'.", payload
+
+        # Check Tenant Binding if supplied
+        token_tid = payload.get("tid")
+        if tenant_id and token_tid and tenant_id != token_tid:
+            return False, f"Tenant mismatch: token issued for tenant '{token_tid}', presented for '{tenant_id}'.", payload
 
         # Check User Identity Binding: empty caller identity is strictly REJECTED
         sanitized_email = (user_email or "").strip().lower()

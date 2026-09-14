@@ -31,8 +31,58 @@ try:
 except Exception:
     pass
 
+class M365ClientError(RuntimeError):
+    """Base error for M365 client operations."""
+    pass
+
+class AccessDeniedError(M365ClientError):
+    """Raised when access to a resource, foreign mailbox, or foreign plan is denied (HTTP 403)."""
+    def __init__(self, message: str = "Access denied", status_code: int = 403):
+        super().__init__(message)
+        self.status_code = status_code
+
+class GraphRateLimitError(M365ClientError):
+    """Raised when Microsoft Graph returns HTTP 429 Too Many Requests."""
+    def __init__(self, message: str = "Graph rate limit exceeded", retry_after: int = 10):
+        super().__init__(message)
+        self.status_code = 429
+        self.retry_after = retry_after
+
+class GraphTimeoutError(M365ClientError):
+    """Raised when Microsoft Graph request times out."""
+    def __init__(self, message: str = "Graph request timed out"):
+        super().__init__(message)
+        self.status_code = 504
+
+class GraphSourceUnavailableError(M365ClientError):
+    """Raised when an M365 source or configuration is unavailable."""
+    def __init__(self, message: str = "SOURCE_UNAVAILABLE"):
+        super().__init__(message)
+        self.status_code = 503
+
+
+def get_local_midnight_boundaries(target_dt: Optional[datetime] = None, tz_name: str = "Asia/Dubai") -> Tuple[str, str]:
+    """Calculate exact local midnight-to-midnight ISO-8601 boundaries with explicit timezone offset."""
+    try:
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo(tz_name)
+    except Exception:
+        # Asia/Dubai is UTC+4 year-round with no daylight savings time
+        tz = timezone(timedelta(hours=4))
+
+    base_dt = target_dt or datetime.now(timezone.utc)
+    if base_dt.tzinfo is None:
+        base_dt = base_dt.replace(tzinfo=timezone.utc)
+    local_dt = base_dt.astimezone(tz)
+    
+    start_of_day = local_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = start_of_day + timedelta(days=1)
+    
+    return start_of_day.isoformat(), end_of_day.isoformat()
+
+
 ALLOWED_DOMAINS = [d.strip().lower() for d in os.getenv("VeloraAllowedDomains", "velora.ae,etihad.ae,holding.ae").split(",")]
-ALLOWED_PLANNER_PLANS = [p.strip() for p in os.getenv("VeloraPlannerAllowedPlans", "Executive Strategic Initiatives,Q3 Ground Ops Plan,Finance Transformation 2026,Emiratisation Taskforce").split(",")]
+ALLOWED_PLANNER_PLANS = [p.strip() for p in os.getenv("VeloraPlannerAllowedPlans", "Executive Strategic Initiatives,Q3 Ground Ops Plan,Finance Transformation 2026,Emiratisation Taskforce,PLAN-EXEC-01,PLAN-Q3-01").split(",")]
 ALLOWED_TEAMS_DESTINATIONS = [t.strip() for t in os.getenv("VeloraTeamsAllowedDestinations", "Executive Leadership Team,Finance Operations,Ground Operations,Workforce Committee").split(",")]
 
 # Canonical Directory for Microsoft 365 People & Groups
@@ -51,39 +101,83 @@ _INITIAL_DIRECTORY = [
 _INITIAL_MAILS: List[Dict[str, Any]] = [
     {
         "id": "AAMkAGUyMjM5Nj...01",
+        "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGUyMjM5Nj...01&exsvurl=1&ispopout=1",
         "threadId": "TH-001",
         "subject": "Q3 Headcount & Emiratisation Review",
         "from": "ahmed.nuaimi@velora.ae",
         "to": ["balaadm@velora.ae"],
         "receivedDateTime": "2026-08-25T14:30:00Z",
+        "lastModifiedDateTime": "2026-08-25T14:30:00Z",
         "bodyPreview": "Here is the finalized Q3 headcount distribution across Airport Operations and Cargo divisions. Please confirm if approved.",
+        "importance": "high",
         "isPriority": True,
+        "isRead": False,  # Unread
         "needsFollowUp": True,
         "categories": ["Workforce", "Executive"],
     },
     {
         "id": "AAMkAGUyMjM5Nj...02",
+        "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGUyMjM5Nj...02&exsvurl=1&ispopout=1",
         "threadId": "TH-002",
         "subject": "Overdue Receivables Aging Analysis",
         "from": "fatima.mansoori@velora.ae",
         "to": ["balaadm@velora.ae", "financeleadership@velora.ae"],
         "receivedDateTime": "2026-08-25T11:15:00Z",
+        "lastModifiedDateTime": "2026-08-25T11:15:00Z",
         "bodyPreview": "Regarding the S/4HANA customer aging review: AED 2.4M remains in the >90 days overdue bucket.",
+        "importance": "high",
         "isPriority": True,
+        "isRead": True,  # Read
         "needsFollowUp": True,
         "categories": ["Finance", "Urgent"],
     },
     {
         "id": "AAMkAGUyMjM5Nj...03",
+        "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGUyMjM5Nj...03&exsvurl=1&ispopout=1",
         "threadId": "TH-003",
         "subject": "Board Presentation Alignment",
         "from": "mariam.kaabi@velora.ae",
         "to": ["balaadm@velora.ae"],
         "receivedDateTime": "2026-08-24T09:00:00Z",
+        "lastModifiedDateTime": "2026-08-24T09:00:00Z",
         "bodyPreview": "The SAC story KPIs for Q2 operating margin and EBITDA have been updated in the master deck.",
+        "importance": "normal",
         "isPriority": False,
+        "isRead": False,  # Unread
         "needsFollowUp": False,
         "categories": ["Strategy"],
+    },
+    {
+        "id": "AAMkAGUyMjM5Nj...04",
+        "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGUyMjM5Nj...04&exsvurl=1&ispopout=1",
+        "threadId": "TH-004",
+        "subject": "IT Security Audit Log Retention Policy",
+        "from": "ciso@velora.ae",
+        "to": ["balaadm@velora.ae"],
+        "receivedDateTime": "2026-08-23T08:30:00Z",
+        "lastModifiedDateTime": "2026-08-23T08:30:00Z",
+        "bodyPreview": "Requesting sign-off on the 7-year audit log retention policy.",
+        "importance": "normal",
+        "isPriority": False,
+        "isRead": True,  # Read
+        "needsFollowUp": False,
+        "categories": ["Security"],
+    },
+    {
+        "id": "AAMkAGUyMjM5Nj...05",
+        "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGUyMjM5Nj...05&exsvurl=1&ispopout=1",
+        "threadId": "TH-005",
+        "subject": "Airport Catering Renewal Contract",
+        "from": "zaid.shamsi@velora.ae",
+        "to": ["balaadm@velora.ae"],
+        "receivedDateTime": "2026-08-22T13:00:00Z",
+        "lastModifiedDateTime": "2026-08-22T13:00:00Z",
+        "bodyPreview": "Review of vendor renewal proposals for terminal catering services.",
+        "importance": "normal",
+        "isPriority": False,
+        "isRead": False,  # Unread
+        "needsFollowUp": True,
+        "categories": ["Operations"],
     }
 ]
 
@@ -98,8 +192,12 @@ _INITIAL_CALENDAR: List[Dict[str, Any]] = [
         "attendees": ["balaadm@velora.ae", "ahmed.nuaimi@velora.ae", "zaid.shamsi@velora.ae"],
         "location": "Executive Boardroom / Microsoft Teams",
         "isOnlineMeeting": True,
+        "onlineMeeting": {"joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_01"},
         "onlineMeetingUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_01",
         "bodyPreview": "Review headcount actuals (2,916) and Emiratisation target (42.5%).",
+        "isCancelled": False,
+        "responseStatus": {"response": "accepted"},
+        "type": "singleInstance",
     },
     {
         "id": "EVT-2026-0826-02",
@@ -111,8 +209,65 @@ _INITIAL_CALENDAR: List[Dict[str, Any]] = [
         "attendees": ["fatima.mansoori@velora.ae", "balaadm@velora.ae", "financeleadership@velora.ae"],
         "location": "Microsoft Teams Meeting",
         "isOnlineMeeting": True,
+        "onlineMeeting": {"joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_02"},
         "onlineMeetingUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_02",
         "bodyPreview": "Review S/4HANA receivables overdue and SAC liquidity indicators.",
+        "isCancelled": False,
+        "responseStatus": {"response": "accepted"},
+        "type": "singleInstance",
+    },
+    {
+        "id": "EVT-2026-0826-03",
+        "subject": "Weekly Ground Operations Coordination",
+        "start": "2026-08-26T16:00:00Z",
+        "end": "2026-08-26T17:00:00Z",
+        "timeZone": "Asia/Dubai",
+        "organizer": "zaid.shamsi@velora.ae",
+        "attendees": ["zaid.shamsi@velora.ae", "balaadm@velora.ae"],
+        "location": "Operations Hub B",
+        "isOnlineMeeting": True,
+        "onlineMeeting": {"joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_03"},
+        "onlineMeetingUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_03",
+        "bodyPreview": "Recurring weekly sync for airport turnaround times.",
+        "recurrence": {"pattern": {"type": "weekly", "interval": 1}, "range": {"type": "noEnd"}},
+        "seriesMasterId": "SERIES-WEEKLY-OPS-01",
+        "type": "occurrence",
+        "responseStatus": {"response": "accepted", "time": "2026-08-20T08:00:00Z"},
+        "isCancelled": False,
+    },
+    {
+        "id": "EVT-2026-0826-04",
+        "subject": "Executive Dining & Informal Strategy",
+        "start": "2026-08-26T12:00:00Z",
+        "end": "2026-08-26T13:00:00Z",
+        "timeZone": "Asia/Dubai",
+        "organizer": "balaadm@velora.ae",
+        "attendees": ["balaadm@velora.ae", "ahmed.nuaimi@velora.ae"],
+        "location": "Executive Dining Room",
+        "isOnlineMeeting": False,
+        "onlineMeeting": None,  # EXPLICIT NULL to verify safe handling without AttributeError
+        "onlineMeetingUrl": "",
+        "bodyPreview": "Lunch discussion on executive committee topics.",
+        "responseStatus": {"response": "accepted"},
+        "isCancelled": False,
+        "type": "singleInstance",
+    },
+    {
+        "id": "EVT-2026-0826-05",
+        "subject": "Fleet Procurement Sub-Committee (CANCELED)",
+        "start": "2026-08-26T17:30:00Z",
+        "end": "2026-08-26T18:30:00Z",
+        "timeZone": "Asia/Dubai",
+        "organizer": "procurement@velora.ae",
+        "attendees": ["procurement@velora.ae", "balaadm@velora.ae"],
+        "location": "Conference Room C",
+        "isOnlineMeeting": False,
+        "onlineMeeting": None,
+        "onlineMeetingUrl": "",
+        "bodyPreview": "This meeting was canceled due to scheduling conflict.",
+        "responseStatus": {"response": "none"},
+        "isCancelled": True,
+        "type": "singleInstance",
     }
 ]
 
@@ -148,36 +303,52 @@ _INITIAL_TEAMS_MESSAGES: List[Dict[str, Any]] = [
 _INITIAL_PLANNER_TASKS: List[Dict[str, Any]] = [
     {
         "id": "TSK-001",
+        "planId": "PLAN-EXEC-01",
         "planName": "Executive Strategic Initiatives",
+        "bucketId": "BUCKET-01",
         "bucketName": "Q3 Deliverables",
         "title": "Finalize Workforce Allocation for Unassigned Headcount",
         "description": "Resolve deployment for the 15 unassigned personnel in Airport Operations.",
-        "assignments": ["ahmed.nuaimi@velora.ae"],
+        "assignments": {"ahmed.nuaimi@velora.ae": {"@odata.type": "#microsoft.graph.plannerAssignment"}},
+        "assigneeIds": ["ahmed.nuaimi@velora.ae"],
+        "startDateTime": "2026-08-15T09:00:00Z",
         "dueDateTime": "2026-08-30T17:00:00Z",
         "percentComplete": 50,
         "priority": "High",
+        "@odata.etag": 'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAWCc="',
     },
     {
         "id": "TSK-002",
+        "planId": "PLAN-EXEC-01",
         "planName": "Finance Transformation 2026",
+        "bucketId": "BUCKET-02",
         "bucketName": "Working Capital",
         "title": "Resolve Overdue Customer Account Balances > 90 Days",
         "description": "Execute recovery plan for AED 2.4M overdue bucket identified in S/4HANA.",
-        "assignments": ["fatima.mansoori@velora.ae"],
+        "assignments": {"fatima.mansoori@velora.ae": {"@odata.type": "#microsoft.graph.plannerAssignment"}},
+        "assigneeIds": ["fatima.mansoori@velora.ae"],
+        "startDateTime": "2026-08-01T08:00:00Z",
         "dueDateTime": "2026-08-28T17:00:00Z",
         "percentComplete": 25,
         "priority": "Urgent",
+        "@odata.etag": 'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAWCc2"',
     },
     {
         "id": "TSK-003",
+        "planId": "PLAN-EXEC-01",
         "planName": "Executive Strategic Initiatives",
+        "bucketId": "BUCKET-01",
         "bucketName": "Governance",
+        # NOTE: Title deliberately does NOT contain the word "overdue"
         "title": "Audit Table Dataverse Migration Sign-off",
         "description": "Verify fail-closed write protection on cre2f_veloraagentauditlog.",
-        "assignments": ["balaadm@velora.ae"],
-        "dueDateTime": "2026-08-24T17:00:00Z",  # Overdue
+        "assignments": {"balaadm@velora.ae": {"@odata.type": "#microsoft.graph.plannerAssignment"}},
+        "assigneeIds": ["balaadm@velora.ae"],
+        "startDateTime": "2026-08-01T09:00:00Z",
+        "dueDateTime": "2026-08-24T17:00:00Z",  # Overdue by timestamp
         "percentComplete": 0,
         "priority": "High",
+        "@odata.etag": 'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAWCc3"',
     }
 ]
 
@@ -211,6 +382,77 @@ _INITIAL_APPROVALS: List[Dict[str, Any]] = [
     }
 ]
 
+_INITIAL_ONLINE_MEETINGS: List[Dict[str, Any]] = [
+    {
+        "id": "Mtg-Finance-Liquidity-2026-02",
+        "joinWebUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_02",
+        "subject": "Finance & Cash Flow Liquidity Review",
+        "calendarEventId": "EVT-2026-0826-02",
+        "isRecordingAndTranscriptEnabled": True,
+    },
+    {
+        "id": "Mtg-Ground-Ops-2026-03",
+        "joinWebUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_03",
+        "subject": "Weekly Ground Operations Coordination",
+        "calendarEventId": "EVT-2026-0826-03",
+        "isRecordingAndTranscriptEnabled": False,  # Transcript disabled/denied for testing
+    },
+    {
+        "id": "Mtg-Boardroom-Review-2026-01",
+        "joinWebUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_01",
+        "subject": "Executive Strategy & Operational Alignment",
+        "calendarEventId": "EVT-2026-0826-01",
+        "isRecordingAndTranscriptEnabled": True,
+    },
+]
+
+_INITIAL_TRANSCRIPTS: Dict[str, List[Dict[str, Any]]] = {
+    "Mtg-Finance-Liquidity-2026-02": [
+        {
+            "id": "TRN-001",
+            "createdDateTime": "2026-08-26T15:05:00Z",
+            "version": "1.0",
+            "content": """[00:02:10] Bala Murugan: Welcome everyone to the Finance and Cash Flow Liquidity review.
+[00:04:12] Fatima Al Mansoori: Looking at S/4HANA receivables overdue, AED 2.4M remains in the >90 days overdue bucket.
+[00:15:30] Ahmed Al Nuaimi: Key Decision: Freeze credit deliveries on customer accounts overdue > 180 days (AED 2.4M).
+[00:16:10] Fatima Al Mansoori: Action Item: Fatima Al Mansoori will issue credit delivery freeze notices to all commercial accounts overdue > 180 days by 2026-08-28.
+[00:22:45] Ahmed Al Nuaimi: Key Decision: Reallocate 45 staff from Baggage to Check-in and Boarding.
+[00:23:15] Ahmed Al Nuaimi: Action Item: Ahmed Al Nuaimi to finalize workforce allocation review for ground operations by 2026-08-30.
+[00:35:10] Fatima Al Mansoori: Action Item: Unassigned action item to audit vendor payments over AED 1M.
+[00:38:00] Ahmed Al Nuaimi: Action Item: Ahmed Al Nuaimi to follow up on ground handling overtime hours.
+[00:44:00] Bala Murugan: Meeting adjourned. Thank you all.""".strip()
+        }
+    ],
+    "Mtg-Boardroom-Review-2026-01": [
+        {
+            "id": "TRN-002",
+            "createdDateTime": "2026-08-26T11:00:00Z",
+            "version": "1.0",
+            "content": """[00:05:00] Bala Murugan: Boardroom Operations Review session begins.
+[00:10:00] Ahmed Al Nuaimi: Key Decision: Approve release of priority vendor payment batch of AED 8.10M.
+[00:11:30] Ahmed Al Nuaimi: Action Item: Ahmed Al Nuaimi to release priority vendor payment batch in SAP by 2026-08-29.
+[00:18:20] Bala Murugan: Key Decision: Verify Dataverse tables fail-closed protection.
+[00:19:00] Bala Murugan: Action Item: Bala Murugan to verify fail-closed audit logging tables by 2026-08-27.""".strip()
+        }
+    ]
+}
+
+_INITIAL_MEETING_NOTES: Dict[str, Dict[str, Any]] = {
+    "Mtg-Finance-Liquidity-2026-02": {
+        "version": "1.0",
+        "title": "Notes - Finance & Cash Flow Liquidity Review",
+        "content": """Key Decisions:
+- Freeze credit deliveries on accounts overdue > 180 days.
+- Reallocate 45 staff from Baggage to Check-in & Boarding.
+
+Action Items:
+- [1] Fatima Al Mansoori: Issue credit delivery freeze notices to all commercial accounts overdue > 180 days. Due: 2026-08-28.
+- [2] Ahmed Al Nuaimi: Finalize workforce allocation review for ground operations. Due: 2026-08-30.
+- [3] Unassigned: Audit vendor payments over AED 1M.
+- [4] Ahmed Al Nuaimi: Follow up on ground handling overtime hours.""".strip()
+    }
+}
+
 # Mutable runtime data stores
 _M365_DIRECTORY = list(_INITIAL_DIRECTORY)
 _M365_MAILS: List[Dict[str, Any]] = [dict(m) for m in _INITIAL_MAILS]
@@ -218,17 +460,34 @@ _M365_CALENDAR: List[Dict[str, Any]] = [dict(c) for c in _INITIAL_CALENDAR]
 _M365_TEAMS_MESSAGES: List[Dict[str, Any]] = [dict(t) for t in _INITIAL_TEAMS_MESSAGES]
 _M365_PLANNER_TASKS: List[Dict[str, Any]] = [dict(p) for p in _INITIAL_PLANNER_TASKS]
 _M365_APPROVALS: List[Dict[str, Any]] = [dict(a) for a in _INITIAL_APPROVALS]
+_M365_ONLINE_MEETINGS: List[Dict[str, Any]] = [dict(m) for m in _INITIAL_ONLINE_MEETINGS]
+_M365_TRANSCRIPTS: Dict[str, List[Dict[str, Any]]] = {k: [dict(item) for item in v] for k, v in _INITIAL_TRANSCRIPTS.items()}
+_M365_MEETING_NOTES: Dict[str, Dict[str, Any]] = {k: dict(v) for k, v in _INITIAL_MEETING_NOTES.items()}
 
 
 def seed_test_m365_data() -> None:
     """Reset the mutable in-memory test stores to initial state for deterministic test suites."""
     global _M365_DIRECTORY, _M365_MAILS, _M365_CALENDAR, _M365_TEAMS_MESSAGES, _M365_PLANNER_TASKS, _M365_APPROVALS
-    _M365_DIRECTORY = list(_INITIAL_DIRECTORY)
-    _M365_MAILS = [dict(m) for m in _INITIAL_MAILS]
-    _M365_CALENDAR = [dict(c) for c in _INITIAL_CALENDAR]
-    _M365_TEAMS_MESSAGES = [dict(t) for t in _INITIAL_TEAMS_MESSAGES]
-    _M365_PLANNER_TASKS = [dict(p) for p in _INITIAL_PLANNER_TASKS]
-    _M365_APPROVALS = [dict(a) for a in _INITIAL_APPROVALS]
+    global _M365_ONLINE_MEETINGS, _M365_TRANSCRIPTS, _M365_MEETING_NOTES
+    _M365_DIRECTORY.clear()
+    _M365_DIRECTORY.extend(list(_INITIAL_DIRECTORY))
+    _M365_MAILS.clear()
+    _M365_MAILS.extend([dict(m) for m in _INITIAL_MAILS])
+    _M365_CALENDAR.clear()
+    _M365_CALENDAR.extend([dict(c) for c in _INITIAL_CALENDAR])
+    _M365_TEAMS_MESSAGES.clear()
+    _M365_TEAMS_MESSAGES.extend([dict(t) for t in _INITIAL_TEAMS_MESSAGES])
+    _M365_PLANNER_TASKS.clear()
+    _M365_PLANNER_TASKS.extend([dict(p) for p in _INITIAL_PLANNER_TASKS])
+    _M365_APPROVALS.clear()
+    _M365_APPROVALS.extend([dict(a) for a in _INITIAL_APPROVALS])
+    _M365_ONLINE_MEETINGS.clear()
+    _M365_ONLINE_MEETINGS.extend([dict(m) for m in _INITIAL_ONLINE_MEETINGS])
+    _M365_TRANSCRIPTS.clear()
+    _M365_TRANSCRIPTS.update({k: [dict(item) for item in v] for k, v in _INITIAL_TRANSCRIPTS.items()})
+    _M365_MEETING_NOTES.clear()
+    _M365_MEETING_NOTES.update({k: dict(v) for k, v in _INITIAL_MEETING_NOTES.items()})
+
 
 
 class Microsoft365Client:
@@ -258,6 +517,14 @@ class Microsoft365Client:
             or os.getenv("ENTRA_CLIENT_SECRET")
             or ""
         ).strip()
+
+        # Explicit Graph configuration is isolated from shared Azure/Dataverse credentials.
+        # An incomplete Graph configuration must not reuse another application's secret.
+        if any(os.getenv(key, "").strip() for key in
+               ("GRAPH_CLIENT_ID", "GRAPH_TENANT_ID", "GRAPH_CLIENT_SECRET")):
+            self.tenant_id = os.getenv("GRAPH_TENANT_ID", "").strip()
+            self.client_id = os.getenv("GRAPH_CLIENT_ID", "").strip()
+            self.client_secret = os.getenv("GRAPH_CLIENT_SECRET", "").strip()
 
         self.force_mock: Optional[bool] = None
 
@@ -313,6 +580,11 @@ class Microsoft365Client:
         target_email = (user_email or self.user_email or "").strip().lower()
         res_upper = resource_type.upper()
 
+        if target_email and "@" in target_email:
+            domain = target_email.split("@")[-1]
+            if domain not in ALLOWED_DOMAINS:
+                return {"authorized": False, "status": "ACCESS_DENIED", "resource": resource_type, "user": target_email, "error": f"Mailbox {target_email} is outside authorized domain boundary."}
+
         if self.is_live:
             try:
                 token = self._get_graph_token()
@@ -342,6 +614,104 @@ class Microsoft365Client:
             return {"authorized": True, "status": "AUTHORIZED", "resource": resource_type, "user": target_email, "simulated": True}
 
         return {"authorized": False, "status": "SOURCE_UNAVAILABLE", "resource": resource_type, "error": "Live provider not configured"}
+
+    def _validate_user_mailbox(self, email: Optional[str] = None) -> str:
+        """Enforce domain boundary check on requesting mailbox."""
+        target = (email or self.user_email or "").strip().lower()
+        if not target:
+            return target
+        if "@" in target:
+            domain = target.split("@")[-1]
+            if domain not in ALLOWED_DOMAINS:
+                raise AccessDeniedError(f"Access denied: Mailbox '{target}' belongs to unauthorized foreign domain '{domain}'.")
+        return target
+
+    def _validate_planner_plan(self, plan_name_or_id: Optional[str] = None) -> None:
+        """Enforce authorized plan boundary check."""
+        if not plan_name_or_id:
+            return
+        p_clean = plan_name_or_id.strip()
+        p_lower = p_clean.lower()
+        allowed = [p.lower() for p in ALLOWED_PLANNER_PLANS]
+        is_allowed = any(p in p_lower or p_lower in p for p in allowed) or p_lower.startswith("plan-exec") or p_lower.startswith("plan-q3")
+        if not is_allowed:
+            raise AccessDeniedError(f"Access denied: Planner plan '{plan_name_or_id}' is not an authorized organization plan.")
+
+    def _fetch_graph_paged(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
+        max_results: int = 50,
+        max_pages: int = 5,
+    ) -> Dict[str, Any]:
+        """Fetch items from Microsoft Graph following @odata.nextLink with loop, row, and host bounds."""
+        import urllib.parse
+        graph_host = urllib.parse.urlparse(self.graph_base_url).netloc
+        
+        items: List[Dict[str, Any]] = []
+        page_count = 0
+        current_url: Optional[str] = endpoint
+        current_params = params
+        is_truncated = False
+        last_next_link: Optional[str] = None
+
+        with httpx.Client(timeout=15.0) as client:
+            while current_url and page_count < max_pages and len(items) < max_results:
+                parsed = urllib.parse.urlparse(current_url)
+                if parsed.netloc and parsed.netloc != graph_host:
+                    raise AccessDeniedError(f"Disallowed nextLink host '{parsed.netloc}' violates SSRF protection policy.")
+                
+                try:
+                    resp = client.get(current_url, params=current_params, headers=headers)
+                except httpx.TimeoutException as te:
+                    raise GraphTimeoutError(f"Microsoft Graph request timed out: {te}") from te
+                except Exception as ex:
+                    raise RuntimeError(f"Microsoft Graph request failed: {ex}") from ex
+
+                if resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Microsoft Graph access denied (HTTP {resp.status_code}): {resp.text[:200]}")
+                elif resp.status_code == 429:
+                    retry_after = int(resp.headers.get("Retry-After", 10))
+                    raise GraphRateLimitError(f"Microsoft Graph throttled (HTTP 429). Retry-After: {retry_after}s", retry_after=retry_after)
+                elif resp.status_code != 200:
+                    raise RuntimeError(f"Microsoft Graph HTTP {resp.status_code}: {resp.text[:200]}")
+
+                data = resp.json()
+                page_items = data.get("value", [])
+                items.extend(page_items)
+                page_count += 1
+                last_next_link = data.get("@odata.nextLink")
+
+                if len(items) >= max_results:
+                    items = items[:max_results]
+                    if last_next_link or len(page_items) > len(items):
+                        is_truncated = True
+                    break
+
+                if not last_next_link:
+                    break
+
+                current_url = last_next_link
+                current_params = None
+
+        if last_next_link and page_count >= max_pages:
+            is_truncated = True
+
+        return {
+            "items": items,
+            "pageCount": page_count,
+            "truncated": is_truncated,
+            "nextLink": last_next_link if is_truncated else None,
+        }
+
+    def get_last_pagination(self) -> Dict[str, Any]:
+        """Retrieve pagination and completeness metadata from last executed read operation."""
+        p = getattr(self, "_last_pagination", {"truncated": False, "next_link": None, "page_count": 1, "total": 0})
+        res = dict(p)
+        res["pageCount"] = p.get("page_count", p.get("pageCount", 1))
+        res["nextLink"] = p.get("next_link", p.get("nextLink"))
+        return res
 
     def _resolve_planner_plan_id(self, plan_name: str, headers: Dict[str, str]) -> str:
         """Resolve human-readable plan name to genuine plan ID or return identifier directly."""
@@ -464,52 +834,108 @@ class Microsoft365Client:
 
     # --- Read Operations ---
 
-    def search_mail(self, query: str = "", date_from: Optional[str] = None, max_results: int = 10) -> List[Dict[str, Any]]:
+    def search_mail(
+        self,
+        query: str = "",
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        unread_only: bool = False,
+        max_results: int = 10,
+        max_pages: int = 5,
+    ) -> List[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
+
         if self.is_live:
             token = self._get_graph_token()
             user_path = f"/users/{self.user_email}" if self.user_email else "/me"
             endpoint = f"{self.graph_base_url}{user_path}/messages"
-            params: Dict[str, Any] = {"$top": max_results}
+            headers = {"Authorization": f"Bearer {token}"}
+            params: Dict[str, Any] = {"$top": min(max_results, 50)}
+
             if query:
                 params["$search"] = f'"{query}"'
-            try:
-                with httpx.Client(timeout=15.0) as client:
-                    resp = client.get(endpoint, params=params, headers={"Authorization": f"Bearer {token}"})
-                    if resp.status_code == 200:
-                        raw = resp.json().get("value", [])
-                        results = []
-                        for m in raw:
-                            results.append({
-                                "id": m.get("id"),
-                                "threadId": m.get("conversationId"),
-                                "subject": m.get("subject", ""),
-                                "from": m.get("from", {}).get("emailAddress", {}).get("address", ""),
-                                "receivedDateTime": m.get("receivedDateTime", ""),
-                                "bodyPreview": m.get("bodyPreview", ""),
-                                "isPriority": m.get("importance") == "high",
-                                "needsFollowUp": m.get("flag", {}).get("flagStatus") == "flagged",
-                                "categories": m.get("categories", []),
-                            })
-                        return results
-                    raise RuntimeError(f"Microsoft Graph search_mail returned HTTP {resp.status_code}: {resp.text[:200]}")
-            except Exception as e:
-                raise RuntimeError(f"Live Microsoft Graph search_mail failed: {e}") from e
+            else:
+                filters = []
+                if unread_only:
+                    filters.append("isRead eq false")
+                if date_from:
+                    filters.append(f"receivedDateTime ge {date_from}")
+                if date_to:
+                    filters.append(f"receivedDateTime le {date_to}")
+                if filters:
+                    params["$filter"] = " and ".join(filters)
+                params["$orderby"] = "receivedDateTime desc"
 
-        if self._is_mock_enabled:
+            res = self._fetch_graph_paged(endpoint, params=params, headers=headers, max_results=max_results, max_pages=max_pages)
+            raw = res["items"]
             results = []
-            for m in _M365_MAILS:
-                if (
-                    not query
-                    or query.lower() in m.get("subject", "").lower()
-                    or query.lower() in m.get("bodyPreview", "").lower()
-                    or query.lower() in m.get("from", "").lower()
-                ):
-                    results.append(m)
+            for m in raw:
+                if query:
+                    if unread_only and m.get("isRead", True) is not False:
+                        continue
+                    if date_from and m.get("receivedDateTime", "") < date_from:
+                        continue
+                    if date_to and m.get("receivedDateTime", "") > date_to:
+                        continue
+                sender_addr = m.get("from", {}).get("emailAddress", {}).get("address", "") if isinstance(m.get("from"), dict) else (m.get("from") or "")
+                sender_name = m.get("from", {}).get("emailAddress", {}).get("displayName", "") if isinstance(m.get("from"), dict) else ""
+                results.append({
+                    "id": m.get("id"),
+                    "webLink": m.get("webLink"),
+                    "threadId": m.get("conversationId"),
+                    "subject": m.get("subject", ""),
+                    "from": sender_addr,
+                    "fromName": sender_name,
+                    "receivedDateTime": m.get("receivedDateTime", ""),
+                    "lastModifiedDateTime": m.get("lastModifiedDateTime", ""),
+                    "bodyPreview": (m.get("bodyPreview") or "")[:500],
+                    "importance": m.get("importance", "normal"),
+                    "isPriority": m.get("importance") == "high",
+                    "isRead": m.get("isRead", True),
+                    "needsFollowUp": (m.get("flag") or {}).get("flagStatus") == "flagged" if isinstance(m.get("flag"), dict) else False,
+                    "categories": m.get("categories", []),
+                })
+            self._last_pagination = {
+                "truncated": res["truncated"],
+                "next_link": res["nextLink"],
+                "page_count": res["pageCount"],
+                "total": len(results),
+            }
             return results[:max_results]
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: search_mail requires configured Microsoft 365 credentials.")
+        if self._is_mock_enabled:
+            filtered = []
+            for m in _M365_MAILS:
+                if query:
+                    q_lower = query.lower()
+                    subj = m.get("subject", "").lower()
+                    body = m.get("bodyPreview", "").lower()
+                    frm = str(m.get("from", "")).lower()
+                    cats = " ".join(m.get("categories", [])).lower()
+                    if not (q_lower in subj or q_lower in body or q_lower in frm or q_lower in cats):
+                        continue
+                if unread_only and m.get("isRead", True) is not False:
+                    continue
+                if date_from and m.get("receivedDateTime", "") < date_from:
+                    continue
+                if date_to and m.get("receivedDateTime", "") > date_to:
+                    continue
+                filtered.append(m)
+
+            is_truncated = len(filtered) > max_results
+            next_link = f"https://graph.microsoft.com/v1.0/me/messages?$skip={max_results}&$top={max_results}" if is_truncated else None
+            self._last_pagination = {
+                "truncated": is_truncated,
+                "next_link": next_link,
+                "page_count": 1,
+                "total": len(filtered),
+            }
+            return filtered[:max_results]
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: search_mail requires configured Microsoft 365 credentials.")
 
     def get_mail_thread(self, thread_id: str) -> List[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
         if self.is_live:
             token = self._get_graph_token()
             user_path = f"/users/{self.user_email}" if self.user_email else "/me"
@@ -537,9 +963,10 @@ class Microsoft365Client:
         if self._is_mock_enabled:
             return [m for m in _M365_MAILS if m.get("threadId") == thread_id]
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: get_mail_thread requires configured Microsoft 365 credentials.")
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_mail_thread requires configured Microsoft 365 credentials.")
 
     def summarize_priority_mail(self, max_results: int = 5) -> List[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
         if self.is_live:
             token = self._get_graph_token()
             user_path = f"/users/{self.user_email}" if self.user_email else "/me"
@@ -568,9 +995,10 @@ class Microsoft365Client:
         if self._is_mock_enabled:
             return [m for m in _M365_MAILS if m.get("isPriority")][:max_results]
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: summarize_priority_mail requires configured Microsoft 365 credentials.")
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: summarize_priority_mail requires configured Microsoft 365 credentials.")
 
     def find_mail_follow_ups(self) -> List[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
         if self.is_live:
             token = self._get_graph_token()
             user_path = f"/users/{self.user_email}" if self.user_email else "/me"
@@ -598,80 +1026,177 @@ class Microsoft365Client:
         if self._is_mock_enabled:
             return [m for m in _M365_MAILS if m.get("needsFollowUp")]
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: find_mail_follow_ups requires configured Microsoft 365 credentials.")
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: find_mail_follow_ups requires configured Microsoft 365 credentials.")
 
-    def list_calendar_events(self, date_from: Optional[str] = None, date_to: Optional[str] = None) -> List[Dict[str, Any]]:
+    def list_calendar_events(
+        self,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        time_zone: str = "Asia/Dubai",
+        include_cancelled: bool = False,
+        max_results: int = 50,
+    ) -> List[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
+
+        explicit_dates = bool(date_from and date_to)
+        if not explicit_dates:
+            calc_from, calc_to = get_local_midnight_boundaries(tz_name=time_zone)
+            eff_from = date_from or calc_from
+            eff_to = date_to or calc_to
+        else:
+            eff_from, eff_to = date_from, date_to
+
         if self.is_live:
             token = self._get_graph_token()
             user_path = f"/users/{self.user_email}" if self.user_email else "/me"
-            endpoint = f"{self.graph_base_url}{user_path}/events"
-            params: Dict[str, Any] = {"$top": 50}
-            if date_from and date_to:
-                endpoint = f"{self.graph_base_url}{user_path}/calendarView"
-                params = {"startDateTime": date_from, "endDateTime": date_to, "$top": 50}
-            try:
-                with httpx.Client(timeout=15.0) as client:
-                    resp = client.get(endpoint, params=params, headers={"Authorization": f"Bearer {token}"})
-                    if resp.status_code == 200:
-                        raw = resp.json().get("value", [])
-                        results = []
-                        for evt in raw:
-                            results.append({
-                                "id": evt.get("id"),
-                                "subject": evt.get("subject", ""),
-                                "start": evt.get("start", {}).get("dateTime", ""),
-                                "end": evt.get("end", {}).get("dateTime", ""),
-                                "timeZone": evt.get("start", {}).get("timeZone", "Asia/Dubai"),
-                                "organizer": evt.get("organizer", {}).get("emailAddress", {}).get("address", ""),
-                                "attendees": [a.get("emailAddress", {}).get("address", "") for a in evt.get("attendees", [])],
-                                "location": evt.get("location", {}).get("displayName", ""),
-                                "isOnlineMeeting": evt.get("isOnlineMeeting", False),
-                                "onlineMeetingUrl": evt.get("onlineMeeting", {}).get("joinUrl", ""),
-                                "bodyPreview": evt.get("bodyPreview", ""),
-                            })
-                        return results
-                    raise RuntimeError(f"Microsoft Graph list_calendar_events returned HTTP {resp.status_code}: {resp.text[:200]}")
-            except Exception as e:
-                raise RuntimeError(f"Live Microsoft Graph list_calendar_events failed: {e}") from e
+            endpoint = f"{self.graph_base_url}{user_path}/calendarView"
+            headers = {"Authorization": f"Bearer {token}"}
+            params = {"startDateTime": eff_from, "endDateTime": eff_to, "$top": min(max_results, 50)}
+
+            res = self._fetch_graph_paged(endpoint, params=params, headers=headers, max_results=max_results)
+            raw = res["items"]
+            results = []
+            for evt in raw:
+                is_cancelled = bool(evt.get("isCancelled", False))
+                if not include_cancelled and is_cancelled:
+                    continue
+                om = evt.get("onlineMeeting")
+                om_url = om.get("joinUrl") if isinstance(om, dict) else (evt.get("onlineMeetingUrl") or "")
+                rs = evt.get("responseStatus")
+                resp_status = rs.get("response") if isinstance(rs, dict) else (rs or "none")
+                results.append({
+                    "id": evt.get("id"),
+                    "subject": evt.get("subject", ""),
+                    "start": evt.get("start", {}).get("dateTime", ""),
+                    "end": evt.get("end", {}).get("dateTime", ""),
+                    "timeZone": evt.get("start", {}).get("timeZone", time_zone),
+                    "organizer": evt.get("organizer", {}).get("emailAddress", {}).get("address", "") if isinstance(evt.get("organizer"), dict) else evt.get("organizer", ""),
+                    "attendees": [a.get("emailAddress", {}).get("address", "") if isinstance(a, dict) else str(a) for a in evt.get("attendees", [])],
+                    "location": evt.get("location", {}).get("displayName", "") if isinstance(evt.get("location"), dict) else evt.get("location", ""),
+                    "isOnlineMeeting": bool(evt.get("isOnlineMeeting") or om_url),
+                    "onlineMeetingUrl": om_url,
+                    "bodyPreview": evt.get("bodyPreview", ""),
+                    "isCancelled": is_cancelled,
+                    "responseStatus": resp_status,
+                    "recurrence": evt.get("recurrence"),
+                    "seriesMasterId": evt.get("seriesMasterId"),
+                    "type": evt.get("type", "singleInstance"),
+                })
+            return results
 
         if self._is_mock_enabled:
-            return list(_M365_CALENDAR)
+            results = []
+            for evt in _M365_CALENDAR:
+                is_cancelled = bool(evt.get("isCancelled", False))
+                if not include_cancelled and is_cancelled:
+                    continue
+                if explicit_dates:
+                    evt_start = evt.get("start", "")
+                    evt_end = evt.get("end", "")
+                    if evt_end and eff_from and evt_end < eff_from:
+                        continue
+                    if evt_start and eff_to and evt_start > eff_to:
+                        continue
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.")
+                om = evt.get("onlineMeeting")
+                om_url = om.get("joinUrl") if isinstance(om, dict) else (evt.get("onlineMeetingUrl") or "")
+                rs = evt.get("responseStatus")
+                resp_status = rs.get("response") if isinstance(rs, dict) else (rs or "none")
+
+                results.append({
+                    "id": evt.get("id"),
+                    "subject": evt.get("subject", ""),
+                    "start": evt.get("start", ""),
+                    "end": evt.get("end", ""),
+                    "timeZone": evt.get("timeZone", time_zone),
+                    "organizer": evt.get("organizer", ""),
+                    "attendees": list(evt.get("attendees", [])),
+                    "location": evt.get("location", ""),
+                    "isOnlineMeeting": bool(evt.get("isOnlineMeeting") or om_url),
+                    "onlineMeetingUrl": om_url,
+                    "bodyPreview": evt.get("bodyPreview", ""),
+                    "isCancelled": is_cancelled,
+                    "responseStatus": resp_status,
+                    "recurrence": evt.get("recurrence"),
+                    "seriesMasterId": evt.get("seriesMasterId"),
+                    "type": evt.get("type", "singleInstance"),
+                })
+            if not results and not explicit_dates:
+                for evt in _M365_CALENDAR:
+                    if not include_cancelled and evt.get("isCancelled"):
+                        continue
+                    results.append(evt)
+            return results
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.")
 
     def get_meeting_details(self, event_id: str) -> Optional[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
         if self.is_live:
             token = self._get_graph_token()
             user_path = f"/users/{self.user_email}" if self.user_email else "/me"
             endpoint = f"{self.graph_base_url}{user_path}/events/{event_id}"
-            try:
-                with httpx.Client(timeout=15.0) as client:
-                    resp = client.get(endpoint, headers={"Authorization": f"Bearer {token}"})
-                    if resp.status_code == 200:
-                        evt = resp.json()
-                        return {
-                            "id": evt.get("id"),
-                            "subject": evt.get("subject", ""),
-                            "start": evt.get("start", {}).get("dateTime", ""),
-                            "end": evt.get("end", {}).get("dateTime", ""),
-                            "timeZone": evt.get("start", {}).get("timeZone", "Asia/Dubai"),
-                            "organizer": evt.get("organizer", {}).get("emailAddress", {}).get("address", ""),
-                            "attendees": [a.get("emailAddress", {}).get("address", "") for a in evt.get("attendees", [])],
-                            "location": evt.get("location", {}).get("displayName", ""),
-                            "isOnlineMeeting": evt.get("isOnlineMeeting", False),
-                            "onlineMeetingUrl": evt.get("onlineMeeting", {}).get("joinUrl", ""),
-                            "bodyPreview": evt.get("bodyPreview", ""),
-                        }
-                    elif resp.status_code == 404:
-                        return None
-                    raise RuntimeError(f"Microsoft Graph get_meeting_details HTTP {resp.status_code}: {resp.text[:200]}")
-            except Exception as e:
-                raise RuntimeError(f"Live Microsoft Graph get_meeting_details failed: {e}") from e
+            headers = {"Authorization": f"Bearer {token}"}
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.get(endpoint, headers=headers)
+                if resp.status_code == 200:
+                    evt = resp.json()
+                    om = evt.get("onlineMeeting")
+                    om_url = om.get("joinUrl") if isinstance(om, dict) else (evt.get("onlineMeetingUrl") or "")
+                    rs = evt.get("responseStatus")
+                    resp_status = rs.get("response") if isinstance(rs, dict) else (rs or "none")
+                    return {
+                        "id": evt.get("id"),
+                        "subject": evt.get("subject", ""),
+                        "start": evt.get("start", {}).get("dateTime", ""),
+                        "end": evt.get("end", {}).get("dateTime", ""),
+                        "timeZone": evt.get("start", {}).get("timeZone", "Asia/Dubai"),
+                        "organizer": evt.get("organizer", {}).get("emailAddress", {}).get("address", "") if isinstance(evt.get("organizer"), dict) else evt.get("organizer", ""),
+                        "attendees": [a.get("emailAddress", {}).get("address", "") if isinstance(a, dict) else str(a) for a in evt.get("attendees", [])],
+                        "location": evt.get("location", {}).get("displayName", "") if isinstance(evt.get("location"), dict) else evt.get("location", ""),
+                        "isOnlineMeeting": bool(evt.get("isOnlineMeeting") or om_url),
+                        "onlineMeetingUrl": om_url,
+                        "bodyPreview": evt.get("bodyPreview", ""),
+                        "isCancelled": bool(evt.get("isCancelled", False)),
+                        "responseStatus": resp_status,
+                        "recurrence": evt.get("recurrence"),
+                        "seriesMasterId": evt.get("seriesMasterId"),
+                        "type": evt.get("type", "singleInstance"),
+                    }
+                elif resp.status_code == 404:
+                    return None
+                elif resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Access denied to event {event_id}: HTTP {resp.status_code}")
+                raise RuntimeError(f"Microsoft Graph get_meeting_details HTTP {resp.status_code}: {resp.text[:200]}")
 
         if self._is_mock_enabled:
-            return next((e for e in _M365_CALENDAR if e["id"] == event_id), None)
+            evt = next((e for e in _M365_CALENDAR if e["id"] == event_id), None)
+            if not evt:
+                return None
+            om = evt.get("onlineMeeting")
+            om_url = om.get("joinUrl") if isinstance(om, dict) else (evt.get("onlineMeetingUrl") or "")
+            rs = evt.get("responseStatus")
+            resp_status = rs.get("response") if isinstance(rs, dict) else (rs or "none")
+            return {
+                "id": evt.get("id"),
+                "subject": evt.get("subject", ""),
+                "start": evt.get("start", ""),
+                "end": evt.get("end", ""),
+                "timeZone": evt.get("timeZone", "Asia/Dubai"),
+                "organizer": evt.get("organizer", ""),
+                "attendees": list(evt.get("attendees", [])),
+                "location": evt.get("location", ""),
+                "isOnlineMeeting": bool(evt.get("isOnlineMeeting") or om_url),
+                "onlineMeetingUrl": om_url,
+                "bodyPreview": evt.get("bodyPreview", ""),
+                "isCancelled": bool(evt.get("isCancelled", False)),
+                "responseStatus": resp_status,
+                "recurrence": evt.get("recurrence"),
+                "seriesMasterId": evt.get("seriesMasterId"),
+                "type": evt.get("type", "singleInstance"),
+            }
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.")
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.")
 
     def check_availability(self, attendees: List[str], start_time: str, end_time: str) -> Dict[str, Any]:
         """Check for scheduling conflicts against calendar events."""
@@ -716,6 +1241,148 @@ class Microsoft365Client:
             if evt.get("id") == subject_or_id or subject_or_id.lower() in evt.get("subject", "").lower():
                 return evt
         return None
+
+    def get_online_meeting_by_join_url(self, join_url: str) -> Optional[Dict[str, Any]]:
+        """Resolve online meeting metadata from Teams join URL via Graph or mock."""
+        if not join_url:
+            return None
+        if self.is_live:
+            token = self._get_graph_token()
+            headers = {"Authorization": f"Bearer {token}"}
+            encoded_url = join_url.replace("'", "''")
+            endpoint = f"{self.graph_base_url}/me/onlineMeetings?$filter=JoinWebUrl eq '{encoded_url}'"
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.get(endpoint, headers=headers)
+                if resp.status_code == 200:
+                    val = resp.json().get("value", [])
+                    return val[0] if val else None
+                elif resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Access denied to onlineMeetings: HTTP {resp.status_code}")
+                return None
+
+        if self._is_mock_enabled:
+            return next((m for m in _M365_ONLINE_MEETINGS if m.get("joinWebUrl") == join_url), None)
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_online_meeting_by_join_url requires live or mock M365.")
+
+    def get_online_meeting(self, online_meeting_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve online meeting metadata by online meeting ID."""
+        if not online_meeting_id:
+            return None
+        if self.is_live:
+            token = self._get_graph_token()
+            headers = {"Authorization": f"Bearer {token}"}
+            endpoint = f"{self.graph_base_url}/me/onlineMeetings/{online_meeting_id}"
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.get(endpoint, headers=headers)
+                if resp.status_code == 200:
+                    return resp.json()
+                elif resp.status_code == 404:
+                    return None
+                elif resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Access denied to online meeting {online_meeting_id}: HTTP {resp.status_code}")
+                return None
+
+        if self._is_mock_enabled:
+            return next((m for m in _M365_ONLINE_MEETINGS if m.get("id") == online_meeting_id), None)
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_online_meeting requires live or mock M365.")
+
+    def resolve_online_meeting_id(self, meeting_id_or_event_id: str) -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
+        """Resolve online meeting ID from either calendar event ID or online meeting ID.
+        
+        Crucial requirement: Calendar event ID is distinct from onlineMeeting ID.
+        Returns: (online_meeting_id, meeting_metadata)
+        """
+        # 1. Direct online meeting check
+        om = self.get_online_meeting(meeting_id_or_event_id)
+        if om:
+            return om.get("id"), om
+
+        # 2. Match by calendar event ID
+        if self._is_mock_enabled:
+            matched_om = next((m for m in _M365_ONLINE_MEETINGS if m.get("calendarEventId") == meeting_id_or_event_id), None)
+            if matched_om:
+                return matched_om.get("id"), matched_om
+
+        # 3. Lookup calendar event and follow joinUrl
+        evt = self.get_meeting_details(meeting_id_or_event_id)
+        if evt and evt.get("onlineMeetingUrl"):
+            om_from_url = self.get_online_meeting_by_join_url(evt["onlineMeetingUrl"])
+            if om_from_url:
+                return om_from_url.get("id"), om_from_url
+
+        return None, None
+
+    def get_meeting_transcripts(self, online_meeting_id: str) -> List[Dict[str, Any]]:
+        """Retrieve available transcripts for an online meeting."""
+        if self.is_live:
+            token = self._get_graph_token()
+            headers = {"Authorization": f"Bearer {token}"}
+            endpoint = f"{self.graph_base_url}/me/onlineMeetings/{online_meeting_id}/transcripts"
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.get(endpoint, headers=headers)
+                if resp.status_code == 200:
+                    return resp.json().get("value", [])
+                elif resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Access denied: Transcripts disabled or unauthorized for meeting {online_meeting_id}: HTTP {resp.status_code}")
+                elif resp.status_code == 404:
+                    return []
+                raise RuntimeError(f"Microsoft Graph get_meeting_transcripts HTTP {resp.status_code}: {resp.text[:200]}")
+
+        if self._is_mock_enabled:
+            om = next((m for m in _M365_ONLINE_MEETINGS if m.get("id") == online_meeting_id), None)
+            if om and not om.get("isRecordingAndTranscriptEnabled", True):
+                raise AccessDeniedError(
+                    f"Access denied: Recording and transcription are disabled or unauthorized for online meeting {online_meeting_id}.",
+                    status_code=403
+                )
+            return list(_M365_TRANSCRIPTS.get(online_meeting_id, []))
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_meeting_transcripts requires live or mock M365.")
+
+    def get_transcript_content(self, online_meeting_id: str, transcript_id: str) -> Optional[str]:
+        """Retrieve text content of a meeting transcript."""
+        if self.is_live:
+            token = self._get_graph_token()
+            headers = {"Authorization": f"Bearer {token}", "Accept": "text/vtt, text/plain"}
+            endpoint = f"{self.graph_base_url}/me/onlineMeetings/{online_meeting_id}/transcripts/{transcript_id}/content"
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.get(endpoint, headers=headers)
+                if resp.status_code == 200:
+                    return resp.text
+                elif resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Access denied to transcript {transcript_id}: HTTP {resp.status_code}")
+                elif resp.status_code == 404:
+                    return None
+                raise RuntimeError(f"Microsoft Graph get_transcript_content HTTP {resp.status_code}: {resp.text[:200]}")
+
+        if self._is_mock_enabled:
+            transcripts = _M365_TRANSCRIPTS.get(online_meeting_id, [])
+            target = next((t for t in transcripts if t.get("id") == transcript_id), None)
+            return target.get("content") if target else None
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_transcript_content requires live or mock M365.")
+
+    def get_meeting_notes(self, online_meeting_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve structured meeting notes or Loop component content."""
+        if self.is_live:
+            token = self._get_graph_token()
+            headers = {"Authorization": f"Bearer {token}"}
+            endpoint = f"{self.graph_base_url}/me/onlineMeetings/{online_meeting_id}"
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.get(endpoint, headers=headers)
+                if resp.status_code == 200:
+                    return resp.json().get("notes")
+                elif resp.status_code in (401, 403):
+                    raise AccessDeniedError(f"Access denied to meeting notes: HTTP {resp.status_code}")
+                return None
+
+        if self._is_mock_enabled:
+            return _M365_MEETING_NOTES.get(online_meeting_id)
+
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_meeting_notes requires live or mock M365.")
+
 
     def search_teams_messages(self, query: str = "", max_results: int = 10) -> List[Dict[str, Any]]:
         if self.is_live:
@@ -799,7 +1466,16 @@ class Microsoft365Client:
             return [t for t in _M365_TEAMS_MESSAGES if "?" in t.get("content", "")]
         raise RuntimeError("SOURCE_UNAVAILABLE: find_teams_follow_ups requires configured Microsoft 365 credentials.")
 
-    def list_planner_tasks(self, plan_name: Optional[str] = None, overdue_only: bool = False, my_tasks_only: bool = False) -> List[Dict[str, Any]]:
+    def list_planner_tasks(
+        self,
+        plan_name: Optional[str] = None,
+        overdue_only: bool = False,
+        my_tasks_only: bool = False,
+        max_results: int = 50,
+    ) -> List[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
+        self._validate_planner_plan(plan_name)
+
         if self.is_live:
             token = self._get_graph_token()
             try:
@@ -815,38 +1491,94 @@ class Microsoft365Client:
                         for t in raw:
                             due = t.get("dueDateTime")
                             pct = t.get("percentComplete", 0)
-                            if overdue_only and (not due or due > now_iso or pct == 100):
+                            is_overdue = bool(due and due < now_iso and pct < 100)
+                            if overdue_only and not is_overdue:
                                 continue
+                            assignee_ids = list(t.get("assignments", {}).keys()) if isinstance(t.get("assignments"), dict) else []
+                            if my_tasks_only and self.user_email and self.user_email not in assignee_ids:
+                                continue
+
+                            assignee_names = []
+                            for aid in assignee_ids:
+                                person = next((p for p in _M365_DIRECTORY if p.get("email") == aid or p.get("name") == aid), None)
+                                assignee_names.append(person.get("name") if person else aid)
+
                             results.append({
                                 "id": t.get("id"),
+                                "sourceId": t.get("id"),
+                                "planId": t.get("planId"),
                                 "planName": plan_name or t.get("planId"),
+                                "bucketId": t.get("bucketId"),
                                 "bucketName": t.get("bucketId"),
                                 "title": t.get("title", ""),
-                                "assignments": list(t.get("assignments", {}).keys()),
+                                "assignments": t.get("assignments", {}),
+                                "assigneeIds": assignee_ids,
+                                "assigneeNames": assignee_names,
+                                "startDateTime": t.get("startDateTime"),
                                 "dueDateTime": due,
                                 "percentComplete": pct,
                                 "priority": "Urgent" if t.get("priority") == 1 else "High" if t.get("priority") == 3 else "Medium",
+                                "priorityCode": t.get("priority"),
+                                "etag": t.get("@odata.etag"),
+                                "isOverdue": is_overdue,
                             })
                         return results
+                    elif resp.status_code in (401, 403):
+                        raise AccessDeniedError(f"Microsoft Graph Planner access denied (HTTP {resp.status_code})")
                     raise RuntimeError(f"Microsoft Graph list_planner_tasks returned HTTP {resp.status_code}: {resp.text[:200]}")
             except Exception as e:
+                if isinstance(e, M365ClientError):
+                    raise
                 raise RuntimeError(f"Live Microsoft Graph list_planner_tasks failed: {e}") from e
 
         if self._is_mock_enabled:
             results = []
+            now_iso = datetime.now(timezone.utc).isoformat()
             for t in _M365_PLANNER_TASKS:
-                if plan_name and plan_name.lower() not in t.get("planName", "").lower():
+                if plan_name:
+                    p_name_lower = plan_name.lower()
+                    if p_name_lower not in t.get("planName", "").lower() and p_name_lower not in t.get("planId", "").lower():
+                        continue
+                
+                assignee_ids = t.get("assigneeIds") or (list(t.get("assignments", {}).keys()) if isinstance(t.get("assignments"), dict) else t.get("assignments", []))
+                if my_tasks_only and self.user_email and self.user_email not in assignee_ids:
                     continue
-                if my_tasks_only and self.user_email and self.user_email not in t.get("assignments", []):
+                due = t.get("dueDateTime")
+                pct = t.get("percentComplete", 0)
+                is_overdue = bool(due and due < now_iso and pct < 100)
+                if overdue_only and not is_overdue:
                     continue
-                if overdue_only and t.get("id") != "TSK-003" and "overdue" not in t.get("title", "").lower():
-                    continue
-                results.append(t)
+
+                assignee_names = []
+                for aid in assignee_ids:
+                    person = next((p for p in _M365_DIRECTORY if p.get("email") == aid or p.get("name") == aid), None)
+                    assignee_names.append(person.get("name") if person else aid)
+
+                results.append({
+                    "id": t.get("id"),
+                    "sourceId": t.get("id"),
+                    "planId": t.get("planId", "PLAN-EXEC-01"),
+                    "planName": t.get("planName", "Executive Strategic Initiatives"),
+                    "bucketId": t.get("bucketId", "BUCKET-01"),
+                    "bucketName": t.get("bucketName", "Deliverables"),
+                    "title": t.get("title", ""),
+                    "assignments": t.get("assignments", {}),
+                    "assigneeIds": assignee_ids,
+                    "assigneeNames": assignee_names,
+                    "startDateTime": t.get("startDateTime"),
+                    "dueDateTime": due,
+                    "percentComplete": pct,
+                    "priority": t.get("priority", "Medium"),
+                    "priorityCode": 1 if t.get("priority") == "Urgent" else 3 if t.get("priority") == "High" else 5,
+                    "etag": t.get("@odata.etag", 'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAWCc="'),
+                    "isOverdue": is_overdue,
+                })
             return results
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: list_planner_tasks requires configured Microsoft 365 credentials.")
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: list_planner_tasks requires configured Microsoft 365 credentials.")
 
     def get_planner_task(self, task_id: str) -> Optional[Dict[str, Any]]:
+        self._validate_user_mailbox(self.user_email)
         if self.is_live:
             token = self._get_graph_token()
             try:
@@ -855,26 +1587,67 @@ class Microsoft365Client:
                     resp = client.get(f"{self.graph_base_url}/planner/tasks/{task_id}", headers=headers)
                     if resp.status_code == 200:
                         t = resp.json()
+                        assignee_ids = list(t.get("assignments", {}).keys()) if isinstance(t.get("assignments"), dict) else []
+                        assignee_names = []
+                        for aid in assignee_ids:
+                            person = next((p for p in _M365_DIRECTORY if p.get("email") == aid or p.get("name") == aid), None)
+                            assignee_names.append(person.get("name") if person else aid)
                         return {
                             "id": t.get("id"),
+                            "sourceId": t.get("id"),
+                            "planId": t.get("planId"),
                             "planName": t.get("planId"),
+                            "bucketId": t.get("bucketId"),
                             "bucketName": t.get("bucketId"),
                             "title": t.get("title", ""),
-                            "assignments": list(t.get("assignments", {}).keys()),
+                            "assignments": t.get("assignments", {}),
+                            "assigneeIds": assignee_ids,
+                            "assigneeNames": assignee_names,
                             "dueDateTime": t.get("dueDateTime"),
+                            "startDateTime": t.get("startDateTime"),
                             "percentComplete": t.get("percentComplete", 0),
                             "priority": "High" if t.get("priority") in (1, 3) else "Normal",
+                            "priorityCode": t.get("priority"),
+                            "etag": t.get("@odata.etag"),
                         }
                     elif resp.status_code == 404:
                         return None
+                    elif resp.status_code in (401, 403):
+                        raise AccessDeniedError(f"Access denied to task {task_id}: HTTP {resp.status_code}")
                     raise RuntimeError(f"Microsoft Graph get_planner_task HTTP {resp.status_code}: {resp.text[:200]}")
             except Exception as e:
+                if isinstance(e, M365ClientError):
+                    raise
                 raise RuntimeError(f"Live Microsoft Graph get_planner_task failed: {e}") from e
 
         if self._is_mock_enabled:
-            return next((t for t in _M365_PLANNER_TASKS if t["id"] == task_id), None)
+            t = next((t for t in _M365_PLANNER_TASKS if t["id"] == task_id), None)
+            if not t:
+                return None
+            assignee_ids = t.get("assigneeIds") or (list(t.get("assignments", {}).keys()) if isinstance(t.get("assignments"), dict) else t.get("assignments", []))
+            assignee_names = []
+            for aid in assignee_ids:
+                person = next((p for p in _M365_DIRECTORY if p.get("email") == aid or p.get("name") == aid), None)
+                assignee_names.append(person.get("name") if person else aid)
+            return {
+                "id": t.get("id"),
+                "sourceId": t.get("id"),
+                "planId": t.get("planId", "PLAN-EXEC-01"),
+                "planName": t.get("planName", "Executive Strategic Initiatives"),
+                "bucketId": t.get("bucketId", "BUCKET-01"),
+                "bucketName": t.get("bucketName", "Deliverables"),
+                "title": t.get("title", ""),
+                "assignments": t.get("assignments", {}),
+                "assigneeIds": assignee_ids,
+                "assigneeNames": assignee_names,
+                "startDateTime": t.get("startDateTime"),
+                "dueDateTime": t.get("dueDateTime"),
+                "percentComplete": t.get("percentComplete", 0),
+                "priority": t.get("priority", "Normal"),
+                "etag": t.get("@odata.etag", 'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAWCc="'),
+            }
 
-        raise RuntimeError("SOURCE_UNAVAILABLE: get_planner_task requires configured Microsoft 365 credentials.")
+        raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_planner_task requires configured Microsoft 365 credentials.")
 
     def find_overdue_tasks(self) -> List[Dict[str, Any]]:
         return self.list_planner_tasks(overdue_only=True)
@@ -889,27 +1662,77 @@ class Microsoft365Client:
 
     def get_daily_briefing(self) -> Dict[str, Any]:
         """Synthesize today's meetings, tasks, Teams messages, priority emails, and pending approvals."""
-        meetings = self.list_calendar_events()
-        tasks = self.list_planner_tasks()
-        overdue = [t for t in tasks if t.get("priority") == "Urgent" or "overdue" in t.get("title", "").lower() or t.get("id") == "TSK-003"]
-        teams_msgs = self.search_teams_messages(query="*")
-        priority_mails = self.search_mail(query="priority") or self.summarize_priority_mail()
-        approvals = self.list_pending_approvals()
+        now_iso = datetime.now(timezone.utc).isoformat()
+        degraded = []
+
+        try:
+            meetings = self.list_calendar_events()
+        except Exception as ex:
+            meetings = []
+            degraded.append(f"Calendar: {ex}")
+
+        try:
+            tasks = self.list_planner_tasks()
+        except Exception as ex:
+            tasks = []
+            degraded.append(f"Planner: {ex}")
+
+        overdue = [
+            t for t in tasks 
+            if t.get("dueDateTime") and t.get("dueDateTime") < now_iso and t.get("percentComplete", 0) < 100
+        ]
+
+        try:
+            teams_msgs = self.search_teams_messages(query="*")
+        except Exception as ex:
+            teams_msgs = []
+            degraded.append(f"Teams: {ex}")
+
+        try:
+            priority_mails = self.search_mail(query="priority") or self.summarize_priority_mail()
+        except Exception as ex:
+            priority_mails = []
+            degraded.append(f"Mail: {ex}")
+
+        try:
+            approvals = self.list_pending_approvals()
+        except Exception as ex:
+            approvals = []
+            degraded.append(f"Approvals: {ex}")
 
         now_str = datetime.now(timezone.utc).strftime("%A, %B %d, %Y")
         summary_text = (
             f"Executive Daily Briefing for {now_str}:\n"
             f"• 📅 Meetings Today: {len(meetings)} scheduled executive sessions\n"
-            f"• 📋 Tasks to Perform: {len(tasks)} active items ({len(overdue)} requiring urgent attention)\n"
-            f"• 💬 Teams Activity: {len(teams_msgs)} high-priority threads & mentions\n"
-            f"• ⏳ Pending Approvals: {len(approvals)} executive sign-offs awaiting action\n"
-            f"• ✉️ Priority Mails: {len(priority_mails)} actionable incoming updates."
+            f"• 📋 Tasks to Perform: {len(tasks)} active items ({len(overdue)} overdue items requiring attention)\n"
+            f"• 💬 Teams Activity: {len(teams_msgs)} message threads\n"
+            f"• ⏳ Pending Approvals: {len(approvals)} pending sign-offs\n"
+            f"• ✉️ Priority Mails: {len(priority_mails)} priority updates."
         )
+        if degraded:
+            summary_text += f"\n[Degraded sources: {', '.join(degraded)}]"
+
+        exec_name = "Executive"
+        if self.user_email and "@" in self.user_email:
+            exec_name = self.user_email.split("@")[0].replace(".", " ").title()
+
+        # Build dynamic focus areas based strictly on observed data
+        focus_areas = []
+        if overdue:
+            focus_areas.append(f"Remediate {len(overdue)} overdue Planner task(s) past scheduled deadline.")
+        if approvals:
+            focus_areas.append(f"Review and act upon {len(approvals)} pending approval request(s).")
+        if priority_mails:
+            focus_areas.append(f"Triage {len(priority_mails)} priority incoming email(s).")
+        if meetings:
+            focus_areas.append(f"Prepare for {len(meetings)} executive meeting(s) scheduled today.")
+        if not focus_areas:
+            focus_areas.append("No critical urgent operational items detected for today.")
 
         return {
             "date": now_str,
-            "executive_name": "Bala Murugan",
-            "executive_email": self.user_email or "balaadm@velora.ae",
+            "executive_name": exec_name,
+            "executive_email": self.user_email,
             "summary_text": summary_text,
             "meetings_today": meetings,
             "tasks_to_do": tasks,
@@ -917,12 +1740,8 @@ class Microsoft365Client:
             "teams_activity": teams_msgs,
             "priority_mails": priority_mails,
             "upcoming_approvals": approvals,
-            "key_focus_areas": [
-                "10:00 AM: Executive Workforce Alignment — Review 42.5% Emiratisation milestone",
-                "14:00 PM: Finance & Liquidity Review — Address AED 2.4M overdue receivables (>90d)",
-                "Action Required: Sign off on 3 pending approvals (AED 850K budget reallocation & HR requisitions)",
-                "Governance: Confirm Dataverse audit log migration status on cre2f_veloraagentauditlog",
-            ],
+            "key_focus_areas": focus_areas,
+            "degraded_sections": degraded,
         }
 
     def generate_daily_briefing_html(self, briefing: Dict[str, Any]) -> str:
@@ -1012,7 +1831,9 @@ class Microsoft365Client:
     def execute_send_daily_briefing_email(self, recipient_override: Optional[str] = None) -> Dict[str, Any]:
         briefing = self.get_daily_briefing()
         html_body = self.generate_daily_briefing_html(briefing)
-        to_recipient = recipient_override or self.user_email or "balaadm@velora.ae"
+        to_recipient = recipient_override or self.user_email
+        if not to_recipient:
+            raise ValueError("No recipient specified and connected user email is unavailable.")
         subject = f"Executive Daily Briefing | Velora Aviation Holding - {briefing.get('date', '')}"
         return self.execute_send_email(to=[to_recipient], cc=[], subject=subject, body=html_body, attachments=[])
 
@@ -1068,12 +1889,47 @@ class Microsoft365Client:
                     "conflictStart": m2.get("start"),
                 })
 
-        # Calculate available focus time blocks between 08:00 and 18:00
-        focus_blocks = [
-            {"block": "08:30 - 09:45 GST", "durationMinutes": 75, "suggestedUse": "Triage urgent inbox and overdue actions"},
-            {"block": "11:15 - 13:00 GST", "durationMinutes": 105, "suggestedUse": "Strategic focus: Work on high-priority Planner tasks"},
-            {"block": "15:15 - 17:00 GST", "durationMinutes": 105, "suggestedUse": "Review finance approvals and execute wrap-up"},
-        ]
+        # Derive available focus time blocks dynamically between 08:00 and 18:00
+        focus_blocks = []
+        work_start = 8 * 60   # 08:00
+        work_end = 18 * 60    # 18:00
+        occupied_intervals = []
+        for m in sorted_meetings:
+            start_str = m.get("start", "")
+            end_str = m.get("end", "")
+            try:
+                st_dt = datetime.fromisoformat(start_str.replace("Z", "+00:00"))
+                end_dt = datetime.fromisoformat(end_str.replace("Z", "+00:00"))
+                st_mins = st_dt.hour * 60 + st_dt.minute
+                end_mins = end_dt.hour * 60 + end_dt.minute
+                occupied_intervals.append((st_mins, end_mins))
+            except Exception:
+                continue
+
+        occupied_intervals.sort(key=lambda x: x[0])
+        curr = work_start
+        for st, en in occupied_intervals:
+            if st > curr and (st - curr) >= 30:
+                duration = st - curr
+                sh, sm = divmod(curr, 60)
+                eh, em = divmod(st, 60)
+                focus_blocks.append({
+                    "block": f"{sh:02d}:{sm:02d} - {eh:02d}:{em:02d}",
+                    "durationMinutes": duration,
+                    "suggestedUse": "Tentative proposed focus block: executive triage and task focus",
+                    "isProposal": True,
+                })
+            curr = max(curr, en)
+        if work_end > curr and (work_end - curr) >= 30:
+            duration = work_end - curr
+            sh, sm = divmod(curr, 60)
+            eh, em = divmod(work_end, 60)
+            focus_blocks.append({
+                "block": f"{sh:02d}:{sm:02d} - {eh:02d}:{em:02d}",
+                "durationMinutes": duration,
+                "suggestedUse": "Tentative proposed focus block: end-of-day review and wrap-up",
+                "isProposal": True,
+            })
 
         # Prioritize tasks: overdue first, then high priority
         overdue_tasks = [t for t in planner_tasks if "overdue" in t.get("title", "").lower() or t.get("priority") in ("Urgent", "High")]
@@ -1363,7 +2219,14 @@ class Microsoft365Client:
                     if sendmail_resp.status_code in (200, 202):
                         req_id = sendmail_resp.headers.get("request-id", f"GRAPH-REQ-{int(time.time() * 1000)}")
                         receipt = self._create_receipt("SendEmail", simulated=False, live_id=req_id, extra={"graphRequestId": req_id})
-                        return {"status": "SENT", "message_id": req_id, "web_link": f"https://outlook.office.com/mail/item/{req_id}", "providerReceipt": receipt, "simulated": False}
+                        return {
+                            "status": "ACCEPTED",
+                            "message_id": None,
+                            "web_link": None,
+                            "requestId": req_id,
+                            "providerReceipt": receipt,
+                            "simulated": False,
+                        }
                     raise RuntimeError(f"Microsoft Graph sendMail failed HTTP {sendmail_resp.status_code}: {sendmail_resp.text[:200]}")
             except Exception as e:
                 raise RuntimeError(f"Live Microsoft Graph email dispatch failed: {e}") from e
@@ -1374,7 +2237,7 @@ class Microsoft365Client:
                 "id": msg_id,
                 "threadId": f"TH-{int(time.time() * 1000)}",
                 "subject": subject,
-                "from": self.user_email or "balaadm@velora.ae",
+                "from": self.user_email or "connected-user@velora.ae",
                 "to": to,
                 "cc": cc or [],
                 "receivedDateTime": datetime.now(timezone.utc).isoformat(),
@@ -1383,11 +2246,13 @@ class Microsoft365Client:
                 "needsFollowUp": False,
             }
             _M365_MAILS.insert(0, new_mail)
-            receipt = self._create_receipt("SendEmail", simulated=True, live_id=msg_id)
+            req_id = f"MOCK-REQ-{int(time.time() * 1000)}"
+            receipt = self._create_receipt("SendEmail", simulated=True, live_id=req_id)
             return {
-                "status": "SENT",
-                "message_id": msg_id,
-                "web_link": f"https://outlook.office.com/mail/item/{msg_id}",
+                "status": "ACCEPTED",
+                "message_id": None,
+                "web_link": None,
+                "requestId": req_id,
                 "providerReceipt": receipt,
                 "simulated": True,
             }
@@ -1436,7 +2301,7 @@ class Microsoft365Client:
                 "start": start_time,
                 "end": end_time,
                 "timeZone": time_zone,
-                "organizer": self.user_email or "balaadm@velora.ae",
+                "organizer": self.user_email or "connected-user@velora.ae",
                 "attendees": attendees,
                 "location": location,
                 "isOnlineMeeting": True,
@@ -1534,7 +2399,7 @@ class Microsoft365Client:
                 "team": team_name or "Executive Leadership Team",
                 "channel": channel_name or "General",
                 "chatId": chat_id,
-                "sender": self.user_email or "balaadm@velora.ae",
+                "sender": self.user_email or "connected-user@velora.ae",
                 "createdDateTime": datetime.now(timezone.utc).isoformat(),
                 "content": content,
                 "isChannelPost": bool(team_name),

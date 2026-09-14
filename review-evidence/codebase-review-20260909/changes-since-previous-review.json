@@ -1,0 +1,570 @@
+[
+  {
+    "path": "build_velora_remaining_steps_slide.js",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "skills-lock.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "generate_evaluation_test_pack.py",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "velora_50_case_evaluation_results.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "build_velora_coverage_7_column_slide.js",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "create_teams_word_report.py",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "build_velora_followup_deck.js",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "run_50_case_evaluation_pack.py",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "run_25_case_test_pack_and_generate_docx.py",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/package-lock.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/package.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/tsconfig.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/action.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/PowerCAT.Package.Settings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/PackageImportExtension.cs",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/PowerCAT.PackageDeployer.Package.csproj",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/PowerCAT.PackageDeployer.Package.sln",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "deploy/generate_connectors_swagger.py",
+    "status": "CHANGED",
+    "previous_sha256": "1d067d8f35d62bbda5cc295a73f5b89097aeba96d0f4d09764652801004eca9d",
+    "current_sha256": "a8f8deb64a33c2090ec15e5ad1b8e305dcc54995b92ea5d46c49f8effef66b28"
+  },
+  {
+    "path": "AgentReviewTool/deploy-prod-AgentReviewTool.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/deploy-test-AgentReviewTool.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/deploy-validation-AgentReviewTool.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/deploy-prod-CopilotStudioAccelerator.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/deploy-validation-CopilotStudioAccelerator.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/deploy-test-CopilotStudioAccelerator.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/deploy-azure-containerapps.sh",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/build_all_images.sh",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/feature_request.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/site-feedback.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/facilitator-connector-swagger.json",
+    "status": "CHANGED",
+    "previous_sha256": "bd199a7b8cb026d586b8e890d578d38bbbf456a7bb639f5181527bf16784e89f",
+    "current_sha256": "41e308927cc1c2826a5b820acd03e468789127fce96e2e51fd02c11152abb89f"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4-connector-swagger.json",
+    "status": "CHANGED",
+    "previous_sha256": "0cd48ae7edf432952a82d204ecdc37720b9b8ed9b7c68a28ff62afa8dbcb690e",
+    "current_sha256": "88c8f3e9eddfac1ec7679d52a7ba502b370cd31261747f9516ac54370e419b52"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/deploy/build_and_push_image.sh",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/ask-sac/test/test_app.py",
+    "status": "CHANGED",
+    "previous_sha256": "b19552080a4e026c486003c83de97086fc44bc93b9b3031a7b13f5ed58cf3406",
+    "current_sha256": "2fce567bb8ef1679ecc0b15d1d10e429630745bdd751dec2b27aeecac8bedd44"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/settings.py",
+    "status": "CHANGED",
+    "previous_sha256": "d70e5bb1248ec4397180dab400d45363c79fb12bfbe5e4935934deffaef5640d",
+    "current_sha256": "8bec9c9dbe92d31279179124f7effde103efbbf9df9075f3578d09830e31181d"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/deploy/build_image.sh",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/deploy/LocalDeploy.ps1",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/deploy/deploy.sh",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/web/widget.html",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "status": "CHANGED",
+    "previous_sha256": "d5a00a03e182e82d2d210b55b241f03a106a146df141bcc706e10242de39b356",
+    "current_sha256": "8353cb333ea13a556bdebaca509b321a4bd7a5fee1ec142c10d0254393a57cc7"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Prod/customDeploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Prod/deploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Test/customDeploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Test/deploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Validation/customDeploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Validation/deploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotstudioAcceleratorResources/Pipelines/export-solution-to-github-Power-CAT-Copilot-Studio-Kit.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "CopilotstudioAcceleratorResources/Release/Pipelines/CopilotstudioAccelerator/create-github-release.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Customizations.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Solution.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Workflows/AgentReviewerFlow-3B131928-8094-F011-B41C-6045BDEF4136.json.data.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Workflows/AgentReviewerFlow-3B131928-8094-F011-B41C-6045BDEF4136.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Assets/botcomponent_aipluginoperationset.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Assets/botcomponent_workflowset.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Assets/botcomponent_connectionreferenceset.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/RibbonDiff.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/Entity.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{62d3576d-aa81-43f5-8fd4-f7820efe6387}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{716fb9a7-68ac-43bd-a884-095f732ba083}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{d14f3b2c-7f2c-4352-ace4-c1f9115df244}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{33cd9dfb-5ce1-4a0d-ac42-a1d1af4d3659}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{17054174-40ab-f011-bbd3-7c1e52671ad0}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{cd5a44bc-c446-4e5d-b8b8-baedbd43732e}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{478df625-e869-4445-9e62-496f8f55189e}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/card/{d8ab8a0f-9265-443a-a867-05585d05f9ef}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/card/{d8ab8a0f-9265-443a-a867-05585d05f9ef}_managed.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/quick/{f98a6b53-2056-42e5-a721-a71c067fba9e}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/quick/{f98a6b53-2056-42e5-a721-a71c067fba9e}_managed.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/main/{3de44aa2-d5cd-40e7-bc75-3184eee70d08}.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/main/{3de44aa2-d5cd-40e7-bc75-3184eee70d08}_managed.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.ThankYou/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.StageB-CopilotPatternEvaluation/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.StartOver/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.StageA-FetchCopilotComponentDetails/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Synonyms/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.OnError/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.ResetConversation/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Goodbye/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.ConversationStart/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.AgentReview/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Fallback/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Greeting/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Search/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.EndofConversation/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Signin/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Escalate/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.AgentReviewer/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.gpt.default/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.StageC-AgentReviewReportGeneration/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.MultipleTopicsMatched/botcomponent.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/Team.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/Owner.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/SystemUser.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/BusinessUnit.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/FileAttachment.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptfetchcopilotcomponentdetails78f117f0481a4325b6c1aa3ac2487121/customapi.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapi.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptcopilotpatternevaluationpromptb141656b8546437a968e94cce6c8be1c/customapi.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptcopilotpatternevaluationpromptb141656b8546437a968e94cce6c8be1c/customapirequestparameters/Copilot_20Details/customapirequestparameter.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptcopilotpatternevaluationpromptb141656b8546437a968e94cce6c8be1c/customapiresponseproperties/json/customapiresponseproperty.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapirequestparameters/Review_20Results/customapirequestparameter.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapirequestparameters/Extraction_20Details/customapirequestparameter.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapiresponseproperties/json/customapiresponseproperty.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptfetchcopilotcomponentdetails78f117f0481a4325b6c1aa3ac2487121/customapirequestparameters/BotId/customapirequestparameter.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptfetchcopilotcomponentdetails78f117f0481a4325b6c1aa3ac2487121/customapiresponseproperties/json/customapiresponseproperty.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/bots/cr306_agentReviewer/bot.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/bots/cr306_agentReviewer/configuration.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/aiplugins/msdynaip_StageBCopilotPatternEvaluationPrompt_1760861060595/aiplugin.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/aiplugins/msdynaip_StageAFetchCopilotComponentDetails_1760803431462/aiplugin.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/aiplugins/msdynaip_StageCAgentReviewReportGeneration_1760882637666/aiplugin.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/config/Prod/customDeploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/config/Prod/deploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/config/Test/customDeploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/config/Test/deploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/config/Validation/customDeploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "AgentReviewTool/config/Validation/deploymentSettings.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/AppSourceAssets/[Content_Types].xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/AppSourceAssets/Input.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/AppSourceAssets/TermsOfUse.html",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/Resources/ConfigSettings.Designer.cs",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/Utils/OrganizationSettingsUpdater.cs",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/Utils/JsonUtility.cs",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/Models/FlowConfigurationItem.cs",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/PkgAssets/ImportConfig.xml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "PowerCAT.PackageDeployer.Package/PkgAssets/manifest.ppkg.json",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/test/scoreCalculator.test.js",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/evaluate.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/index.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/analysis/patternUtils.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/analysis/StageAService.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/models/types.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/parser/csZipParser.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/parser/yamlUtils.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/evaluation/predictV2Client.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/evaluation/scoreCalculator.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/evaluation/constants.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/evaluation/evaluationOrchestrator.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/src/report/pdfReport.ts",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  },
+  {
+    "path": "agent-review-pipeline/.github/workflows/agent-review.yml",
+    "status": "NOT_IN_PRIOR_INVENTORY; not necessarily newly added"
+  }
+]

@@ -1,0 +1,31 @@
+mcs.metadata:
+  componentName: Joiners Analytics
+kind: AdaptiveDialog
+modelDescription: "Use this topic for aggregate SuccessFactors joiner questions: how many joined last week; new joiners this month; departments that hired most last quarter; and this-month versus last-month comparisons. Interpret periods in Asia/Dubai, count distinct employees using real hire/start dates, aggregate by department description, and never expose employee-level data or audit details."
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    triggerQueries:
+      - joiners analytics
+      - show joiner stats
+      - new employee analytics
+      - analyze recent hires
+      - joiner trends report
+      - how many people joined recently
+      - employee onboarding statistics
+      - view joiners data
+      - recent joiners analysis
+      - track new hires
+
+  actions:
+    - kind: SendActivity
+      id: SendActivity_dQHIl5
+      activity: "Welcome to the SuccessFactors analytics topic. Please select your question:"
+
+    - kind: SendActivity
+      id: SendActivity_HbiIZd
+      activity: All analytics are based on real hire or employment start dates, aggregated by department description, and do not include employee names or audit details. Dates are interpreted in Asia/Dubai time zone.
+
+inputType: {}
+outputType: {}

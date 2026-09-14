@@ -1,0 +1,120 @@
+mcs.metadata:
+  componentName: Velora SuccessFactors Workforce Cards - Get a verified workforce metric as an Adaptive Card
+kind: TaskDialog
+response:
+  activity:
+    attachments:
+      - kind: AdaptiveCardTemplate
+        cardContent: |-
+          ={
+            type: "AdaptiveCard",
+            '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+            version: "1.5",
+            fallbackText: Topic.Output.fallbackText,
+            body: [
+              {
+                type: "TextBlock",
+                text: Topic.Output.cardTitle,
+                weight: "Bolder",
+                size: "Large",
+                wrap: true,
+                style: "heading"
+              },
+              {
+                type: "TextBlock",
+                text: Topic.Output.cardSubtitle,
+                isSubtle: true,
+                wrap: true,
+                spacing: "Small"
+              },
+              {
+                type: "TextBlock",
+                text: Topic.Output.cardStatus,
+                weight: "Bolder",
+                color: "Accent",
+                wrap: true,
+                spacing: "Medium"
+              },
+              {
+                type: "FactSet",
+                separator: true,
+                facts: [
+                  { title: Topic.Output.fact1Title, value: Topic.Output.fact1Value },
+                  { title: Topic.Output.fact2Title, value: Topic.Output.fact2Value },
+                  { title: Topic.Output.fact3Title, value: Topic.Output.fact3Value },
+                  { title: Topic.Output.fact4Title, value: Topic.Output.fact4Value },
+                  { title: Topic.Output.fact5Title, value: Topic.Output.fact5Value },
+                  { title: Topic.Output.fact6Title, value: Topic.Output.fact6Value }
+                ]
+              },
+              {
+                type: "TextBlock",
+                text: Topic.Output.cardNote,
+                isSubtle: true,
+                size: "Small",
+                wrap: true,
+                separator: true
+              }
+            ]
+          }
+
+  mode: Strict
+
+modelDisplayName: Get a verified workforce metric as an Adaptive Card
+modelDescription: "PRIMARY response tool for aggregate SuccessFactors workforce questions: headcount, Emiratisation (UAE nationals divided by employees with known nationality), joiners, leavers, attrition, joiner-leaver trends, and workforce dashboards. Use this connector for normal aggregate requests so Copilot Studio and Teams receive a native Adaptive Card. It applies the service's governed default period. For an explicitly dated or filtered analysis, use the SuccessFactors MCP. If a channel cannot render the card, return fallbackText exactly; never expose card JSON."
+outputs:
+  - propertyName: adaptiveCard
+
+  - propertyName: adaptiveCardJson
+
+  - propertyName: cardNote
+
+  - propertyName: cardStatus
+
+  - propertyName: cardSubtitle
+
+  - propertyName: cardTitle
+
+  - propertyName: fact1Title
+
+  - propertyName: fact1Value
+
+  - propertyName: fact2Title
+
+  - propertyName: fact2Value
+
+  - propertyName: fact3Title
+
+  - propertyName: fact3Value
+
+  - propertyName: fact4Title
+
+  - propertyName: fact4Value
+
+  - propertyName: fact5Title
+
+  - propertyName: fact5Value
+
+  - propertyName: fact6Title
+
+  - propertyName: fact6Value
+
+  - propertyName: fallbackPresentation
+
+  - propertyName: fallbackText
+
+  - propertyName: metric
+
+  - propertyName: presentationPreference
+
+  - propertyName: success
+
+action:
+  kind: InvokeConnectorTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_velora-20successfactors-20workforce-20cards-5fa-6a35ebb122500440.2757f259277d471d99859750f0d2906a
+  connectionProperties:
+    mode: Maker
+
+  operationId: GetWorkforceAdaptiveCard
+
+outputMode: All

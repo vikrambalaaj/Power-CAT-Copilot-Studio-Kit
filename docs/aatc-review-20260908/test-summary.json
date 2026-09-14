@@ -1,0 +1,61 @@
+{
+  "scope": "OFFLINE TESTS; NOT LIVE ACCEPTANCE",
+  "suites": [
+    {
+      "suite": "SuccessFactors",
+      "passed": 96,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "ask-successfactors-final-tests.xml"
+    },
+    {
+      "suite": "Productivity",
+      "passed": 91,
+      "failed": 1,
+      "skipped": 0,
+      "evidence": "ask-productivity-final-tests.xml"
+    },
+    {
+      "suite": "S4HANA",
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "ask-s4hana-tests.xml"
+    },
+    {
+      "suite": "Facilitator",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "ask-facilitator-tests.xml"
+    },
+    {
+      "suite": "SAC",
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0,
+      "evidence": "ask-sac-tests.xml"
+    },
+    {
+      "suite": "Evidence integrity",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "evidence-integrity-tests.xml"
+    },
+    {
+      "suite": "Adaptive Cards",
+      "passed": 6,
+      "failed": 0,
+      "evidence": "cards-tests.log"
+    },
+    {
+      "suite": "Agent review pipeline",
+      "passed": 3,
+      "failed": 0,
+      "evidence": "pipeline-tests.log"
+    }
+  ],
+  "passed": 255,
+  "failed": 4
+}

@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: Calendar MCP - Work IQ Calendar (Preview)
+kind: TaskDialog
+modelDisplayName: Work IQ Calendar (Preview)
+modelDescription: "Work IQ MCP server for Microsoft Outlook Calendar operations. This feature is in preview and is part of the Work IQ tools, providing shared work intelligence and actions for agents. Availability and capabilities are subject to change. Learn more: https://aka.ms/AboutWorkIQ"
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_a365outlookcalendarmcp.shared-a365outlookca-edd16ea4-5a8b-4288-b57a-5cca97c9c049
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: mcp_CalendarTools

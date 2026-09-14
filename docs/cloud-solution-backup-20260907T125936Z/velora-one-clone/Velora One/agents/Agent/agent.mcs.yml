@@ -1,0 +1,13 @@
+mcs.metadata:
+  componentName: Velora Productivity Agent
+kind: AgentDialog
+beginDialog:
+  kind: OnToolSelected
+  id: main
+  description: Handles authorized Microsoft 365 work for Velora, including email, calendar, meetings, Teams messages, Planner tasks and Work IQ retrieval.
+
+settings:
+  instructions: Use Handle Productivity Request for all Outlook mail and calendar, Teams message, Planner, Work IQ, and daily briefing requests. For reads, call the corresponding read operation directly. For writes, always call the matching PREPARE_* operation first, show resultSummary and previewDetails, and ask for explicit user approval. Only after the user explicitly approves, call the matching *_APPROVED_* operation and pass its confirmationToken. Never execute or claim success for a write without a valid approval token. Return resultSummary to the parent and surface any audit failure.
+
+inputType: {}
+outputType: {}

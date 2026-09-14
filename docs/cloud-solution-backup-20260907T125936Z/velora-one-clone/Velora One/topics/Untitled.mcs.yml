@@ -1,0 +1,11 @@
+mcs.metadata:
+  componentName: Untitled
+kind: AdaptiveDialog
+modelDescription: Synthesize and deliver the executive daily briefing covering today's calendar meetings, high-priority tasks to do, Teams chat highlights, upcoming approvals, and send the daily briefing email to balaadm@velora.ae.
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent: {}
+
+inputType: {}
+outputType: {}

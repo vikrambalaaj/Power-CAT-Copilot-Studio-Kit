@@ -1,0 +1,22 @@
+[
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "before_sha256": "9d5386e731f1c45902a8009ea40851fb0b9b58f9f8f038fd98766d0505226caa",
+    "after_sha256": "d55389e7ea4052ca5dcba3645887dc20e97a286b4a5c7665c495d074d84d9e7f"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+    "before_sha256": "996757ae49125eefcbe4300d4681a36079f4d33c08600c8de8f1a4126a1c8b4e",
+    "after_sha256": "2af163b49e9e49ed39a8536e0b0ce3f18bdcc813f695f04216bfa56e29c32d59"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "before_sha256": "5cfb16559d19bee898ce636964933ca830b5f2b2ddcb7614be9f96386960dd25",
+    "after_sha256": "f5251f38c45928e9e61387856ed6d340a4a76eb52b68bd87791a090906567af2"
+  },
+  {
+    "path": "deploy/test_all_live_systems_and_audit.py",
+    "before_sha256": "0110edcd89bbc03b249e603d8214e841d94b90ef5db90b3fc78af26bf54ec30c",
+    "after_sha256": "f92d43daa44b5654b586090e38109aa6c8bc99b1603268c87333cc598bddb169"
+  }
+]

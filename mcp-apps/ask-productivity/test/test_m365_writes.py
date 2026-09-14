@@ -54,8 +54,8 @@ class TestM365Writes(unittest.IsolatedAsyncioTestCase):
             userEmail="balaadm@velora.ae",
         )
         self.assertEqual(res["status"], "SUCCESS")
-        self.assertTrue(res["externalObjectId"].startswith("MS-MSG-"))
-        self.assertIn("outlook.office.com", res["evidenceLink"])
+        self.assertTrue(res["externalObjectId"].startswith("MOCK-REQ-") or "REQ-" in res["externalObjectId"])
+        self.assertEqual(res["evidenceLink"], "")
 
     async def test_email_reply_two_step_lifecycle(self):
         prep = await prepare_email_reply(

@@ -1,0 +1,9 @@
+id,priority,recommendation,acceptance
+N01,P1,Credential-free artifacts and image contexts,Expanded archive and image secret scan; reproducible build
+N02,P1,Real email outcomes and validated approval,Provider failure yields no success receipt; invalid approval yields no provider call
+N03,P1,Durable audit before writes,Outage/retry/restart/concurrency cannot bypass commit
+N04,P1,Runtime identity and shared approval lifecycle,Negative identity/request/replay tests across REST MCP and workers
+N05,P1,Complete release evaluation,Every required stage succeeds before release pass
+N06,P1,Unified federation and connector contracts,Deployed authenticated success and denied invalid calls; audit readback
+N07,P1,Patched dependencies and images,Updated locks; compatibility tests; image SBOM and current scan
+N08,P1,Private revision-bound evidence,Public allowlist; private evidence; original control IDs mapped

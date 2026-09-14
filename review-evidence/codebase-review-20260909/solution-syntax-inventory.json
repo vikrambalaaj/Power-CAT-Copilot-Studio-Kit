@@ -1,0 +1,407 @@
+[
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Customizations.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Solution.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Workflows/AgentReviewerFlow-3B131928-8094-F011-B41C-6045BDEF4136.json.data.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Workflows/AgentReviewerFlow-3B131928-8094-F011-B41C-6045BDEF4136.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Assets/botcomponent_aipluginoperationset.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Assets/botcomponent_workflowset.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Assets/botcomponent_connectionreferenceset.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/RibbonDiff.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/Entity.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{62d3576d-aa81-43f5-8fd4-f7820efe6387}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{716fb9a7-68ac-43bd-a884-095f732ba083}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{d14f3b2c-7f2c-4352-ace4-c1f9115df244}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{33cd9dfb-5ce1-4a0d-ac42-a1d1af4d3659}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{17054174-40ab-f011-bbd3-7c1e52671ad0}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{cd5a44bc-c446-4e5d-b8b8-baedbd43732e}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/SavedQueries/{478df625-e869-4445-9e62-496f8f55189e}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/card/{d8ab8a0f-9265-443a-a867-05585d05f9ef}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/card/{d8ab8a0f-9265-443a-a867-05585d05f9ef}_managed.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/quick/{f98a6b53-2056-42e5-a721-a71c067fba9e}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/quick/{f98a6b53-2056-42e5-a721-a71c067fba9e}_managed.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/main/{3de44aa2-d5cd-40e7-bc75-3184eee70d08}.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Entities/cat_AgentReviewDetail/FormXml/main/{3de44aa2-d5cd-40e7-bc75-3184eee70d08}_managed.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.ThankYou/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.StageB-CopilotPatternEvaluation/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.StartOver/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.StageA-FetchCopilotComponentDetails/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Synonyms/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.OnError/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.ResetConversation/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Goodbye/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.ConversationStart/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.AgentReview/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Fallback/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Greeting/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Search/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.EndofConversation/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Signin/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.Escalate/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.AgentReviewer/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.gpt.default/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.action.StageC-AgentReviewReportGeneration/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/botcomponents/cr306_agentReviewer.topic.MultipleTopicsMatched/botcomponent.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/Team.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/Owner.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/SystemUser.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/BusinessUnit.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/Other/Relationships/FileAttachment.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptfetchcopilotcomponentdetails78f117f0481a4325b6c1aa3ac2487121/customapi.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapi.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptcopilotpatternevaluationpromptb141656b8546437a968e94cce6c8be1c/customapi.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptcopilotpatternevaluationpromptb141656b8546437a968e94cce6c8be1c/customapirequestparameters/Copilot_20Details/customapirequestparameter.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptcopilotpatternevaluationpromptb141656b8546437a968e94cce6c8be1c/customapiresponseproperties/json/customapiresponseproperty.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapirequestparameters/Review_20Results/customapirequestparameter.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapirequestparameters/Extraction_20Details/customapirequestparameter.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptagentreviewreportgeneration6a468cc0f62843b393c4d003f1536678/customapiresponseproperties/json/customapiresponseproperty.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptfetchcopilotcomponentdetails78f117f0481a4325b6c1aa3ac2487121/customapirequestparameters/BotId/customapirequestparameter.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/customapis/msdyn_aibdptfetchcopilotcomponentdetails78f117f0481a4325b6c1aa3ac2487121/customapiresponseproperties/json/customapiresponseproperty.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/bots/cr306_agentReviewer/bot.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/bots/cr306_agentReviewer/configuration.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/aiplugins/msdynaip_StageBCopilotPatternEvaluationPrompt_1760861060595/aiplugin.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/aiplugins/msdynaip_StageAFetchCopilotComponentDetails_1760803431462/aiplugin.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/SolutionPackage/src/aiplugins/msdynaip_StageCAgentReviewReportGeneration_1760882637666/aiplugin.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/config/Prod/customDeploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/config/Prod/deploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/config/Test/customDeploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/config/Test/deploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/config/Validation/customDeploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "AgentReviewTool/config/Validation/deploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/SolutionPackage/obj/project.assets.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/SolutionPackage/obj/CopilotStudioAccelerator.cdsproj.nuget.dgspec.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Prod/customDeploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Prod/deploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Test/customDeploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Test/deploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Validation/customDeploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "CopilotStudioAccelerator/config/Validation/deploymentSettings.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "deploy/solution/[Content_Types].xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "deploy/solution/audit_cloud_flows.json",
+    "format": "json",
+    "status": "PARSED"
+  },
+  {
+    "path": "deploy/solution/customizations.xml",
+    "format": "xml",
+    "status": "PARSED"
+  },
+  {
+    "path": "deploy/solution/solution.xml",
+    "format": "xml",
+    "status": "PARSED"
+  }
+]

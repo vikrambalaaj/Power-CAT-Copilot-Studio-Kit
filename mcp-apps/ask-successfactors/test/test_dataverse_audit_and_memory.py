@@ -1,7 +1,10 @@
-"""Unit and integration tests for Extended Dataverse Audit Table & 30-Day Memory Service."""
+import os
+import tempfile
+from pathlib import Path
 import asyncio
 import unittest
 from datetime import datetime, timezone, timedelta
+from unittest.mock import patch
 
 from successfactors_mcp.dataverse_audit import (
     DataverseAuditRecord,
@@ -19,6 +22,11 @@ from successfactors_mcp.memory_service import MemoryService
 
 class DataverseAuditAndMemoryTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self._orig_spool = os.environ.get("DATAVERSE_AUDIT_SPOOL_PATH")
+        os.environ["DATAVERSE_AUDIT_SPOOL_PATH"] = str(Path(self._temp_dir.name) / "sf_audit_spool.jsonl")
+        self._orig_allow_buffered = os.environ.get("ALLOW_BUFFERED_AUDIT_WRITES")
+        os.environ["ALLOW_BUFFERED_AUDIT_WRITES"] = "1"
         self.dv_client = DataverseClient()
         self.dv_client.clear_all_for_testing()
         self.bg_logger = BackgroundLogger(dataverse_client=self.dv_client)
@@ -29,6 +37,15 @@ class DataverseAuditAndMemoryTests(unittest.IsolatedAsyncioTestCase):
 
     async def asyncTearDown(self):
         await self.bg_logger.stop()
+        if self._orig_spool is not None:
+            os.environ["DATAVERSE_AUDIT_SPOOL_PATH"] = self._orig_spool
+        else:
+            os.environ.pop("DATAVERSE_AUDIT_SPOOL_PATH", None)
+        if self._orig_allow_buffered is not None:
+            os.environ["ALLOW_BUFFERED_AUDIT_WRITES"] = self._orig_allow_buffered
+        else:
+            os.environ.pop("ALLOW_BUFFERED_AUDIT_WRITES", None)
+        self._temp_dir.cleanup()
 
     async def test_audit_record_discriminator_and_contract_fields(self):
         record = DataverseAuditRecord(
@@ -302,6 +319,69 @@ class DataverseAuditAndMemoryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rec.memory_summary, "CFO queried Q3 budget execution.")
         self.assertEqual(rec.memory_topics, ["Finance", "Budget"])
 
+    async def test_federated_dataverse_client_assertion_and_is_live(self):
+        """Verify that DataverseClient in SuccessFactors uses client_id with federated token assertion (RFC 7523)."""
+        captured_requests = []
+
+        class MockResponse:
+            def __init__(self, status_code=200, json_data=None):
+                self.status_code = status_code
+                self._json_data = json_data or {"access_token": "fed_access_token_sf_999", "expires_in": 3600}
+                self.content = b'{"access_token": "fed_access_token_sf_999"}'
+
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return self._json_data
+
+        class MockAsyncClient:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *args):
+                pass
+
+            async def post(self, url, data=None, **kwargs):
+                captured_requests.append({"url": url, "data": data})
+                return MockResponse()
+
+        with patch.dict(
+            os.environ,
+            {
+                "AZURE_CLIENT_SECRET": "",
+                "DATAVERSE_CLIENT_SECRET": "",
+                "MOCK_DATAVERSE": "0",
+            },
+        ):
+            client = DataverseClient(
+                base_url="https://org4b098979.crm15.dynamics.com",
+                tenant_id="9ce80a2a-2703-4502-b26e-d911a3f83418",
+                client_id="c659609b-76db-49b1-8470-3205a6c35ecb",
+                federated_token="sample-jwt-federated-assertion-sf",
+                auth_type="FederatedCredential",
+            )
+
+            # Confirm is_live is True even without client_secret
+            self.assertTrue(client.is_live)
+            self.assertFalse(client.client_secret)
+
+            with patch("httpx.AsyncClient", MockAsyncClient):
+                token = await client._get_access_token()
+                self.assertEqual(token, "fed_access_token_sf_999")
+
+        self.assertEqual(len(captured_requests), 1)
+        req = captured_requests[0]
+        self.assertIn("9ce80a2a-2703-4502-b26e-d911a3f83418", req["url"])
+        self.assertEqual(req["data"]["client_id"], "c659609b-76db-49b1-8470-3205a6c35ecb")
+        self.assertEqual(req["data"]["client_assertion_type"], "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
+        self.assertEqual(req["data"]["client_assertion"], "sample-jwt-federated-assertion-sf")
+        self.assertEqual(req["data"]["grant_type"], "client_credentials")
+
 
 if __name__ == "__main__":
     unittest.main()
+

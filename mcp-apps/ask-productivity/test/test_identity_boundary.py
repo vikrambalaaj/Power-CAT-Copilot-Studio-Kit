@@ -215,6 +215,64 @@ class TestIdentityBoundary(unittest.TestCase):
         self.assertEqual(identity.display_email, "balaadm@velora.ae")
         self.assertEqual(identity.identity_tuple, ("7d167021-f5e9-4331-9b75-d44d55a1ce9b", "user-bala-123"))
 
+    def test_handoff_rejects_missing_auth(self):
+        from starlette.testclient import TestClient
+        from productivity_mcp.server import app
+        client = TestClient(app)
+        res = client.post("/handoff", json={
+            "task": "Search priority mail",
+            "operation": "SEARCH_MAIL",
+            "rootCorrelationId": "corr-1",
+            "conversationId": "conv-1",
+            "turnId": "turn-1",
+            "parameters": {"query": "test"},
+            "userObjectId": "user-123",
+            "userEmail": "user@velora.ae",
+        })
+        self.assertEqual(res.status_code, 401)
+
+    def test_handoff_rejects_unverified_principal_headers(self):
+        from starlette.testclient import TestClient
+        from productivity_mcp.server import app
+        client = TestClient(app)
+        res = client.post("/handoff", json={
+            "task": "Search priority mail",
+            "operation": "SEARCH_MAIL",
+            "rootCorrelationId": "corr-1",
+            "conversationId": "conv-1",
+            "turnId": "turn-1",
+            "parameters": {"query": "test"},
+            "userObjectId": "user-123",
+            "userEmail": "user@velora.ae",
+        }, headers={"x-ms-client-principal": "fake-header"})
+        self.assertEqual(res.status_code, 401)
+
+    def test_handoff_rejects_body_identity_conflict(self):
+        from starlette.testclient import TestClient
+        from productivity_mcp.server import app
+        client = TestClient(app)
+        now = int(time.time())
+        token = make_test_jwt({
+            "tid": "7d167021-f5e9-4331-9b75-d44d55a1ce9b",
+            "oid": "user-bala-123",
+            "aud": "https://api.velora.ae",
+            "preferred_username": "balaadm@velora.ae",
+            "exp": now + 3600,
+            "sub": "user-bala-123",
+        })
+        # Token says user-bala-123, body requests attacker-666
+        res = client.post("/handoff", json={
+            "task": "Search priority mail",
+            "operation": "SEARCH_MAIL",
+            "rootCorrelationId": "corr-1",
+            "conversationId": "conv-1",
+            "turnId": "turn-1",
+            "parameters": {"query": "test"},
+            "userObjectId": "attacker-666",
+            "userEmail": "balaadm@velora.ae",
+        }, headers={"Authorization": f"Bearer {token}"})
+        self.assertEqual(res.status_code, 403)
+
 
 if __name__ == "__main__":
     unittest.main()

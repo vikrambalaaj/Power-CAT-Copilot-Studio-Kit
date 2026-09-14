@@ -1,0 +1,107 @@
+entity,provided_field,observed_type,authority_and_limit
+ARageingData,CompanyCode,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,FiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,AccountingDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,LedgerGLLineItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,AccountingDocumentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,Customer,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,CustomerName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,GLAccount,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,GLAccountName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,ProfitCenter,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,Segment,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,CompanyCodeCurrency,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,NetDueDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,PostingDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,DocumentDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,OpenAmount,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+ARageingData,DaysOverdue,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,CompanyCode,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,FiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,AccountingDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,LedgerGLLineItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,AccountingDocumentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,Supplier,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,SupplierName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,GLAccount,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,GLAccountName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,ProfitCenter,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,Segment,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,DisplayCurrency,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,NetDueDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,PostingDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,DocumentDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,OpenAmount,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+APageingData,DaysOverdue,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetChangeDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,FinMgmtAreaFiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,FinancialManagementArea,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetCategory,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetChangeDocumentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetDocumentYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetEntryDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetEntryDocumentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetPeriod,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,FundsCenter,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,FundsCenterDescription,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,CommitmentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,CommitmentItemDescription,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,TransactionCurrency,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetAmountInTransactionCrcy,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetingProcess,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetingProcessText,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetMovementType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetMovementTypeText,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetEntryDocumentType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,DocumentTypeText,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,CreationDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetEntryDocumentDate,date string,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetTransfer,BudgetEntryDocItemDescription,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FundsCenter,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CommitmentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FinMgmtAreaFiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FinMgmtAreaPeriod,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FundsCenterDescription,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CommitmentItemDescription,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FinancialManagementArea,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FinancialManagementAreaCrcy,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FundsMgmtValueType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetVersion,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetValueType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,InternalBudgetingProcess,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetMovementTypeText,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetWorkFlowStatus,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BdgtCashEffectivityFiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetEntryDocumentType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,DocumentTypeText,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FundsMgmtAmountType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,FundsManagementStatisticalType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BusinessTransactionType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ReferenceDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ReferenceDocumentFiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ReferenceDocumentItem,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ReferenceDocumentType,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,GLAccount,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,GLAccountName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CompanyCode,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CompanyCodeName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ProfitCenter,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ProfitCenterLongName,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,Segment,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,AccountingDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,PurchaseOrder,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,PurchaseRequisition,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,SalesOrder,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetEntryDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ControllingDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,EmployeeExpenseReport,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ConcurTravelRequest,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CTEExpenseReportObligation,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ConcurTravelExpenseDocument,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CommitmentItemFiscalYear,string — preserve blank/leading zeros,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,BudgetAmountInFMACrcy,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CmtmtOpenItemAmountInFMACrcy,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,ActualAmountInFMACrcy,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification
+BudgetConsumData,CtrlgItemAmountInFMACrcy,decimal — preserve precision and sign,User-supplied example; actual EDM type/nullability/key require $metadata verification

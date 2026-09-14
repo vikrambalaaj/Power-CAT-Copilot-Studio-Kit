@@ -1,0 +1,29 @@
+capability,current_agent,tool_or_operation,connection_reference,auth_mode,read_write_scope,destination,dependent_topic,validation_case,route_status
+Email (Read),Velora Productivity Agent,Work IQ Mail (Preview) / getEmails,shared_workiqmail,User Delegated OAuth,Read,Velora One (Direct),Mail MCP - Work IQ Mail (Preview),T04,Migrate to Direct Tool
+Email (Read),Velora One,Work IQ Mail (Preview) / getEmails,shared_workiqmail,User Delegated OAuth,Read,Velora One (Direct),Mail MCP - Work IQ Mail (Preview),T04,Retain Direct Tool
+Email (Draft),Velora Productivity Agent,Work IQ Mail (Preview) / createDraft,shared_workiqmail,User Delegated OAuth,Write (Draft),Velora One (Direct),Mail MCP - Work IQ Mail (Preview),T09,Migrate to Direct Tool
+Email (Send),Velora Productivity Agent,Parent-to-child router -> Productivity API / PREPARE_SEND_EMAIL,shared_veloraproductivityapi,Entra User Delegated OBO,Write (Requires Approval),Velora Productivity API via Velora One,None (Governed Action),T09,Direct Governed API (No Child Agent)
+Calendar (Read Schedule),Velora One,Work IQ Calendar (Preview) / getEvents,shared_workiqcalendar,User Delegated OAuth,Read,Velora One (Direct),Calendar MCP - Work IQ Calendar (Preview),T01 T03 T05 T06,Retain Direct Tool
+Calendar (Read Schedule),Velora Productivity Agent,Work IQ Calendar (Preview) / getEvents,shared_workiqcalendar,User Delegated OAuth,Read,Velora One (Direct),Calendar MCP - Work IQ Calendar (Preview),T01 T03 T05 T06,Deprecate Child Route
+Calendar (Schedule Event),Velora Productivity Agent,Parent-to-child router -> Productivity API / PREPARE_CREATE_MEETING,shared_veloraproductivityapi,Entra User Delegated OBO,Write (Requires Approval),Velora Productivity API via Velora One,None (Governed Action),T11,Direct Governed API (No Child Agent)
+Teams (Mentions & Messages),Velora Productivity Agent,Work IQ Teams (Preview) / getMentions,shared_workiqteams,User Delegated OAuth,Read,Velora One (Direct),None,T08,Migrate to Direct Tool
+Tasks (List Tasks),Velora Productivity Agent,Planner / List my tasks,shared_planner,User Delegated OAuth,Read,Velora One (Direct),None,T01 T03 T07 T13,Migrate to Direct Tool
+Tasks (Update Task),Velora Productivity Agent,Planner / Update a task (V2),shared_planner,User Delegated OAuth,Write,Velora One (Direct),None,T13,Migrate to Direct Tool
+Tasks (Create Task),Velora Productivity Agent,Planner / Create a task,shared_planner,User Delegated OAuth,Write,Velora One (Direct),None,T13,Migrate to Direct Tool
+Files & Policy (Search),Velora Productivity Agent,Work IQ OneDrive (Preview) / searchFiles,shared_workiqonedrive,User Delegated OAuth,Read,Velora One (Direct),None,T10 T14,Migrate to Direct Tool
+Files & Policy (Search),Velora Productivity Agent,Work IQ SharePoint (Preview) / searchSites,shared_workiqsharepoint,User Delegated OAuth,Read,Velora One (Direct),None,T10 T14,Migrate to Direct Tool
+Files & Policy (Policy Attachment),Velora One,ExecutiveTravelPolicy.pdf (Native Knowledge),Dataverse Knowledge Store,System/Managed,Read,Velora One (Direct),None,T10,Retain Direct Knowledge
+Daily Plan / Morning Brief,Velora Productivity Agent,Connected Child Orchestration,child_agent_handoff,Internal Child Dispatch,Read/Synthesis,Velora One (Direct Orchestration),None,T01 T02,Deprecate Child Delegation
+Daily Plan / Morning Brief,Velora One,Combined Work IQ Mail + Calendar + Tasks,shared_workiq*,User Delegated OAuth,Read/Synthesis,Velora One (Direct Orchestration),None,T01 T02,Single Agent Direct Synthesis
+End-of-Day Wrap-up,Velora Productivity Agent,Connected Child Orchestration,child_agent_handoff,Internal Child Dispatch,Read/Synthesis,Velora One (Direct Orchestration),None,T15,Deprecate Child Delegation
+Rest-of-Day Checklist,Velora Productivity Agent,Connected Child Orchestration,child_agent_handoff,Internal Child Dispatch,Read/Synthesis,Velora One (Direct Orchestration),None,T13,Deprecate Child Delegation
+Custom Approvals & Governed State,Velora Productivity Agent,Productivity API / PREPARE_* and *_APPROVED_*,shared_veloraproductivityapi,Entra User Delegated OBO,State Machine Write,Velora Productivity API via Velora One,None,T12 T19 T20,Direct Governed API (No Child Agent)
+Audit Trail Persistence,Velora One,Dataverse Table / cre2f_veloraagentauditlog,Dataverse App User,Service Identity,Write (Audit Row),Dataverse / Azure Log Sink,None,T20,Retain Direct Audit
+Workforce Overview & Headcount,Velora One,Get a verified workforce metric as an Adaptive Card,shared_velorasuccessfactorscards,Service / Managed,Read,Velora One (Direct),None,T21,Enable Card Route (Retain Direct)
+Workforce Aggregates (Joiners/Leavers/Attrition),Velora One,sf__get_headcount sf__get_joiners sf__get_leavers sf__get_attrition_kpi,shared_velorasuccessfactorsmcp,Entra / Key Vault,Read,Velora One (Direct),Joiners Analytics,T21,Retain for Detailed Drilldowns
+Finance (AP Ageing),Velora One,s4__get_payables_aging,shared_veloras4financemcpazure,Entra / Key Vault,Read,Velora One (Direct),None,T22,Retain Direct MCP
+Finance (AR Ageing),Velora One,s4__get_receivables_aging,shared_veloras4financemcpazure,Entra / Key Vault,Read,Velora One (Direct),None,T22,Retain Direct MCP
+Finance (Budget Movements),Velora One,s4__get_budget_movements,shared_veloras4financemcpazure,Entra / Key Vault,Read,Velora One (Direct),None,T22,Retain Direct MCP
+Finance (Budget Consumption),Velora One,s4__get_budget_consumption,shared_veloras4financemcpazure,Entra / Key Vault,Read,Velora One (Direct),None,T22,Retain Direct MCP
+Finance (Profit & Loss),Velora One,s4__get_profit_and_loss,N/A,N/A,Excluded,DEPRECATED (Out of Scope),None,T22,Remove from Instructions and Topics
+Connected Child Dispatch,Velora One,Parent-to-child agent handoff router (820157fd-efe3-4498-8e8b-50feb0cff82b),shared_parenttochildrouter,None,Routing,DEPRECATED (To Be Removed),None,T25,Delete Child Connection After Backup

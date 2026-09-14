@@ -1,0 +1,21 @@
+Graph: /private/tmp/velora-graphify-review-20260909/graphify-out/graph.json (3545 nodes) | Traversal: BFS depth=2 | Start: ['check_kill_switch()', 'KillSwitchActiveError', 'TestNetworkSecurityAndKillSwitch'] | 50 nodes found
+
+[!] TRUNCATED: showing 16 of 50 nodes (~650-token budget). The answer may be among the 34 cut nodes — raise the token budget (CLI: --budget) or narrow the query (e.g. context_filter=['call'], or get_node for a specific symbol).
+
+NODE check_kill_switch() [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L80 community=]
+NODE KillSwitchActiveError [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L19 community=]
+NODE TestNetworkSecurityAndKillSwitch [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L29 community=]
+NODE test_network_and_killswitch.py [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L1 community=]
+NODE ask-facilitator/shared_mcp/kill_switch.py [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L1 community=]
+NODE SSRFSecurityError [src=mcp-apps/ask-facilitator/shared_mcp/network_security.py loc=L49 community=]
+NODE is_global_kill_switch_active() [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L26 community=]
+NODE get_disabled_clients() [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L58 community=]
+NODE get_disabled_tenants() [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L69 community=]
+NODE get_disabled_tools() [src=mcp-apps/ask-facilitator/shared_mcp/kill_switch.py loc=L47 community=]
+NODE .test_kill_switch_global() [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L92 community=]
+NODE .test_kill_switch_per_client_and_tenant() [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L114 community=]
+NODE .test_kill_switch_per_tool() [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L103 community=]
+NODE .test_odata_next_link_validates_same_origin() [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L72 community=]
+NODE .test_ssrf_blocks_cloud_metadata() [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L43 community=]
+NODE .test_ssrf_blocks_loopback() [src=mcp-apps/ask-productivity/test/test_network_and_killswitch.py loc=L52 community=]
+... (truncated — 34 more nodes cut by ~650-token budget. Narrow with context_filter=['call'] or use get_node for a specific symbol)

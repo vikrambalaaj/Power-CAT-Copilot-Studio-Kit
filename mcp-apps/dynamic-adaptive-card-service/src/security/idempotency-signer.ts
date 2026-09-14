@@ -13,7 +13,10 @@ export class IdempotencySigner {
   private processedTokens = new Set<string>();
 
   constructor(secretKey?: string) {
-    this.secretKey = secretKey || process.env.TOKEN_SIGNING_SECRET || "enterprise_default_secret_key_84920";
+    if (!secretKey && !process.env.TOKEN_SIGNING_SECRET && process.env.NODE_ENV === "production") {
+      throw new Error("FATAL: TOKEN_SIGNING_SECRET must be explicitly configured in production environments.");
+    }
+    this.secretKey = secretKey || process.env.TOKEN_SIGNING_SECRET || "enterprise_dev_secret_key_84920";
   }
 
   /**
@@ -58,7 +61,9 @@ export class IdempotencySigner {
       .update(payloadB64)
       .digest("base64url");
 
-    if (signature !== expectedSig) {
+    const sigBuf = Buffer.from(signature);
+    const expBuf = Buffer.from(expectedSig);
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
       return { valid: false, error: "Invalid signature: token has been tampered with." };
     }
 

@@ -1,0 +1,13 @@
+requirement_id,minutes_paragraphs,required_outcome,work_packages
+R01,"P19, P22–24",Live SAP/M365 selected use cases; consistent source attribution and permission-aware outputs across prompts,"W01, W02, W04, W05, W15, W16"
+R02,P27–30,Morning brief at 07:00; on-demand and email pre-meeting briefs including remaining meetings; end-of-day digest; configurable CEO preferences; evidence of automatic operation even if later disabled,"W05, W07, W15, W16"
+R03,P33–35,"Ranked attention items across inbox, calendar and meetings with contextual priority scores and score factors","W05, W06, W15"
+R04,P38–42,Meaningful categorized recommendations and alerts; useful/not-useful feedback; scope and sources aligned with CEO Office,"W08, W09, W14, W15"
+R05,P45–48,"Visible confidence for each material data point, evaluation, suggestion or recommendation; evidence-based framework","W01, W06–W08, W11, W14, W15"
+R06,P51–53,Expandable plain-language decision explanation; vendor evaluation illustrates criteria and weights; sources/confidence/rationale on one screen,"W01, W11, W15"
+R07,P56–60,"Exportable decision reconstruction with identity, provenance, rationale, attribution and integrity; demonstrate tamper/deletion resistance","W03, W04, W12, W16"
+R08,P63–65,Show how prior vendor performance changes or supports current evaluation; explicitly identify available history and gaps,"W10, W11, W15, W16"
+R09,P68–70,"Teams meeting intelligence with live action tracker, named owners, due dates and automatic deadline follow-ups","W05, W07, W13, W15, W16"
+R10,P69,In-person meeting capture is a documented roadmap item if not completed for Phase 1,"W13, W16"
+R11,P74–75,Agree peer benchmarking scope with CEO; implement agreed scope or present explicit pending scope/status,"W14, W16"
+R12,P79–81,Prepare next-review scenarios and evidence; complete remaining capabilities with truthful status,W00–W16

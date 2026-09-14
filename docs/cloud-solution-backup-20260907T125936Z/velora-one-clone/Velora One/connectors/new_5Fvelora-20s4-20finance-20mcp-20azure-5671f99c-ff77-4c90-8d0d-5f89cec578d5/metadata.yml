@@ -1,0 +1,21 @@
+﻿{
+  "connectorid": "5671f99c-ff77-4c90-8d0d-5f89cec578d5",
+  "name": "new_5Fvelora-20s4-20finance-20mcp-20azure",
+  "displayname": "Velora S4 Finance MCP Azure",
+  "description": "SAP S/4HANA Finance MCP running on Azure Container Apps image 1.1.6.",
+  "connectorinternalid": "shared_new-5Fvelora-20s4-20finance-20mcp-20azure-5Fa2a49f89a81f4c99",
+  "openapidefinition": "connectors/new_5Fvelora-20s4-20finance-20mcp-20azure-5671f99c-ff77-4c90-8d0d-5f89cec578d5/openapidefinition.json",
+  "connectionparameters": "connectors/new_5Fvelora-20s4-20finance-20mcp-20azure-5671f99c-ff77-4c90-8d0d-5f89cec578d5/connectionparameters.json",
+  "connectionparametersets": null,
+  "policytemplateinstances": "connectors/new_5Fvelora-20s4-20finance-20mcp-20azure-5671f99c-ff77-4c90-8d0d-5f89cec578d5/policytemplateinstances.json",
+  "iconbrandcolor": null,
+  "iconblob": "connectors/new_5Fvelora-20s4-20finance-20mcp-20azure-5671f99c-ff77-4c90-8d0d-5f89cec578d5/iconblob.png",
+  "connectortype": 1,
+  "statecode": 0,
+  "statuscode": 1,
+  "ismanaged": false,
+  "componentstate": 0,
+  "createdon": "2026-08-28T20:11:36Z",
+  "modifiedon": "2026-08-28T20:11:38Z",
+  "versionnumber": 3260699
+}

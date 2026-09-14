@@ -1,5 +1,6 @@
 """Test One-Time Enterprise Consent Gating and Time-Aware Greeting Flow."""
 import asyncio
+import pytest
 from successfactors_mcp.successfactors_tools import (
     sf__check_and_record_consent,
     sf__get_session_greeting,
@@ -10,6 +11,7 @@ from successfactors_mcp.greeting_service import (
 )
 
 
+@pytest.mark.asyncio
 async def test_one_time_consent_and_greeting_lifecycle():
     test_user_email = "executive.test@velora.ae"
     test_user_oid = "usr-test-oid-999"

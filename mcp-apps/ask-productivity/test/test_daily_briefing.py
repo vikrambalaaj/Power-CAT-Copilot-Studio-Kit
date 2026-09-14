@@ -65,13 +65,13 @@ class TestDailyBriefing(unittest.IsolatedAsyncioTestCase):
             userEmail="balaadm@velora.ae",
         )
         self.assertEqual(send_res["status"], "SUCCESS")
-        self.assertIn("Daily Briefing email successfully delivered", send_res["resultSummary"])
-        self.assertTrue(send_res["externalObjectId"].startswith("MS-MSG-"))
+        self.assertIn("Daily Briefing email successfully accepted", send_res["resultSummary"])
+        self.assertTrue(send_res["externalObjectId"].startswith("MOCK-REQ-") or "REQ-" in send_res["externalObjectId"])
 
     async def test_send_daily_briefing_email_direct(self):
         send_res = await send_daily_briefing_email(userEmail="balaadm@velora.ae")
         self.assertEqual(send_res["status"], "SUCCESS")
-        self.assertIn("Daily Briefing email successfully delivered", send_res["resultSummary"])
+        self.assertIn("Daily Briefing email successfully accepted", send_res["resultSummary"])
 
 
 if __name__ == "__main__":

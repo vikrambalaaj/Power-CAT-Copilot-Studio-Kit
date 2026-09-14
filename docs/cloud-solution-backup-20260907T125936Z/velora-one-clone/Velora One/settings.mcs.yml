@@ -1,0 +1,37 @@
+displayName: Velora One
+schemaName: new_VeloraExecutiveAgent
+accessControlPolicy: GroupMembership
+authenticationMode: Integrated
+authenticationTrigger: Always
+authorizedSecurityGroupIds:
+  - 59f978fe-ff65-4397-9a50-08fe27cb2b87
+configuration:
+  channels:
+    - channelId: MsTeams
+
+    - channelId: Microsoft365Copilot
+
+  settings:
+    GenerativeActionsEnabled: true
+
+  isAgentConnectable: false
+  publishOnImport: true
+  gPTSettings:
+    defaultSchemaName: new_VeloraExecutiveAgent.gpt.default
+
+  isLightweightBot: false
+  aISettings:
+    useModelKnowledge: true
+    isFileAnalysisEnabled: true
+    isSemanticSearchEnabled: true
+    contentModeration: Low
+    optInUseLatestModels: false
+
+  recognizer:
+    kind: GenerativeAIRecognizer
+
+  deferredProvisioning: false
+
+publishedOn: 2026-08-31T05:14:32.0000000Z
+template: default-2.1.0
+language: 1033

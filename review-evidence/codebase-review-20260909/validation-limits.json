@@ -1,0 +1,9 @@
+{
+  "live_provider_acceptance": "NOT_RUN",
+  "federated_audit_write_readback": "NOT_RUN",
+  "deployed_revision_and_configuration": "NOT_VERIFIED_THIS_TURN",
+  "container_build_and_image_scan": "NOT_RUN_DOCKER_DAEMON_UNAVAILABLE",
+  "productivity_python_installed_dependency_audit": "INCONCLUSIVE_ZERO_PACKAGES_FOUND",
+  "business_messages_or_mutations": "NONE",
+  "source_edits_this_turn": "NONE"
+}

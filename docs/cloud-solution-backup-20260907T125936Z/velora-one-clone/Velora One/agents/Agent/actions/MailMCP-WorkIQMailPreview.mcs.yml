@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: Mail MCP - Work IQ Mail (Preview)
+kind: TaskDialog
+modelDisplayName: Work IQ Mail (Preview)
+modelDescription: "Work IQ MCP server for Microsoft Outlook Mail operations. This feature is in preview and is part of the Work IQ tools, providing shared work intelligence and actions for agents. Availability and capabilities are subject to change. Learn more: https://aka.ms/AboutWorkIQ"
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_a365outlookmailmcp.shared-a365outlookma-44e4bc59-dd0b-4387-a5b5-9c27f534b726
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: mcp_MailTools

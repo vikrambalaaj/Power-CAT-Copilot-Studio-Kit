@@ -1,0 +1,11 @@
+[
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+  "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/tools.py"
+]

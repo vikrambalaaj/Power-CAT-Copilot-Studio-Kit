@@ -1,0 +1,64 @@
+{
+  "suites": [
+    {
+      "suite": "ask-facilitator",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ask-productivity",
+      "passed": 91,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "suite": "ask-s4hana",
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ask-sac",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ask-successfactors",
+      "passed": 96,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cleanup",
+      "passed": 3,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "suite": "credential-architecture",
+      "passed": 2,
+      "failed": 5,
+      "skipped": 0
+    },
+    {
+      "suite": "cards",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "pipeline",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "passed": 261,
+    "failed": 7,
+    "skipped": 0
+  },
+  "scope": "Offline tests; synthetic providers do not establish live acceptance."
+}

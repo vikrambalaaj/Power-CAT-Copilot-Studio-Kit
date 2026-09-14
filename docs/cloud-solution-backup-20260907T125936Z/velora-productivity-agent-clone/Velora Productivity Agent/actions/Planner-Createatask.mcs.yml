@@ -1,0 +1,99 @@
+mcs.metadata:
+  componentName: Planner - Create a task
+kind: TaskDialog
+response:
+  activity:
+  mode: Generated
+
+modelDisplayName: Create a task
+modelDescription: Create a new task in Planner.
+outputs:
+  - propertyName: _assignments
+
+  - propertyName: appliedCategories.category1
+
+  - propertyName: appliedCategories.category10
+
+  - propertyName: appliedCategories.category11
+
+  - propertyName: appliedCategories.category12
+
+  - propertyName: appliedCategories.category13
+
+  - propertyName: appliedCategories.category14
+
+  - propertyName: appliedCategories.category15
+
+  - propertyName: appliedCategories.category16
+
+  - propertyName: appliedCategories.category17
+
+  - propertyName: appliedCategories.category18
+
+  - propertyName: appliedCategories.category19
+
+  - propertyName: appliedCategories.category2
+
+  - propertyName: appliedCategories.category20
+
+  - propertyName: appliedCategories.category21
+
+  - propertyName: appliedCategories.category22
+
+  - propertyName: appliedCategories.category23
+
+  - propertyName: appliedCategories.category24
+
+  - propertyName: appliedCategories.category25
+
+  - propertyName: appliedCategories.category3
+
+  - propertyName: appliedCategories.category4
+
+  - propertyName: appliedCategories.category5
+
+  - propertyName: appliedCategories.category6
+
+  - propertyName: appliedCategories.category7
+
+  - propertyName: appliedCategories.category8
+
+  - propertyName: appliedCategories.category9
+
+  - propertyName: bucketId
+
+  - propertyName: completedDateTime
+
+  - propertyName: createdBy.user.displayName
+
+  - propertyName: createdBy.user.id
+
+  - propertyName: createdDateTime
+
+  - propertyName: dueDateTime
+
+  - propertyName: hasDescription
+
+  - propertyName: id
+
+  - propertyName: percentComplete
+
+  - propertyName: planId
+
+  - propertyName: priority
+
+  - propertyName: referenceCount
+
+  - propertyName: startDateTime
+
+  - propertyName: title
+
+action:
+  kind: InvokeConnectorTaskAction
+  connectionReference: cre2f_VeloraProductivityAgent.shared_planner.da44ac194ffb4d6584055e9a2cbe6f55
+  connectionProperties:
+    mode: Invoker
+
+  operationId: CreateTask_V4
+
+outputMode: All

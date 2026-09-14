@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed Velora sourced answer contract",
+  "description": "Design contract, not yet wired into service routes. Additional business validation must verify source IDs, permissions, freshness and claim support.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "correlationId",
+    "summary",
+    "claims",
+    "sources",
+    "confidence",
+    "auditStatus"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "EMPTY",
+        "SOURCE_UNAVAILABLE",
+        "ACCESS_DENIED",
+        "NEEDS_CLARIFICATION",
+        "POLICY_BLOCKED",
+        "ERROR"
+      ]
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "text",
+          "kind",
+          "sourceIds"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "FACT",
+              "CALCULATION",
+              "RECOMMENDATION",
+              "EVALUATION",
+              "HISTORICAL_FACT"
+            ]
+          },
+          "sourceIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "methodExplanation": {
+            "type": "string"
+          },
+          "ruleVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "businessName",
+          "description",
+          "scope",
+          "period",
+          "retrievedAt",
+          "dataMode",
+          "coverage",
+          "limitations",
+          "evidenceReference"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "businessName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period": {
+            "type": "string",
+            "minLength": 1
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sourceUpdatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "evidenceReference": {
+            "type": "string",
+            "minLength": 1
+          },
+          "link": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dataMode": {
+            "enum": [
+              "LIVE",
+              "APPROVED_SNAPSHOT",
+              "DEMONSTRATION"
+            ]
+          },
+          "coverage": {
+            "enum": [
+              "COMPLETE",
+              "PARTIAL",
+              "UNKNOWN"
+            ]
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "reason"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "NOT_ASSESSED"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "auditStatus": {
+      "enum": [
+        "PERSISTED",
+        "DURABLY_QUEUED",
+        "FAILED"
+      ]
+    }
+  }
+}

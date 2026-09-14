@@ -1,0 +1,15 @@
+mcs.metadata:
+  componentName: Velora SuccessFactors MCP
+  description: Read-only executive HR analytics and employee information from SAP SuccessFactors through the Velora MCP server.
+kind: TaskDialog
+modelDisplayName: Velora SuccessFactors MCP
+modelDescription: Read-only executive HR analytics and employee information from SAP SuccessFactors through the Velora MCP server.
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_new-5fvelora-20successfactors-20mcp-5fa2a49f89a81f4c99.26c5920898c14226b5cefeea96e8fea0
+  connectionProperties:
+    mode: Maker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeServer

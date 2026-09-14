@@ -135,6 +135,119 @@
           }
         }
       }
+    },
+    "/draft_meeting_summary_email": {
+      "post": {
+        "summary": "Draft Executive Meeting Summary Email",
+        "operationId": "draftMeetingSummaryEmail",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "topic",
+                "attendees",
+                "key_decisions",
+                "action_items"
+              ],
+              "properties": {
+                "topic": {
+                  "type": "string"
+                },
+                "attendees": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "key_decisions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "action_items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "task": {
+                        "type": "string"
+                      },
+                      "owner": {
+                        "type": "string"
+                      },
+                      "due": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "notes": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft email object ready for review"
+          }
+        }
+      }
+    },
+    "/send_executive_email_via_graph": {
+      "post": {
+        "summary": "Send Executive Email via Microsoft Graph",
+        "operationId": "sendExecutiveEmailViaGraph",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "to_recipients",
+                "subject",
+                "body_html"
+              ],
+              "properties": {
+                "to_recipients": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body_html": {
+                  "type": "string"
+                },
+                "cc_recipients": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "confirmation_token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email dispatch confirmation"
+          }
+        }
+      }
     }
   }
 }

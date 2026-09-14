@@ -58,7 +58,7 @@ class TestHandoffContract(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(resp2.status, "SUCCESS")
         self.assertFalse(resp2.approvalRequired)
         self.assertEqual(resp2.correlationId, "corr-parent-root-12345")
-        self.assertTrue(resp2.structuredResult["externalObjectId"].startswith("MS-MSG-"))
+        self.assertTrue(resp2.structuredResult["externalObjectId"].startswith("MOCK-REQ-") or "REQ-" in resp2.structuredResult["externalObjectId"])
 
     async def test_parent_search_mail_read_handoff(self):
         """Test read delegation handoff contract."""

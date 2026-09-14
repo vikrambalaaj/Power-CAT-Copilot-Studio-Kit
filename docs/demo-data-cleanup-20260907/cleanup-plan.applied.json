@@ -1,0 +1,88 @@
+{
+  "root": "/Users/vikrambala/copilotstudio",
+  "created_at_utc": "2026-09-07T08:19:01.804707+00:00",
+  "files": [
+    {
+      "path": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+      "before_sha256": "1e8b3c3e475cbd64b8910de903e6cdeca6f15a7a9ccf1c8a46e53ec4c5f47c50",
+      "after_sha256": "c9ddd40d02d5ffbdd5ecedd92a3d3a03fc949a3625ec21580fbf762db4cc6501",
+      "changes": [
+        "Remove fixture collection _M365_DIRECTORY",
+        "Remove fixture collection _M365_MAILS",
+        "Remove fixture collection _M365_CALENDAR",
+        "Remove fixture collection _M365_TEAMS_MESSAGES",
+        "Remove fixture collection _M365_PLANNER_TASKS",
+        "Delete embedded fixture seed seed_test_m365_data",
+        "Remove runtime mock-mode switch",
+        "Require configured live Graph credentials",
+        "Delete offline fallback: _get_graph_token",
+        "Remove simulated-success receipt generation",
+        "Remove sample directory lookup; keep supplied email handling",
+        "Delete offline fallback: search_mail",
+        "Remove fixed/local result: get_mail_thread",
+        "Remove fixed/local result: summarize_priority_mail",
+        "Remove fixed/local result: find_mail_follow_ups",
+        "Delete offline fallback: list_calendar_events",
+        "Remove fixed/local result: get_meeting_details",
+        "Remove fixed/local result: check_availability",
+        "Delete offline fallback: search_teams_messages",
+        "Remove fixed/local result: get_channel_context",
+        "Remove fixed/local result: get_chat_context",
+        "Delete offline fallback: list_planner_tasks",
+        "Remove fixed/local result: get_planner_task",
+        "Delete offline fallback: execute_send_email",
+        "Delete offline fallback: execute_create_meeting",
+        "Delete offline fallback: execute_update_meeting",
+        "Delete offline fallback: execute_cancel_meeting",
+        "Delete offline fallback: execute_post_teams_message",
+        "Delete offline fallback: execute_create_planner_task",
+        "Delete offline fallback: execute_update_planner_task",
+        "Remove fixed/local result: list_pending_approvals"
+      ]
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/client.py",
+      "before_sha256": "d344c49c47492732b96c34de091982ab72b185b4ae6332de6db580e99c6b8d8d",
+      "after_sha256": "0c31a0851e6af1fe172d0bcc73c64f51a99d49951b90702cf5bcc267f4f3faa1",
+      "changes": [
+        "Delete embedded SAC response: get_executive_kpis",
+        "Delete embedded SAC response: get_story_analytics",
+        "Delete embedded SAC response: get_model_data"
+      ]
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac_mcp/settings.py",
+      "before_sha256": "1fa39fff58cf4422a071f066d5d53c3cdf08011375c3bc8d636bbd3507eaa461",
+      "after_sha256": "d70e5bb1248ec4397180dab400d45363c79fb12bfbe5e4935934deffaef5640d",
+      "changes": [
+        "Remove demo-mode configuration field"
+      ]
+    },
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+      "before_sha256": "7f433ff2e54b598b5d3e767b3d6d7d6ffa02e21ff1e6da4bd599c9db3c990139",
+      "after_sha256": "ec41c49f97d73d2e92cb6748bd8d803fe0d8437ed6c3f90d8010d63fddaec625",
+      "changes": [
+        "Remove fixture collection _CALENDAR_STORE",
+        "Remove fixture collection _DATAVERSE_AUDIT_LOGS",
+        "Delete embedded fixture seed seed_test_facilitator_data",
+        "Remove fabricated/local provider result: query_user_history_from_dataverse",
+        "Remove fabricated/local provider result: sync_dataverse_logs_to_memory",
+        "Remove fabricated/local provider result: get_calendar_meetings",
+        "Remove fabricated/local provider result: process_calendar_meeting_workflow",
+        "Remove fabricated/local provider result: generate_pre_meeting_briefing",
+        "Remove fabricated/local provider result: export_meeting_to_loop_notebook"
+      ]
+    },
+    {
+      "path": "mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+      "before_sha256": "47bb38cddba07e2c53ae574dccbb630a9a04058018b0ab230d9560f4be1a1e51",
+      "after_sha256": "77000eead6ded35efb9f1fdd96c18359d72824d6946f8382db4255f6ef4edcd1",
+      "changes": [
+        "Delete embedded employee policy-preview record"
+      ]
+    }
+  ],
+  "scope": "Source-only; tests, historical artifacts, Azure images and Dataverse records are not deleted.",
+  "applied_at_utc": "2026-09-07T08:20:32.621603+00:00"
+}

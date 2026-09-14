@@ -1,0 +1,15 @@
+﻿{
+  "api_key": {
+    "type": "securestring",
+    "uiDefinition": {
+      "displayName": "",
+      "description": "",
+      "tooltip": "",
+      "constraints": {
+        "tabIndex": 2,
+        "clearText": false,
+        "required": "true"
+      }
+    }
+  }
+}

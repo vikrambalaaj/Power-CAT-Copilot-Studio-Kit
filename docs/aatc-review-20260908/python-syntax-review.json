@@ -1,0 +1,486 @@
+[
+  {
+    "file": "mcp-apps/test_target_credential_architecture.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/run_server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/run_server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_dataverse_foundation.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_two_step_pattern.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_four_failed_cases.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_daily_briefing.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_m365_writes.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_notification_claims.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_m365_reads.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_recommendation_engine.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_federated_auth_isolation.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_identity_boundary.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_operation_state_machine.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/test/test_handoff_contract.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/shared_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/shared_mcp/logger.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/shared_mcp/kill_switch.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/shared_mcp/identity.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-productivity/shared_mcp/network_security.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/test/test_financial_error_propagation.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/test/test_reviewer_findings.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/test/test_app.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/__main__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/shared_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/shared_mcp/kill_switch.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/shared_mcp/identity.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-s4hana/shared_mcp/network_security.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/test/test_app.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/deploy/generate_plugin.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/adaptive_cards.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/client.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/tools.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/cache.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/settings.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-sac/sac_mcp/__main__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_validate_against_headcount_report.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_consent_greeting.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_dataverse_audit_and_memory.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_consent_and_greeting.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_connection_manager.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_audit_durability.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_federated_auth_isolation.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_cache_and_concurrency.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_consent_persistence_and_gate.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_leavers_attrition_trend.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_policy_and_drilldown.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/test/test_app.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/__main__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/auth.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/telemetry.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/logger.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/kill_switch.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/http.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/file_logger.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/identity.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-successfactors/shared_mcp/network_security.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/test/test_facilitator_governance.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/test/test_app.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/__main__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/shared_mcp/__init__.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/shared_mcp/kill_switch.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/shared_mcp/identity.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "mcp-apps/ask-facilitator/shared_mcp/network_security.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/generate_connectors_swagger.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/build_velora_executive_platform_solution.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/enrich_plugins_with_states.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/repair_dataverse_schema.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/test_all_live_systems_and_audit.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/cleanup/test_remove_runtime_demo_data.py",
+    "syntax": "PASS"
+  },
+  {
+    "file": "deploy/cleanup/remove_runtime_demo_data.py",
+    "syntax": "PASS"
+  }
+]

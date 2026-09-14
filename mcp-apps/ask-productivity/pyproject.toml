@@ -18,3 +18,7 @@ dependencies = [
     "structlog>=24.1.0",
     "rich>=13.7.0"
 ]
+
+[tool.setuptools]
+packages = ["productivity_mcp", "shared_mcp"]
+

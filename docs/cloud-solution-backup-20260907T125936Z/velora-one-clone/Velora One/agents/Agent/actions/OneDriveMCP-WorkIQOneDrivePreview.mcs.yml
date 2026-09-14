@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: OneDrive MCP - Work IQ OneDrive (Preview)
+kind: TaskDialog
+modelDisplayName: Work IQ OneDrive (Preview)
+modelDescription: "Work IQ MCP server for Microsoft OneDrive operations. This feature is in preview and is part of the Work IQ tools, providing shared work intelligence and actions for agents. Availability and capabilities are subject to change. Learn more: https://aka.ms/AboutWorkIQ"
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_workiqonedrive.shared-workiqonedriv-3d19714c-204f-4e17-aa33-92f06c4c8372
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: mcp_OneDriveRemoteServer

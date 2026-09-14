@@ -1,0 +1,15 @@
+mcs.metadata:
+  componentName: Velora S4 Finance MCP Azure
+  description: SAP S/4HANA Finance MCP running on Azure Container Apps image 1.1.6.
+kind: TaskDialog
+modelDisplayName: Velora S4 Finance MCP Azure
+modelDescription: SAP S/4HANA Finance MCP running on Azure Container Apps image 1.1.6.
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_new-5fvelora-20s4-20finance-20mcp-20azure-5fa2a49f89a81f4c99.354d2b628d1a4cc7831c16b282a25b02
+  connectionProperties:
+    mode: Maker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeServer

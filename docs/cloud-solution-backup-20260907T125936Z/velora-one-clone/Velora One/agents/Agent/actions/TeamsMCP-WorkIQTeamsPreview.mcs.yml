@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: Teams MCP - Work IQ Teams (Preview)
+kind: TaskDialog
+modelDisplayName: Work IQ Teams (Preview)
+modelDescription: "Work IQ MCP server for Microsoft Teams operations. This feature is in preview and is part of the Work IQ tools, providing shared work intelligence and actions for agents. Availability and capabilities are subject to change. Learn more: https://aka.ms/AboutWorkIQ"
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_a365teamsmcp.shared-a365teamsmcp-3a711cfd-eb80-4254-8b9d-b0a3ac0b04fa
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: mcp_TeamsServer

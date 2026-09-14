@@ -1,0 +1,17 @@
+{
+  "admin_roles": {
+    "empty": [],
+    "unverified_roles": [],
+    "forged_principal": [
+      "Velora_Admin"
+    ]
+  },
+  "approval_empty_identity": true,
+  "approval_replay_new_instance": true,
+  "loop_actual_filesystem_write": "SAVED_TO_LOOP_NOTEBOOK",
+  "facilitator_no_key_route": 200,
+  "ar_ledger_keys_collide": true,
+  "buffered_sink_marked_persisted": 1,
+  "buffered_spool_commit": true,
+  "two_replicas_same_notification_send_count": 2
+}

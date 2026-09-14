@@ -1,0 +1,7 @@
+mcs.metadata:
+  componentName: https://velora.ae
+  description: This knowledge source searches information on the web found in https://velora.ae website
+kind: KnowledgeSourceConfiguration
+source:
+  kind: PublicSiteSearchSource
+  site: https://velora.ae

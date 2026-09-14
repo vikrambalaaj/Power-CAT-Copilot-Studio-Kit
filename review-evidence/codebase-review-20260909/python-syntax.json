@@ -1,0 +1,502 @@
+[
+  {
+    "path": "generate_evaluation_test_pack.py",
+    "status": "PASS"
+  },
+  {
+    "path": "create_teams_word_report.py",
+    "status": "PASS"
+  },
+  {
+    "path": "run_50_case_evaluation_pack.py",
+    "status": "PASS"
+  },
+  {
+    "path": "run_25_case_test_pack_and_generate_docx.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/generate_connectors_swagger.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/build_velora_executive_platform_solution.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/enrich_plugins_with_states.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/repair_dataverse_schema.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/test_all_live_systems_and_audit.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/test_target_credential_architecture.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/run_server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/run_server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_dataverse_foundation.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_two_step_pattern.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_four_failed_cases.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_daily_briefing.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_m365_writes.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_notification_claims.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_m365_reads.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_recommendation_engine.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_federated_auth_isolation.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_identity_boundary.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_operation_state_machine.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/test/test_handoff_contract.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/shared_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/shared_mcp/logger.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/shared_mcp/kill_switch.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/shared_mcp/identity.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/shared_mcp/network_security.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/test/test_financial_error_propagation.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/test/test_reviewer_findings.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/test/test_app.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/s4hana_mcp/__main__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/shared_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/shared_mcp/kill_switch.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/shared_mcp/identity.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/shared_mcp/network_security.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/test/test_app.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/deploy/generate_plugin.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/adaptive_cards.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/client.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/tools.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/cache.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/settings.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-sac/sac_mcp/__main__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_validate_against_headcount_report.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_consent_greeting.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_dataverse_audit_and_memory.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_consent_and_greeting.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_connection_manager.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_audit_durability.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_federated_auth_isolation.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_cache_and_concurrency.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_consent_persistence_and_gate.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_leavers_attrition_trend.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_policy_and_drilldown.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/test/test_app.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/__main__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/auth.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/telemetry.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/logger.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/kill_switch.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/http.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/file_logger.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/identity.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/shared_mcp/network_security.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/test/test_facilitator_governance.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/test/test_app.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/facilitator_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/facilitator_mcp/__main__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/shared_mcp/__init__.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/shared_mcp/kill_switch.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/shared_mcp/identity.py",
+    "status": "PASS"
+  },
+  {
+    "path": "mcp-apps/ask-facilitator/shared_mcp/network_security.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/cleanup/test_remove_runtime_demo_data.py",
+    "status": "PASS"
+  },
+  {
+    "path": "deploy/cleanup/remove_runtime_demo_data.py",
+    "status": "PASS"
+  }
+]

@@ -1,0 +1,108 @@
+<!DOCTYPE html><html><head><style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body { background: #0B1924; color: #E1E7EC; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 750px; }
+  .window { width: 1160px; background: #142433; border-radius: 12px; border: 1px solid #23394D; box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column; }
+  .titlebar { background: #0E1A24; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #203547; }
+  .window-dots { display: flex; gap: 8px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot-red { background: #FF5F56; }
+  .dot-yellow { background: #FFBD2E; }
+  .dot-green { background: #27C93F; }
+  .app-title { font-size: 13px; font-weight: 600; color: #8EA0B0; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .app-badge { background: #13A6A6; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+  .content { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+  
+  .chat-bubble-user { align-self: flex-end; background: #1D394E; color: #FFFFFF; padding: 12px 18px; border-radius: 14px 14px 2px 14px; max-width: 82%; font-size: 13.5px; border: 1px solid #2B5473; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+  .chat-bubble-agent { align-self: flex-start; background: #182B3A; color: #E8ECEF; padding: 18px 20px; border-radius: 14px 14px 14px 2px; width: 100%; border: 1px solid #294459; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px; }
+  
+  .agent-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #23394D; }
+  .agent-id { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 700; color: #FFFFFF; }
+  .agent-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #13A6A6, #2E6F95); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
+  
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 16px; }
+  .badge-green { background: rgba(46,139,104,0.2); color: #4ADE80; border: 1px solid #2E8B68; }
+  .badge-blue { background: rgba(46,111,149,0.25); color: #60A5FA; border: 1px solid #2E6F95; }
+  .badge-amber { background: rgba(214,138,30,0.2); color: #FBBF24; border: 1px solid #D68A1E; }
+  .badge-red { background: rgba(184,74,74,0.25); color: #F87171; border: 1px solid #B84A4A; }
+  .badge-purple { background: rgba(139,92,246,0.25); color: #C084FC; border: 1px solid #8B5CF6; }
+  
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .stat-card { background: #101E2B; padding: 12px 14px; border-radius: 8px; border: 1px solid #203547; }
+  .stat-label { font-size: 10.5px; font-weight: 600; color: #8699A8; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-val { font-size: 19px; font-weight: 800; color: #FFFFFF; margin-top: 3px; }
+  .stat-sub { font-size: 10.5px; color: #8699A8; margin-top: 2px; }
+  
+  .table-custom { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11.5px; }
+  .table-custom th { background: #0E1A24; color: #94A3B8; text-align: left; padding: 7px 10px; font-weight: 600; border-bottom: 1px solid #23394D; }
+  .table-custom td { padding: 8px 10px; border-bottom: 1px solid #1C3042; color: #CFDCE6; }
+  .table-custom tr:hover { background: #162938; }
+  
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none; }
+  .btn-primary { background: #13A6A6; color: #FFFFFF; }
+  .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #334D63; }
+  .btn-success { background: #2E8B68; color: #FFFFFF; }
+  .btn-danger { background: #B84A4A; color: #FFFFFF; }
+  
+  .banner-scheduled { background: #102534; border: 1px solid #1B4561; border-radius: 6px; padding: 8px 14px; font-size: 11.5px; color: #60A5FA; display: flex; align-items: center; justify-content: space-between; }
+  .code-box { background: #0B141C; border-radius: 6px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: #7DD3FC; border: 1px solid #1E3345; overflow-x: auto; }
+</style></head><body>
+<div class="window">
+  <div class="titlebar">
+    <div class="window-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+    <div class="app-title"><span class="app-badge">COPILOT STUDIO</span> Velora One — Live Attribution & Grounding</div>
+    <div class="badge badge-green">✓ GROUNDING ACTIVE</div>
+  </div>
+  <div class="content">
+    <div class="chat-bubble-user">
+      What is our active workforce headcount by department and current Emiratisation KPI? Cite all underlying ERP sources.
+    </div>
+    <div class="chat-bubble-agent">
+      <div class="agent-header">
+        <div class="agent-id"><div class="agent-avatar">V1</div> Velora One Executive Agent • SAP SuccessFactors Live</div>
+        <div class="badge badge-blue">SAP SF OData v2 LIVE</div>
+      </div>
+      <div>
+        <p style="font-size: 13.5px; line-height: 1.5; color: #E2E8F0;">
+          Live workforce status from <strong>SAP SuccessFactors (api22.sapsf.com)</strong> as of <strong>09 Sep 2026, 13:59 GST</strong>: Total headcount is <strong>4,112</strong> across <strong>98 departments</strong>, with <strong>3,704 active eligible employees</strong>. Emiratisation stands at <strong>3.4%</strong> (126 UAE nationals) against statutory target of <strong>52.0%</strong> (Below Target, gap: -48.6%). PDPL privacy controls applied.
+        </p>
+      </div>
+      <div class="card-grid">
+        <div class="stat-card">
+          <div class="stat-label">Active Headcount</div>
+          <div class="stat-val">3,704</div>
+          <div class="stat-sub">Total Headcount: 4,112 (98 Depts)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Emiratisation Ratio</div>
+          <div class="stat-val" style="color:#F87171;">3.4%</div>
+          <div class="stat-sub">126 UAE Nationals vs 52.0% Target</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Top Department Load</div>
+          <div class="stat-val">1,109</div>
+          <div class="stat-sub">Check-in & Boarding (27.0%)</div>
+        </div>
+      </div>
+      <div style="background: #0E1A24; border: 1px solid #1E3447; border-radius: 8px; padding: 12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11.5px; font-weight:700; color:#13A6A6; text-transform:uppercase; letter-spacing:0.5px;">
+            📌 Verified Underlying ERP Sources & Provenance [3 Direct References]
+          </span>
+          <span class="badge badge-green">100% AUDIT COMMITTED</span>
+        </div>
+        <table class="table-custom">
+          <tr><th>#</th><th>Data System / Entity</th><th>Live OData Service / Endpoint</th><th>Query Timestamp</th><th>Audit Correlation ID</th><th>Classification</th></tr>
+          <tr><td>[1]</td><td><strong>SAP SuccessFactors</strong></td><td><code>https://api22.sapsf.com/odata/v2/EmpJob</code></td><td>2026-09-09 13:59:43 GST</td><td>corr-vel-e2e-001</td><td><span class="badge badge-amber">CONFIDENTIAL</span></td></tr>
+          <tr><td>[2]</td><td><strong>SAP SuccessFactors</strong></td><td><code>https://api22.sapsf.com/odata/v2/PerPersonal</code></td><td>2026-09-09 13:59:48 GST</td><td>corr-vel-e2e-001</td><td><span class="badge badge-amber">CONFIDENTIAL</span></td></tr>
+          <tr><td>[3]</td><td><strong>Dataverse Audit Ledger</strong></td><td><code>cre2f_veloraagentauditlog</code> (Table)</td><td>2026-09-09 13:59:52 GST</td><td>inv-001-e</td><td><span class="badge badge-blue">INTERNAL</span></td></tr>
+        </table>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn btn-primary">Drilldown Department Table</button>
+        <button class="btn btn-outline">Export Provenance Receipt (JSON)</button>
+        <span style="font-size:11px; color:#8599A8; margin-left:auto;">Executive: <code>balaadm@velora.ae</code> | Tenant: <code>7d167021-f5e9-4331-9b75-d44d55a1ce9b</code></span>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

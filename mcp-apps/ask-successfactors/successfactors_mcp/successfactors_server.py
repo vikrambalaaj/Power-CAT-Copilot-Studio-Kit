@@ -627,10 +627,8 @@ def _extract_and_verify_admin_roles(request) -> list[str]:
         except Exception:
             pass
 
-    # 3. Explicitly configured internal perimeter EasyAuth trust
-    trust_easyauth = os.getenv("TRUST_EASYAUTH_CLIENT_PRINCIPAL", "").lower() in ("true", "1") or (
-        "PYTEST_CURRENT_TEST" in os.environ and os.getenv("STRICT_AUTH_GATEWAY", "0") != "1"
-    )
+    # 3. Explicitly configured internal perimeter EasyAuth trust (production perimeter only)
+    trust_easyauth = os.getenv("TRUST_EASYAUTH_CLIENT_PRINCIPAL", "").lower() in ("true", "1")
     if trust_easyauth:
         principal_raw = headers.get("x-ms-client-principal")
         if principal_raw:

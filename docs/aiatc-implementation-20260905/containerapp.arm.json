@@ -1,0 +1,287 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "16147516189486582895"
+    }
+  },
+  "parameters": {
+    "appName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "managedEnvironmentId": {
+      "type": "string"
+    },
+    "userAssignedIdentityId": {
+      "type": "string"
+    },
+    "registryServer": {
+      "type": "string"
+    },
+    "image": {
+      "type": "string",
+      "metadata": {
+        "description": "Use the ACR repository@sha256:digest reference from the release record."
+      }
+    },
+    "externalIngress": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable only when the approved gateway/network design requires it."
+      }
+    },
+    "publicBaseUrl": {
+      "type": "string"
+    },
+    "allowedHosts": {
+      "type": "string"
+    },
+    "sfApiUrl": {
+      "type": "string"
+    },
+    "sfCompanyId": {
+      "type": "string"
+    },
+    "sfUsernameSecretUrl": {
+      "type": "string"
+    },
+    "sfPasswordSecretUrl": {
+      "type": "string"
+    },
+    "mcpApiKeySecretUrl": {
+      "type": "string"
+    },
+    "approvalHmacSecretUrl": {
+      "type": "string"
+    },
+    "dataverseUrl": {
+      "type": "string"
+    },
+    "dataverseTenantId": {
+      "type": "string"
+    },
+    "dataverseClientId": {
+      "type": "string"
+    },
+    "dataverseClientSecretUrl": {
+      "type": "string"
+    },
+    "emiratisationTarget": {
+      "type": "string",
+      "metadata": {
+        "description": "An approved business target; no default regulatory claim."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('appName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[format('{0}', parameters('userAssignedIdentityId'))]": {}
+        }
+      },
+      "properties": {
+        "managedEnvironmentId": "[parameters('managedEnvironmentId')]",
+        "configuration": {
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": "[parameters('externalIngress')]",
+            "targetPort": 8082,
+            "transport": "auto",
+            "allowInsecure": false
+          },
+          "registries": [
+            {
+              "server": "[parameters('registryServer')]",
+              "identity": "[parameters('userAssignedIdentityId')]"
+            }
+          ],
+          "secrets": [
+            {
+              "name": "sf-username",
+              "keyVaultUrl": "[parameters('sfUsernameSecretUrl')]",
+              "identity": "[parameters('userAssignedIdentityId')]"
+            },
+            {
+              "name": "sf-password",
+              "keyVaultUrl": "[parameters('sfPasswordSecretUrl')]",
+              "identity": "[parameters('userAssignedIdentityId')]"
+            },
+            {
+              "name": "mcp-api-key",
+              "keyVaultUrl": "[parameters('mcpApiKeySecretUrl')]",
+              "identity": "[parameters('userAssignedIdentityId')]"
+            },
+            {
+              "name": "approval-hmac",
+              "keyVaultUrl": "[parameters('approvalHmacSecretUrl')]",
+              "identity": "[parameters('userAssignedIdentityId')]"
+            },
+            {
+              "name": "dataverse-client-secret",
+              "keyVaultUrl": "[parameters('dataverseClientSecretUrl')]",
+              "identity": "[parameters('userAssignedIdentityId')]"
+            }
+          ]
+        },
+        "template": {
+          "scale": {
+            "minReplicas": 1,
+            "maxReplicas": 1
+          },
+          "containers": [
+            {
+              "name": "successfactors",
+              "image": "[parameters('image')]",
+              "resources": {
+                "cpu": "[json('0.5')]",
+                "memory": "1Gi"
+              },
+              "env": [
+                {
+                  "name": "PORT",
+                  "value": "8082"
+                },
+                {
+                  "name": "ALLOW_ANONYMOUS",
+                  "value": "false"
+                },
+                {
+                  "name": "ENABLE_MUTATING_TOOLS",
+                  "value": "false"
+                },
+                {
+                  "name": "ENABLE_PERSONAL_INFO_TOOL",
+                  "value": "false"
+                },
+                {
+                  "name": "ENFORCE_CONSENT_GATE",
+                  "value": "true"
+                },
+                {
+                  "name": "MCP_FILE_LOG",
+                  "value": "0"
+                },
+                {
+                  "name": "CORS_ORIGINS",
+                  "value": ""
+                },
+                {
+                  "name": "ALLOWED_HOSTS",
+                  "value": "[parameters('allowedHosts')]"
+                },
+                {
+                  "name": "PUBLIC_BASE_URL",
+                  "value": "[parameters('publicBaseUrl')]"
+                },
+                {
+                  "name": "SF_API_URL",
+                  "value": "[parameters('sfApiUrl')]"
+                },
+                {
+                  "name": "SF_COMPANY_ID",
+                  "value": "[parameters('sfCompanyId')]"
+                },
+                {
+                  "name": "SF_USERNAME",
+                  "secretRef": "sf-username"
+                },
+                {
+                  "name": "SF_PASSWORD",
+                  "secretRef": "sf-password"
+                },
+                {
+                  "name": "MCP_API_KEY",
+                  "secretRef": "mcp-api-key"
+                },
+                {
+                  "name": "VELORA_APPROVAL_HMAC_SECRET",
+                  "secretRef": "approval-hmac"
+                },
+                {
+                  "name": "SF_EMIRATISATION_TARGET",
+                  "value": "[parameters('emiratisationTarget')]"
+                },
+                {
+                  "name": "DATAVERSE_URL",
+                  "value": "[parameters('dataverseUrl')]"
+                },
+                {
+                  "name": "AZURE_TENANT_ID",
+                  "value": "[parameters('dataverseTenantId')]"
+                },
+                {
+                  "name": "AZURE_CLIENT_ID",
+                  "value": "[parameters('dataverseClientId')]"
+                },
+                {
+                  "name": "AZURE_CLIENT_SECRET",
+                  "secretRef": "dataverse-client-secret"
+                }
+              ],
+              "probes": [
+                {
+                  "type": "Startup",
+                  "httpGet": {
+                    "path": "/health",
+                    "port": 8082,
+                    "scheme": "HTTP"
+                  },
+                  "periodSeconds": 5,
+                  "timeoutSeconds": 3,
+                  "failureThreshold": 24
+                },
+                {
+                  "type": "Liveness",
+                  "httpGet": {
+                    "path": "/health",
+                    "port": 8082,
+                    "scheme": "HTTP"
+                  },
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 30,
+                  "timeoutSeconds": 3,
+                  "failureThreshold": 3
+                },
+                {
+                  "type": "Readiness",
+                  "httpGet": {
+                    "path": "/health",
+                    "port": 8082,
+                    "scheme": "HTTP"
+                  },
+                  "periodSeconds": 10,
+                  "timeoutSeconds": 3,
+                  "failureThreshold": 3
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "fqdn": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01').configuration.ingress.fqdn]"
+    },
+    "deployedImage": {
+      "type": "string",
+      "value": "[parameters('image')]"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "createTime": "2026-09-05T13:12:14.904972+00:00",
+  "finishTime": "2026-09-05T13:13:11.778663+00:00",
+  "outputImages": [
+    {
+      "digest": "sha256:af3e8effc487c391254aa8981b63771a907f07cc1a078a223da7df4ef1cdcee4",
+      "registry": "azvelaiagentexecaidevcruaen.azurecr.io",
+      "repository": "velora-mcp-sf",
+      "tag": "aiatc-20260905-02"
+    }
+  ],
+  "runId": "dgb",
+  "status": "Succeeded"
+}

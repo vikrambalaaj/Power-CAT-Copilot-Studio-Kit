@@ -1,0 +1,95 @@
+{
+  "status": "Design examples; not a deployable Dataverse import",
+  "rules": [
+    {
+      "kpiCode": "HEADCOUNT",
+      "businessName": "Headcount",
+      "sourceBusinessName": "SuccessFactors employee register",
+      "ruleVersion": "draft-1",
+      "state": "Draft",
+      "enabled": false,
+      "threshold": null,
+      "approvedBy": null,
+      "activationBlockedBy": [
+        "Approve metric definition and source mapping",
+        "Approve scope, threshold, unit and effective date",
+        "Approve recommendation wording and delivery policy"
+      ]
+    },
+    {
+      "kpiCode": "EMIRATISATION",
+      "businessName": "Emiratisation",
+      "sourceBusinessName": "SuccessFactors workforce and nationality",
+      "ruleVersion": "draft-1",
+      "state": "Draft",
+      "enabled": false,
+      "threshold": null,
+      "approvedBy": null,
+      "activationBlockedBy": [
+        "Approve metric definition and source mapping",
+        "Approve scope, threshold, unit and effective date",
+        "Approve recommendation wording and delivery policy"
+      ]
+    },
+    {
+      "kpiCode": "RECEIVABLES",
+      "businessName": "Receivables",
+      "sourceBusinessName": "Finance open customer invoices",
+      "ruleVersion": "draft-1",
+      "state": "Draft",
+      "enabled": false,
+      "threshold": null,
+      "approvedBy": null,
+      "activationBlockedBy": [
+        "Approve metric definition and source mapping",
+        "Approve scope, threshold, unit and effective date",
+        "Approve recommendation wording and delivery policy"
+      ]
+    },
+    {
+      "kpiCode": "PAYABLES",
+      "businessName": "Payables",
+      "sourceBusinessName": "Finance open supplier balances",
+      "ruleVersion": "draft-1",
+      "state": "Draft",
+      "enabled": false,
+      "threshold": null,
+      "approvedBy": null,
+      "activationBlockedBy": [
+        "Approve metric definition and source mapping",
+        "Approve scope, threshold, unit and effective date",
+        "Approve recommendation wording and delivery policy"
+      ]
+    },
+    {
+      "kpiCode": "PROFIT_LOSS",
+      "businessName": "Profit and loss",
+      "sourceBusinessName": "Finance approved statement",
+      "ruleVersion": "draft-1",
+      "state": "Draft",
+      "enabled": false,
+      "threshold": null,
+      "approvedBy": null,
+      "activationBlockedBy": [
+        "Approve metric definition and source mapping",
+        "Approve scope, threshold, unit and effective date",
+        "Approve recommendation wording and delivery policy"
+      ]
+    },
+    {
+      "kpiCode": "BUDGET_VARIANCE",
+      "businessName": "Budget variance",
+      "sourceBusinessName": "Finance actuals and approved budget",
+      "ruleVersion": "draft-1",
+      "state": "Draft",
+      "enabled": false,
+      "threshold": null,
+      "approvedBy": null,
+      "activationBlockedBy": [
+        "Approve metric definition and source mapping",
+        "Approve scope, threshold, unit and effective date",
+        "Approve recommendation wording and delivery policy"
+      ]
+    }
+  ]
+}

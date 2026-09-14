@@ -13,6 +13,7 @@ class SACSettings(BaseSettings):
     mcp_api_key_secret_ref: str = ''
     executing_identity: str = 'velora-sac-reader'
     authorization_model: str = 'MAKER_SERVICE_CREDENTIAL'
+    demo_mode: bool = False
     port: int = 8084
     mcp_api_key: str = ''
     allow_anonymous: bool = False

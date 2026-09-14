@@ -1,4 +1,4 @@
-"""End-to-End Multi-System Integration, Connected Productivity Agent, and Audit Table Verification Suite."""
+"""Limited read-only service health checks; not end-to-end or audit verification."""
 from __future__ import annotations
 
 import json
@@ -77,101 +77,56 @@ APPROVED_AUDIT_COLUMNS = [
 ]
 
 
-def generate_audit_record(service: dict, outcome: str = "SUCCESS", count: int = 1) -> dict:
-    """Generate an approved Dataverse audit payload adhering strictly to Section 3.2 schema rules."""
-    now_iso = datetime.now(timezone.utc).isoformat()
-    return {
-        "cre2f_rootcorrelationid": "corr-deploy-test-001",
-        "cre2f_conversationid": "conv-deploy-001",
-        "cre2f_invocationid": f"inv-{int(time.time()*1000)}",
-        "cre2f_idempotencykey": f"idk-{int(time.time()*1000)}",
-        "cre2f_callingagent": "Velora Executive Agent",
-        "cre2f_executingagent": service["name"],
-        "cre2f_agentversion": "1.0.0",
-        "cre2f_environment": "Velora-AgenticAD-Dev",
-        "cre2f_useremail": "balaadm@velora.ae",
-        "cre2f_newcolumn": "balaadm@velora.ae",
-        "cre2f_recordtype": "TOOL_EXECUTION_END",
-        "cre2f_capability": service["sample_tool"],
-        "cre2f_operation": service["sample_tool"],
-        "cre2f_sourcesystem": service["source_system"],
-        "cre2f_outcome": outcome,
-        "cre2f_eventtime": now_iso,
-        "cre2f_resultcount": count,
-        "cre2f_auditdetail": f"Verified execution of {service['sample_tool']} against {service['source_system']}",
-        "cre2f_messagesummary": f"Execution of {service['sample_tool']}",
-        "cre2f_dataclassification": "CONFIDENTIAL",
-    }
-
-
-def validate_audit_payload(record: dict) -> tuple[bool, str]:
-    """Validate that the audit record strictly follows Dataverse schema constraints."""
-    for col in APPROVED_AUDIT_COLUMNS:
-        if col not in record:
-            return False, f"Missing required column: {col}"
-    if "Audit Detail" in record:
-        return False, "Display name 'Audit Detail' used instead of logical name 'cre2f_auditdetail'"
-    return True, "Schema valid"
-
 
 def test_service_record(service: dict) -> dict:
-    """Validate service definition and Dataverse audit compliance."""
-    start_time = time.time()
+    """Read health only. This does not execute a business tool or persist audit data."""
+    start_time = time.monotonic()
     result = {
         "service": service["name"],
         "app": service["app"],
         "health_url": service["health_url"],
-        "status": "VALIDATED",
-        "latency_ms": 0,
-        "response_data": {"status": "HEALTHY", "app": service["app"]},
-        "audit_validation": None
+        "health_status": "UNVERIFIED",
+        "business_operation_status": "NOT_RUN",
+        "audit_write_status": "NOT_RUN",
+        "audit_readback_status": "NOT_RUN",
+        "aatc_status": "INCOMPLETE",
     }
-    
-    audit_record = generate_audit_record(service, outcome="SUCCESS", count=1)
-    valid, reason = validate_audit_payload(audit_record)
-    result["audit_record"] = audit_record
-    result["audit_validation"] = {"valid": valid, "reason": reason}
-    result["latency_ms"] = int((time.time() - start_time) * 1000)
+    try:
+        request = urllib.request.Request(service["health_url"], method="GET", headers={"Accept": "application/json"})
+        with urllib.request.urlopen(request, timeout=15) as response:
+            result["http_status"] = response.status
+            body = response.read(65537)
+            if len(body) > 65536:
+                raise ValueError("Health response exceeded size limit")
+            payload = json.loads(body)
+            state = payload.get("status") if isinstance(payload, dict) else None
+            result["health_status"] = "HEALTHY" if response.status == 200 and state in ("ok", "healthy", "HEALTHY", "UP") else "UNCONFIRMED"
+    except urllib.error.HTTPError as error:
+        result["http_status"] = error.code
+        result["health_status"] = "FAILED"
+    except Exception as error:
+        result["health_status"] = "FAILED"
+        result["error_type"] = type(error).__name__
+    result["latency_ms"] = round((time.monotonic() - start_time) * 1000)
     return result
 
 
 def main():
-    print("=" * 80)
-    print("VELORA EXECUTIVE AGENT PLATFORM - INTEGRATION & AUDIT VERIFICATION")
-    print(f"Timestamp: {datetime.now(timezone.utc).isoformat()}")
-    print(f"Dataverse Audit Table: {DATAVERSE_AUDIT_TABLE}")
-    print("=" * 80)
-    
-    results = []
-    all_passed = True
-    
-    for s in SERVICES:
-        print(f"\n[VERIFYING SERVICE & CONTRACT] {s['name']} ({s['app']})...")
-        res = test_service_record(s)
-        results.append(res)
-        
-        status_flag = "✅ PASS" if res["audit_validation"]["valid"] else "❌ FAIL"
-        if not res["audit_validation"]["valid"]:
-            all_passed = False
-            
-        print(f"  Status: {res['status']}")
-        print(f"  Audit Schema Compliance: {res['audit_validation']['reason']}")
-        print(f"  Sample Operation: {s['sample_tool']} on {s['source_system']}")
-        print(f"  Result: {status_flag}")
-        
-    print("\n" + "=" * 80)
-    print("DATAVERSE AUDIT BATCH PAYLOAD SUMMARY")
-    print("=" * 80)
-    audit_batch = [r["audit_record"] for r in results]
-    print(json.dumps(audit_batch, indent=2))
-    
-    print("\n" + "=" * 80)
-    if all_passed:
-        print(f"OVERALL RESULT: ALL {len(SERVICES)} AGENT SERVICES & AUDIT CONTRACTS PASSED ({len(SERVICES)}/{len(SERVICES)})")
-    else:
-        print("OVERALL RESULT: SOME TESTS FAILED")
-    print("=" * 80)
+    results = [test_service_record(service) for service in SERVICES]
+    print(json.dumps({
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "scope": "Read-only health checks against configured service URLs only",
+        "results": results,
+        "aatc_status": "INCOMPLETE",
+        "remaining_evidence": [
+            "Verify these URLs match the current deployed release.",
+            "Execute authorized business operations against real providers.",
+            "Persist audit events and read back the matching durable records.",
+            "Record deployed source revision and image digest.",
+        ],
+    }, indent=2))
+    return 2  # Health alone must never produce a successful integration sign-off.
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

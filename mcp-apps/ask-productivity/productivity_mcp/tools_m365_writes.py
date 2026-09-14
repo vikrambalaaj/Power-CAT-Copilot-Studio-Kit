@@ -6,9 +6,10 @@ Enforces:
 """
 from __future__ import annotations
 
+import asyncio
 import os
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone as dt_timezone, timedelta
 from typing import Any, Dict, List, Optional
 
 from .audit_client import get_productivity_audit_service
@@ -22,6 +23,8 @@ from .models import (
     PlannerTaskPreview,
 )
 from .token_manager import get_token_manager
+from .briefing_service import compute_content_hash
+from .subscription_service import get_subscription_service
 
 
 def _get_write_actions_enabled() -> bool:
@@ -43,6 +46,249 @@ def _format_write_result(
         warnings.append("Executed in simulated demo mode: no live Microsoft Graph tenant credentials used.")
     outcome = "SIMULATED_SUCCESS" if is_simulated else "SUCCESS"
     return outcome, summary, warnings
+
+
+from shared_mcp.kill_switch import check_kill_switch, KillSwitchActiveError
+from .operation_store import get_operation_store, normalize_operation_type, OperationState
+
+
+async def _execute_governed_stage_b(
+    operation_name: str,
+    stage_b_operation_name: str,
+    confirmation_token: str,
+    preview_details: Dict[str, Any],
+    executor_fn,
+    action_desc_fn,
+    root_correlation_id: str = "",
+    conversation_id: str = "",
+    turn_id: str = "",
+    user_object_id: str = "",
+    user_email: str = "",
+    tenant_id: str = "velora-tenant",
+    worker_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Governed atomic Stage B execution implementing full W03/W04 lifecycle.
+    
+    Order:
+    1. Evaluate Kill Switch & Emergency Switches.
+    2. Verify cryptographic token signature, expiration, user binding, and preview checksum.
+    3. Atomically claim execution from durable Operation Store (row-level lock prevents dual-submission across replicas).
+       If already SUCCEEDED, safely replay previous execution result.
+    4. Commit fail-closed Dataverse TRANSACTION_START audit record.
+    5. Execute external provider mutation.
+       - If success: mark SUCCEEDED in Operation Store, consume token, commit TRANSACTION_RESULT.
+       - If ambiguous provider timeout: mark OUTCOME_UNKNOWN (fail-closed, do not auto-resubmit).
+       - If failure before submission: mark FAILED_BEFORE_SUBMISSION.
+    """
+    op_store = get_operation_store()
+    op_rec = op_store.get_operation_by_approval_id(confirmation_token)
+    if not preview_details and op_rec and op_rec.proposed_payload:
+        preview_details = op_rec.proposed_payload
+
+    start_ts = datetime.now(dt_timezone.utc).isoformat()
+    corr_id = root_correlation_id or (preview_details or {}).get("correlationId") or f"corr-exec-{int(time.time() * 1000)}"
+
+    # 1. Emergency switch & Kill Switch Checks
+    if not _get_write_actions_enabled():
+        return WriteResultEnvelope(
+            status="POLICY_BLOCKED",
+            resultSummary=f"Action '{stage_b_operation_name}' is temporarily suspended by enterprise VeloraWriteActionsEnabled switch.",
+            correlationId=corr_id,
+            auditStatus="BLOCKED",
+            warnings=["Write actions disabled in current environment."],
+        ).model_dump()
+
+    try:
+        check_kill_switch(tool_name=operation_name, tenant_id=tenant_id)
+    except KillSwitchActiveError as k_err:
+        return WriteResultEnvelope(
+            status="POLICY_BLOCKED",
+            resultSummary=f"Action '{stage_b_operation_name}' blocked by kill switch: {k_err.message}",
+            correlationId=corr_id,
+            auditStatus="BLOCKED",
+            warnings=[k_err.message],
+        ).model_dump()
+
+    # 2. Cryptographic Token & Integrity Validation
+    token_mgr = get_token_manager()
+    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
+        token=confirmation_token,
+        expected_operation=operation_name,
+        user_object_id=user_object_id,
+        user_email=user_email,
+        current_preview_data=preview_details,
+        tenant_id=tenant_id,
+    )
+    if not is_valid:
+        return WriteResultEnvelope(
+            status="TOKEN_INVALID",
+            resultSummary=f"Action blocked: {error_reason}",
+            correlationId=corr_id,
+            auditStatus="REJECTED",
+            warnings=[error_reason],
+        ).model_dump()
+
+    # 3. Durable Atomic Claim on Operation Store
+    claim_worker = worker_id or os.getenv("CONTAINER_APP_REPLICA_NAME") or os.getenv("HOSTNAME") or "worker-default-node"
+    canonical_op = normalize_operation_type(operation_name)
+
+    # If operation is stored in PREPARED state, transition it to APPROVED via user confirmation
+    if op_rec and op_rec.state == OperationState.PREPARED.value:
+        try:
+            op_store.confirm_approval(
+                approval_id=confirmation_token,
+                user_object_id=op_rec.user_object_id,
+                tenant_id=op_rec.tenant_id,
+                current_preview_data=preview_details,
+                approval_token=confirmation_token,
+            )
+        except Exception as conf_err:
+            return WriteResultEnvelope(
+                status="TOKEN_INVALID",
+                resultSummary=f"Approval confirmation failed: {conf_err}",
+                correlationId=corr_id,
+                auditStatus="REJECTED",
+                warnings=[str(conf_err)],
+            ).model_dump()
+
+    claimed, op_record, claim_reason = op_store.claim_execution(
+        approval_id=confirmation_token,
+        executor_id=claim_worker,
+        presented_user_oid=(op_rec.user_object_id if op_rec else (user_object_id or user_email)),
+        presented_tenant_id=(op_rec.tenant_id if op_rec else tenant_id),
+        expected_operation=canonical_op,
+        lease_seconds=60.0,
+    )
+    if not claimed:
+        if claim_reason == "ALREADY_SUCCEEDED" and op_record and op_record.result_payload:
+            return op_record.result_payload
+        conflict_status = "CONCURRENCY_CONFLICT" if "EXECUTING" in claim_reason or "CONCURRENT" in claim_reason else "TOKEN_INVALID"
+        return WriteResultEnvelope(
+            status=conflict_status,
+            resultSummary=f"Action blocked: {claim_reason}",
+            correlationId=corr_id,
+            auditStatus="REJECTED",
+            warnings=[f"Operation store claim denied: {claim_reason}"],
+        ).model_dump()
+
+    idemp_key = token_payload.get("idempotencyKey") or token_payload.get("idk") or f"idemp-{int(time.time() * 1000)}"
+    summary = f"Executing approved {operation_name} for {user_email or user_object_id}"
+
+    # 4. Strict Fail-Closed TRANSACTION_START Dataverse Audit
+    audit_svc = get_productivity_audit_service()
+    start_res = await audit_svc.start_stage_b_write_fail_closed(
+        operation=stage_b_operation_name,
+        root_correlation_id=corr_id,
+        user_object_id=user_object_id,
+        user_email=user_email,
+        idempotency_key=idemp_key,
+        approval_token=confirmation_token,
+        summary=summary,
+        conversation_id=conversation_id,
+        turn_id=turn_id,
+    )
+
+    if not start_res.get("may_proceed"):
+        if op_record:
+            op_store.fail_execution(
+                op_record.operation_id,
+                f"Fail-closed write blocked: {start_res.get('error')}",
+                before_submission=True,
+            )
+        return WriteResultEnvelope(
+            status="FAIL_CLOSED_BLOCKED",
+            resultSummary=f"Action aborted: {start_res.get('error')}",
+            correlationId=corr_id,
+            auditStatus="AUDIT_FAILED_WRITE_BLOCKED",
+            warnings=["Fail-closed write policy: No external action was taken because the audit record could not be secured."],
+        ).model_dump()
+
+    audit_rec_id = start_res.get("audit_record_id", "")
+    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
+
+    # 5. Execute Provider Mutation
+    try:
+        res = executor_fn()
+        msg_id = res.get("message_id") or res.get("event_id") or res.get("task_id") or res.get("chat_message_id") or res.get("id")
+        req_id = res.get("requestId", "")
+        external_id = msg_id or req_id or ""
+        evidence_link = res.get("web_link") or ""
+
+        action_desc = action_desc_fn(res)
+        outcome, summary_text, warnings = _format_write_result(res, action_desc)
+
+        envelope = WriteResultEnvelope(
+            status="SUCCESS",
+            resultSummary=summary_text,
+            externalObjectId=external_id,
+            evidenceLink=evidence_link,
+            correlationId=corr_id,
+            auditStatus="PERSISTED",
+            warnings=warnings,
+        ).model_dump()
+
+        # Mark SUCCEEDED in durable operation store
+        if op_record:
+            op_store.complete_execution(
+                op_record.operation_id,
+                result_payload=envelope,
+                provider_reference={"external_id": external_id, "evidence_link": evidence_link, "receipt": res},
+            )
+        token_mgr.consume_token(confirmation_token)
+
+        # Complete Audit (TRANSACTION_RESULT)
+        await audit_svc.complete_stage_b_write(
+            audit_record_id=audit_rec_id,
+            invocation_id=inv_id,
+            outcome=outcome,
+            external_object_id=external_id,
+            evidence_link=evidence_link,
+            summary=summary_text,
+            start_time=start_ts,
+            root_correlation_id=corr_id,
+            user_email=user_email,
+            operation=stage_b_operation_name,
+            idempotency_key=idemp_key,
+        )
+
+        return envelope
+
+    except Exception as ex:
+        err_str = str(ex)
+        is_timeout = (
+            isinstance(ex, (TimeoutError, asyncio.TimeoutError))
+            or "timeout" in err_str.lower()
+            or "504" in err_str
+            or "timed out" in err_str.lower()
+        )
+        before_submission = not is_timeout
+        if op_record:
+            op_store.fail_execution(
+                op_record.operation_id,
+                f"Execution failed: {err_str}",
+                before_submission=before_submission,
+            )
+
+        # Complete Audit with Failure
+        await audit_svc.complete_stage_b_write(
+            audit_record_id=audit_rec_id,
+            invocation_id=inv_id,
+            outcome="OUTCOME_UNKNOWN" if is_timeout else "ERROR",
+            error_msg=err_str,
+            start_time=start_ts,
+            root_correlation_id=corr_id,
+            user_email=user_email,
+            operation=stage_b_operation_name,
+            idempotency_key=idemp_key,
+        )
+
+        return WriteResultEnvelope(
+            status="OUTCOME_UNKNOWN" if is_timeout else "EXECUTION_ERROR",
+            resultSummary=f"Failed to execute {operation_name}: {err_str}",
+            correlationId=corr_id,
+            auditStatus="PERSISTED_ERROR",
+            warnings=[err_str],
+        ).model_dump()
 
 
 # =====================================================================
@@ -142,131 +388,36 @@ async def send_approved_email(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Validate approval token, fail-closed audit check, and execute approved email dispatch."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-exec-{int(time.time() * 1000)}"
-
-    # Emergency switch check
-    if not _get_write_actions_enabled():
-        return WriteResultEnvelope(
-            status="POLICY_BLOCKED",
-            resultSummary="Email dispatch is temporarily suspended by enterprise VeloraWriteActionsEnabled switch.",
-            correlationId=corr_id,
-            auditStatus="BLOCKED",
-            warnings=["Write actions disabled in current environment."],
-        ).model_dump()
-
-    # 1. Cryptographic token & integrity validation
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_EMAIL",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(
-            status="TOKEN_INVALID",
-            resultSummary=f"Action blocked: {error_reason}",
-            correlationId=corr_id,
-            auditStatus="REJECTED",
-            warnings=[error_reason],
-        ).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-email-{int(time.time() * 1000)}")
-    summary = f"Sending approved email to {', '.join(previewDetails.get('to', []))}"
-
-    # 2. Strict Fail-Closed TRANSACTION_START Dataverse audit
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="SendApprovedEmail",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=summary,
-        conversation_id=conversationId,
-        turn_id=turnId,
-    )
-
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(
-            status="FAIL_CLOSED_BLOCKED",
-            resultSummary=f"Action aborted: {start_res.get('error')}",
-            correlationId=corr_id,
-            auditStatus="AUDIT_FAILED_WRITE_BLOCKED",
-            warnings=["Fail-closed write policy: No external action was taken because the audit record could not be secured."],
-        ).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    # 3. Call Microsoft 365 Connector
+    """Stage B: Validate approval token, fail-closed audit check, atomic claim, and execute approved email dispatch."""
     client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_send_email(
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_EMAIL",
+        stage_b_operation_name="SendApprovedEmail",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_send_email(
             to=previewDetails.get("to", []),
             cc=previewDetails.get("cc", []),
             subject=previewDetails.get("subject", ""),
             body=previewDetails.get("body", ""),
             attachments=previewDetails.get("attachments", []),
-        )
-        msg_id = res["message_id"]
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Email successfully sent to {', '.join(previewDetails.get('to', []))}. Outlook Message ID: {msg_id}."
-        )
-
-        # 4. Complete Audit (TRANSACTION_RESULT)
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=msg_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedEmail",
-            idempotency_key=idemp_key,
-        )
-
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=msg_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            auditStatus="PERSISTED",
-            warnings=warnings,
-        ).model_dump()
-
-    except Exception as ex:
-        # Audit failure
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedEmail",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="EXECUTION_ERROR",
-            resultSummary=f"Failed to dispatch email via Outlook: {str(ex)}",
-            correlationId=corr_id,
-            auditStatus="PERSISTED_ERROR",
-            warnings=[str(ex)],
-        ).model_dump()
+        ),
+        action_desc_fn=lambda r: (
+            f"Email successfully delivered to {', '.join(previewDetails.get('to', []))}. Outlook Message ID: {r.get('message_id')}"
+            if r.get("message_id")
+            else f"Email successfully accepted by Microsoft Graph for delivery to {', '.join(previewDetails.get('to', []))} (Request ID: {r.get('requestId')})"
+        ),
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
+    )
 
 
 async def prepare_email_reply(
@@ -522,64 +673,17 @@ async def create_approved_meeting(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Validate token, fail-closed audit check, and create approved meeting."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-cal-{int(time.time() * 1000)}"
-
-    if not _get_write_actions_enabled():
-        return WriteResultEnvelope(
-            status="POLICY_BLOCKED",
-            resultSummary="Meeting creation is temporarily suspended by enterprise switch.",
-            correlationId=corr_id,
-            auditStatus="BLOCKED",
-        ).model_dump()
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_MEETING_CREATION",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(
-            status="TOKEN_INVALID",
-            resultSummary=f"Action blocked: {error_reason}",
-            correlationId=corr_id,
-            auditStatus="REJECTED",
-        ).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-meet-{int(time.time() * 1000)}")
-    summary = f"Creating approved meeting: '{previewDetails.get('subject')}'"
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="CreateApprovedMeeting",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=summary,
-        conversation_id=conversationId,
-        turn_id=turnId,
-    )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(
-            status="FAIL_CLOSED_BLOCKED",
-            resultSummary=f"Action aborted: {start_res.get('error')}",
-            correlationId=corr_id,
-            auditStatus="AUDIT_FAILED_WRITE_BLOCKED",
-        ).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
+    """Stage B: Validate token, fail-closed audit check, atomic claim, and create approved meeting."""
     client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_create_meeting(
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_MEETING_CREATION",
+        stage_b_operation_name="CreateApprovedMeeting",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_create_meeting(
             subject=previewDetails.get("subject", ""),
             attendees=previewDetails.get("attendees", []),
             start_time=previewDetails.get("startTime", ""),
@@ -587,56 +691,20 @@ async def create_approved_meeting(
             time_zone=previewDetails.get("timeZone", "Asia/Dubai"),
             location=previewDetails.get("location", "Teams Meeting"),
             body=previewDetails.get("body", ""),
-        )
-        evt_id = res["event_id"]
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Meeting '{previewDetails.get('subject')}' scheduled successfully. Outlook Event ID: {evt_id}."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=evt_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CreateApprovedMeeting",
-            idempotency_key=idemp_key,
-        )
-
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=evt_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            auditStatus="PERSISTED",
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CreateApprovedMeeting",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="EXECUTION_ERROR",
-            resultSummary=f"Failed to create meeting: {str(ex)}",
-            correlationId=corr_id,
-            auditStatus="PERSISTED_ERROR",
-        ).model_dump()
+        ),
+        action_desc_fn=lambda r: (
+            f"Meeting '{previewDetails.get('subject')}' scheduled successfully. Outlook Event ID: {r.get('event_id')}."
+            if r.get("event_id")
+            else f"Meeting '{previewDetails.get('subject')}' accepted by Microsoft Graph (Request ID: {r.get('requestId')})."
+        ),
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
+    )
 
 
 async def prepare_meeting_update(
@@ -726,87 +794,27 @@ async def update_approved_meeting(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Execute approved meeting updates."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-cal-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_MEETING_UPDATE",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-calupd-{int(time.time() * 1000)}")
+    """Stage B: Execute approved meeting updates with fail-closed audit and atomic claim."""
     event_id = previewDetails.get("existingEventId", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="UpdateApprovedMeeting",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Updating meeting '{event_id}'",
+    client = Microsoft365Client(user_email=userEmail)
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_MEETING_UPDATE",
+        stage_b_operation_name="UpdateApprovedMeeting",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_update_meeting(event_id=event_id, updates=previewDetails),
+        action_desc_fn=lambda r: f"Meeting '{event_id}' updated successfully.",
+        root_correlation_id=rootCorrelationId,
         conversation_id=conversationId,
         turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
     )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_update_meeting(event_id=event_id, updates=previewDetails)
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Meeting '{event_id}' updated successfully."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=event_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="UpdateApprovedMeeting",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=event_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="UpdateApprovedMeeting",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
 
 
 async def prepare_meeting_cancellation(
@@ -894,85 +902,27 @@ async def cancel_approved_meeting(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Execute approved meeting cancellation."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-cal-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_MEETING_CANCELLATION",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-calcanc-{int(time.time() * 1000)}")
+    """Stage B: Execute approved meeting cancellation with fail-closed audit and atomic claim."""
     event_id = previewDetails.get("existingEventId", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="CancelApprovedMeeting",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Cancelling meeting '{event_id}'",
+    client = Microsoft365Client(user_email=userEmail)
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_MEETING_CANCELLATION",
+        stage_b_operation_name="CancelApprovedMeeting",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_cancel_meeting(event_id=event_id),
+        action_desc_fn=lambda r: f"Meeting '{event_id}' was cancelled.",
+        root_correlation_id=rootCorrelationId,
         conversation_id=conversationId,
         turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
     )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_cancel_meeting(event_id=event_id)
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Meeting '{event_id}' was cancelled."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=event_id,
-            evidence_link="",
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CancelApprovedMeeting",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=event_id,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CancelApprovedMeeting",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
 
 
 # =====================================================================
@@ -1048,89 +998,32 @@ async def send_approved_teams_chat_message(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Dispatch approved Teams direct chat message."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-tm-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_TEAMS_CHAT_MESSAGE",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-tmchat-{int(time.time() * 1000)}")
+    """Stage B: Dispatch approved Teams direct chat message with fail-closed audit and atomic claim."""
     chat_id = previewDetails.get("chatId", "")
     content = previewDetails.get("messageContent", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="SendApprovedTeamsChatMessage",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Posting Teams message to chat '{chat_id}'",
+    client = Microsoft365Client(user_email=userEmail)
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_TEAMS_CHAT_MESSAGE",
+        stage_b_operation_name="SendApprovedTeamsChatMessage",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_post_teams_message(content=content, chat_id=chat_id),
+        action_desc_fn=lambda r: (
+            f"Message posted to Teams chat '{chat_id}'. Message ID: {r.get('message_id')}."
+            if r.get("message_id")
+            else f"Message accepted by Microsoft Graph for chat delivery (Request ID: {r.get('requestId')})."
+        ),
+        root_correlation_id=rootCorrelationId,
         conversation_id=conversationId,
         turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
     )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_post_teams_message(content=content, chat_id=chat_id)
-        msg_id = res["message_id"]
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Message posted to Teams chat '{chat_id}'. Message ID: {msg_id}."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=msg_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedTeamsChatMessage",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=msg_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedTeamsChatMessage",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
 
 
 async def prepare_teams_channel_post(
@@ -1215,90 +1108,33 @@ async def send_approved_teams_channel_post(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Dispatch approved Teams channel post."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-tm-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_TEAMS_CHANNEL_POST",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-tmchan-{int(time.time() * 1000)}")
+    """Stage B: Dispatch approved Teams channel post with fail-closed audit and atomic claim."""
     team = previewDetails.get("teamName", "")
     chan = previewDetails.get("channelName", "")
     content = previewDetails.get("messageContent", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="SendApprovedTeamsChannelPost",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Posting to Teams channel '{team} > {chan}'",
+    client = Microsoft365Client(user_email=userEmail)
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_TEAMS_CHANNEL_POST",
+        stage_b_operation_name="SendApprovedTeamsChannelPost",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_post_teams_message(content=content, team_name=team, channel_name=chan),
+        action_desc_fn=lambda r: (
+            f"Message posted to '{team} > {chan}'. Teams Message ID: {r.get('message_id')}."
+            if r.get("message_id")
+            else f"Message accepted by Microsoft Graph for channel delivery (Request ID: {r.get('requestId')})."
+        ),
+        root_correlation_id=rootCorrelationId,
         conversation_id=conversationId,
         turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
     )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_post_teams_message(content=content, team_name=team, channel_name=chan)
-        msg_id = res["message_id"]
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Message posted to '{team} > {chan}'. Teams Message ID: {msg_id}."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=msg_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedTeamsChannelPost",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=msg_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedTeamsChannelPost",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
 
 
 # =====================================================================
@@ -1339,7 +1175,7 @@ async def prepare_planner_task(
         "taskTitle": title,
         "description": description,
         "assignees": resolved_ass,
-        "startDate": datetime.now(timezone.utc).isoformat(),
+        "startDate": datetime.now(dt_timezone.utc).isoformat(),
         "dueDate": dueDate,
         "priority": priority,
         "correlationId": corr_id,
@@ -1394,48 +1230,20 @@ async def create_approved_planner_task(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Create approved Planner task."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-pln-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_PLANNER_TASK",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-plntsk-{int(time.time() * 1000)}")
+    """Stage B: Create approved Planner task with fail-closed audit and atomic claim."""
     plan = previewDetails.get("planName", "")
     bucket = previewDetails.get("bucketName", "")
     title = previewDetails.get("taskTitle", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="CreateApprovedPlannerTask",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Creating Planner task '{title}'",
-        conversation_id=conversationId,
-        turn_id=turnId,
-    )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
     client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_create_planner_task(
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_PLANNER_TASK",
+        stage_b_operation_name="CreateApprovedPlannerTask",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_create_planner_task(
             plan_name=plan,
             bucket_name=bucket,
             title=title,
@@ -1443,49 +1251,20 @@ async def create_approved_planner_task(
             assignees=previewDetails.get("assignees", []),
             due_date=previewDetails.get("dueDate"),
             priority=previewDetails.get("priority", "Medium"),
-        )
-        task_id = res["task_id"]
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Planner task '{title}' created successfully in plan '{plan}'. Task ID: {task_id}."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=task_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CreateApprovedPlannerTask",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=task_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CreateApprovedPlannerTask",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
+        ),
+        action_desc_fn=lambda r: (
+            f"Planner task '{title}' created in '{plan}'. Task ID: {r.get('task_id')}."
+            if r.get("task_id")
+            else f"Planner task '{title}' accepted by Microsoft Graph (Request ID: {r.get('requestId')})."
+        ),
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
+    )
 
 
 async def prepare_planner_task_update(
@@ -1571,87 +1350,27 @@ async def update_approved_planner_task(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Execute approved Planner task update."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-pln-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_PLANNER_TASK_UPDATE",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-plnupd-{int(time.time() * 1000)}")
+    """Stage B: Execute approved Planner task update with fail-closed audit and atomic claim."""
     task_id = previewDetails.get("existingTaskId", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="UpdateApprovedPlannerTask",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Updating task '{task_id}'",
+    client = Microsoft365Client(user_email=userEmail)
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_PLANNER_TASK_UPDATE",
+        stage_b_operation_name="UpdateApprovedPlannerTask",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_update_planner_task(task_id=task_id, updates=previewDetails),
+        action_desc_fn=lambda r: f"Planner task '{task_id}' updated successfully.",
+        root_correlation_id=rootCorrelationId,
         conversation_id=conversationId,
         turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
     )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_update_planner_task(task_id=task_id, updates=previewDetails)
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Planner task '{task_id}' updated successfully."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=task_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="UpdateApprovedPlannerTask",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=task_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="UpdateApprovedPlannerTask",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
 
 
 async def prepare_planner_completion(
@@ -1735,87 +1454,27 @@ async def complete_approved_planner_task(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Mark approved Planner task complete."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    corr_id = rootCorrelationId or previewDetails.get("correlationId") or f"corr-pln-{int(time.time() * 1000)}"
-
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_PLANNER_COMPLETION",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(status="TOKEN_INVALID", resultSummary=error_reason, correlationId=corr_id).model_dump()
-
-    idemp_key = token_payload.get("idk", f"idemp-plncmp-{int(time.time() * 1000)}")
+    """Stage B: Mark approved Planner task complete with fail-closed audit and atomic claim."""
     task_id = previewDetails.get("existingTaskId", "")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="CompleteApprovedPlannerTask",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Marking task '{task_id}' complete",
+    client = Microsoft365Client(user_email=userEmail)
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_PLANNER_COMPLETION",
+        stage_b_operation_name="CompleteApprovedPlannerTask",
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        executor_fn=lambda: client.execute_complete_planner_task(task_id=task_id),
+        action_desc_fn=lambda r: f"Planner task '{task_id}' marked as completed (100%).",
+        root_correlation_id=rootCorrelationId,
         conversation_id=conversationId,
         turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
     )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(status="FAIL_CLOSED_BLOCKED", resultSummary=start_res.get("error", ""), correlationId=corr_id).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
-    client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_complete_planner_task(task_id=task_id)
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Planner task '{task_id}' marked as completed (100%)."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=task_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CompleteApprovedPlannerTask",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=task_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="CompleteApprovedPlannerTask",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(status="EXECUTION_ERROR", resultSummary=str(ex), correlationId=corr_id).model_dump()
 
 
 # =====================================================================
@@ -1849,6 +1508,7 @@ async def prepare_daily_briefing_email(
         "totalMeetings": len(briefing.get("meetings_today", [])),
         "totalTasks": len(briefing.get("tasks_to_do", [])),
         "totalApprovals": len(briefing.get("upcoming_approvals", [])),
+        "contentHash": compute_content_hash(briefing),
         "correlationId": corr_id,
     }
 
@@ -1898,111 +1558,45 @@ async def send_approved_daily_briefing_email(
     turnId: str = "",
     userObjectId: str = "",
     userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Stage B: Execute verified Daily Briefing email dispatch with fail-closed audit protection."""
-    start_ts = datetime.now(timezone.utc).isoformat()
-    token_mgr = get_token_manager()
-    is_valid, error_reason, token_payload = token_mgr.verify_approval_token(
-        token=confirmationToken,
-        expected_operation="PREPARE_DAILY_BRIEFING_EMAIL",
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        current_preview_data=previewDetails,
-    )
-    if not is_valid:
-        return WriteResultEnvelope(
-            status="TOKEN_INVALID",
-            resultSummary=f"Action blocked: {error_reason}",
-            correlationId=rootCorrelationId,
-            auditStatus="REJECTED",
-            warnings=[error_reason],
-        ).model_dump()
+    """Stage B: Execute verified Daily Briefing email dispatch with fail-closed audit and atomic claim."""
+    preview = previewDetails
+    if not preview:
+        op_rec = get_operation_store().get_operation_by_approval_id(confirmationToken)
+        if op_rec and op_rec.proposed_payload:
+            preview = op_rec.proposed_payload
+        else:
+            preview = {}
 
-    preview = previewDetails or token_payload.get("preview", {})
-    corr_id = preview.get("correlationId") or rootCorrelationId
-    idemp_key = token_payload.get("idk", f"idemp-briefmail-{int(time.time() * 1000)}")
-
-    audit_svc = get_productivity_audit_service()
-    start_res = await audit_svc.start_stage_b_write_fail_closed(
-        operation="SendApprovedDailyBriefingEmail",
-        root_correlation_id=corr_id,
-        user_object_id=userObjectId,
-        user_email=userEmail,
-        idempotency_key=idemp_key,
-        approval_token=confirmationToken,
-        summary=f"Dispatching Daily Briefing email to {preview.get('to')}",
-        conversation_id=conversationId,
-        turn_id=turnId,
-    )
-    if not start_res.get("may_proceed"):
-        return WriteResultEnvelope(
-            status="FAIL_CLOSED_BLOCKED",
-            resultSummary=f"Action aborted: {start_res.get('error')}",
-            correlationId=corr_id,
-            auditStatus="AUDIT_FAILED_WRITE_BLOCKED",
-            warnings=["Fail-closed write policy: No external action was taken because the audit record could not be secured."],
-        ).model_dump()
-
-    audit_rec_id = start_res.get("audit_record_id", "")
-    inv_id = start_res.get("invocation_id", f"inv-{idemp_key}")
-
+    to_list = preview.get("to", [userEmail or "balaadm@velora.ae"])
     client = Microsoft365Client(user_email=userEmail)
-    try:
-        res = client.execute_send_email(
-            to=preview.get("to", [userEmail or "balaadm@velora.ae"]),
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_DAILY_BRIEFING_EMAIL",
+        stage_b_operation_name="SendApprovedDailyBriefingEmail",
+        confirmation_token=confirmationToken,
+        preview_details=preview,
+        executor_fn=lambda: client.execute_send_email(
+            to=to_list,
             cc=preview.get("cc", []),
             subject=preview.get("subject", "Executive Daily Briefing"),
             body=preview.get("body", ""),
             attachments=[],
-        )
-        msg_id = res["message_id"]
-        evidence_link = res["web_link"]
-
-        outcome, summary_text, warnings = _format_write_result(
-            res,
-            f"Daily Briefing email successfully delivered to {', '.join(preview.get('to', []))}."
-        )
-
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome=outcome,
-            external_object_id=msg_id,
-            evidence_link=evidence_link,
-            summary=summary_text,
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedDailyBriefingEmail",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="SUCCESS",
-            resultSummary=summary_text,
-            externalObjectId=msg_id,
-            evidenceLink=evidence_link,
-            correlationId=corr_id,
-            auditStatus="PERSISTED",
-            warnings=warnings,
-        ).model_dump()
-    except Exception as ex:
-        await audit_svc.complete_stage_b_write(
-            audit_record_id=audit_rec_id,
-            invocation_id=inv_id,
-            outcome="ERROR",
-            error_msg=str(ex),
-            start_time=start_ts,
-            root_correlation_id=corr_id,
-            user_email=userEmail,
-            operation="SendApprovedDailyBriefingEmail",
-            idempotency_key=idemp_key,
-        )
-        return WriteResultEnvelope(
-            status="EXECUTION_ERROR",
-            resultSummary=str(ex),
-            correlationId=corr_id,
-            auditStatus="PERSISTED_ERROR",
-        ).model_dump()
+        ),
+        action_desc_fn=lambda r: (
+            f"Daily Briefing email successfully delivered to {', '.join(to_list)}."
+            if r.get("message_id")
+            else f"Daily Briefing email successfully accepted by Microsoft Graph for delivery to {', '.join(to_list)} (Request ID: {r.get('requestId')})."
+        ),
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
+    )
 
 
 async def send_daily_briefing_email(
@@ -2039,5 +1633,238 @@ async def send_daily_briefing_email(
         userObjectId=userObjectId,
         userEmail=userEmail,
     )
+
+
+# =====================================================================
+# GOVERNED AUTOMATION SUBSCRIPTION MANAGEMENT (W07)
+# =====================================================================
+
+async def prepare_automation_subscription(
+    kind: str,
+    mailbox: Optional[str] = None,
+    recipients: Optional[List[str]] = None,
+    localSchedule: Optional[str] = None,
+    timezone: str = "Asia/Dubai",
+    meetingFilters: Optional[Dict[str, Any]] = None,
+    leadTimeMinutes: int = 15,
+    horizonHours: int = 24,
+    channel: str = "EMAIL",
+    validUntil: Optional[str] = None,
+    allowedDataScope: Optional[List[str]] = None,
+    quietHoursPolicy: str = "SUPPRESS",
+    missedRunPolicy: str = "SKIP",
+    rootCorrelationId: str = "",
+    conversationId: str = "",
+    turnId: str = "",
+    userObjectId: str = "",
+    userEmail: str = "",
+    tenantId: str = "velora-tenant",
+) -> Dict[str, Any]:
+    """Stage A: Prepare recurring automation subscription in DRAFT state and issue cryptographic approval token."""
+    corr_id = rootCorrelationId or f"corr-sub-{int(time.time() * 1000)}"
+    idemp_key = f"idemp-sub-{int(time.time() * 1000)}"
+    sub_service = get_subscription_service()
+
+    target_mailbox = mailbox or userEmail or "balaadm@velora.ae"
+    target_recipients = recipients or [target_mailbox]
+
+    subscription, token = sub_service.prepare_subscription(
+        tenant_id=tenantId,
+        owner=userObjectId or userEmail or "balaadm@velora.ae",
+        mailbox=target_mailbox,
+        sender="velora-agent@velora.ae",
+        recipients=target_recipients,
+        kind=kind,
+        timezone_str=timezone,
+        local_schedule=localSchedule,
+        meeting_filters=meetingFilters,
+        lead_time_minutes=leadTimeMinutes,
+        horizon_hours=horizonHours,
+        channel=channel,
+        valid_until=validUntil,
+        allowed_data_scope=allowedDataScope,
+        quiet_hours_policy=quietHoursPolicy,
+        missed_run_policy=missedRunPolicy,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+    )
+
+    preview_data = {
+        "subscriptionId": subscription.subscriptionId,
+        "kind": subscription.kind.value,
+        "mailbox": subscription.mailbox,
+        "recipients": subscription.recipients,
+        "schedule": subscription.localSchedule,
+        "timezone": subscription.timezone,
+        "tenantId": subscription.tenantId,
+        "enabled": False,  # Strict default disabled
+        "correlationId": corr_id,
+    }
+
+
+    audit_svc = get_productivity_audit_service()
+    await audit_svc.audit_stage_a_preview(
+        operation="PrepareAutomationSubscription",
+        root_correlation_id=corr_id,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        preview_summary=f"Prepared automation subscription {subscription.subscriptionId} for kind={kind}. State=DRAFT (disabled).",
+        preview_details=preview_data,
+        idempotency_key=idemp_key,
+        approval_token=token,
+        expires_on=(datetime.now(dt_timezone.utc) + timedelta(minutes=30)).isoformat(),
+        conversation_id=conversationId,
+        turn_id=turnId,
+    )
+
+    return WritePreviewEnvelope(
+        status="PREVIEW_READY",
+        approvalRequired=True,
+        resultSummary=f"Prepared {kind} automation subscription {subscription.subscriptionId} in DRAFT state. Explicit approval required to activate.",
+        confirmationToken=token,
+        correlationId=corr_id,
+        previewDetails=preview_data,
+        expiresOn=(datetime.now(dt_timezone.utc) + timedelta(minutes=30)).isoformat(),
+        idempotencyKey=idemp_key,
+        warnings=["Subscription is created disabled (DRAFT) and will only execute after explicit confirmation."],
+    ).model_dump()
+
+
+async def confirm_automation_subscription(
+    confirmationToken: str,
+    subscriptionId: str,
+    rootCorrelationId: str = "",
+    conversationId: str = "",
+    turnId: str = "",
+    userObjectId: str = "",
+    userEmail: str = "",
+    tenantId: str = "velora-tenant",
+    workerId: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Stage B: Confirm and activate automation subscription with cryptographic token validation."""
+    sub_service = get_subscription_service()
+
+    def _activate():
+        sub = sub_service.confirm_subscription(
+            confirmation_token=confirmationToken,
+            subscription_id=subscriptionId,
+            user_object_id=userObjectId,
+            user_email=userEmail,
+            tenant_id=tenantId,
+        )
+        return {"subscriptionId": sub.subscriptionId, "state": "ENABLED", "enabled": True}
+
+    return await _execute_governed_stage_b(
+        operation_name="PREPARE_AUTOMATION_SUBSCRIPTION",
+        stage_b_operation_name="ConfirmAutomationSubscription",
+        confirmation_token=confirmationToken,
+        preview_details=None,
+        executor_fn=_activate,
+        action_desc_fn=lambda r: f"Automation subscription {r.get('subscriptionId')} successfully confirmed and ACTIVATED.",
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        tenant_id=tenantId,
+        worker_id=workerId,
+    )
+
+
+async def revoke_automation_subscription(
+    subscriptionId: str,
+    rootCorrelationId: str = "",
+    conversationId: str = "",
+    turnId: str = "",
+    userObjectId: str = "",
+    userEmail: str = "",
+    tenantId: str = "velora-tenant",
+) -> Dict[str, Any]:
+    """Revoke / disable an automation subscription. Preserves execution history."""
+    corr_id = rootCorrelationId or f"corr-revsub-{int(time.time() * 1000)}"
+    sub_service = get_subscription_service()
+    sub = sub_service.revoke_subscription(
+        subscription_id=subscriptionId,
+        tenant_id=tenantId,
+        revoked_by=userObjectId or userEmail,
+    )
+
+    audit_svc = get_productivity_audit_service()
+    await audit_svc.audit_read_tool_execution(
+        tool_name="RevokeAutomationSubscription",
+        root_correlation_id=corr_id,
+        user_object_id=userObjectId,
+        user_email=userEmail,
+        result_count=1,
+        summary=f"Automation subscription {subscriptionId} revoked. Enabled set to false.",
+        conversation_id=conversationId,
+        turn_id=turnId,
+    )
+
+    return WriteResultEnvelope(
+        status="SUCCESS",
+        resultSummary=f"Automation subscription {subscriptionId} has been REVOKED.",
+        correlationId=corr_id,
+        auditStatus="PERSISTED",
+        externalObjectId=subscriptionId,
+    ).model_dump()
+
+
+async def prepare_meeting_actions(
+    meetingId: str,
+    sourceVersion: str = "1.0",
+    notesOverride: Optional[str] = None,
+    transcriptOverride: Optional[str] = None,
+    targetPlan: str = "Executive Strategic Initiatives",
+    targetBucket: str = "Q3 Deliverables",
+    rootCorrelationId: str = "",
+    conversationId: str = "",
+    turnId: str = "",
+    userObjectId: str = "",
+    userEmail: str = "",
+    tenantId: str = "velora-aviation",
+) -> Dict[str, Any]:
+    """Stage A: Extract meeting action items, resolve directory owners, and prepare approval preview envelope."""
+    from .meeting_actions import prepare_meeting_actions as _prepare_actions
+    return await _prepare_actions(
+        meeting_id=meetingId,
+        source_version=sourceVersion,
+        notes_override=notesOverride,
+        transcript_override=transcriptOverride,
+        target_plan=targetPlan,
+        target_bucket=targetBucket,
+        user_email=userEmail,
+        user_object_id=userObjectId,
+        tenant_id=tenantId,
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+    )
+
+
+async def create_approved_meeting_actions(
+    confirmationToken: str,
+    previewDetails: Dict[str, Any],
+    rootCorrelationId: str = "",
+    conversationId: str = "",
+    turnId: str = "",
+    userObjectId: str = "",
+    userEmail: str = "",
+    tenantId: str = "velora-aviation",
+) -> Dict[str, Any]:
+    """Stage B: Commit approved meeting actions to Microsoft Planner with atomic mapping persistence."""
+    from .meeting_actions import create_approved_meeting_actions as _commit_actions
+    return await _commit_actions(
+        confirmation_token=confirmationToken,
+        preview_details=previewDetails,
+        user_email=userEmail,
+        user_object_id=userObjectId,
+        tenant_id=tenantId,
+        root_correlation_id=rootCorrelationId,
+        conversation_id=conversationId,
+        turn_id=turnId,
+    )
+
+
 
 

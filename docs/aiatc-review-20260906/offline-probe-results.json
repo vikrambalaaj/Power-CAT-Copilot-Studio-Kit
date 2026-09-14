@@ -1,0 +1,142 @@
+[
+  {
+    "check": "numeric_money",
+    "observed": {
+      "rows": [
+        {
+          "OpenAmount": 9007199254740994.0
+        }
+      ],
+      "count": 1,
+      "declared_count_present": true,
+      "pages": 1,
+      "complete": true,
+      "incomplete_reason": ""
+    }
+  },
+  {
+    "check": "budget_transfer_lines",
+    "observed": {
+      "rows": [
+        {
+          "BudgetChangeDocument": "001",
+          "BudgetChangeDocumentItem": "001",
+          "FundsCenter": "F",
+          "CommitmentItem": "C",
+          "BudgetAmountInTransactionCrcy": "100"
+        }
+      ],
+      "count": 1,
+      "declared_count_present": false,
+      "pages": 1,
+      "complete": false,
+      "incomplete_reason": "Snapshot inconsistency detected: conflicting versions of document line BDG:::001:F:C"
+    }
+  },
+  {
+    "check": "consumption_periods",
+    "observed": {
+      "rows": [
+        {
+          "FinancialManagementArea": "1000",
+          "FundsCenter": "F",
+          "CommitmentItem": "C",
+          "FinMgmtAreaPeriod": "001",
+          "BudgetAmountInFMACrcy": "100"
+        }
+      ],
+      "count": 1,
+      "declared_count_present": false,
+      "pages": 1,
+      "complete": false,
+      "incomplete_reason": "Snapshot inconsistency detected: conflicting versions of document line CNS:1000:::F:C::"
+    }
+  },
+  {
+    "check": "s4__get_receivables_aging",
+    "observed": {
+      "status": "COMPLETE",
+      "multi": true,
+      "summary": "### SAP S/4HANA Accounts Receivable Aging Summary (Multi-Currency)\n\u2022 **Company Code**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2)\n\n"
+    }
+  },
+  {
+    "check": "s4__get_payables_aging",
+    "observed": {
+      "status": "COMPLETE",
+      "multi": true,
+      "summary": "### SAP S/4HANA Accounts Payable Aging Summary (Multi-Currency)\n\u2022 **Company Code**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2)\n\n**B"
+    }
+  },
+  {
+    "check": "s4__get_budget_transfers",
+    "observed": {
+      "status": "COMPLETE",
+      "multi": true,
+      "summary": "### SAP S/4HANA Budget Movements Register (Multi-Currency)\n\u2022 **Funds Management Area**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2)\n"
+    }
+  },
+  {
+    "check": "s4__get_budget_consumption",
+    "observed": {
+      "status": "CONFIGURATION_REQUIRED",
+      "multi": true,
+      "summary": "### SAP S/4HANA Budget & Expenditure Report (Multi-Currency)\n\u2022 **Funds Management Area**: 1000\n\u2022 **Coverage**: 2 rows retrieved (declared: 2"
+    }
+  },
+  {
+    "check": "fastmcp_names",
+    "observed": [
+      "s4__get_receivables_aging",
+      "s4__get_payables_aging",
+      "s4__get_budget_transfers",
+      "s4__get_budget_consumption",
+      "s4__get_customer_master",
+      "s4__get_cost_center_master",
+      "s4__get_profit_center_master"
+    ]
+  },
+  {
+    "check": "invalid_amount",
+    "observed": "0.00"
+  },
+  {
+    "check": "marker_string_serialization",
+    "observed": "{\"CustomerName\":123}"
+  },
+  {
+    "check": "sibling_root_accepted",
+    "observed": "https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001evil"
+  },
+  {
+    "check": "streamable_initialize",
+    "observed": {
+      "http": 500,
+      "body": "Internal Server Error"
+    }
+  },
+  {
+    "check": "partial_snapshot_recommendations",
+    "observed": 1
+  },
+  {
+    "check": "restart_recommendations",
+    "observed": 1
+  },
+  {
+    "check": "error_without_receipt_delivery",
+    "observed": {
+      "delivered": 1,
+      "states": [
+        "DELIVERED"
+      ]
+    }
+  },
+  {
+    "check": "loop_without_provider",
+    "observed": {
+      "status": "SAVED_TO_LOOP_NOTEBOOK",
+      "link": "https://loop.microsoft.com/p/velora-exec/LOOP-8a06e1b48b55"
+    }
+  }
+]

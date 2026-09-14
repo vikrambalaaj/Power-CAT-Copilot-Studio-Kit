@@ -1,0 +1,20 @@
+mcs.metadata:
+  componentName: Velora Facilitator MCP
+  description: Facilitates meetings, executive briefings, governed user-history retrieval, and approved follow-up workflows.
+kind: TaskDialog
+modelDisplayName: Velora Facilitator MCP
+modelDescription: Facilitates meetings, executive briefings, governed user-history retrieval, and approved follow-up workflows.
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: new_VeloraExecutiveAgent.shared_new-5fvelora-20facilitator-20mcp-5fa2a49f89a81f4c99.d09bc6a42b2241d1a5d74117ae817b98
+  connectionProperties:
+    mode: Maker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeServer
+    tools:
+      kind: UseSpecificTools
+      tools:
+        - get_facilitator_guide
+        - draft_meeting_summary_email

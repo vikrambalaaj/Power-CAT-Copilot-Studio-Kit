@@ -1,0 +1,105 @@
+{
+  "check_kill_switch": {
+    "definitions": 4,
+    "incoming_calls": [
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_kill_switch_global()",
+        "location": "L94"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_kill_switch_per_tool()",
+        "location": "L107"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_kill_switch_per_client_and_tenant()",
+        "location": "L119"
+      }
+    ]
+  },
+  "validate_destination_url": {
+    "definitions": 4,
+    "incoming_calls": [
+      {
+        "source_file": "mcp-apps/ask-facilitator/shared_mcp/network_security.py",
+        "caller": "validate_odata_next_link()",
+        "location": "L173"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/shared_mcp/network_security.py",
+        "caller": "validate_odata_next_link()",
+        "location": "L173"
+      },
+      {
+        "source_file": "mcp-apps/ask-s4hana/shared_mcp/network_security.py",
+        "caller": "validate_odata_next_link()",
+        "location": "L173"
+      },
+      {
+        "source_file": "mcp-apps/ask-successfactors/shared_mcp/network_security.py",
+        "caller": "validate_odata_next_link()",
+        "location": "L173"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_ssrf_blocks_cloud_metadata()",
+        "location": "L45"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_ssrf_blocks_loopback()",
+        "location": "L54"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_ssrf_blocks_unauthorized_private_ip()",
+        "location": "L60"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+        "caller": ".test_ssrf_blocks_non_https_schemes()",
+        "location": "L65"
+      }
+    ]
+  },
+  "verify_gateway_assertion": {
+    "definitions": 4,
+    "incoming_calls": [
+      {
+        "source_file": "mcp-apps/ask-facilitator/shared_mcp/identity.py",
+        "caller": "extract_verified_identity()",
+        "location": "L429"
+      },
+      {
+        "source_file": "mcp-apps/ask-productivity/shared_mcp/identity.py",
+        "caller": "extract_verified_identity()",
+        "location": "L429"
+      },
+      {
+        "source_file": "mcp-apps/ask-s4hana/shared_mcp/identity.py",
+        "caller": "extract_verified_identity()",
+        "location": "L429"
+      },
+      {
+        "source_file": "mcp-apps/ask-successfactors/shared_mcp/identity.py",
+        "caller": "extract_verified_identity()",
+        "location": "L429"
+      },
+      {
+        "source_file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+        "caller": "_extract_and_verify_admin_roles()",
+        "location": "L625"
+      }
+    ]
+  },
+  "confirm_approval": {
+    "definitions": 1,
+    "incoming_calls": []
+  },
+  "claim_execution": {
+    "definitions": 1,
+    "incoming_calls": []
+  }
+}

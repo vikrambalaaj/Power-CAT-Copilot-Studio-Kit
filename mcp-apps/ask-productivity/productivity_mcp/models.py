@@ -4,6 +4,27 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
+from .evidence_contracts import (
+    ActorType,
+    AttentionItem,
+    AutomationSubscription,
+    ClaimKind,
+    ConfidenceAssessment,
+    ConfidenceLabel,
+    DecisionRecord,
+    DeliveryReceipt,
+    EvidenceEnvelope,
+    EvidenceSource,
+    ExecutionContext,
+    MaterialClaim,
+    OperationStatus,
+    SubscriptionKind,
+    decimal_serializer,
+)
+
+if not hasattr(BaseModel, "model_dump"):
+    BaseModel.model_dump = BaseModel.dict
+
 
 # --- Standard Output Envelopes (Section 5.4 & 13) ---
 
@@ -18,6 +39,12 @@ class ReadToolEnvelope(BaseModel):
     warnings: List[str] = Field(default_factory=list, description="Policy, privacy, or freshness warnings")
     correlationId: str = Field(description="Preserved root correlation ID")
     auditStatus: str = Field(default="PERSISTED", description="Dataverse audit logging status")
+    claims: List[MaterialClaim] = Field(default_factory=list, description="Attributed material claims")
+    sources: List[EvidenceSource] = Field(default_factory=list, description="Referenced underlying sources")
+    confidence: Optional[ConfidenceAssessment] = Field(default=None, description="Confidence assessment")
+    truncated: bool = Field(default=False, description="Whether additional provider results were truncated by bounds")
+    nextLink: Optional[str] = Field(default=None, description="Authorized OData next link if results were truncated")
+    pageCount: int = Field(default=1, description="Number of provider pages traversed")
 
 
 class WritePreviewEnvelope(BaseModel):
@@ -224,6 +251,7 @@ class HandoffRequest(BaseModel):
     userObjectId: str = Field(description="Signed-in Entra Object ID")
     userEmail: str = Field(description="Signed-in user email")
     userTimezone: str = Field(default="Asia/Dubai", description="User preferred IANA time zone")
+    tenantId: Optional[str] = Field(default="velora-tenant", description="Entra Directory Tenant ID")
     channel: str = Field(default="Microsoft365Copilot", description="Client channel")
     dataClassification: str = Field(default="CONFIDENTIAL", description="Data sensitivity classification")
     parameters: Dict[str, Any] = Field(default_factory=dict, description="Operation specific parameters")
@@ -240,3 +268,6 @@ class HandoffResponse(BaseModel):
     warnings: List[str] = Field(default_factory=list, description="Any warnings")
     previewDetails: Optional[Dict[str, Any]] = Field(default=None, description="Preview payload if approvalRequired is true")
     structuredResult: Optional[Any] = Field(default=None, description="Result payload if read operation")
+    claims: List[MaterialClaim] = Field(default_factory=list, description="Attributed material claims")
+    sources: List[EvidenceSource] = Field(default_factory=list, description="Underlying evidence sources")
+    confidence: Optional[ConfidenceAssessment] = Field(default=None, description="Conservative confidence rating")

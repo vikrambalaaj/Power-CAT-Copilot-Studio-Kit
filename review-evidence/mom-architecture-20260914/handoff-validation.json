@@ -1,0 +1,14 @@
+{
+  "authoredFilesInventoried": 152,
+  "pythonFilesParsed": 111,
+  "pythonSyntaxErrors": 0,
+  "workPackages": 17,
+  "applicationSourceChangesByReview": false,
+  "liveProviderValidation": false,
+  "sourceDrift": [],
+  "missingLinks": [],
+  "requirementsMapped": 12,
+  "evidenceEntryPoints": 22,
+  "acceptancePackages": 17,
+  "masterWordCount": 9702
+}

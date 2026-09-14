@@ -1,0 +1,12 @@
+{
+  "testsRun": 15,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "scope": [
+    "test_recommendation_engine.py",
+    "test_notification_claims.py"
+  ],
+  "network": "blocked",
+  "providerEvidence": false
+}

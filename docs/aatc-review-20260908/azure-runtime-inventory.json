@@ -1,0 +1,5 @@
+{
+  "status": "NOT_OBTAINED",
+  "reason": "AuthorizationFailed",
+  "details": "azure-read-verification.json"
+}

@@ -1,0 +1,21 @@
+﻿{
+  "connectorid": "311c80db-5418-439c-b912-9f45caa0cb9f",
+  "name": "cre2f_5Fvelora-20productivity-20api",
+  "displayname": "Velora Productivity API",
+  "description": "Microsoft 365, Mail, Calendar, Teams, Planner, and Fail-Closed Dataverse Audit Connector for Velora Executive Agent Platform.",
+  "connectorinternalid": "shared_cre2f-5Fvelora-20productivity-20api-5Fa2a49f89a81f4c99",
+  "openapidefinition": "connectors/cre2f_5Fvelora-20productivity-20api-311c80db-5418-439c-b912-9f45caa0cb9f/openapidefinition.json",
+  "connectionparameters": "connectors/cre2f_5Fvelora-20productivity-20api-311c80db-5418-439c-b912-9f45caa0cb9f/connectionparameters.json",
+  "connectionparametersets": null,
+  "policytemplateinstances": "connectors/cre2f_5Fvelora-20productivity-20api-311c80db-5418-439c-b912-9f45caa0cb9f/policytemplateinstances.json",
+  "iconbrandcolor": null,
+  "iconblob": "connectors/cre2f_5Fvelora-20productivity-20api-311c80db-5418-439c-b912-9f45caa0cb9f/iconblob.png",
+  "connectortype": 1,
+  "statecode": 0,
+  "statuscode": 1,
+  "ismanaged": false,
+  "componentstate": 0,
+  "createdon": "2026-08-29T10:52:57Z",
+  "modifiedon": "2026-08-29T10:53:00Z",
+  "versionnumber": 3281390
+}

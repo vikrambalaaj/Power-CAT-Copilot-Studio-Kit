@@ -1,0 +1,36 @@
+[
+  {
+    "archive": "deploy/cre2f_VeloraExecutiveAgentPlatform.zip",
+    "entries": 10,
+    "workflow_files": [],
+    "sensitive_name_candidates": [
+      "solution/env"
+    ],
+    "uncompressed_bytes": 877482
+  },
+  {
+    "archive": "mcp-apps/ask-productivity/velora-productivity-agent.zip",
+    "entries": 6,
+    "workflow_files": [],
+    "sensitive_name_candidates": [],
+    "uncompressed_bytes": 32355
+  },
+  {
+    "archive": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+    "entries": 91,
+    "workflow_files": [],
+    "sensitive_name_candidates": [
+      "agent/env/"
+    ],
+    "uncompressed_bytes": 736569
+  },
+  {
+    "archive": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+    "entries": 87,
+    "workflow_files": [],
+    "sensitive_name_candidates": [
+      "agent/env/"
+    ],
+    "uncompressed_bytes": 807268
+  }
+]

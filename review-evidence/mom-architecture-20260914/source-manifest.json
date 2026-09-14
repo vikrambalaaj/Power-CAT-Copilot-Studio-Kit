@@ -1,0 +1,615 @@
+{
+  "head": "f1f9a1bb51fcef4c538db4a8c705937ab5c702f3",
+  "workingTree": "dirty; file hashes are the reviewed baseline",
+  "files": [
+    {
+      "path": "/Users/vikrambala/copilotstudio/.github/workflows/deploy-pages.yml",
+      "sha256": "0e44c00e5c3c24d0f84a9a76480cc74479cb540beda48318b1a77e466f585c89"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/analysis/StageAService.ts",
+      "sha256": "7b72a47f171d2a241c79dcd46adc4a35d65539aeb22c198518028129e6f0edd9"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/analysis/patternUtils.ts",
+      "sha256": "816e8a5d079d2bbbc8f1d02dd189cc50ebbc4b82401a265dcc974b62569d2aea"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/evaluate.ts",
+      "sha256": "4dd2ec48891119cca54108f1bce8f62df7372dc0154961530d7faad6e1b00c6d"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/evaluation/constants.ts",
+      "sha256": "e3609df0d8097408eb33c9f2cfb8b979adfef1de664033d284fad9b0ed9841e4"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/evaluation/evaluationOrchestrator.ts",
+      "sha256": "96674c095c0a2b7b39dd32bd14fdeac4b3a55fc737ecb25290691418490a1e43"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/evaluation/predictV2Client.ts",
+      "sha256": "9a7a7412488091c13a121333528a9fe2c6128c863f2bc8880844cbb724887fe0"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/evaluation/scoreCalculator.ts",
+      "sha256": "57afd6dba66f304724e98f1dfb63833a371e2aac98a1e2ea72754d06182dfbb1"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/index.ts",
+      "sha256": "b3752271b947195f0a033dac2ab99eab2ebe20576f2efe68a38c89933eed6887"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/models/types.ts",
+      "sha256": "f16804243d65411db2f7314dc652e964c116197bda2a6c0e36e6f5fae78e1155"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/parser/csZipParser.ts",
+      "sha256": "d4f4bb8e46b04f0b57da87357f9f4baf935b5198475c51e5ba8a4dabfcd8f853"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/parser/yamlUtils.ts",
+      "sha256": "f09dce662f32775c6f1383b926d9fc77fdaa8f2e8c62f6a0b2933307246e6e14"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/agent-review-pipeline/src/report/pdfReport.ts",
+      "sha256": "f73af9c62632500cb4fb920ca324f26eb42c2eb186454238dd629cda9ab433ad"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/build_velora_executive_platform_solution.py",
+      "sha256": "17b1e1e2f71924e35c0fe8ea33dd0330788519dc2e9331b98dd0897fcf0b3406"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/cleanup/remove_runtime_demo_data.py",
+      "sha256": "a914b5e541b55900fa6025b69c712eb84c4597c8217e88077fe6cd5e458c2b5b"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/cleanup/test_remove_runtime_demo_data.py",
+      "sha256": "c519f259b326a99b43ffb3bb97ef4819d4ca496aa80e318c05532dc449dd8d14"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/enrich_plugins_with_states.py",
+      "sha256": "2dd2c00474f329a87b5f377b6d1ee64ad879c01eaed559388890bdd5af6155a6"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/generate_connectors_swagger.py",
+      "sha256": "a8f8deb64a33c2090ec15e5ad1b8e305dcc54995b92ea5d46c49f8effef66b28"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/repair_dataverse_schema.py",
+      "sha256": "031aeb3ed4c063f56069c57d4f42fafbf30114325e149ee979e31e9e3b87c479"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/solution/[Content_Types].xml",
+      "sha256": "ac5602c08ccce9d61d27cc09aea00690fa2a88a9ebe159eb9b7a4fbad0a97793"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/solution/audit_cloud_flows.json",
+      "sha256": "21823bdcda670c8e201823f8ea666ff93cd6532d9e97d255ace40f8734d6730f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/solution/customizations.xml",
+      "sha256": "9f41eb536649a4eb7d035849f0806f15945e9f7c4ff1339e7920948182713a07"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/solution/solution.xml",
+      "sha256": "134a96a0410861fa0ecf6cac0420d5a8245978abb5d3ad1e0f7e09a6012c5ecc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/deploy/test_all_live_systems_and_audit.py",
+      "sha256": "f92d43daa44b5654b586090e38109aa6c8bc99b1603268c87333cc598bddb169"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/deploy/containerapp.bicep",
+      "sha256": "c7851e09d1c4957f65abe6225712118388085abb9e7f4438288e1ce8c35bee13"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/__init__.py",
+      "sha256": "54cc6788e1c41ac49c051dcab919c896c815f6001c887ec9bc45884629a220dd"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/__main__.py",
+      "sha256": "7f522d166c9e171592b4a6ef36ca445536583e31a61afe92d5942ebde86f156c"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+      "sha256": "1cefdb89a7f9cde12ea06bcf5c7c77080848210dba138ddfe76720dfe57a4875"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+      "sha256": "8353cb333ea13a556bdebaca509b321a4bd7a5fee1ec142c10d0254393a57cc7"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/requirements.txt",
+      "sha256": "d778318ae20c6a756d1777a500e5c5c05896b99e62634d2cb7962d121ddf71ed"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/run_server.py",
+      "sha256": "e6e2c77f81a142fe04f2cfdfc04f1c42c0fe69439e2a26689fd279d287904acb"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_app.py",
+      "sha256": "cf393aebc1bfd79662114e86272b7ce2eac50e712f7f6c7247c3fcd257c5f552"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_facilitator_governance.py",
+      "sha256": "0bd82df04446dbcd0088c7749871bab044a34636ca6e7b2238d5e7a8c2ee50e4"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/agent/appPackage/instruction.txt",
+      "sha256": "c0f4e87b4810177fbae5257ffc47a5fc1caf0589e2678610248b6a25527cc19d"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/agent/appPackage/productivity-plugin.json",
+      "sha256": "4e893095bdac5712144416b976093d1417ab8e82730b14d9548f2f4325da0771"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/deploy/containerapp.bicep",
+      "sha256": "e0405099d1f9dcdfaa558a8e88bc502e0d2a23b49028bdc88551ed5c25faeabb"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity-connector-swagger.json",
+      "sha256": "9a82daf6891010290a5350d0b2cfca2cf581a2a30c3d9c7804de5035be1bf037"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/__init__.py",
+      "sha256": "fef7e0a6dde5d9ba24e3d8d76951abbc46bf89c6bc2462ea80e2652f0024654c"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+      "sha256": "126bcf74eb2e71470c86209d3ee2b9673869677fab1c7fdc3712d5a31d8cf395"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+      "sha256": "f5251f38c45928e9e61387856ed6d340a4a76eb52b68bd87791a090906567af2"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+      "sha256": "6198ae21d2e288e41ef2f4e298cf5341522e24b36fdbfd10f569726e0dccb4bd"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/models.py",
+      "sha256": "2722b62609894cb50daddddd03c7f731b164cedb8ffde8970bf319cd3303fe7e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+      "sha256": "a98c2b8262e01e98b623b37905df2fdc4002cdf7e6b86be15de31340375ee87e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+      "sha256": "8c38895c05507ca6b519eab0e24bcfb46f3376fb20ac2515539a275f0b906aa0"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/server.py",
+      "sha256": "bc9e833a584cb87dea19049382830d5dadb61d63f5f3187306d8064ea25e362f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+      "sha256": "8fdb08c3afa8cf92c7a8adcad6f72238efcc90d6024b70f418ccc3bf652f4404"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+      "sha256": "9315ec713170b52f36396d27d342ca76ea39d992a18df62768cb4172fb0cc13d"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+      "sha256": "8e7503b86c410366f327bff835f81e58d69d3fc798bedba94d08ea516207fdb6"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/worker.py",
+      "sha256": "dffd748db4454515e3309b4ba3f5b3092ef41189e064805c2a12a2ba2ddd8c8e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/pyproject.toml",
+      "sha256": "4baab228d91bf21eb1bd776ef9ecc661a55ebb2045e4a8c986a55de4ea468667"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/requirements.txt",
+      "sha256": "6b4e76a22ec34adce599a813af0b259fd6e6cf1a062381e68f0d6449184c4b63"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/run_server.py",
+      "sha256": "9223c0a067d4845bfe8bad4c1b7344470c88c857c322fb87f18d942494337cf8"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/runtime.txt",
+      "sha256": "02d287dbf3943b450426d17b92e79f16ce8ff12560874a55aabcb49b48c663c4"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/__init__.py",
+      "sha256": "e2e4927cb2372e0475fa6baca10f847779aacd86aa79af11eb14c95036bbb996"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/logger.py",
+      "sha256": "4ce6e60acb7d54c024c5aab37039ecef80e7b4abc1477e7018beafb659059a5a"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_daily_briefing.py",
+      "sha256": "3308a203aecbb0298129b04980eab456fa6caaecf43fe283e82f33779aa29b73"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_dataverse_foundation.py",
+      "sha256": "69f03e955928a22bdff9a4f247e2742af58a7c8de0c667aa52f80f880339db42"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_federated_auth_isolation.py",
+      "sha256": "79a801a147d175a63387bf83310ed3ec29ee70c34d2a62ea6f4f6301c036d85f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_four_failed_cases.py",
+      "sha256": "31b544e8874a142e8cb351fd5544c24883dd9d0a055b366f63aab084693cf9db"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_configuration.py",
+      "sha256": "71a840529b2131855cfc8cbec20ab9b86679befb863c7462951edd3b91a305ae"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_handoff_contract.py",
+      "sha256": "9229aeecb511879a2b9602de9428bae830e76aa3a3fa977e183495c8ea53b318"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_identity_boundary.py",
+      "sha256": "3976f70fd7af977994fbac6f2f700f576250c1db131535838e4bbc5a5bf4be05"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_m365_reads.py",
+      "sha256": "27458b16d279ff74eca9b79fadf5da1506b96a13a7673c76ad9d8e8ca952018e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_m365_writes.py",
+      "sha256": "62328e3a2b8372d5aa0fbfbb8bd6b381c8ff78f78da166747a063ee1af095a8d"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+      "sha256": "d9d3f418ab4d01957335b09dfda8320162346b0cc3c9d22ca7643e31d616cf9e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_notification_claims.py",
+      "sha256": "2721eeaaaec24ee1e20fc5feb72f3be86d247a737b626d88ff8e187b6a4efd42"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_operation_state_machine.py",
+      "sha256": "6d108e564f570c2ad69bdb67969260197f19359aa4c52aa9333da06623c901fb"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_recommendation_engine.py",
+      "sha256": "0cef4b9f90fa16bdaa422a6a3fce36556d5342479cc1249226eb9637eedc4126"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_two_step_pattern.py",
+      "sha256": "06e14caad799fa6a74cf8ee593320c5e393308f4fd5fe92cde27e49762f205c5"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/deploy/containerapp.bicep",
+      "sha256": "46f4baab6df5750ad04e2fdf7431541cff576ea7f5ec242b39ed7a14a87cd906"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+      "sha256": "6180cf76f2d4b5ad72cedf238e563040da5bf3d708ac4528b9418ba151dd44c2"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/pyproject.toml",
+      "sha256": "bce0a004c612ffcb138974eb88afa301f4e12f765bd239c3416ba7576496ab40"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/requirements.txt",
+      "sha256": "d778318ae20c6a756d1777a500e5c5c05896b99e62634d2cb7962d121ddf71ed"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/__init__.py",
+      "sha256": "ee7279a4fc27cd82a88155282f2c5a4477d580879260e24738a76e4bdb4bbc5f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/__main__.py",
+      "sha256": "69427e5b84bc4c9be4383eb20ce54875d09728ed84cb754e880c935e5a6fc35a"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+      "sha256": "ba11d2bbaf8ae4f9a2e3eda1a76d507ef2033bf3f4504436bbb69b475ef0dafb"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+      "sha256": "4fbc20900e2c10f53a77a33d654e13ecbd4b0e562fe1ab0ef753363a3ace0ca9"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+      "sha256": "ae0a20b291d811db2fe431f077e8fcd863f916825aad0c9a67d6aa93cb78a6d5"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+      "sha256": "b5d0a45262964347967f66b38e9cc785289e1755ddb6e4f16e970a91e8ab8360"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+      "sha256": "c550bcb32ef9bfcb1e7da4bcbc8e30937b0aeaf75325454a181136073e3f5bed"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+      "sha256": "e648a22e816d2585bd07c1dc0e8c23b3f74110f0c019738cb8b848d2ab39916e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+      "sha256": "a75c90ee17d3d4104f8936f67267c4ec0d5162937cdacffa68610b59787caea2"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+      "sha256": "2af163b49e9e49ed39a8536e0b0ce3f18bdcc813f695f04216bfa56e29c32d59"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+      "sha256": "932ab6ee1e32f549a30f48da9f3b09ba32c0a8d182a0a90d740600c10be829b6"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_app.py",
+      "sha256": "4cded3424d968c61fe6b888c56cd4e4c14a8aca4fb0e68aa19aee7cddd3088bd"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_financial_error_propagation.py",
+      "sha256": "85e6cc6bb0a6090fc8c6e641b8ccfdbe90ed897dbf1b4f4ac88bb4996ce53e1e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_reviewer_findings.py",
+      "sha256": "28a9debc31b1ef36e7216de93b17fcca77cb40a1bf1864b1579f0f1694873f84"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/agent/appPackage/instruction.txt",
+      "sha256": "36de53608c57c58cd6af8e275f416655dd78c3945e7e87fc5d2b1c678a43a756"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+      "sha256": "8bf09cd3864b9b1de2e8f667d00674faa6a16606aada731da7f73360ac79b41c"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/deploy/containerapp.bicep",
+      "sha256": "bd3c85a97954c5dad0688528a266f8d48268f87d144a4791dc6ff894f4e78851"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+      "sha256": "208995c413890ffa1e6068a5c1556473c2ee21c08c82c3dba9ddabdbbf0b694d"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/pyproject.toml",
+      "sha256": "fefc5fa29b55c2789b13ae4ff14c180e9dc92a02ae09f89c502e46e1ea0437e5"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/requirements.txt",
+      "sha256": "96d55444a911d816af1b0ce0017d89fcce5e83b3cab2c88244edd452c94fd5bd"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/runtime.txt",
+      "sha256": "02d287dbf3943b450426d17b92e79f16ce8ff12560874a55aabcb49b48c663c4"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/__init__.py",
+      "sha256": "72033621e0c6b0a2b0d4d7faaf673af7c4f27cd2bd5e417e50f2cd98288e6133"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/auth.py",
+      "sha256": "87d112dad7367a4b519a73f67e0fe07a5446f5b8cda4ecd88512c477792e2340"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/file_logger.py",
+      "sha256": "a4c433211b53c0fcf9c3c637922a5f0009fb4db8c9048edbbf082bbff115a934"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/http.py",
+      "sha256": "5f2f14deaefcb11dc8fb482be46f07add196773b6a55604f82eb654ca24995bc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/identity.py",
+      "sha256": "d17446430ff204e46faff320848ec182d5566bb0ce6cfc46bbddbc0f4e8aa98e"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/kill_switch.py",
+      "sha256": "09340f773b466ba3985ab27f693a374a75a6d40c82b181629c5093afe0832448"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/logger.py",
+      "sha256": "489816886f71b2e773e10011444c78891389a4321fea1cbc29079ce358eabd31"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/network_security.py",
+      "sha256": "b823d271e9bd6e98c2367220c29d1cae62bdc0bd416e7ba3a8ee2d5013c0bacc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/telemetry.py",
+      "sha256": "70e434a66c08507d394bfe912a79a0f6946d958c38394443162fc5eb9bffd246"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/__init__.py",
+      "sha256": "14be812d56bdd70170652702b8c599a7c3f89708d6876a3b4f6e99023ce1ee6a"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/__main__.py",
+      "sha256": "29cf54bd9f163a41403c2c0e2ff37818568301b5dbdaac4b1547af0e2e78e81f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+      "sha256": "eff12ca860b1bb00a3f239e998ff19221bc3cca0f54a13c5f5429abc3f2007ef"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+      "sha256": "9bbed85a38c3f839b4bd4a2e24ef3fbee4104c3b029b6ab0bd497de5aad2e9bc"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+      "sha256": "17ec7112d7713fb2cc1bb72d4ea63780705340d230ce5db0072257b69211b901"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+      "sha256": "1c4b6cb104ca68d6dd9d8661e28ba0262f8669f5ed75bba3dcd003d24c8a5fd3"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+      "sha256": "38dc40d3b23f66fb3517948ad65d8454bf008d07de8354949c87fe0477ad84f6"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+      "sha256": "9e9cd7baab65549fa505dd1a428d03d75eeefcd43bb97f848ce8d8e4571d6d90"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+      "sha256": "5fa3ff877e3a0e482f9d51200ebed4ee36f4b2865d29336c21cf118c8d35fb9c"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+      "sha256": "20a4f95f6bb8f6db905ab251c4889d0c42d50a32470e4986819929a5c8b255df"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+      "sha256": "d55389e7ea4052ca5dcba3645887dc20e97a286b4a5c7665c495d074d84d9e7f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+      "sha256": "95872e652df5b7bcace77a3f2fa527e083a40f911c051c251931a7bdf674f6e5"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+      "sha256": "740c589daca6b6a6c4a8460869bc72ca934e54a5e097e37ddbda0cfa1f434077"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+      "sha256": "77000eead6ded35efb9f1fdd96c18359d72824d6946f8382db4255f6ef4edcd1"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+      "sha256": "b3efd80d653bb96ba5bb77dd27a0af44592ef27a0892a12934a21aac39e93d7a"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+      "sha256": "c1a84eb9bc0a51287d81a9a261f8592d3d85fe2f97611160a61cf1a5d1651615"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+      "sha256": "336749c6a6b9567d5a0652b47b6f53a1a1abb4305d496f2bd76d7037fca972e3"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+      "sha256": "01c5feed922ec27d16f3e7ce8f87c2452d2a8a369af215af6bd5ef5c8609401b"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+      "sha256": "16d049eaacc60d280bc0d2e07e48d8aa1f1b54f106b1dd8a1379d916aa0e60e7"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_app.py",
+      "sha256": "3fc7123578537df95e579beb0f1f0e19e63e14c29d8a9e254ab4dbfdac47104c"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_audit_durability.py",
+      "sha256": "ff2f7559b6e8a4296652ad60736b34f35e7047cf907203295abf6f832cf68785"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_cache_and_concurrency.py",
+      "sha256": "391bbe0e6f58ed6ee38167b71a8499fe33f384b7c20dd85018b3d62b33ddd747"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_connection_manager.py",
+      "sha256": "f829aa54aea37a703a28f70f6831ebbfb7b9cde2971fbd809628754450b29612"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_consent_and_greeting.py",
+      "sha256": "08c354aa3d8f5c6d3370a0b02c73d5f5b5d1089ed0adfe4d0e822cf58660451a"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_consent_greeting.py",
+      "sha256": "44679e0f4a3346989ab29c4f7220fd27924389377b16178758460836507b4475"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_consent_persistence_and_gate.py",
+      "sha256": "a576b91cd43855d2a1fe68294998a5a646eac795697c9d10e206be1a1200216d"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_dataverse_audit_and_memory.py",
+      "sha256": "879077e8d33af0d35cb91ca688804d8b1a6cee3a198bb0b30c20f8eedd271fd0"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_federated_auth_isolation.py",
+      "sha256": "7ecb74f9141ff1b49ff664f668569422a4b38de23cb2b168fafb916e4ceb378f"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_leavers_attrition_trend.py",
+      "sha256": "563e20a8a7b70ec7291f3cdc4ed487f7b24cdca80c91d794b3d85eb8b954208b"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_policy_and_drilldown.py",
+      "sha256": "dc03e416204a3a5279e76403d62c0baf89f2739f5bad51a71a19a365e556fcb2"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_validate_against_headcount_report.py",
+      "sha256": "2476ccf40ba689bd5b5c65936c3d8b929f849814f018e3177056b45428121a63"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/deploy-azure-containerapps.sh",
+      "sha256": "2001660ba94912bf3cac17025f8623d2726c8827699e1084c7ca9659e0f57f39"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/src/engine/fallback-generator.ts",
+      "sha256": "677190c52399771b289ae1c1f2d1316a91704603a8edf5cc2cba64db548c2937"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/src/engine/template-evaluator.ts",
+      "sha256": "bfc0368c4065538cc0b5242ccafcf9f16e4d70552e04a46f5fd1a0c261fb68b3"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/src/engine/template-registry.ts",
+      "sha256": "e5c48e0b8612b75f854690d28b61796f45d9637f3774a790a40a68d1ac6bbebf"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/src/engine/validator-sanitizer.ts",
+      "sha256": "e14c318040b18074e5ffaa1c4b4be0a50d1beed2aabb12595ff716a038c2ad55"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/src/index.ts",
+      "sha256": "79bbf89f91b501cf8f6df86c7db3bbffe05712a561363e594e4b36924fcc44f9"
+    },
+    {
+      "path": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/src/security/idempotency-signer.ts",
+      "sha256": "64d78d2624cb910f6746e3628596ae4ed5947231a5dde1fefec5834107793f6e"
+    }
+  ],
+  "scope": "Authored relevant service/deployment files; excludes virtualenvs, dependencies, binaries, secrets and generated dist. Hash inventory is broader than individually line-reviewed files."
+}

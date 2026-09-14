@@ -1,0 +1,8 @@
+{
+  "status": "BLOCKED",
+  "operation": "Microsoft.App/containerApps/read",
+  "resource_group": "az-vel-agenticad-execai-dev-uaen-rg",
+  "reason": "Azure AuthorizationFailed: current account lacks resource read access or scope is invalid",
+  "deployment_verified": false,
+  "audit_write_readback_verified": false
+}

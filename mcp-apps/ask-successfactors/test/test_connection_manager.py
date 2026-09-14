@@ -222,6 +222,38 @@ class ConnectionManagerTests(unittest.IsolatedAsyncioTestCase):
             val2 = await self.secret_store.get_secret("NEW_REF")
             self.assertEqual(val2, "NewVal456")
 
+    async def test_federated_dataverse_connection_resolution_and_health(self):
+        """Verify that Dataverse connection supports FederatedCredential using client_id without static secret."""
+        with patch.dict(
+            os.environ,
+            {
+                "AZURE_CLIENT_ID": "c659609b-76db-49b1-8470-3205a6c35ecb",
+                "AZURE_TENANT_ID": "9ce80a2a-2703-4502-b26e-d911a3f83418",
+                "DATAVERSE_AUTH_TYPE": "FederatedCredential",
+                "AZURE_FEDERATED_TOKEN": "mock-jwt-assertion-token",
+            },
+            clear=True,
+        ):
+            mgr = ConnectionManager(
+                secret_store=SecretStoreProvider(),
+                default_environment="Development",
+            )
+            dv_conn = mgr.resolve_connection("Velora Dataverse Connection")
+            self.assertIsNotNone(dv_conn)
+            self.assertEqual(dv_conn.auth_type, AuthType.FEDERATED_CREDENTIAL)
+            self.assertEqual(dv_conn.client_id, "c659609b-76db-49b1-8470-3205a6c35ecb")
+            self.assertEqual(dv_conn.tenant_id, "9ce80a2a-2703-4502-b26e-d911a3f83418")
+
+            # Credentials resolution retrieves federated token as secret
+            creds = await mgr.get_resolved_credentials(dv_conn)
+            self.assertEqual(creds["client_id"], "c659609b-76db-49b1-8470-3205a6c35ecb")
+            self.assertEqual(creds["secret"], "mock-jwt-assertion-token")
+            self.assertEqual(creds["auth_type"], AuthType.FEDERATED_CREDENTIAL)
+
+            # Health validation without static secret succeeds via client_id presence
+            self.assertEqual(dv_conn.status, ConnectionHealthStatus.HEALTHY)
+
 
 if __name__ == "__main__":
     unittest.main()
+

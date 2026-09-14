@@ -1,0 +1,446 @@
+[
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/build_velora_executive_platform_solution.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/cleanup/remove_runtime_demo_data.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/cleanup/test_remove_runtime_demo_data.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/enrich_plugins_with_states.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/generate_connectors_swagger.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/repair_dataverse_schema.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/deploy/test_all_live_systems_and_audit.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/__main__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/run_server.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/identity.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/kill_switch.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/shared_mcp/network_security.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_app.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_facilitator_governance.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/server.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/run_server.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/identity.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/kill_switch.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/logger.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/shared_mcp/network_security.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_daily_briefing.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_dataverse_foundation.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_federated_auth_isolation.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_four_failed_cases.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_configuration.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_handoff_contract.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_identity_boundary.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_m365_reads.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_m365_writes.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_network_and_killswitch.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_notification_claims.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_operation_state_machine.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_recommendation_engine.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_two_step_pattern.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/__main__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/identity.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/kill_switch.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/shared_mcp/network_security.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_app.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_financial_error_propagation.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_reviewer_findings.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/auth.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/file_logger.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/http.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/identity.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/kill_switch.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/logger.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/network_security.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/shared_mcp/telemetry.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/__init__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/__main__.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_app.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_audit_durability.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_cache_and_concurrency.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_connection_manager.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_consent_and_greeting.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_consent_greeting.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_consent_persistence_and_gate.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_dataverse_audit_and_memory.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_federated_auth_isolation.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_leavers_attrition_trend.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_policy_and_drilldown.py",
+    "parsed": true
+  },
+  {
+    "path": "/Users/vikrambala/copilotstudio/mcp-apps/ask-successfactors/test/test_validate_against_headcount_report.py",
+    "parsed": true
+  }
+]

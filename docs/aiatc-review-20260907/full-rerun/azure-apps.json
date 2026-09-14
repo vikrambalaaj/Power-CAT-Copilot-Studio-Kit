@@ -1,0 +1,12 @@
+[
+  {
+    "external": true,
+    "identity": "None",
+    "image": [
+      "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-s4hana:1.1.7"
+    ],
+    "name": "agenticad-execai-dev-uaen-ca-001",
+    "revision": "agenticad-execai-dev-uaen-ca-001--0000022",
+    "volumes": []
+  }
+]

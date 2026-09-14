@@ -1,0 +1,31 @@
+﻿connectionReferences:
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_a365outlookcalendarmcp.shared-a365outlookca-edd16ea4-5a8b-4288-b57a-5cca97c9c049
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_a365outlookcalendarmcp
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_a365outlookmailmcp.shared-a365outlookma-44e4bc59-dd0b-4387-a5b5-9c27f534b726
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_a365outlookmailmcp
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_a365teamsmcp.shared-a365teamsmcp-3a711cfd-eb80-4254-8b9d-b0a3ac0b04fa
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_a365teamsmcp
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_commondataserviceforapps.47cd19a4397f40649b106ab45a211c85
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_cre2f-5fvelora-20productivity-20api-5fa2a49f89a81f4c99.83d6b694c3174e828efd94ca027ab8b3
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_cre2f-5fvelora-20productivity-20api-5fa2a49f89a81f4c99
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_cre2f-5fvelora-20sac-20analytics-20mcp-5fa2a49f89a81f4c99.182b4bac05844d20a8189f3f8da4dd11
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_cre2f-5fvelora-20sac-20analytics-20mcp-5fa2a49f89a81f4c99
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_new-5fvelora-20facilitator-20mcp-5fa2a49f89a81f4c99.d09bc6a42b2241d1a5d74117ae817b98
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_new-5fvelora-20facilitator-20mcp-5fa2a49f89a81f4c99
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_new-5fvelora-20s4-20finance-20mcp-20azure-5fa2a49f89a81f4c99.354d2b628d1a4cc7831c16b282a25b02
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_new-5fvelora-20s4-20finance-20mcp-20azure-5fa2a49f89a81f4c99
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_new-5fvelora-20successfactors-20mcp-5fa2a49f89a81f4c99.26c5920898c14226b5cefeea96e8fea0
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_new-5fvelora-20successfactors-20mcp-5fa2a49f89a81f4c99
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_planner.shared-planner-ccb1b932-963e-4256-b088-6bad4d1b96dd
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_planner
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_velora-20successfactors-20workforce-20cards-5fa-6a35ebb122500440.2757f259277d471d99859750f0d2906a
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_velora-20successfactors-20workforce-20cards-5fa-6a35ebb122500440
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_workiqonedrive.shared-workiqonedriv-3d19714c-204f-4e17-aa33-92f06c4c8372
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_workiqonedrive
+  - connectionReferenceLogicalName: new_VeloraExecutiveAgent.shared_workiqsharepoint.shared-workiqsharepo-e15b07f7-6328-4a6a-a6a2-6d88657651d3
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_workiqsharepoint
+  - connectionReferenceLogicalName: new_sharedcommondataserviceforapps_7e1a8
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps
+  - connectionReferenceLogicalName: new_sharedoffice365_10474
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_office365
