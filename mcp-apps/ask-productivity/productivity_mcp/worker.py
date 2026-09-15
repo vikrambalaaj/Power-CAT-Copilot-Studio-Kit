@@ -36,14 +36,17 @@ from productivity_mcp.standing_authorization import get_standing_authorization_s
 
 def evaluate_and_dispatch_subscriptions(
     client: Microsoft365Client,
-    tenant_id: str,
+    tenant_id: str = "velora-tenant",
     now: Optional[datetime] = None,
+    require_live_delivery: bool = False,
 ) -> int:
-    """Evaluate active automation subscriptions and dispatch due executive briefings.
-    
-    Invariants:
+    """Evaluate all enabled subscriptions against the current time and calendar state.
+
+    Safety & Resilience Invariants:
     - Only enabled subscriptions are evaluated.
-    - Idempotency run key prevents any duplicate dispatches.
+    - Idempotency run key prevents any duplicate dispatches across workers.
+    - Atomically claims run before provider interaction.
+    - Validates email channel dispatch and provider receipts.
     - Revoked or disabled subscriptions yield 0 dispatches.
     - Records audit history in subscription_run_history.
     """
@@ -89,6 +92,26 @@ def evaluate_and_dispatch_subscriptions(
             log.warning(f"subscription_dispatch_blocked_by_kill_switch run_key={run_key} error={k_err.message}")
             continue
 
+        # Channel verification: only EMAIL is currently supported
+        if sub.channel.upper() != "EMAIL":
+            log.warning(f"unsupported_subscription_channel sub={sub.subscriptionId} channel={sub.channel}")
+            continue
+
+        # Atomically claim run BEFORE sending to prevent race conditions across concurrent replicas
+        execution_id = f"exec-{int(time.time() * 1000)}"
+        claimed = sub_service.claim_subscription_run(
+            run_key=run_key,
+            tenant_id=tenant_id,
+            subscription_id=sub.subscriptionId,
+            subscription_version=sub.version,
+            execution_id=execution_id,
+            scheduled_occurrence=exec_ctx.get("scheduledOccurrence", ""),
+            details={"sub_id": sub.subscriptionId, "kind": sub.kind.value},
+        )
+        if not claimed:
+            log.info(f"subscription_run_claim_contested_or_already_taken run_key={run_key}")
+            continue
+
         try:
             subject = ""
             html_body = ""
@@ -115,33 +138,41 @@ def evaluate_and_dispatch_subscriptions(
 
             else:
                 log.warning(f"unsupported_subscription_kind sub={sub.subscriptionId} kind={sub.kind}")
+                sub_service.complete_subscription_run(
+                    run_key=run_key,
+                    status="FAILED",
+                    details={"error": f"Unsupported subscription kind: {sub.kind}"},
+                )
                 continue
 
-            # Dispatch via email channel
-            if sub.channel.upper() == "EMAIL":
-                client.execute_send_email(
-                    to=sub.recipients,
-                    cc=[],
-                    subject=subject,
-                    body=html_body,
-                    attachments=[],
-                )
+            # Dispatch via email channel and capture receipt
+            send_res = client.execute_send_email(
+                to=sub.recipients,
+                cc=[],
+                subject=subject,
+                body=html_body,
+                attachments=[],
+            )
 
-            # Record run history
-            execution_id = f"exec-{int(time.time() * 1000)}"
-            sub_service.record_subscription_run(
+            # Enforce live-delivery requirements
+            if require_live_delivery and send_res.get("simulated", True):
+                raise RuntimeError("Subscription delivery failed: live delivery required but provider returned simulated response.")
+
+            # Validate receipt from provider
+            receipt = send_res.get("providerReceipt") or send_res.get("requestId") or send_res.get("id") or send_res.get("message_id")
+            if not receipt and send_res.get("status") not in ("ACCEPTED", "SENT", "SUCCESS"):
+                raise RuntimeError(f"Subscription delivery failed: missing provider dispatch receipt. Response: {send_res}")
+
+            # Record run success atomically
+            sub_service.complete_subscription_run(
                 run_key=run_key,
-                tenant_id=tenant_id,
-                subscription_id=sub.subscriptionId,
-                subscription_version=sub.version,
-                execution_id=execution_id,
-                scheduled_occurrence=exec_ctx.get("scheduledOccurrence", ""),
                 status="SUCCESS",
                 details={
                     "subject": subject,
                     "contentHash": brief_content_hash,
                     "kind": sub.kind.value,
                     "recipients": sub.recipients,
+                    "providerReceipt": receipt,
                 },
             )
             dispatched_count += 1
@@ -149,6 +180,11 @@ def evaluate_and_dispatch_subscriptions(
 
         except Exception as ex:
             log.error(f"subscription_dispatch_failed run_key={run_key} error={ex}", exc_info=True)
+            sub_service.complete_subscription_run(
+                run_key=run_key,
+                status="FAILED",
+                details={"error": str(ex)},
+            )
 
     return dispatched_count
 
@@ -202,7 +238,12 @@ def run_worker_pass(
         delivered = engine.dispatch_outbox(m365_client=client, require_live_delivery=live_req)
 
         # 5. Evaluate and dispatch active automation subscriptions
-        sub_dispatches = evaluate_and_dispatch_subscriptions(client=client, tenant_id=tenant_id, now=now)
+        sub_dispatches = evaluate_and_dispatch_subscriptions(
+            client=client,
+            tenant_id=tenant_id,
+            now=now,
+            require_live_delivery=live_req,
+        )
 
         total_delivered = delivered + sub_dispatches
         log.info(f"worker_sweep_complete total_delivered={total_delivered} outbox_delivered={delivered} subscription_dispatches={sub_dispatches} reconciled={reconciled} workload_id={workload_id}")

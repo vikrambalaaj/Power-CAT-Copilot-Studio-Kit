@@ -41,7 +41,7 @@ class SACClient:
             return cached
         token = await self.get_token()
         if not token:
-            raise RuntimeError('SOURCE_UNAVAILABLE: get_executive_kpis requires a configured live provider; no substitute data is returned.')
+            raise RuntimeError('SOURCE_UNAVAILABLE: get_executive_kpis requires a configured live provider; no substitute data is returned. SAC live integration is not configured.')
         headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/json'}
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(f"{settings.sac_tenant_url.rstrip('/')}/api/v1/dataexport/providers/sac/kpis", headers=headers, params={'domain': domain.upper()})

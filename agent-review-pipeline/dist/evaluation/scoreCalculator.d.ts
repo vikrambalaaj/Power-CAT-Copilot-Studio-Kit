@@ -30,6 +30,7 @@ export declare function calculateInstructionScore(evaluation?: InstructionEvalua
  * Calculate overall score and determine pass/fail.
  *
  * Formula: (patternScore × 0.5) + (instructionScore × 0.5)
- * If only one stage available, use that score alone.
+ * All mandatory stages (Stage B and Stage C) must complete successfully.
+ * A missing, failed, or incomplete stage causes the evaluation gate to fail.
  */
 export declare function calculateScores(stageBResult?: PatternEvaluation, stageCResult?: InstructionEvaluation, threshold?: number): ScoreResult;

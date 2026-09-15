@@ -142,6 +142,11 @@ def verify_bearer_token(
 
     alg = header.get("alg")
     configured_test_secret = test_secret or os.getenv("TEST_JWT_SECRET")
+    is_prod = os.getenv("ENVIRONMENT", "").lower() in ("production", "prod") or os.getenv("NODE_ENV", "").lower() == "production"
+
+    if is_prod and configured_test_secret:
+        log.error("Test signing keys and symmetric secrets are strictly prohibited in production")
+        raise AuthenticationError("Test signing keys are disallowed in production")
 
     # Algorithm enforcement: HS256 is ONLY allowed if test secret is explicitly provided
     if alg == "HS256":
@@ -219,6 +224,8 @@ def verify_bearer_token(
             f"https://sts.windows.net/{expected_tid}/",
         }
         if configured_test_secret and (iss.startswith("https://test.") or "test" in iss):
+            if is_prod:
+                raise AuthenticationError("Test issuers are disallowed in production")
             pass  # Test harness mock issuer
         elif iss not in expected_issuers:
             log.warning(f"Issuer mismatch: token iss={iss}, expected one of {expected_issuers}")
@@ -226,15 +233,28 @@ def verify_bearer_token(
 
     # Enforce Audience
     aud = payload.get("aud")
-    expected_aud = expected_audience or os.getenv("API_AUDIENCE") or DEFAULT_AUDIENCE
-    if expected_aud:
+    configured_audiences = {
+        expected_audience,
+        os.getenv("ENTRA_INBOUND_AUDIENCE"),
+        os.getenv("API_AUDIENCE"),
+        os.getenv("ENTRA_CLIENT_ID"),
+        DEFAULT_AUDIENCE,
+    }
+    configured_audiences.discard(None)
+    configured_audiences.discard("")
+    allowed_audiences = set(configured_audiences)
+    for a in configured_audiences:
+        allowed_audiences.add(f"api://{a}")
+
+    if allowed_audiences:
         valid_aud = False
         if isinstance(aud, list):
-            valid_aud = expected_aud in aud
+            valid_aud = any(a in allowed_audiences for a in aud)
         elif isinstance(aud, str):
-            valid_aud = aud == expected_aud or aud == f"api://{expected_aud}"
+            valid_aud = audience in allowed_audiences if (audience := aud) else False
+            valid_aud = aud in allowed_audiences
         if not valid_aud:
-            log.warning(f"Audience mismatch: token aud={aud}, expected={expected_aud}")
+            log.warning(f"Audience mismatch: token aud={aud}, expected one of {allowed_audiences}")
             raise AuthenticationError("Invalid token audience")
 
     # Extract Subject & Identity

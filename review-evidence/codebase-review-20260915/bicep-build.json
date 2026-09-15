@@ -1,0 +1,32 @@
+[
+  {
+    "path": "mcp-apps/ask-facilitator/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": "WARNING: A new Bicep release is available: v0.47.16. Upgrade now by running \"az bicep upgrade\".\n"
+  },
+  {
+    "path": "mcp-apps/ask-productivity/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": "WARNING: A new Bicep release is available: v0.47.16. Upgrade now by running \"az bicep upgrade\".\n"
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": "WARNING: A new Bicep release is available: v0.47.16. Upgrade now by running \"az bicep upgrade\".\n"
+  },
+  {
+    "path": "mcp-apps/ask-sac/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": "WARNING: A new Bicep release is available: v0.47.16. Upgrade now by running \"az bicep upgrade\".\n"
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/deploy/containerapp.bicep",
+    "exit_code": 0,
+    "diagnostics": "WARNING: A new Bicep release is available: v0.47.16. Upgrade now by running \"az bicep upgrade\".\n"
+  },
+  {
+    "path": "mcp-apps/deploy/storage-and-queues.bicep",
+    "exit_code": 0,
+    "diagnostics": "WARNING: A new Bicep release is available: v0.47.16. Upgrade now by running \"az bicep upgrade\".\n"
+  }
+]

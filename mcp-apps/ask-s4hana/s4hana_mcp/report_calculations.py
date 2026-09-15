@@ -36,6 +36,13 @@ def _get_record_currency(r: dict[str, Any], entity_type: str | None = None) -> s
         or ""
     ).strip().upper()
 
+def _first_present_value(record: dict[str, Any], *keys: str) -> Any:
+    """Return first non-None value among keys, preserving valid numeric zeroes."""
+    for k in keys:
+        if k in record and record[k] is not None:
+            return record[k]
+    return None
+
 
 def _calculate_single_currency_aging(records: list[dict[str, Any]], is_receivable: bool = True) -> dict[str, Any]:
     buckets = {
@@ -418,10 +425,10 @@ def calculate_budget_consumption(
     for r in records:
         if not detected_currency:
             detected_currency = _get_record_currency(r, entity_type="BudgetConsumption")
-        raw_b = r.get("BudgetAmountInFMACrcy") or r.get("BudgetAmount") or r.get("TotalBudgetAmount")
-        raw_c = r.get("CmtmtOpenItemAmountInFMACrcy") or r.get("CommitmentAmount") or r.get("OpenCommitmentAmount")
-        raw_a = r.get("ActualAmountInFMACrcy") or r.get("ActualAmount") or r.get("TotalActualAmount")
-        raw_ctrl = r.get("CtrlgItemAmountInFMACrcy") or r.get("ControllingAmount")
+        raw_b = _first_present_value(r, "BudgetAmountInFMACrcy", "BudgetAmount", "TotalBudgetAmount")
+        raw_c = _first_present_value(r, "CmtmtOpenItemAmountInFMACrcy", "CommitmentAmount", "OpenCommitmentAmount")
+        raw_a = _first_present_value(r, "ActualAmountInFMACrcy", "ActualAmount", "TotalActualAmount")
+        raw_ctrl = _first_present_value(r, "CtrlgItemAmountInFMACrcy", "ControllingAmount")
         for raw_val, name in [
             (raw_b, "Budget"),
             (raw_c, "Commitments"),

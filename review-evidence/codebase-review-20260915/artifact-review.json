@@ -1,0 +1,80 @@
+{
+  "definition_counts": {
+    ".json": 74,
+    ".xml": 67
+  },
+  "syntax_errors": [
+    {
+      "path": "PowerCAT.PackageDeployer.Package/PkgAssets/manifest.ppkg.json",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "path": "PowerCAT.PackageDeployer.Package/PowerCAT.Package.Settings.json",
+      "error": "Illegal trailing comma before end of array: line 148 column 6 (char 4260)"
+    }
+  ],
+  "archives": [
+    {
+      "path": "deploy/cre2f_VeloraExecutiveAgentPlatform.zip",
+      "entries": 4,
+      "env_entries": [],
+      "populated_sensitive_assignments": 0,
+      "python_files": 0,
+      "python_errors": []
+    },
+    {
+      "path": "mcp-apps/ask-productivity/velora-productivity-agent.zip",
+      "entries": 6,
+      "env_entries": [],
+      "populated_sensitive_assignments": 0,
+      "python_files": 0,
+      "python_errors": []
+    },
+    {
+      "path": "mcp-apps/ask-salesforce/ask-salesforce.zip",
+      "entries": 91,
+      "env_entries": [
+        "agent/env/"
+      ],
+      "populated_sensitive_assignments": 0,
+      "python_files": 13,
+      "python_errors": []
+    },
+    {
+      "path": "mcp-apps/ask-servicenow/ask-servicenow.zip",
+      "entries": 87,
+      "env_entries": [
+        "agent/env/"
+      ],
+      "populated_sensitive_assignments": 0,
+      "python_files": 13,
+      "python_errors": []
+    }
+  ],
+  "connectors": [
+    {
+      "path": "mcp-apps/ask-facilitator/facilitator-connector-swagger.json",
+      "securityDefinitions": false,
+      "security": false,
+      "host": "facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+    },
+    {
+      "path": "mcp-apps/ask-sac/sac-connector-swagger.json",
+      "securityDefinitions": false,
+      "security": false,
+      "host": "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+    },
+    {
+      "path": "mcp-apps/ask-s4hana/s4-connector-swagger.json",
+      "securityDefinitions": true,
+      "security": true,
+      "host": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io"
+    },
+    {
+      "path": "mcp-apps/ask-productivity/productivity-connector-swagger.json",
+      "securityDefinitions": false,
+      "security": false,
+      "host": "productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+    }
+  ]
+}

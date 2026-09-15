@@ -1,0 +1,91 @@
+{
+  "suites": [
+    {
+      "tests": 96,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-successfactors",
+      "passed": 94
+    },
+    {
+      "tests": 197,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "productivity-workspace",
+      "passed": 196
+    },
+    {
+      "tests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-s4hana",
+      "passed": 39
+    },
+    {
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "facilitator-workspace",
+      "passed": 53
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-sac",
+      "passed": 3
+    },
+    {
+      "tests": 7,
+      "failures": 5,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "architecture",
+      "passed": 2
+    },
+    {
+      "tests": 4,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "cleanup",
+      "passed": 3
+    },
+    {
+      "suite": "cards",
+      "tests": 6,
+      "passed": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "pipeline",
+      "tests": 3,
+      "passed": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "tests": 408,
+    "passed": 399,
+    "failures": 9,
+    "errors": 0,
+    "skipped": 0
+  },
+  "workspace_imports_required": [
+    "productivity",
+    "facilitator"
+  ],
+  "initial_collection_errors": {
+    "productivity": 1,
+    "facilitator": 5
+  }
+}

@@ -140,6 +140,16 @@ sac_swagger = {
     "schemes": ["https"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "x-api-key",
+            "in": "header"
+        }
+    },
+    "security": [
+        {"ApiKeyAuth": []}
+    ],
     "paths": {
         "/health": {
             "get": {
@@ -243,6 +253,16 @@ facilitator_swagger = {
     "schemes": ["https"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "x-api-key",
+            "in": "header"
+        }
+    },
+    "security": [
+        {"ApiKeyAuth": []}
+    ],
     "paths": {
         "/health": {
             "get": {

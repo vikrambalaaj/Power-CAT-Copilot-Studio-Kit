@@ -23,6 +23,7 @@ M365_COLLECTION_METHODS = {
     'get_mail_thread', 'summarize_priority_mail', 'find_mail_follow_ups',
     'get_meeting_details', 'check_availability', 'get_channel_context',
     'get_chat_context', 'get_planner_task', 'list_pending_approvals',
+    'search_mail', 'list_calendar_events', 'search_teams_messages', 'list_planner_tasks',
 }
 FACILITATOR_UNAVAILABLE = {
     'generate_pre_meeting_briefing', 'query_user_history_from_dataverse',
@@ -42,8 +43,18 @@ class Cleanup(ast.NodeTransformer):
         self.changes = []
 
     def visit_Assign(self, node):
-        if self.kind == 'm365' and any(isinstance(t, ast.Attribute) and t.attr == 'force_mock' for t in node.targets):
-            self.changes.append('Remove runtime mock-mode switch')
+        if self.kind == 'm365':
+            if any(isinstance(t, ast.Attribute) and t.attr == 'force_mock' for t in node.targets):
+                self.changes.append('Remove runtime mock-mode switch')
+                return None
+            if any(isinstance(t, ast.Name) and (t.id.startswith('_M365_') or t.id.startswith('_INITIAL_')) for t in node.targets):
+                self.changes.append('Remove fixture collection ' + ', '.join(t.id for t in node.targets if isinstance(t, ast.Name)))
+                return None
+        return self.generic_visit(node)
+
+    def visit_If(self, node):
+        if self.kind == 'm365' and isinstance(node.test, ast.Attribute) and node.test.attr == '_is_mock_enabled':
+            self.changes.append('Remove mock-mode branch')
             return None
         return self.generic_visit(node)
 
@@ -51,7 +62,7 @@ class Cleanup(ast.NodeTransformer):
         if self.kind == 'sac_settings' and isinstance(node.target, ast.Name) and node.target.id == 'demo_mode':
             self.changes.append('Remove demo-mode configuration field')
             return None
-        if self.kind == 'm365' and isinstance(node.target, ast.Name) and node.target.id.startswith('_M365_'):
+        if self.kind == 'm365' and isinstance(node.target, ast.Name) and (node.target.id.startswith('_M365_') or node.target.id.startswith('_INITIAL_')):
             self.changes.append('Remove fixture collection ' + node.target.id)
             return None
         if self.kind == 'facilitator' and isinstance(node.target, ast.Name) and node.target.id in {'_CALENDAR_STORE', '_DATAVERSE_AUDIT_LOGS'}:
@@ -67,6 +78,10 @@ class Cleanup(ast.NodeTransformer):
             if node.name == 'is_live':
                 node.body = statements('return bool(self.graph_access_token or (self.tenant_id and self.client_id and self.client_secret))')
                 self.changes.append('Require configured live Graph credentials')
+                return node
+            if node.name == '_is_mock_enabled':
+                node.body = statements('return False')
+                self.changes.append('Disable mock-mode check')
                 return node
             if node.name in M365_COLLECTION_METHODS:
                 node.body = unavailable(node.name)

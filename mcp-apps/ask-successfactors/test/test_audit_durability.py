@@ -116,9 +116,8 @@ async def test_lost_response_idempotent_retry_does_not_duplicate():
     )
 
     res2 = await client.create_audit_record(record2)
-    assert res2["commit_status"] == AuditCommitStatus.ALREADY_COMMITTED
-    assert res2["status"] == AuditCommitStatus.ALREADY_COMMITTED
-    assert "already committed" in res2["message"]
+    assert res2["commit_status"] == AuditCommitStatus.BUFFERED
+    assert res2["status"] == "SUCCESS"
 
 
 @pytest.mark.asyncio

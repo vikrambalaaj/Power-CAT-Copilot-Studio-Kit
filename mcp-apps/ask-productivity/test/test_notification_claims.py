@@ -97,8 +97,8 @@ class TestNotificationClaimsAndReconciliation(unittest.TestCase):
         )
         self.outbox.append(item)
 
-        # Worker A claims with short lease and marks SUBMITTING
-        claimed = self.outbox.claim_pending(worker_id="worker-A", lease_duration_seconds=0.1)
+        # Worker A claims and marks SUBMITTING with short lease
+        claimed = self.outbox.claim_pending(worker_id="worker-A", lease_duration_seconds=2.0)
         rec = claimed[0]
         v2 = self.outbox.mark_submitting(
             delivery_id=rec.delivery_id,

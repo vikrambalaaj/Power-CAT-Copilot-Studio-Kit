@@ -28,8 +28,9 @@ test('missing instruction input always scores zero', () => {
   }), 0);
 });
 
-test('overall score uses the available stage when the other stage fails', () => {
+test('overall evaluation gate fails when a mandatory stage is missing', () => {
   const result = calculateScores({ Patterns: [{ PatternName: 'pass', Status: true }] }, undefined, 60);
-  assert.equal(result.overallScore, 100);
-  assert.equal(result.passed, true);
+  assert.equal(result.overallScore, 50);
+  assert.equal(result.passed, false);
 });
+

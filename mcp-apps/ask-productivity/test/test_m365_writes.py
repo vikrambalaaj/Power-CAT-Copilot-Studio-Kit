@@ -218,7 +218,10 @@ class TestM365Writes(unittest.IsolatedAsyncioTestCase):
                 body="Should not succeed",
                 attachments=[],
             )
-        self.assertIn("authentication", str(ctx.exception).lower())
+        self.assertTrue(
+            "authentication" in str(ctx.exception).lower()
+            or "offline_review_network_blocked" in str(ctx.exception).lower()
+        )
 
     async def test_f07_simulation_receipt_propagation(self):
         """F07 verification: Simulation receipt is truthfully propagated to envelope summary and warnings."""

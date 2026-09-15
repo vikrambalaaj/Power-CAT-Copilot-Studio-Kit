@@ -190,7 +190,7 @@ def calculate_tenure_years(hire_date: Optional[Any], as_of: Optional[date] = Non
 
 
 def calculate_tenure_group(hire_date: Optional[Any], as_of: Optional[date] = None) -> str:
-    """Calculate tenure bracket for aggregate demographic reporting."""
+    """Calculate tenure bracket for aggregate demographic reporting using exact dates."""
     start = _parse_date_input(hire_date)
     if not start:
         return "Not available"
@@ -199,17 +199,18 @@ def calculate_tenure_group(hire_date: Optional[Any], as_of: Optional[date] = Non
     if start > target_date:
         return "Future Hire"
 
-    years = calculate_tenure_years(hire_date, as_of=target_date)
-    if years is None:
-        return "Not available"
+    # Calculate exact elapsed years based on calendar anniversary
+    exact_years = target_date.year - start.year
+    if (target_date.month, target_date.day) < (start.month, start.day):
+        exact_years -= 1
 
-    if years < 1.0:
+    if exact_years < 1:
         return "< 1 year"
-    elif 1.0 <= years < 3.0:
+    elif 1 <= exact_years < 3:
         return "1–3 years"
-    elif 3.0 <= years < 5.0:
+    elif 3 <= exact_years < 5:
         return "3–5 years"
-    elif 5.0 <= years < 10.0:
+    elif 5 <= exact_years < 10:
         return "5–10 years"
     else:
         return "10+ years"

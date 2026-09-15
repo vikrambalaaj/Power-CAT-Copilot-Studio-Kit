@@ -82,13 +82,13 @@ class S4Client:
         # Enforce exact approved host and production/QAS separation
         if env in {"production", "prod"}:
             if host != "fiori.velora.ae":
-                raise ValueError(f"Unapproved host for Production S/4HANA endpoint: '{host}'. Must be 'fiori.velora.ae'.")
+                raise ValueError(f"Unapproved host (not allowlisted) for Production S/4HANA endpoint: '{host}'. Must be 'fiori.velora.ae'.")
         elif env in {"qas", "staging", "test"}:
             if host not in {"fioriqas.velora.ae", "fiori-qas.velora.ae", "fiori.velora.ae"}:
-                raise ValueError(f"Unapproved host for QAS S/4HANA endpoint: '{host}'.")
+                raise ValueError(f"Unapproved host (not allowlisted) for QAS S/4HANA endpoint: '{host}'.")
         else:
             if host != "fiori.velora.ae":
-                raise ValueError(f"Unapproved host for S/4HANA endpoint: '{host}'.")
+                raise ValueError(f"Unapproved host (not allowlisted) for S/4HANA endpoint: '{host}'.")
 
         # Check path prefix: must be approved OData service path
         path = parsed.path.rstrip("/")

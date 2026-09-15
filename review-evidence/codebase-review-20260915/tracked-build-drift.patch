@@ -1,0 +1,27 @@
+diff --git a/mcp-apps/dynamic-adaptive-card-service/dist/security/idempotency-signer.js b/mcp-apps/dynamic-adaptive-card-service/dist/security/idempotency-signer.js
+index c4300441..beee41c9 100644
+--- a/mcp-apps/dynamic-adaptive-card-service/dist/security/idempotency-signer.js
++++ b/mcp-apps/dynamic-adaptive-card-service/dist/security/idempotency-signer.js
+@@ -3,7 +3,10 @@ export class IdempotencySigner {
+     secretKey;
+     processedTokens = new Set();
+     constructor(secretKey) {
+-        this.secretKey = secretKey || process.env.TOKEN_SIGNING_SECRET || "enterprise_default_secret_key_84920";
++        if (!secretKey && !process.env.TOKEN_SIGNING_SECRET && process.env.NODE_ENV === "production") {
++            throw new Error("FATAL: TOKEN_SIGNING_SECRET must be explicitly configured in production environments.");
++        }
++        this.secretKey = secretKey || process.env.TOKEN_SIGNING_SECRET || "enterprise_dev_secret_key_84920";
+     }
+     /**
+      * Generates a signed, tamper-proof ticket token containing session and timing metadata.
+@@ -41,7 +44,9 @@ export class IdempotencySigner {
+             .createHmac("sha256", this.secretKey)
+             .update(payloadB64)
+             .digest("base64url");
+-        if (signature !== expectedSig) {
++        const sigBuf = Buffer.from(signature);
++        const expBuf = Buffer.from(expectedSig);
++        if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+             return { valid: false, error: "Invalid signature: token has been tampered with." };
+         }
+         if (this.processedTokens.has(ticketToken)) {

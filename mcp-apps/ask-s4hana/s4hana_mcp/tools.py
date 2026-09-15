@@ -400,16 +400,16 @@ async def s4__get_budget_consumption(
     """Retrieve budget, commitment, and actual expenditure records from SAP S/4HANA."""
     entity = getattr(client.settings, "s4_budget_consumption_entity", "")
     is_summary = entity == "BudgetConsumSummary"
-    fma = None if is_summary else (financial_management_area or "1000")
+    fma = financial_management_area if financial_management_area is not None else (None if is_summary else "1000")
     filters = build_budget_consumption_filters(
         financial_management_area=fma,
         funds_center=funds_center,
-        commitment_item=None if is_summary else commitment_item,
+        commitment_item=commitment_item,
         fiscal_year=fiscal_year,
         period=period,
         currency=currency,
-        budget_version=None if is_summary else budget_version,
-        company_code=None if is_summary else company_code,
+        budget_version=budget_version,
+        company_code=company_code,
     )
     result = await client.query(
         client.settings.s4_budget_consumption_entity,

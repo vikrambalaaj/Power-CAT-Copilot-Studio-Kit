@@ -37,29 +37,22 @@ export function calculateInstructionScore(evaluation) {
  * Calculate overall score and determine pass/fail.
  *
  * Formula: (patternScore × 0.5) + (instructionScore × 0.5)
- * If only one stage available, use that score alone.
+ * All mandatory stages (Stage B and Stage C) must complete successfully.
+ * A missing, failed, or incomplete stage causes the evaluation gate to fail.
  */
 export function calculateScores(stageBResult, stageCResult, threshold = DEFAULT_THRESHOLD) {
     const patternScore = calculatePatternScore(stageBResult);
     const instructionScore = calculateInstructionScore(stageCResult);
-    let overallScore;
-    if (stageBResult && stageCResult) {
-        overallScore = Math.round(patternScore * 0.5 + instructionScore * 0.5);
-    }
-    else if (stageBResult) {
-        overallScore = patternScore;
-    }
-    else if (stageCResult) {
-        overallScore = instructionScore;
-    }
-    else {
-        overallScore = 0;
-    }
+    const hasStageB = Boolean(stageBResult && Array.isArray(stageBResult.Patterns) && stageBResult.Patterns.length > 0);
+    const hasStageC = Boolean(stageCResult && Array.isArray(stageCResult.issues));
+    const isComplete = hasStageB && hasStageC;
+    const overallScore = Math.round(patternScore * 0.5 + instructionScore * 0.5);
+    const passed = isComplete && overallScore >= threshold;
     return {
         patternScore,
         instructionScore,
         overallScore,
-        passed: overallScore >= threshold,
+        passed,
         threshold,
         stageBPatternCount: stageBResult?.Patterns?.length ?? 0,
         stageBPassingCount: stageBResult?.Patterns?.filter((p) => p.Status === true).length ?? 0,

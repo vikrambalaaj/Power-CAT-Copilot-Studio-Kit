@@ -1,0 +1,30 @@
+{
+  "@types/node": {
+    "current": "20.19.41",
+    "wanted": "20.19.43",
+    "latest": "26.5.1",
+    "dependent": "agent-review-pipeline",
+    "location": "/Users/vikrambala/copilotstudio/agent-review-pipeline/node_modules/@types/node"
+  },
+  "js-yaml": {
+    "current": "4.3.1",
+    "wanted": "4.3.2",
+    "latest": "5.4.2",
+    "dependent": "agent-review-pipeline",
+    "location": "/Users/vikrambala/copilotstudio/agent-review-pipeline/node_modules/js-yaml"
+  },
+  "jszip": {
+    "current": "3.10.1",
+    "wanted": "3.10.2",
+    "latest": "3.10.2",
+    "dependent": "agent-review-pipeline",
+    "location": "/Users/vikrambala/copilotstudio/agent-review-pipeline/node_modules/jszip"
+  },
+  "typescript": {
+    "current": "5.9.3",
+    "wanted": "5.9.3",
+    "latest": "7.0.2",
+    "dependent": "agent-review-pipeline",
+    "location": "/Users/vikrambala/copilotstudio/agent-review-pipeline/node_modules/typescript"
+  }
+}

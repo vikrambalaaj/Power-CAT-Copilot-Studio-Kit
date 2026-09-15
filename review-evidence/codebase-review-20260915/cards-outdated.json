@@ -1,0 +1,44 @@
+{
+  "@types/node": {
+    "current": "20.19.43",
+    "wanted": "20.19.43",
+    "latest": "26.5.1",
+    "dependent": "dynamic-adaptive-card-service",
+    "location": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/node_modules/@types/node"
+  },
+  "fastify": {
+    "current": "4.29.1",
+    "wanted": "4.29.1",
+    "latest": "5.12.4",
+    "dependent": "dynamic-adaptive-card-service",
+    "location": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/node_modules/fastify"
+  },
+  "tsx": {
+    "current": "4.23.12",
+    "wanted": "4.23.13",
+    "latest": "4.23.13",
+    "dependent": "dynamic-adaptive-card-service",
+    "location": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/node_modules/tsx"
+  },
+  "typescript": {
+    "current": "5.9.3",
+    "wanted": "5.9.3",
+    "latest": "7.0.2",
+    "dependent": "dynamic-adaptive-card-service",
+    "location": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/node_modules/typescript"
+  },
+  "vitest": {
+    "current": "1.6.1",
+    "wanted": "1.6.1",
+    "latest": "5.0.0",
+    "dependent": "dynamic-adaptive-card-service",
+    "location": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/node_modules/vitest"
+  },
+  "zod": {
+    "current": "3.25.76",
+    "wanted": "3.25.76",
+    "latest": "4.6.5",
+    "dependent": "dynamic-adaptive-card-service",
+    "location": "/Users/vikrambala/copilotstudio/mcp-apps/dynamic-adaptive-card-service/node_modules/zod"
+  }
+}

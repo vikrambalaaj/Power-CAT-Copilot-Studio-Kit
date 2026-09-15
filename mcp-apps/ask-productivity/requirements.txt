@@ -7,4 +7,5 @@ structlog>=24.1.0
 pydantic>=2.6.0
 pydantic-settings>=2.0.0
 tenacity>=8.3.0
-cryptography>=46.0.0,<46.0.4
+cryptography>=46.0.5
+psycopg2-binary>=2.9.9

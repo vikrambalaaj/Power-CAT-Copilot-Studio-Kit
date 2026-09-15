@@ -10,7 +10,7 @@ applications:
       PYTHON_VERSION: 3.11.15
       PYTHONUNBUFFERED: "1"
       ALLOWED_HOSTS: "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost:*,127.0.0.1:*,*"
-      ALLOW_ANONYMOUS: "true"
+      ALLOW_ANONYMOUS: "false"
       CORS_ORIGINS: "*"
       ENABLE_MUTATING_TOOLS: "false"
       ENABLE_PERSONAL_INFO_TOOL: "false"

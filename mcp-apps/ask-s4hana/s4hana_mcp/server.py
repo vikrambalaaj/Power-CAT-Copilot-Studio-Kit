@@ -90,7 +90,7 @@ for name, description, handler in TOOL_SPECS:
     mcp.tool(name=name, description=description)(handler)
 
 
-PUBLIC_PATHS = {"/health", "/", "/schema"}
+PUBLIC_PATHS = {"/health", "/"}
 
 
 class ApiKeyMiddleware:
@@ -100,7 +100,7 @@ class ApiKeyMiddleware:
     async def __call__(self, scope, receive, send):
         if scope.get("type") == "http":
             path = scope.get("path", "")
-            if path not in PUBLIC_PATHS and not path.startswith("/schema"):
+            if path not in PUBLIC_PATHS:
                 if not settings.allow_anonymous:
                     headers = {key.lower(): value for key, value in scope.get("headers", [])}
                     supplied = headers.get(b"x-api-key", b"").decode("utf-8")
@@ -330,14 +330,28 @@ async def handle_schema_endpoint(request):
     headers = {"Accept": "application/xml"}
     if auth:
         headers["Authorization"] = auth
-    async with httpx.AsyncClient(verify=settings.s4_verify_tls) as h:
-        res = await h.get(url, headers=headers)
-        text = res.text
-        if entity:
-            m = re.search(rf'<EntityType Name="{entity}".*?</EntityType>', text, re.DOTALL | re.IGNORECASE)
-            if m:
-                return Response(m.group(0), media_type="application/xml")
-        return Response(text, media_type="application/xml")
+    try:
+        async with httpx.AsyncClient(verify=settings.s4_verify_tls) as h:
+            res = await h.get(url, headers=headers)
+            res.raise_for_status()
+            text = res.text
+            if entity:
+                m = re.search(rf'<EntityType Name="{entity}".*?</EntityType>', text, re.DOTALL | re.IGNORECASE)
+                if m:
+                    return Response(m.group(0), media_type="application/xml")
+            return Response(text, media_type="application/xml")
+    except httpx.HTTPStatusError as e:
+        log.error(f"Upstream SAP metadata request failed with status {e.response.status_code}")
+        return SafeJSONResponse(
+            {"error": f"Upstream SAP metadata request failed with status {e.response.status_code}", "status": "error"},
+            status_code=502,
+        )
+    except Exception as e:
+        log.error(f"Failed to retrieve SAP metadata: {e}")
+        return SafeJSONResponse(
+            {"error": f"Failed to retrieve SAP metadata: {str(e)}", "status": "error"},
+            status_code=502,
+        )
 
 
 async def handle_mcp_endpoint(request):
