@@ -3,9 +3,9 @@
   "info": {
     "title": "Velora S4HANA Finance MCP",
     "description": "SAP S/4HANA Finance integration for Velora Executive Agent",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
-  "host": "s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+  "host": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
   "basePath": "/",
   "schemes": [
     "https"
@@ -15,6 +15,18 @@
   ],
   "produces": [
     "application/json"
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "x-api-key",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
   ],
   "paths": {
     "/health": {
@@ -62,6 +74,9 @@
                 "customer": {
                   "type": "string"
                 },
+                "customer_name": {
+                  "type": "string"
+                },
                 "currency": {
                   "type": "string",
                   "default": "AED"
@@ -98,6 +113,9 @@
                 "supplier": {
                   "type": "string"
                 },
+                "supplier_name": {
+                  "type": "string"
+                },
                 "currency": {
                   "type": "string",
                   "default": "AED"
@@ -113,10 +131,10 @@
         }
       }
     },
-    "/s4__get_profit_and_loss": {
+    "/s4__get_budget_consumption": {
       "post": {
-        "summary": "Retrieve Profit and Loss statement from SAP S/4HANA",
-        "operationId": "getProfitAndLoss",
+        "summary": "Retrieve budget, commitment, and actual expenditure from SAP S/4HANA BudgetConsumSummary",
+        "operationId": "getBudgetConsumption",
         "parameters": [
           {
             "name": "body",
@@ -125,22 +143,25 @@
             "schema": {
               "type": "object",
               "properties": {
-                "company_code": {
-                  "type": "string"
+                "funds_center": {
+                  "type": "string",
+                  "description": "Funds Center code, e.g. 10CGADHR70"
                 },
                 "fiscal_year": {
-                  "type": "string"
-                },
-                "fiscal_period": {
-                  "type": "string"
-                },
-                "ledger": {
                   "type": "string",
-                  "default": "0L"
+                  "description": "Fiscal Year, e.g. 2026"
+                },
+                "period": {
+                  "type": "string",
+                  "description": "Period 1-12"
                 },
                 "currency": {
                   "type": "string",
                   "default": "AED"
+                },
+                "top": {
+                  "type": "integer",
+                  "default": 100
                 }
               }
             }
@@ -148,43 +169,7 @@
         ],
         "responses": {
           "200": {
-            "description": "P&L statement summary with Adaptive Card"
-          }
-        }
-      }
-    },
-    "/s4__get_budget_variance": {
-      "post": {
-        "summary": "Retrieve budget versus actuals variance from SAP S/4HANA",
-        "operationId": "getBudgetVariance",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "company_code": {
-                  "type": "string"
-                },
-                "fiscal_year": {
-                  "type": "string"
-                },
-                "fiscal_period": {
-                  "type": "string"
-                },
-                "plan_version": {
-                  "type": "string",
-                  "default": "0"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Budget variance analysis"
+            "description": "Budget consumption summary dataset with Adaptive Card"
           }
         }
       }

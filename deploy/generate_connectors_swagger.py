@@ -9,13 +9,23 @@ s4_swagger = {
     "info": {
         "title": "Velora S4HANA Finance MCP",
         "description": "SAP S/4HANA Finance integration for Velora Executive Agent",
-        "version": "1.0.0"
+        "version": "2.0.0"
     },
-    "host": "s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+    "host": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
     "basePath": "/",
     "schemes": ["https"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "x-api-key",
+            "in": "header"
+        }
+    },
+    "security": [
+        {"ApiKeyAuth": []}
+    ],
     "paths": {
         "/health": {
             "get": {
@@ -50,6 +60,7 @@ s4_swagger = {
                                 "company_code": {"type": "string", "description": "Company code, e.g. 1000"},
                                 "key_date": {"type": "string", "description": "Key date YYYY-MM-DD"},
                                 "customer": {"type": "string"},
+                                "customer_name": {"type": "string"},
                                 "currency": {"type": "string", "default": "AED"}
                             }
                         }
@@ -75,6 +86,7 @@ s4_swagger = {
                                 "company_code": {"type": "string"},
                                 "key_date": {"type": "string"},
                                 "supplier": {"type": "string"},
+                                "supplier_name": {"type": "string"},
                                 "currency": {"type": "string", "default": "AED"}
                             }
                         }
@@ -85,10 +97,10 @@ s4_swagger = {
                 }
             }
         },
-        "/s4__get_profit_and_loss": {
+        "/s4__get_budget_consumption": {
             "post": {
-                "summary": "Retrieve Profit and Loss statement from SAP S/4HANA",
-                "operationId": "getProfitAndLoss",
+                "summary": "Retrieve budget, commitment, and actual expenditure from SAP S/4HANA BudgetConsumSummary",
+                "operationId": "getBudgetConsumption",
                 "parameters": [
                     {
                         "name": "body",
@@ -97,47 +109,23 @@ s4_swagger = {
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "company_code": {"type": "string"},
-                                "fiscal_year": {"type": "string"},
-                                "fiscal_period": {"type": "string"},
-                                "ledger": {"type": "string", "default": "0L"},
-                                "currency": {"type": "string", "default": "AED"}
+                                "funds_center": {"type": "string", "description": "Funds Center code, e.g. 10CGADHR70"},
+                                "fiscal_year": {"type": "string", "description": "Fiscal Year, e.g. 2026"},
+                                "period": {"type": "string", "description": "Period 1-12"},
+                                "currency": {"type": "string", "default": "AED"},
+                                "top": {"type": "integer", "default": 100}
                             }
                         }
                     }
                 ],
                 "responses": {
-                    "200": {"description": "P&L statement summary with Adaptive Card"}
-                }
-            }
-        },
-        "/s4__get_budget_variance": {
-            "post": {
-                "summary": "Retrieve budget versus actuals variance from SAP S/4HANA",
-                "operationId": "getBudgetVariance",
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "required": True,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "company_code": {"type": "string"},
-                                "fiscal_year": {"type": "string"},
-                                "fiscal_period": {"type": "string"},
-                                "plan_version": {"type": "string", "default": "0"}
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {"description": "Budget variance analysis"}
+                    "200": {"description": "Budget consumption summary dataset with Adaptive Card"}
                 }
             }
         }
     }
 }
+
 
 # 2. SAC Analytics Swagger
 sac_swagger = {
