@@ -26,11 +26,17 @@ export declare function calculatePatternScore(evaluation?: PatternEvaluation): n
  * A criterion passes if no issue ID starts with its prefix.
  */
 export declare function calculateInstructionScore(evaluation?: InstructionEvaluation): number;
+export interface ScoreCalculationOptions {
+    stageBCompleted?: boolean;
+    stageCCompleted?: boolean;
+    hasErrors?: boolean;
+}
 /**
  * Calculate overall score and determine pass/fail.
  *
  * Formula: (patternScore × 0.5) + (instructionScore × 0.5)
  * All mandatory stages (Stage B and Stage C) must complete successfully.
  * A missing, failed, or incomplete stage causes the evaluation gate to fail.
+ * Stage errors prevent release pass.
  */
-export declare function calculateScores(stageBResult?: PatternEvaluation, stageCResult?: InstructionEvaluation, threshold?: number): ScoreResult;
+export declare function calculateScores(stageBResult?: PatternEvaluation, stageCResult?: InstructionEvaluation, threshold?: number, options?: ScoreCalculationOptions): ScoreResult;

@@ -108,3 +108,34 @@ def check_kill_switch(
         if tenant_id.strip().lower() in disabled_tenants:
             log.warning(f"Execution BLOCKED: Tenant '{tenant_id}' is disabled via DISABLED_TENANTS.")
             raise KillSwitchActiveError(f"Tenant '{tenant_id}' operations are temporarily suspended.")
+
+
+def set_kill_switch(tier: str, value: str = "true") -> None:
+    """Convenience helper to activate a kill switch tier."""
+    t = tier.lower()
+    if t == "global":
+        os.environ["VELORA_EMERGENCY_KILL_SWITCH"] = "true"
+    elif t in ("tool", "tools"):
+        curr = os.getenv("DISABLED_TOOLS", "")
+        items = set(x.strip().lower() for x in curr.split(",") if x.strip())
+        items.add(value.strip().lower())
+        os.environ["DISABLED_TOOLS"] = ",".join(items)
+    elif t in ("client", "clients"):
+        curr = os.getenv("DISABLED_CLIENTS", "")
+        items = set(x.strip().lower() for x in curr.split(",") if x.strip())
+        items.add(value.strip().lower())
+        os.environ["DISABLED_CLIENTS"] = ",".join(items)
+    elif t in ("tenant", "tenants"):
+        curr = os.getenv("DISABLED_TENANTS", "")
+        items = set(x.strip().lower() for x in curr.split(",") if x.strip())
+        items.add(value.strip().lower())
+        os.environ["DISABLED_TENANTS"] = ",".join(items)
+
+
+def clear_all_kill_switches() -> None:
+    """Clear all kill switch environment overrides."""
+    os.environ.pop("VELORA_EMERGENCY_KILL_SWITCH", None)
+    os.environ.pop("DISABLED_TOOLS", None)
+    os.environ.pop("DISABLED_CLIENTS", None)
+    os.environ.pop("DISABLED_TENANTS", None)
+

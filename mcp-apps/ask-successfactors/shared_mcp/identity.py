@@ -142,9 +142,13 @@ def verify_bearer_token(
 
     alg = header.get("alg")
     configured_test_secret = test_secret or os.getenv("TEST_JWT_SECRET")
-    is_prod = os.getenv("ENVIRONMENT", "").lower() in ("production", "prod") or os.getenv("NODE_ENV", "").lower() == "production"
+    is_prod = (
+        os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+        or os.getenv("NODE_ENV", "").lower() == "production"
+        or os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+    )
 
-    if is_prod and configured_test_secret:
+    if is_prod and (configured_test_secret or alg == "HS256"):
         log.error("Test signing keys and symmetric secrets are strictly prohibited in production")
         raise AuthenticationError("Test signing keys are disallowed in production")
 
@@ -233,17 +237,19 @@ def verify_bearer_token(
 
     # Enforce Audience
     aud = payload.get("aud")
-    configured_audiences = {
-        expected_audience,
-        os.getenv("ENTRA_INBOUND_AUDIENCE"),
-        os.getenv("API_AUDIENCE"),
-        os.getenv("ENTRA_CLIENT_ID"),
-        DEFAULT_AUDIENCE,
-    }
+    if expected_audience:
+        configured_audiences = {expected_audience}
+    else:
+        configured_audiences = {
+            os.getenv("ENTRA_INBOUND_AUDIENCE"),
+            os.getenv("API_AUDIENCE"),
+            os.getenv("ENTRA_CLIENT_ID"),
+            DEFAULT_AUDIENCE,
+        }
     configured_audiences.discard(None)
     configured_audiences.discard("")
     allowed_audiences = set(configured_audiences)
-    for a in configured_audiences:
+    for a in list(configured_audiences):
         allowed_audiences.add(f"api://{a}")
 
     if allowed_audiences:
@@ -251,7 +257,6 @@ def verify_bearer_token(
         if isinstance(aud, list):
             valid_aud = any(a in allowed_audiences for a in aud)
         elif isinstance(aud, str):
-            valid_aud = audience in allowed_audiences if (audience := aud) else False
             valid_aud = aud in allowed_audiences
         if not valid_aud:
             log.warning(f"Audience mismatch: token aud={aud}, expected one of {allowed_audiences}")

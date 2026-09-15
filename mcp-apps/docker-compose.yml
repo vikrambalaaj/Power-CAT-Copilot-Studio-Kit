@@ -76,6 +76,6 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=production
-      - TOKEN_SIGNING_SECRET=${TOKEN_SIGNING_SECRET:-enterprise_card_token_signing_secret_prod_001}
+      - TOKEN_SIGNING_SECRET=${TOKEN_SIGNING_SECRET:?TOKEN_SIGNING_SECRET must be explicitly set}
     restart: unless-stopped
 

@@ -1,9 +1,21 @@
 import crypto from "crypto";
 import fs from "fs";
+import path from "path";
 export class IdempotencySigner {
     secretKey;
     static sharedProcessedTokens = new Set();
-    static storagePath = process.env.IDEMPOTENCY_STORAGE_PATH || "/tmp/card_consumed_tokens.json";
+    static getStoragePath() {
+        if (process.env.IDEMPOTENCY_STORAGE_PATH) {
+            return process.env.IDEMPOTENCY_STORAGE_PATH;
+        }
+        if (process.env.AZURE_STORAGE_MOUNT_PATH) {
+            return path.join(process.env.AZURE_STORAGE_MOUNT_PATH, "card_consumed_tokens.json");
+        }
+        if (process.env.VELORA_STATE_DIR) {
+            return path.join(process.env.VELORA_STATE_DIR, "card_consumed_tokens.json");
+        }
+        return "/tmp/card_consumed_tokens.json";
+    }
     static {
         IdempotencySigner.loadPersistedTokens();
     }
@@ -15,8 +27,9 @@ export class IdempotencySigner {
     }
     static loadPersistedTokens() {
         try {
-            if (fs.existsSync(IdempotencySigner.storagePath)) {
-                const raw = fs.readFileSync(IdempotencySigner.storagePath, "utf8");
+            const storagePath = IdempotencySigner.getStoragePath();
+            if (fs.existsSync(storagePath)) {
+                const raw = fs.readFileSync(storagePath, "utf8");
                 const list = JSON.parse(raw);
                 if (Array.isArray(list)) {
                     for (const item of list) {
@@ -28,16 +41,7 @@ export class IdempotencySigner {
             }
         }
         catch {
-            // Best effort load
-        }
-    }
-    static persistTokens() {
-        try {
-            const arr = Array.from(IdempotencySigner.sharedProcessedTokens).slice(-100000);
-            fs.writeFileSync(IdempotencySigner.storagePath, JSON.stringify(arr), "utf8");
-        }
-        catch {
-            // Best effort persist
+            // Best effort warm up
         }
     }
     /**
@@ -97,21 +101,107 @@ export class IdempotencySigner {
         if (IdempotencySigner.sharedProcessedTokens.has(canonicalToken) || (stableId && IdempotencySigner.sharedProcessedTokens.has(stableId))) {
             return { valid: false, error: "Token already consumed: stale or duplicate click." };
         }
-        // Refresh from disk in case another process consumed it
-        IdempotencySigner.loadPersistedTokens();
-        if (IdempotencySigner.sharedProcessedTokens.has(canonicalToken) || (stableId && IdempotencySigner.sharedProcessedTokens.has(stableId))) {
-            return { valid: false, error: "Token already consumed: stale or duplicate click." };
-        }
         const now = Math.floor(Date.now() / 1000);
         if (now > payload.expiresAt) {
             return { valid: false, error: "Token has expired." };
         }
-        // Mark canonical token and stable action ID as consumed
-        IdempotencySigner.sharedProcessedTokens.add(canonicalToken);
-        if (stableId) {
-            IdempotencySigner.sharedProcessedTokens.add(stableId);
+        const storagePath = IdempotencySigner.getStoragePath();
+        const storageDir = path.dirname(storagePath);
+        try {
+            if (!fs.existsSync(storageDir)) {
+                fs.mkdirSync(storageDir, { recursive: true });
+            }
         }
-        IdempotencySigner.persistTokens();
-        return { valid: true, payload };
+        catch (dirErr) {
+            // Fail closed when storage directory is unwritable
+            return {
+                valid: false,
+                error: `Storage failure: unable to create storage directory: ${dirErr?.message || dirErr}`,
+            };
+        }
+        const lockPath = storagePath + ".lock";
+        let lockFd = null;
+        const maxWaitMs = 3000;
+        const lockStart = Date.now();
+        while (lockFd === null) {
+            try {
+                lockFd = fs.openSync(lockPath, "wx");
+            }
+            catch (err) {
+                if (err.code === "EEXIST") {
+                    try {
+                        const stat = fs.statSync(lockPath);
+                        if (Date.now() - stat.mtimeMs > 5000) {
+                            fs.unlinkSync(lockPath);
+                            continue;
+                        }
+                    }
+                    catch { }
+                    if (Date.now() - lockStart > maxWaitMs) {
+                        return {
+                            valid: false,
+                            error: "Storage lock timeout: unable to acquire idempotency store lock.",
+                        };
+                    }
+                    const target = Date.now() + 15;
+                    while (Date.now() < target) { }
+                }
+                else {
+                    return {
+                        valid: false,
+                        error: `Storage lock error: ${err.message}`,
+                    };
+                }
+            }
+        }
+        try {
+            // Read current persisted tokens under lock
+            const diskTokens = new Set();
+            if (fs.existsSync(storagePath)) {
+                const raw = fs.readFileSync(storagePath, "utf8");
+                const list = JSON.parse(raw);
+                if (Array.isArray(list)) {
+                    for (const item of list) {
+                        if (typeof item === "string") {
+                            diskTokens.add(item);
+                            IdempotencySigner.sharedProcessedTokens.add(item);
+                        }
+                    }
+                }
+            }
+            if (diskTokens.has(canonicalToken) ||
+                (stableId && diskTokens.has(stableId)) ||
+                IdempotencySigner.sharedProcessedTokens.has(canonicalToken) ||
+                (stableId && IdempotencySigner.sharedProcessedTokens.has(stableId))) {
+                return { valid: false, error: "Token already consumed: stale or duplicate click." };
+            }
+            diskTokens.add(canonicalToken);
+            IdempotencySigner.sharedProcessedTokens.add(canonicalToken);
+            if (stableId) {
+                diskTokens.add(stableId);
+                IdempotencySigner.sharedProcessedTokens.add(stableId);
+            }
+            const arr = Array.from(diskTokens).slice(-100000);
+            const tempPath = `${storagePath}.${process.pid}.${Date.now()}.tmp`;
+            fs.writeFileSync(tempPath, JSON.stringify(arr), "utf8");
+            fs.renameSync(tempPath, storagePath);
+            return { valid: true, payload };
+        }
+        catch (storageErr) {
+            // Fail closed when store is unavailable or persistence fails
+            return {
+                valid: false,
+                error: `Storage failure: failed to atomically record token consumption: ${storageErr?.message || storageErr}`,
+            };
+        }
+        finally {
+            if (lockFd !== null) {
+                try {
+                    fs.closeSync(lockFd);
+                    fs.unlinkSync(lockPath);
+                }
+                catch { }
+            }
+        }
     }
 }

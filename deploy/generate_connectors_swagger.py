@@ -17,14 +17,15 @@ s4_swagger = {
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "BearerAuth": {
             "type": "apiKey",
-            "name": "x-api-key",
-            "in": "header"
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Bearer token. Enter: Bearer <token>"
         }
     },
     "security": [
-        {"ApiKeyAuth": []}
+        {"BearerAuth": []}
     ],
     "paths": {
         "/health": {
@@ -141,14 +142,15 @@ sac_swagger = {
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "BearerAuth": {
             "type": "apiKey",
-            "name": "x-api-key",
-            "in": "header"
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Bearer token. Enter: Bearer <token>"
         }
     },
     "security": [
-        {"ApiKeyAuth": []}
+        {"BearerAuth": []}
     ],
     "paths": {
         "/health": {
@@ -254,14 +256,15 @@ facilitator_swagger = {
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "BearerAuth": {
             "type": "apiKey",
-            "name": "x-api-key",
-            "in": "header"
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Bearer token. Enter: Bearer <token>"
         }
     },
     "security": [
-        {"ApiKeyAuth": []}
+        {"BearerAuth": []}
     ],
     "paths": {
         "/health": {

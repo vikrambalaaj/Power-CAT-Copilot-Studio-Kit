@@ -674,8 +674,7 @@
                 "s4__get_profit_center_master"
             ],
             "auth": {
-                "type": "ApiKeyPluginVault",
-                "reference_id": "REPLACE_WITH_S4_PLUGIN_VAULT_REFERENCE_ID"
+                "type": "None"
             }
         }
     ]

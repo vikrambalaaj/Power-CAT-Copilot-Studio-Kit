@@ -326,7 +326,42 @@ class SubscriptionService:
                 conn.commit()
                 return True
             except sqlite3.IntegrityError:
-                # Contest detected or already claimed/run
+                # Contest detected or already claimed/run. Check if existing row was an expired claim or crashed worker.
+                cursor.execute("SELECT status, details_json FROM subscription_run_history WHERE run_key = ?", (run_key,))
+                row = cursor.fetchone()
+                if row:
+                    curr_status, curr_details_raw = row
+                    if curr_status in ("SUCCESS", "FAILED"):
+                        return False
+                    # Reconcile potentially submitted messages before retrying to prevent duplicate sends
+                    if curr_details_raw:
+                        try:
+                            curr_details = json.loads(curr_details_raw)
+                            if isinstance(curr_details, dict) and (curr_details.get("providerReceipt") or curr_details.get("message_id")):
+                                # Dispatched before crash: transition to SUCCESS
+                                cursor.execute("UPDATE subscription_run_history SET status = 'SUCCESS' WHERE run_key = ?", (run_key,))
+                                conn.commit()
+                                return False
+                        except Exception:
+                            pass
+
+                # Atomically claim expired pre-submission claim
+                cursor.execute("""
+                    UPDATE subscription_run_history
+                    SET status = 'CLAIMED',
+                        execution_id = ?,
+                        executed_at = ?,
+                        details_json = ?
+                    WHERE run_key = ? AND (
+                        status = 'EXPIRED_CLAIM'
+                        OR (status = 'CLAIMED' AND datetime(executed_at) <= datetime(?, '-600 seconds'))
+                    )
+                """, (
+                    execution_id, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key, now_iso
+                ))
+                if cursor.rowcount > 0:
+                    conn.commit()
+                    return True
                 return False
 
     def complete_subscription_run(

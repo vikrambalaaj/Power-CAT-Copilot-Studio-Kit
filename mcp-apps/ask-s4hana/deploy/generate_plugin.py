@@ -57,7 +57,7 @@ def main() -> None:
         "S4_MCP_GATEWAY_URL",
         "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com",
     ).rstrip("/")
-    auth_type = os.getenv("S4_PLUGIN_AUTH_TYPE", "ApiKeyPluginVault")
+    auth_type = os.getenv("S4_PLUGIN_AUTH_TYPE", "None")
     reference = os.getenv("S4_PLUGIN_AUTH_REFERENCE_ID", "REPLACE_WITH_S4_PLUGIN_VAULT_REFERENCE_ID")
     if auth_type not in {"None", "ApiKeyPluginVault", "OAuthPluginVault"}:
         raise SystemExit("S4_PLUGIN_AUTH_TYPE is invalid")

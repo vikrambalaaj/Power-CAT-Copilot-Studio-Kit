@@ -277,11 +277,117 @@ class SubscriptionService:
             return [self._row_to_subscription(r) for r in rows]
 
     def is_run_already_executed(self, run_key: str) -> bool:
-        """Check if a specific run key has already been executed (idempotency barrier)."""
+        """Check if a specific run key has already been claimed or executed (idempotency barrier)."""
+        now = datetime.now(timezone.utc)
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT 1 FROM subscription_run_history WHERE run_key = ?", (run_key,))
-            return cursor.fetchone() is not None
+            cursor.execute("SELECT status, executed_at FROM subscription_run_history WHERE run_key = ?", (run_key,))
+            row = cursor.fetchone()
+            if not row:
+                return False
+            status, executed_at = row
+            if status == "CLAIMED":
+                # Check for crashed worker (stale claim > 10 minutes)
+                try:
+                    claimed_dt = datetime.fromisoformat(executed_at)
+                    if (now - claimed_dt).total_seconds() > 600:
+                        cursor.execute("UPDATE subscription_run_history SET status = 'EXPIRED_CLAIM' WHERE run_key = ?", (run_key,))
+                        conn.commit()
+                        return False
+                except Exception:
+                    pass
+                return True
+            return status in ("SUCCESS", "FAILED")
+
+    def claim_subscription_run(
+        self,
+        run_key: str,
+        tenant_id: str,
+        subscription_id: str,
+        subscription_version: str,
+        execution_id: str,
+        scheduled_occurrence: str,
+        details: Optional[Dict[str, Any]] = None,
+    ) -> bool:
+        """Atomically claim a subscription run before dispatching to prevent duplicate execution across concurrent workers."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    INSERT INTO subscription_run_history (
+                        run_key, tenant_id, subscription_id, subscription_version,
+                        execution_id, scheduled_occurrence, status, executed_at, details_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, 'CLAIMED', ?, ?)
+                """, (
+                    run_key, tenant_id, subscription_id, subscription_version,
+                    execution_id, scheduled_occurrence, now_iso, json.dumps(details or {}, default=decimal_serializer),
+                ))
+                conn.commit()
+                return True
+            except sqlite3.IntegrityError:
+                # Contest detected or already claimed/run. Check if existing row was an expired claim or crashed worker.
+                cursor.execute("SELECT status, details_json FROM subscription_run_history WHERE run_key = ?", (run_key,))
+                row = cursor.fetchone()
+                if row:
+                    curr_status, curr_details_raw = row
+                    if curr_status in ("SUCCESS", "FAILED"):
+                        return False
+                    # Reconcile potentially submitted messages before retrying to prevent duplicate sends
+                    if curr_details_raw:
+                        try:
+                            curr_details = json.loads(curr_details_raw)
+                            if isinstance(curr_details, dict) and (curr_details.get("providerReceipt") or curr_details.get("message_id")):
+                                # Dispatched before crash: transition to SUCCESS
+                                cursor.execute("UPDATE subscription_run_history SET status = 'SUCCESS' WHERE run_key = ?", (run_key,))
+                                conn.commit()
+                                return False
+                        except Exception:
+                            pass
+
+                # Atomically claim expired pre-submission claim
+                cursor.execute("""
+                    UPDATE subscription_run_history
+                    SET status = 'CLAIMED',
+                        execution_id = ?,
+                        executed_at = ?,
+                        details_json = ?
+                    WHERE run_key = ? AND (
+                        status = 'EXPIRED_CLAIM'
+                        OR (status = 'CLAIMED' AND datetime(executed_at) <= datetime(?, '-600 seconds'))
+                    )
+                """, (
+                    execution_id, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key, now_iso
+                ))
+                if cursor.rowcount > 0:
+                    conn.commit()
+                    return True
+                return False
+
+    def complete_subscription_run(
+        self,
+        run_key: str,
+        status: str,
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Update a claimed subscription run to final status (SUCCESS, FAILED) with provider receipts."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE subscription_run_history
+                SET status = ?, executed_at = ?, details_json = ?
+                WHERE run_key = ?
+            """, (
+                status, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key,
+            ))
+            if status == "SUCCESS":
+                cursor.execute("""
+                    UPDATE automation_subscriptions
+                    SET last_run_at = ?
+                    WHERE subscription_id = (SELECT subscription_id FROM subscription_run_history WHERE run_key = ?)
+                """, (now_iso, run_key))
+            conn.commit()
 
     def record_subscription_run(
         self,

@@ -59,6 +59,9 @@ export async function runEvaluation(
     },
   });
 
+  let stageBCompleted = false;
+  let stageCCompleted = false;
+
   // Run Stage B: Pattern Evaluation
   try {
     console.log('[Stage B] Invoking PredictV2...');
@@ -69,14 +72,15 @@ export async function runEvaluation(
         (p) => p.PatternName !== 'Missing Trigger Phrases' && p.PatternName !== 'Inadequate Test Cases'
       );
     }
+    stageBCompleted = true;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error(`[Stage B] Failed: ${msg}`);
     errors.push(`Stage B failed: ${msg}`);
   }
 
-  // Merge local patterns (Stage A deterministic checks) into Stage B results
-  if (stageAOutput.localPatterns?.length) {
+  // Merge local patterns (Stage A deterministic checks) into Stage B results only if Stage B completed
+  if (stageBCompleted && stageAOutput.localPatterns?.length) {
     const localAsPatterns = stageAOutput.localPatterns.map((lp) => ({
       PatternName: lp.patternName,
       Status: lp.status,
@@ -103,6 +107,7 @@ export async function runEvaluation(
       console.log('[Stage C] Invoking PredictV2...');
       stageCResult = await invokeStageC(dataverseHost, accessToken, stageAOutput.agentInstructions);
       console.log(`[Stage C] Complete: ${stageCResult.issues?.length ?? 0} issues found`);
+      stageCCompleted = true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(`[Stage C] Failed: ${msg}`);
@@ -113,8 +118,13 @@ export async function runEvaluation(
     errors.push('Stage C skipped: no agent instructions in solution');
   }
 
-  // Calculate scores
-  const scores = calculateScores(stageBResult, stageCResult, threshold);
+  // Calculate scores — mandatory stage completion tracked separately; errors prevent pass
+  const hasErrors = errors.length > 0;
+  const scores = calculateScores(stageBResult, stageCResult, threshold, {
+    stageBCompleted,
+    stageCCompleted,
+    hasErrors,
+  });
   console.log(`[Scoring] Pattern: ${scores.patternScore}%, Instruction: ${scores.instructionScore}%, Overall: ${scores.overallScore}% (threshold: ${scores.threshold}%) → ${scores.passed ? 'PASSED' : 'FAILED'}`);
 
   return {

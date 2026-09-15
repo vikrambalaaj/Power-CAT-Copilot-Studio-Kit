@@ -56,24 +56,40 @@ export function calculateInstructionScore(evaluation?: InstructionEvaluation): n
   return Math.round((earnedPoints / MAX_INSTRUCTION_POINTS) * 100);
 }
 
+export interface ScoreCalculationOptions {
+  stageBCompleted?: boolean;
+  stageCCompleted?: boolean;
+  hasErrors?: boolean;
+}
+
 /**
  * Calculate overall score and determine pass/fail.
  *
  * Formula: (patternScore × 0.5) + (instructionScore × 0.5)
  * All mandatory stages (Stage B and Stage C) must complete successfully.
  * A missing, failed, or incomplete stage causes the evaluation gate to fail.
+ * Stage errors prevent release pass.
  */
 export function calculateScores(
   stageBResult?: PatternEvaluation,
   stageCResult?: InstructionEvaluation,
-  threshold: number = DEFAULT_THRESHOLD
+  threshold: number = DEFAULT_THRESHOLD,
+  options?: ScoreCalculationOptions
 ): ScoreResult {
   const patternScore = calculatePatternScore(stageBResult);
   const instructionScore = calculateInstructionScore(stageCResult);
 
-  const hasStageB = Boolean(stageBResult && Array.isArray(stageBResult.Patterns) && stageBResult.Patterns.length > 0);
-  const hasStageC = Boolean(stageCResult && Array.isArray(stageCResult.issues));
-  const isComplete = hasStageB && hasStageC;
+  const stageBCompleted =
+    options?.stageBCompleted !== undefined
+      ? options.stageBCompleted
+      : Boolean(stageBResult && Array.isArray(stageBResult.Patterns) && stageBResult.Patterns.length > 0);
+  const stageCCompleted =
+    options?.stageCCompleted !== undefined
+      ? options.stageCCompleted
+      : Boolean(stageCResult && Array.isArray(stageCResult.issues));
+  const hasErrors = options?.hasErrors ?? false;
+
+  const isComplete = stageBCompleted && stageCCompleted && !hasErrors;
 
   const overallScore = Math.round(patternScore * 0.5 + instructionScore * 0.5);
   const passed = isComplete && overallScore >= threshold;

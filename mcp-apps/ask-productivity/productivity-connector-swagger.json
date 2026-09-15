@@ -17,15 +17,16 @@
     "application/json"
   ],
   "securityDefinitions": {
-    "ApiKeyAuth": {
+    "BearerAuth": {
       "type": "apiKey",
-      "name": "x-api-key",
-      "in": "header"
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT Bearer access token. Format: Bearer <token>"
     }
   },
   "security": [
     {
-      "ApiKeyAuth": []
+      "BearerAuth": []
     }
   ],
   "paths": {
