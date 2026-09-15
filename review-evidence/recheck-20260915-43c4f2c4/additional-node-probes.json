@@ -1,0 +1,15 @@
+{
+  "evaluationAfterStageBFailure": {
+    "errors": [
+      "Stage B failed: SYNTHETIC_STAGE_B_OUTAGE"
+    ],
+    "passed": false,
+    "score": 50,
+    "providerCalls": 2
+  },
+  "cardPersistenceFailure": {
+    "firstAccepted": true,
+    "replayAfterRestartAccepted": false,
+    "storeExists": true
+  }
+}

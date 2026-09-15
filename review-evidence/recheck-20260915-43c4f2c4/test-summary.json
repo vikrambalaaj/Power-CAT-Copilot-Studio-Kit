@@ -1,0 +1,83 @@
+{
+  "suites": [
+    {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "architecture-tests",
+      "passed": 7
+    },
+    {
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-facilitator-tests",
+      "passed": 53
+    },
+    {
+      "tests": 197,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-productivity-tests",
+      "passed": 197
+    },
+    {
+      "tests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-s4hana-tests",
+      "passed": 39
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-sac-tests",
+      "passed": 3
+    },
+    {
+      "tests": 96,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "ask-successfactors-tests",
+      "passed": 96
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "cleanup-tests",
+      "passed": 4
+    },
+    {
+      "suite": "cards",
+      "tests": 6,
+      "passed": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "pipeline",
+      "tests": 3,
+      "passed": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "total": {
+    "tests": 408,
+    "passed": 408,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "unauthenticated_schema": {
+    "tools_status": 401,
+    "schema_status": 401,
+    "provider_calls": 0,
+    "metadata_returned": false
+  },
+  "zero_value_alias_selection": {
+    "expected_budget": "0",
+    "observed_budget": "0.00",
+    "expected_actual": "0",
+    "observed_actual": "0.00"
+  },
+  "summary_filter_loss": {
+    "requested_filters": [
+      "company_code",
+      "financial_management_area",
+      "commitment_item",
+      "budget_version"
+    ],
+    "provider_filters": {
+      "FinancialManagementArea": "2000",
+      "CommitmentItem": "CI-1",
+      "BudgetVersion": "V2",
+      "CompanyCode": "2000"
+    }
+  }
+}

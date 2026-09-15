@@ -1,0 +1,51 @@
+{
+  "agent-review-pipeline": {
+    "manifest": {
+      "js-yaml": "^4.3.2",
+      "jspdf": "^4.2.1",
+      "jszip": "^3.10.1"
+    },
+    "lock_root": {
+      "js-yaml": "^4.1.0",
+      "jspdf": "^4.2.1",
+      "jszip": "^3.10.1"
+    },
+    "installed": {
+      "js-yaml": "4.3.1",
+      "jspdf": "4.2.1",
+      "jszip": "3.10.1"
+    }
+  },
+  "mcp-apps/dynamic-adaptive-card-service": {
+    "manifest": {
+      "adaptivecards": "^3.0.2",
+      "adaptivecards-templating": "^2.3.1",
+      "fastify": "^4.28.1",
+      "zod": "^3.23.8"
+    },
+    "lock_root": {
+      "adaptivecards": "^3.0.2",
+      "adaptivecards-templating": "^2.3.1",
+      "fastify": "^4.28.1",
+      "zod": "^3.23.8"
+    },
+    "installed": {
+      "adaptivecards": "3.0.6",
+      "adaptivecards-templating": "2.3.1",
+      "fastify": "4.29.1",
+      "zod": "3.25.76"
+    }
+  },
+  "mcp-apps/ask-successfactors/uv.lock": {
+    "cryptography": "46.0.3",
+    "mcp": "1.26.0"
+  },
+  "mcp-apps/ask-s4hana/uv.lock": {
+    "cryptography": "50.0.1",
+    "mcp": "1.26.0"
+  },
+  "mcp-apps/ask-productivity/uv.lock": {
+    "cryptography": "50.0.1",
+    "mcp": "2.2.0"
+  }
+}
