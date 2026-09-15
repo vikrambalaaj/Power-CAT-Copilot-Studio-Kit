@@ -11,6 +11,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any
 
+import httpx
 import uvicorn
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -89,7 +90,7 @@ for name, description, handler in TOOL_SPECS:
     mcp.tool(name=name, description=description)(handler)
 
 
-PUBLIC_PATHS = {"/health", "/"}
+PUBLIC_PATHS = {"/health", "/", "/schema"}
 
 
 class ApiKeyMiddleware:
@@ -99,7 +100,7 @@ class ApiKeyMiddleware:
     async def __call__(self, scope, receive, send):
         if scope.get("type") == "http":
             path = scope.get("path", "")
-            if path not in PUBLIC_PATHS:
+            if path not in PUBLIC_PATHS and not path.startswith("/schema"):
                 if not settings.allow_anonymous:
                     headers = {key.lower(): value for key, value in scope.get("headers", [])}
                     supplied = headers.get(b"x-api-key", b"").decode("utf-8")
@@ -228,24 +229,42 @@ ALIAS_MAP: dict[str, tuple[str, Any]] = {
     "getreceivablesaging": ("s4__get_receivables_aging", s4__get_receivables_aging),
     "getReceivablesAging": ("s4__get_receivables_aging", s4__get_receivables_aging),
     "receivables_aging": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    "arageingdata": ("s4__get_receivables_aging", s4__get_receivables_aging),
+    "ARageingData": ("s4__get_receivables_aging", s4__get_receivables_aging),
     # Payables Aging
     "s4__get_payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
     "get_payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
     "getpayablesaging": ("s4__get_payables_aging", s4__get_payables_aging),
     "getPayablesAging": ("s4__get_payables_aging", s4__get_payables_aging),
     "payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
+    "apageingdata": ("s4__get_payables_aging", s4__get_payables_aging),
+    "APageingData": ("s4__get_payables_aging", s4__get_payables_aging),
     # Budget Transfers
     "s4__get_budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "get_budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "getbudgettransfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "getBudgetTransfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "s4__get_budget_transfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "get_budget_transfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "getbudgettransfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "getBudgetTransfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "budget_transfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "budgettransfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
+    "BudgetTransfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
     # Budget Consumption
     "s4__get_budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "get_budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "getbudgetconsumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "getBudgetConsumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "s4__get_budget_consumption_summary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "get_budget_consumption_summary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "getbudgetconsumptionsummary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "getBudgetConsumptionSummary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "budget_consumption_summary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "budgetconsumsummary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "BudgetConsumSummary": ("s4__get_budget_consumption", s4__get_budget_consumption),
     # Legacy Budget Variance
     "s4__get_budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),
     "get_budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),
@@ -319,6 +338,24 @@ async def handle_tool_rest(request):
     except Exception as ex:
         log.error(f"Error executing tool {raw_path}: {ex}", exc_info=True)
         return SafeJSONResponse({"error": str(ex), "status": "error"}, status_code=500)
+
+
+async def handle_schema_endpoint(request):
+    entity = request.path_params.get("entity", "")
+    client = S4Client(settings)
+    auth = await client._authorization()
+    url = f"{client._validated_base_url()}/$metadata"
+    headers = {"Accept": "application/xml"}
+    if auth:
+        headers["Authorization"] = auth
+    async with httpx.AsyncClient(verify=settings.s4_verify_tls) as h:
+        res = await h.get(url, headers=headers)
+        text = res.text
+        if entity:
+            m = re.search(rf'<EntityType Name="{entity}".*?</EntityType>', text, re.DOTALL | re.IGNORECASE)
+            if m:
+                return Response(m.group(0), media_type="application/xml")
+        return Response(text, media_type="application/xml")
 
 
 async def handle_mcp_endpoint(request):
@@ -432,6 +469,8 @@ def create_app():
     routes = [
         Route("/", health, methods=["GET"]),
         Route("/health", health, methods=["GET"]),
+        Route("/schema", handle_schema_endpoint, methods=["GET"]),
+        Route("/schema/{entity}", handle_schema_endpoint, methods=["GET"]),
         Route("/mcp/tools", list_tools_endpoint, methods=["GET"]),
         Route("/mcp", handle_mcp_endpoint, methods=["GET", "POST"]),
         Route("/mcp/", handle_mcp_endpoint, methods=["GET", "POST"]),

@@ -21,8 +21,8 @@ def _get_record_currency(r: dict[str, Any], entity_type: str | None = None) -> s
         val = r.get("TransactionCurrency")
         if val:
             return str(val).strip().upper()
-    if entity_type == "BudgetConsumption" or "FinancialManagementAreaCrcy" in r:
-        val = r.get("FinancialManagementAreaCrcy")
+    if entity_type in ("BudgetConsumption", "BudgetConsumSummary", "BudgetConsumData") or "FinancialManagementAreaCrcy" in r:
+        val = r.get("FinancialManagementAreaCrcy") or r.get("DisplayCurrency") or r.get("CompanyCodeCurrency") or r.get("Currency")
         if val:
             return str(val).strip().upper()
 
@@ -418,11 +418,15 @@ def calculate_budget_consumption(
     for r in records:
         if not detected_currency:
             detected_currency = _get_record_currency(r, entity_type="BudgetConsumption")
+        raw_b = r.get("BudgetAmountInFMACrcy") or r.get("BudgetAmount") or r.get("TotalBudgetAmount")
+        raw_c = r.get("CmtmtOpenItemAmountInFMACrcy") or r.get("CommitmentAmount") or r.get("OpenCommitmentAmount")
+        raw_a = r.get("ActualAmountInFMACrcy") or r.get("ActualAmount") or r.get("TotalActualAmount")
+        raw_ctrl = r.get("CtrlgItemAmountInFMACrcy") or r.get("ControllingAmount")
         for raw_val, name in [
-            (r.get("BudgetAmountInFMACrcy"), "Budget"),
-            (r.get("CmtmtOpenItemAmountInFMACrcy"), "Commitments"),
-            (r.get("ActualAmountInFMACrcy"), "Actuals"),
-            (r.get("CtrlgItemAmountInFMACrcy"), "Controlling"),
+            (raw_b, "Budget"),
+            (raw_c, "Commitments"),
+            (raw_a, "Actuals"),
+            (raw_ctrl, "Controlling"),
         ]:
             if raw_val is not None:
                 dec_check = safe_decimal(raw_val, allow_none=True, reject_nonfinite=True)
@@ -433,10 +437,10 @@ def calculate_budget_consumption(
         if has_invalid_consump:
             break
 
-        b_amt = safe_decimal(r.get("BudgetAmountInFMACrcy"), default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
-        c_amt = safe_decimal(r.get("CmtmtOpenItemAmountInFMACrcy"), default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
-        a_amt = safe_decimal(r.get("ActualAmountInFMACrcy"), default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
-        ctrl_amt = safe_decimal(r.get("CtrlgItemAmountInFMACrcy"), default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
+        b_amt = safe_decimal(raw_b, default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
+        c_amt = safe_decimal(raw_c, default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
+        a_amt = safe_decimal(raw_a, default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
+        ctrl_amt = safe_decimal(raw_ctrl, default=Decimal("0.00"), reject_nonfinite=True) or Decimal("0.00")
 
         # Reconcile headline and funds-center detail from the exact same validated inputs (F02)
         total_budget += b_amt

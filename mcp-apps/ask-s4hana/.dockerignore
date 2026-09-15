@@ -1,0 +1,17 @@
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!requirements.txt
+!s4hana_mcp/
+!s4hana_mcp/**
+!shared_mcp/
+!shared_mcp/**
+!deploy/
+!deploy/**
+**/__pycache__/
+**/*.pyc
+**/.env*
+**/.venv/
+**/.pytest_cache/
+**/logs/

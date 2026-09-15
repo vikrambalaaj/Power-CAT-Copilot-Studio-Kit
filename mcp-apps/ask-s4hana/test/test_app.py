@@ -28,7 +28,7 @@ class FakeSettings:
     s4_ar_entity = "ARageingData"
     s4_ap_entity = "APageingData"
     s4_budget_transfer_entity = "BudgetTransfer"
-    s4_budget_consumption_entity = "BudgetConsumData"
+    s4_budget_consumption_entity = "BudgetConsumSummary"
     s4_customer_api_url = "https://fiori.velora.ae/sap/opu/odata4/sap/zmm_cds_sbn_customer_srv/srvd_a2x/sap/zmm_cds_sdf_customer_srv/0001"
     s4_customer_entity = "CustomerMaster"
     s4_costcenter_api_url = "https://fiori.velora.ae/sap/opu/odata4/sap/zfi_cds_sbn_costcenter_srv/srvd_a2x/sap/zfi_cds_sdf_costcenter_srv/0001"
@@ -255,6 +255,55 @@ class ToolAndServerTests(unittest.IsolatedAsyncioTestCase):
             cons_filters = fake.calls[-1][1]["$filter"]
             self.assertIn("FinMgmtAreaFiscalYear eq '2026'", cons_filters)
             self.assertIn("FinMgmtAreaPeriod eq '008'", cons_filters)
+        finally:
+            tools.client = original
+
+    async def test_c28_budget_consumption_summary_entity_and_alias(self):
+        from s4hana_mcp.settings import Settings
+        s = Settings()
+        self.assertEqual(s.s4_budget_consumption_entity, "BudgetConsumSummary")
+
+        handler = server.resolve_tool_handler("BudgetConsumSummary")
+        self.assertIsNotNone(handler)
+        self.assertEqual(handler[0], "s4__get_budget_consumption")
+
+        handler2 = server.resolve_tool_handler("getBudgetConsumptionSummary")
+        self.assertIsNotNone(handler2)
+        self.assertEqual(handler2[0], "s4__get_budget_consumption")
+
+        bt_handler = server.resolve_tool_handler("BudgetTransfer")
+        self.assertIsNotNone(bt_handler)
+        self.assertEqual(bt_handler[0], "s4__get_budget_transfers")
+
+        ar_handler = server.resolve_tool_handler("ARageingData")
+        self.assertIsNotNone(ar_handler)
+        self.assertEqual(ar_handler[0], "s4__get_receivables_aging")
+
+        ap_handler = server.resolve_tool_handler("APageingData")
+        self.assertIsNotNone(ap_handler)
+        self.assertEqual(ap_handler[0], "s4__get_payables_aging")
+
+        original = tools.client
+        fake = CapturingClient(return_rows=[
+            {
+                "FinancialManagementArea": "1000",
+                "FundsCenter": "FC01",
+                "FinancialManagementAreaCrcy": "AED",
+                "BudgetAmountInFMACrcy": "1000000.00",
+                "ActualAmountInFMACrcy": "450000.00",
+                "CmtmtOpenItemAmountInFMACrcy": "150000.00",
+            }
+        ])
+        fake.settings.s4_budget_consumption_entity = "BudgetConsumSummary"
+        tools.client = fake
+        try:
+            res = await tools.s4__get_budget_consumption(financial_management_area="1000", currency="AED")
+            self.assertEqual(fake.calls[-1][0], "BudgetConsumSummary")
+            self.assertFalse(res.isError)
+            calc = res.structuredContent["calculations"]
+            self.assertEqual(calc["raw_budget"], Decimal("1000000.00"))
+            self.assertEqual(calc["raw_actuals"], Decimal("450000.00"))
+            self.assertEqual(calc["raw_commitments"], Decimal("150000.00"))
         finally:
             tools.client = original
 

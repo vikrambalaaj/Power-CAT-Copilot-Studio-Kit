@@ -331,10 +331,23 @@ class S4Client:
                             "retryable": False,
                         }
                     if response.status_code >= 400:
+                        detail = ""
+                        try:
+                            err_body = response.json()
+                            if isinstance(err_body, dict):
+                                err_obj = err_body.get("error")
+                                if isinstance(err_obj, dict):
+                                    detail = err_obj.get("message") or str(err_obj)
+                                elif err_obj:
+                                    detail = str(err_obj)
+                        except Exception:
+                            detail = response.text[:300] if hasattr(response, "text") else ""
+                        err_msg = f"S/4HANA request failed with HTTP {response.status_code}" + (f": {detail}" if detail else "")
+                        log.error(f"S/4HANA upstream error: {err_msg} on {current_url}")
                         return {
                             "status": "error",
                             "code": "S4_UPSTREAM_ERROR",
-                            "message": f"S/4HANA request failed with HTTP {response.status_code}",
+                            "message": err_msg,
                             "retryable": response.status_code in {408, 429, 500, 502, 503, 504},
                         }
 

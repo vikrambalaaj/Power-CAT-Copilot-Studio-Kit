@@ -26,12 +26,12 @@ class Settings(BaseSettings):
     s4_ar_entity: str = "ARageingData"
     s4_ap_entity: str = "APageingData"
     s4_budget_transfer_entity: str = "BudgetTransfer"
-    s4_budget_consumption_entity: str = "BudgetConsumData"
+    s4_budget_consumption_entity: str = "BudgetConsumSummary"
     s4_pl_entity: str = "GLDetails"
 
     # Legacy / Master Data entity configuration
     s4_budget_api_url: str = ""
-    s4_budget_entity: str = "BudgetConsumReport"
+    s4_budget_entity: str = "BudgetConsumSummary"
     s4_customer_api_url: str = ""
     s4_customer_entity: str = "CustomerMaster"
     s4_costcenter_api_url: str = ""

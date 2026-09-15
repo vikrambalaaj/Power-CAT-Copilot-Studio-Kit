@@ -29,7 +29,7 @@ class FakeSettings:
     s4_ar_entity = "ARageingData"
     s4_ap_entity = "APageingData"
     s4_budget_transfer_entity = "BudgetTransfer"
-    s4_budget_consumption_entity = "BudgetConsumData"
+    s4_budget_consumption_entity = "BudgetConsumSummary"
     executing_identity = "velora-s4-finance-test-reader"
     authorization_model = "MAKER_SERVICE_CREDENTIAL"
     s4_environment_label = "Production"
