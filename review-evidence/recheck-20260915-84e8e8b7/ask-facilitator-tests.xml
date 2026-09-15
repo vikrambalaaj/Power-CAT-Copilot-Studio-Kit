@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="3" failures="0" skipped="0" tests="3" time="7.605" timestamp="2026-09-15T12:14:41.231269+04:00" hostname="Legend-Rama-Pro-3.local"><testcase classname="" name="test.test_decision_audit_export" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_decision_audit_export.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.11.13-macos-aarch64-none/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test/test_decision_audit_export.py:50: in &lt;module&gt;
+    from facilitator_mcp.server import create_app
+facilitator_mcp/server.py:8: in &lt;module&gt;
+    from mcp.server.fastmcp import FastMCP
+/tmp/velora-recheck-84e8e8b7/lib/python3.11/site-packages/mcp/server/fastmcp.py:16: in &lt;module&gt;
+    raise ModuleNotFoundError(_MESSAGE, name=__name__)
+E   ModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp&lt;2' to keep running v1 code.</error></testcase><testcase classname="" name="test.test_facilitator_governance" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_facilitator_governance.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.11.13-macos-aarch64-none/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test/test_facilitator_governance.py:16: in &lt;module&gt;
+    from facilitator_mcp.server import app
+facilitator_mcp/server.py:8: in &lt;module&gt;
+    from mcp.server.fastmcp import FastMCP
+/tmp/velora-recheck-84e8e8b7/lib/python3.11/site-packages/mcp/server/fastmcp.py:16: in &lt;module&gt;
+    raise ModuleNotFoundError(_MESSAGE, name=__name__)
+E   ModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp&lt;2' to keep running v1 code.</error></testcase><testcase classname="" name="test.test_vendor_evaluation" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_vendor_evaluation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.11.13-macos-aarch64-none/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test/test_vendor_evaluation.py:32: in &lt;module&gt;
+    from facilitator_mcp.server import create_app
+facilitator_mcp/server.py:8: in &lt;module&gt;
+    from mcp.server.fastmcp import FastMCP
+/tmp/velora-recheck-84e8e8b7/lib/python3.11/site-packages/mcp/server/fastmcp.py:16: in &lt;module&gt;
+    raise ModuleNotFoundError(_MESSAGE, name=__name__)
+E   ModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp&lt;2' to keep running v1 code.</error></testcase></testsuite></testsuites>

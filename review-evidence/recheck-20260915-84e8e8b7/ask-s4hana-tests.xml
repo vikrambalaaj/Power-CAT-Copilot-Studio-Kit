@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="2" failures="0" skipped="0" tests="2" time="7.728" timestamp="2026-09-15T12:14:41.231113+04:00" hostname="Legend-Rama-Pro-3.local"><testcase classname="" name="test.test_app" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_app.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.11.13-macos-aarch64-none/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test/test_app.py:8: in &lt;module&gt;
+    import s4hana_mcp.server as server
+s4hana_mcp/server.py:16: in &lt;module&gt;
+    from mcp.server.fastmcp import FastMCP
+/tmp/velora-recheck-84e8e8b7/lib/python3.11/site-packages/mcp/server/fastmcp.py:16: in &lt;module&gt;
+    raise ModuleNotFoundError(_MESSAGE, name=__name__)
+E   ModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp&lt;2' to keep running v1 code.</error></testcase><testcase classname="" name="test.test_reviewer_findings" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_reviewer_findings.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../.local/share/uv/python/cpython-3.11.13-macos-aarch64-none/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test/test_reviewer_findings.py:10: in &lt;module&gt;
+    import s4hana_mcp.server as server
+s4hana_mcp/server.py:16: in &lt;module&gt;
+    from mcp.server.fastmcp import FastMCP
+/tmp/velora-recheck-84e8e8b7/lib/python3.11/site-packages/mcp/server/fastmcp.py:16: in &lt;module&gt;
+    raise ModuleNotFoundError(_MESSAGE, name=__name__)
+E   ModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp&lt;2' to keep running v1 code.</error></testcase></testsuite></testsuites>

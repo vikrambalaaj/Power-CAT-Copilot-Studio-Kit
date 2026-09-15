@@ -1,0 +1,9 @@
+{
+  "velora_env_production_test_key": "AuthenticationError",
+  "explicit_audience_override": "AuthenticationError",
+  "expired_subscription_claim": {
+    "firstClaimed": true,
+    "alreadyExecutedAfterExpiry": false,
+    "retryClaimed": true
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "cardReplay": {
+    "first": true,
+    "exactReplay": false,
+    "appendedSegmentReplay": false,
+    "secondAppendedSegmentReplay": false,
+    "freshInstanceReplay": false
+  },
+  "missingStageB": {
+    "patternScore": 0,
+    "instructionScore": 100,
+    "overallScore": 50,
+    "passed": false,
+    "threshold": 60,
+    "stageBPatternCount": 0,
+    "stageBPassingCount": 0,
+    "stageCIssueCount": 0
+  },
+  "missingStageC": {
+    "patternScore": 100,
+    "instructionScore": 0,
+    "overallScore": 50,
+    "passed": false,
+    "threshold": 60,
+    "stageBPatternCount": 1,
+    "stageBPassingCount": 1,
+    "stageCIssueCount": 0
+  }
+}

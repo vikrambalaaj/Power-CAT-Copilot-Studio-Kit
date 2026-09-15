@@ -1,0 +1,10 @@
+[
+  {
+    "project": "agent-review-pipeline",
+    "exit_code": 0
+  },
+  {
+    "project": "mcp-apps/dynamic-adaptive-card-service",
+    "exit_code": 0
+  }
+]

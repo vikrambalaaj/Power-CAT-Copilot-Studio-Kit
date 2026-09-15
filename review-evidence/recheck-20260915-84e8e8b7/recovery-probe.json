@@ -1,0 +1,6 @@
+{
+  "provider_acceptances_for_same_run": 2,
+  "state_after_interruption": "CLAIMED",
+  "receipt_stored_after_interruption": false,
+  "retry_reported_dispatched": 1
+}

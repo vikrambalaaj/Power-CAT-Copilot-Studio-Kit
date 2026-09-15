@@ -1,0 +1,7 @@
+{
+  "sharedDiskFirstAccepted": true,
+  "sharedDiskRestartReplayAccepted": false,
+  "separateInstanceReplayAccepted": true,
+  "unusableStorageAccepted": false,
+  "unusableStorageError": "Storage lock error: ENOTDIR: not a directory, open '/var/folders/yx/spr8_sl1723g_q23p2ywsrp00000gn/T/velora-storage-check-hSmk7d/file-not-directory/tokens.json.lock'"
+}
