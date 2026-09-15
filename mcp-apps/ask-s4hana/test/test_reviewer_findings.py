@@ -223,11 +223,11 @@ class ReviewerFindingsTests(unittest.IsolatedAsyncioTestCase):
             {
                 "s4__get_receivables_aging",
                 "s4__get_payables_aging",
-                "s4__get_budget_transfers",
                 "s4__get_budget_consumption",
             },
         )
         self.assertNotIn("s4__get_profit_and_loss", tool_names)
+        self.assertNotIn("s4__get_budget_transfers", tool_names)
 
         # 2. Aliases resolve successfully on REST
         import s4hana_mcp.tools as tools
@@ -250,6 +250,11 @@ class ReviewerFindingsTests(unittest.IsolatedAsyncioTestCase):
             # Budget variance alias
             r_bvar = self.client.get("/getBudgetVariance", headers={"X-API-Key": self.api_key})
             self.assertEqual(r_bvar.status_code, 200)
+
+            # BudgetTransfer excluded alias returns UNSUPPORTED_OPERATION
+            r_bt = self.client.get("/BudgetTransfer", headers={"X-API-Key": self.api_key})
+            self.assertEqual(r_bt.status_code, 400)
+            self.assertEqual(r_bt.json().get("code"), "UNSUPPORTED_OPERATION")
 
     def test_f01_ar_company_code_currency_multi_currency_and_text(self):
         """F01: AR uses exact CompanyCodeCurrency; mixed currencies do not sum together and text/cards don't crash."""

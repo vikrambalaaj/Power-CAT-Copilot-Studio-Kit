@@ -3,7 +3,7 @@
     "schema_version": "v2.4",
     "name_for_human": "Velora S/4HANA Finance",
     "description_for_human": "S/4HANA finance intelligence for the Velora Executive Agent",
-    "description_for_model": "Use these read-only SAP S/4HANA tools for receivables aging, payables aging, budget movements, and budget consumption. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
+    "description_for_model": "Use these read-only SAP S/4HANA tools for receivables aging, payables aging, and budget consumption summary. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
     "namespace": "s4",
     "functions": [
         {
@@ -41,25 +41,8 @@
             }
         },
         {
-            "name": "s4__get_budget_transfers",
-            "description": "Retrieve budget movement and original-budget entries from SAP S/4HANA.",
-            "capabilities": {
-                "response_semantics": {
-                    "data_path": "$",
-                    "properties": {
-                        "title": "$.cardTitle",
-                        "subtitle": "$.cardSubtitle",
-                        "template_selector": "$.adaptiveCard"
-                    },
-                    "static_template": {
-                        "file": "./adaptive-cards/budget-movements.json"
-                    }
-                }
-            }
-        },
-        {
             "name": "s4__get_budget_consumption",
-            "description": "Retrieve budget, commitment, and expenditure records from SAP S/4HANA.",
+            "description": "Retrieve budget consumption summary records from SAP S/4HANA.",
             "capabilities": {
                 "response_semantics": {
                     "data_path": "$",
@@ -356,131 +339,8 @@
                             }
                         },
                         {
-                            "name": "s4__get_budget_transfers",
-                            "description": "Retrieve budget movement and original-budget entries from SAP S/4HANA.",
-                            "inputSchema": {
-                                "properties": {
-                                    "financial_management_area": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Financial Management Area"
-                                    },
-                                    "funds_center": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Funds Center"
-                                    },
-                                    "commitment_item": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Commitment Item"
-                                    },
-                                    "fiscal_year": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Fiscal Year"
-                                    },
-                                    "budget_period": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Budget Period"
-                                    },
-                                    "currency": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Currency"
-                                    },
-                                    "budgeting_process": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Budgeting Process"
-                                    },
-                                    "movement_type": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Movement Type"
-                                    },
-                                    "correlation_id": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ],
-                                        "default": null,
-                                        "title": "Correlation Id"
-                                    },
-                                    "top": {
-                                        "default": 100,
-                                        "title": "Top",
-                                        "type": "integer"
-                                    }
-                                },
-                                "title": "s4__get_budget_transfersArguments",
-                                "type": "object"
-                            }
-                        },
-                        {
                             "name": "s4__get_budget_consumption",
-                            "description": "Retrieve budget, commitment, and expenditure records from SAP S/4HANA.",
+                            "description": "Retrieve budget consumption summary records from SAP S/4HANA.",
                             "inputSchema": {
                                 "properties": {
                                     "financial_management_area": {
@@ -808,7 +668,6 @@
             "run_for_functions": [
                 "s4__get_receivables_aging",
                 "s4__get_payables_aging",
-                "s4__get_budget_transfers",
                 "s4__get_budget_consumption",
                 "s4__get_customer_master",
                 "s4__get_cost_center_master",

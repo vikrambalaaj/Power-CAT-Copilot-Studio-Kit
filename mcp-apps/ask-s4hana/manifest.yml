@@ -17,7 +17,6 @@ applications:
       S4_SAP_CLIENT: "100"
       S4_AR_ENTITY: "ARageingData"
       S4_AP_ENTITY: "APageingData"
-      S4_BUDGET_TRANSFER_ENTITY: "BudgetTransfer"
       S4_BUDGET_CONSUMPTION_ENTITY: "BudgetConsumSummary"
       S4_ENVIRONMENT_LABEL: "Production"
       S4_VERIFY_TLS: "true"

@@ -26,12 +26,11 @@ https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/z
 |---|---|---|
 | AR Ageing | ARageingData | https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001/ARageingData?sap-client=100 |
 | AP Ageing | APageingData | https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001/APageingData?sap-client=100 |
-| Budget Transfer | BudgetTransfer | https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001/BudgetTransfer?sap-client=100 |
-| Budget Consumption | BudgetConsumData | https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001/BudgetConsumData?sap-client=100 |
+| Budget Consumption Summary | BudgetConsumSummary | https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001/BudgetConsumSummary?sap-client=100 |
 
 Future metadata verification URL: service root + `/$metadata?sap-client=100`. This specification does not assert that any endpoint has been called or that authentication, permissions, filters, paging, date semantics or metadata have been verified against production.
 
-Keep the service root separate from entity and query parameters. Do not store `?sap-client=100` in the root or concatenate user-supplied path fragments. Use a typed entity allowlist. Production must not fall back to `fioriqas.velora.ae`, the previous separate budget consumption service, or the previous parameterized financial-statement service. Other existing customer/cost-center/profit-center master tools are outside this newly approved four-report scope; keep their configuration separate and do not assume their QAS URLs are approved production sources.
+Keep the service root separate from entity and query parameters. Do not store `?sap-client=100` in the root or concatenate user-supplied path fragments. Use a typed entity allowlist. Production must not fall back to `fioriqas.velora.ae`, the previous separate budget consumption service, or the previous parameterized financial-statement service. Other existing customer/cost-center/profit-center master tools are outside this newly approved three-report scope; keep their configuration separate and do not assume their QAS URLs are approved production sources.
 
 ## 3. Credentials, caller identity and configuration
 

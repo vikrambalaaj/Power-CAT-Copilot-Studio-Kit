@@ -166,44 +166,24 @@ SCHEMAS: dict[str, dict[str, Any]] = {
             "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
         },
     },
-    "s4__get_budget_transfers": {
-        "type": "object",
-        "properties": {
-            "financial_management_area": {"type": "string", "description": "Funds management area, e.g. 1000"},
-            "funds_center": {"type": "string", "description": "Funds center code"},
-            "commitment_item": {"type": "string", "description": "Commitment item code"},
-            "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
-            "budget_period": {"type": "string", "description": "Budget period"},
-            "currency": {"type": "string", "description": "Transaction currency, e.g. AED"},
-            "budgeting_process": {"type": "string", "description": "Budgeting process code, e.g. ENTR"},
-            "movement_type": {"type": "string", "description": "Budget movement type code"},
-            "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
-            "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
-        },
-    },
     "s4__get_budget_consumption": {
         "type": "object",
         "properties": {
-            "financial_management_area": {"type": "string", "description": "Funds management area, e.g. 1000"},
             "funds_center": {"type": "string", "description": "Funds center code"},
-            "commitment_item": {"type": "string", "description": "Commitment item code"},
             "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
             "period": {"type": "string", "description": "Fiscal period, e.g. 008 or 08"},
-            "currency": {"type": "string", "description": "Currency, e.g. AED"},
-            "budget_version": {"type": "string", "description": "Budget version (or blank for base)"},
-            "company_code": {"type": "string", "description": "Company code"},
+            "currency": {"type": "string", "description": "Financial management area currency, e.g. AED"},
             "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
             "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
         },
     },
 }
 
-# Approved 4 core reports for tool discovery (R10)
+# Approved 3 core reports for tool discovery
 CORE_REPORT_SPECS = [
     ("s4__get_receivables_aging", "Retrieve accounts-receivable aging from SAP S/4HANA.", s4__get_receivables_aging),
     ("s4__get_payables_aging", "Retrieve accounts-payable aging from SAP S/4HANA.", s4__get_payables_aging),
-    ("s4__get_budget_transfers", "Retrieve budget movement and original-budget entries from SAP S/4HANA.", s4__get_budget_transfers),
-    ("s4__get_budget_consumption", "Retrieve budget, commitment, and expenditure records from SAP S/4HANA.", s4__get_budget_consumption),
+    ("s4__get_budget_consumption", "Retrieve budget consumption summary records from SAP S/4HANA.", s4__get_budget_consumption),
 ]
 
 
@@ -239,7 +219,7 @@ ALIAS_MAP: dict[str, tuple[str, Any]] = {
     "payables_aging": ("s4__get_payables_aging", s4__get_payables_aging),
     "apageingdata": ("s4__get_payables_aging", s4__get_payables_aging),
     "APageingData": ("s4__get_payables_aging", s4__get_payables_aging),
-    # Budget Transfers
+    # Budget Transfers (Excluded / Unsupported)
     "s4__get_budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "get_budget_transfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "getbudgettransfers": ("s4__get_budget_transfers", s4__get_budget_transfers),
@@ -252,7 +232,7 @@ ALIAS_MAP: dict[str, tuple[str, Any]] = {
     "budget_transfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "budgettransfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
     "BudgetTransfer": ("s4__get_budget_transfers", s4__get_budget_transfers),
-    # Budget Consumption
+    # Budget Consumption (BudgetConsumSummary)
     "s4__get_budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "get_budget_consumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "getbudgetconsumption": ("s4__get_budget_consumption", s4__get_budget_consumption),
@@ -265,6 +245,8 @@ ALIAS_MAP: dict[str, tuple[str, Any]] = {
     "budget_consumption_summary": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "budgetconsumsummary": ("s4__get_budget_consumption", s4__get_budget_consumption),
     "BudgetConsumSummary": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "budgetconsumdata": ("s4__get_budget_consumption", s4__get_budget_consumption),
+    "BudgetConsumData": ("s4__get_budget_consumption", s4__get_budget_consumption),
     # Legacy Budget Variance
     "s4__get_budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),
     "get_budget_variance": ("s4__get_budget_variance", s4__get_budget_variance),

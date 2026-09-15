@@ -201,13 +201,20 @@ class ToolAndServerTests(unittest.IsolatedAsyncioTestCase):
         tool_names = [item[0] for item in tools.TOOL_SPECS]
         self.assertIn("s4__get_receivables_aging", tool_names)
         self.assertIn("s4__get_payables_aging", tool_names)
-        self.assertIn("s4__get_budget_transfers", tool_names)
         self.assertIn("s4__get_budget_consumption", tool_names)
-        # P&L is excluded from discovery
+        # P&L and Budget Transfers are excluded from discovery
         self.assertNotIn("s4__get_profit_and_loss", tool_names)
+        self.assertNotIn("s4__get_budget_transfers", tool_names)
 
     async def test_c25_old_profit_and_loss_returns_unsupported_without_sap_query(self):
         res = await tools.s4__get_profit_and_loss()
+        self.assertIsInstance(res, CallToolResult)
+        self.assertTrue(res.isError)
+        self.assertEqual(res.structuredContent["code"], ReportStatus.UNSUPPORTED_OPERATION.value)
+        self.assertIn("excluded", res.structuredContent["message"])
+
+    async def test_budget_transfers_returns_unsupported_without_sap_query(self):
+        res = await tools.s4__get_budget_transfers()
         self.assertIsInstance(res, CallToolResult)
         self.assertTrue(res.isError)
         self.assertEqual(res.structuredContent["code"], ReportStatus.UNSUPPORTED_OPERATION.value)

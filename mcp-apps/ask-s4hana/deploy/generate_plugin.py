@@ -24,7 +24,6 @@ async def tool_descriptions():
 CARD_BY_TOOL = {
     "s4__get_receivables_aging": "receivables-aging.json",
     "s4__get_payables_aging": "payables-aging.json",
-    "s4__get_budget_transfers": "budget-movements.json",
     "s4__get_budget_consumption": "budget-consumption.json",
     "s4__get_customer_master": "customer-master.json",
     "s4__get_cost_center_master": "cost-center-master.json",
@@ -70,7 +69,7 @@ def main() -> None:
         "schema_version": "v2.4",
         "name_for_human": "Velora S/4HANA Finance",
         "description_for_human": "S/4HANA finance intelligence for the Velora Executive Agent",
-        "description_for_model": "Use these read-only SAP S/4HANA tools for receivables aging, payables aging, budget movements, and budget consumption. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
+        "description_for_model": "Use these read-only SAP S/4HANA tools for receivables aging, payables aging, and budget consumption summary. Preserve periods, currencies, sources, warnings, and authorization boundaries.",
         "namespace": "s4",
         "functions": functions,
         "runtimes": [{
