@@ -9,7 +9,7 @@ applications:
     env:
       PYTHON_VERSION: 3.11.15
       PYTHONUNBUFFERED: "1"
-      ALLOWED_HOSTS: "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost:*,127.0.0.1:*,*"
+      ALLOWED_HOSTS: "velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io,localhost:*,127.0.0.1:*,*"
       ALLOW_ANONYMOUS: "false"
       CORS_ORIGINS: "*"
       ENABLE_MUTATING_TOOLS: "false"
@@ -43,7 +43,7 @@ applications:
       SF_EMIRATISATION_TARGET: "52.0"
       SF_METRIC_RULE_VERSION: "velora-workforce-v2"
       SF_SMALL_GROUP_THRESHOLD: "1"
-      PUBLIC_BASE_URL: "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      PUBLIC_BASE_URL: "https://velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io"
       # Consent gate: enforced in-server for employee-level disclosure tools.
       ENFORCE_CONSENT_GATE: "true"
       # Durable consent store (`cre2f_botuserconsent`, shared with the Copilot

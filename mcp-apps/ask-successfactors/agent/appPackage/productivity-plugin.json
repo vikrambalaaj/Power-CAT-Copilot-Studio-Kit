@@ -29,7 +29,7 @@
                 "type": "None"
             },
             "spec": {
-                "url": "https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com/productivity-connector-swagger.json"
+                "url": "https://velora-mcp-productivity.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/productivity-connector-swagger.json"
             },
             "run_for_functions": [
                 "HandleParentHandoff"

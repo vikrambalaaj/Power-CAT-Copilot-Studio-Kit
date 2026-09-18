@@ -81,7 +81,7 @@ async def call_mcp(req: Request, authorization: Optional[str] = Header(None), x_
 
 @app.api_route("/get_sac_kpis", methods=["GET", "POST"])
 @app.api_route("/tools/get_sac_kpis", methods=["GET", "POST"])
-async def rest_get_sac_kpis(domain: str = "FINANCE", req: Optional[Request] = None):
+async def rest_get_sac_kpis(domain: str = "FINANCE", req: Request = None):
     if req and req.method == "POST":
         try:
             b = await req.json()
@@ -94,7 +94,7 @@ async def rest_get_sac_kpis(domain: str = "FINANCE", req: Optional[Request] = No
 
 @app.api_route("/get_sac_story_analytics", methods=["GET", "POST"])
 @app.api_route("/tools/get_sac_story_analytics", methods=["GET", "POST"])
-async def rest_get_sac_story(story_id: str = "VELORA_CORP_PERF_2026", req: Optional[Request] = None):
+async def rest_get_sac_story(story_id: str = "VELORA_CORP_PERF_2026", req: Request = None):
     if req and req.method == "POST":
         try:
             b = await req.json()
@@ -107,7 +107,7 @@ async def rest_get_sac_story(story_id: str = "VELORA_CORP_PERF_2026", req: Optio
 
 @app.api_route("/get_sac_model_data", methods=["GET", "POST"])
 @app.api_route("/tools/get_sac_model_data", methods=["GET", "POST"])
-async def rest_get_sac_model(model_id: str = "", req: Optional[Request] = None):
+async def rest_get_sac_model(model_id: str = "", req: Request = None):
     measures = None
     if req and req.method == "POST":
         try:

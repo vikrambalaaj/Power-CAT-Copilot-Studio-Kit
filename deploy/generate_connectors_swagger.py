@@ -136,7 +136,7 @@ sac_swagger = {
         "description": "SAP Analytics Cloud KPI and Story integration for Velora Executive Agent",
         "version": "1.0.0"
     },
-    "host": "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+    "host": "velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
     "basePath": "/",
     "schemes": ["https"],
     "consumes": ["application/json"],
@@ -250,7 +250,7 @@ facilitator_swagger = {
         "description": "Executive Meeting Synthesis, Calendar Automation & Institutional Memory",
         "version": "1.0.0"
     },
-    "host": "facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+    "host": "velora-mcp-facilitator.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
     "basePath": "/",
     "schemes": ["https"],
     "consumes": ["application/json"],

@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com" }
+    { "url": "https://velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io" }
   ],
   "paths": {
     "/copilot/workforce-card": {

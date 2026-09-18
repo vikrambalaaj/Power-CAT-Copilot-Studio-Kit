@@ -202,9 +202,9 @@ class ToolAndServerTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("s4__get_receivables_aging", tool_names)
         self.assertIn("s4__get_payables_aging", tool_names)
         self.assertIn("s4__get_budget_consumption", tool_names)
-        # P&L and Budget Transfers are excluded from discovery
+        self.assertIn("s4__get_budget_transfers", tool_names)
+        # P&L is excluded from discovery
         self.assertNotIn("s4__get_profit_and_loss", tool_names)
-        self.assertNotIn("s4__get_budget_transfers", tool_names)
 
     async def test_c25_old_profit_and_loss_returns_unsupported_without_sap_query(self):
         res = await tools.s4__get_profit_and_loss()
@@ -213,12 +213,30 @@ class ToolAndServerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(res.structuredContent["code"], ReportStatus.UNSUPPORTED_OPERATION.value)
         self.assertIn("excluded", res.structuredContent["message"])
 
-    async def test_budget_transfers_returns_unsupported_without_sap_query(self):
-        res = await tools.s4__get_budget_transfers()
-        self.assertIsInstance(res, CallToolResult)
-        self.assertTrue(res.isError)
-        self.assertEqual(res.structuredContent["code"], ReportStatus.UNSUPPORTED_OPERATION.value)
-        self.assertIn("excluded", res.structuredContent["message"])
+    async def test_budget_transfers_queries_sap_and_calculates_movements(self):
+        original = tools.client
+        fake = CapturingClient(return_rows=[
+            {
+                "BudgetChangeDocument": "DOC001",
+                "FinancialManagementArea": "1000",
+                "FundsCenter": "FC01",
+                "TransactionCurrency": "AED",
+                "BudgetAmountInTransactionCrcy": "50000.00",
+                "BudgetingProcess": "TRAN",
+                "BudgetMovementType": "TRAN",
+            }
+        ])
+        tools.client = fake
+        try:
+            res = await tools.s4__get_budget_transfers(financial_management_area="1000", funds_center="FC01")
+            self.assertIsInstance(res, CallToolResult)
+            self.assertFalse(res.isError)
+            self.assertEqual(res.structuredContent["status"], "COMPLETE")
+            self.assertIn("calculations", res.structuredContent)
+            self.assertEqual(res.structuredContent["calculations"]["currency"], "AED")
+            self.assertEqual(fake.calls[0][0], "BudgetTransfer")
+        finally:
+            tools.client = original
 
     async def test_c04_currency_fields_mapped_correctly(self):
         original = tools.client

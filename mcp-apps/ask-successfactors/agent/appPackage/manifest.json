@@ -33,7 +33,7 @@
     },
     "permissions": [],
     "validDomains": [
-        "sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+        "velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
         "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io"
     ]
 }

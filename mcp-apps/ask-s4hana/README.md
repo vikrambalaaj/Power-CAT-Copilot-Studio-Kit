@@ -1,6 +1,6 @@
 # SAP S/4HANA finance MCP server
 
-This is the second MCP server used by the Velora Executive Agent. It is read-only and exposes four finance tools: receivables aging, payables aging, profit and loss, and budget variance.
+This is the second MCP server used by the Velora Executive Agent. It is read-only and exposes three primary finance reports: receivables aging, payables aging, and budget consumption summary (`BudgetConsumSummary`), plus master data lookups. Profit & Loss and Budget Transfers are excluded from the S/4HANA service scope.
 
 ## Configure
 

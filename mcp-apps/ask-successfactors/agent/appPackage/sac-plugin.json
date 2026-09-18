@@ -132,7 +132,7 @@
         {
             "type": "RemoteMCPServer",
             "spec": {
-                "url": "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp",
+                "url": "https://velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/mcp",
                 "mcp_tool_description": {
                     "tools": [
                         {

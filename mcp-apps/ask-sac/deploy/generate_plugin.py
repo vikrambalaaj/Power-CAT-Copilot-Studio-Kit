@@ -7,7 +7,7 @@ APP_PKG_DIR = BASE_DIR.parent / "ask-successfactors" / "agent" / "appPackage"
 
 PLUGIN_AUTH_TYPE = os.getenv("MCP_PLUGIN_AUTH_TYPE", "None")
 PLUGIN_AUTH_REF = os.getenv("SAC_PLUGIN_AUTH_REFERENCE_ID", "velora-sac-vault-ref")
-GATEWAY_URL = os.getenv("SAC_GATEWAY_URL", "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com")
+GATEWAY_URL = os.getenv("SAC_GATEWAY_URL", "https://velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io")
 
 
 def generate():

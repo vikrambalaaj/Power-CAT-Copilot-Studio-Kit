@@ -374,14 +374,50 @@ async def s4__get_payables_aging(
     return response(result)
 
 
-async def s4__get_budget_transfers(**kwargs: Any) -> Any:
-    """Legacy endpoint: Budget Transfer report is excluded from S/4HANA service scope."""
-    return response({
-        "status": ReportStatus.ERROR.value,
-        "code": ReportStatus.UNSUPPORTED_OPERATION.value,
-        "message": "Budget Transfer report is excluded from S/4HANA service scope. Only Budget Consumption Summary (BudgetConsumSummary) is supported.",
-        "type": "BudgetTransfer",
-    })
+async def s4__get_budget_transfers(
+    financial_management_area: str | None = None,
+    funds_center: str | None = None,
+    commitment_item: str | None = None,
+    fiscal_year: str | None = None,
+    budget_period: str | None = None,
+    currency: str | None = None,
+    budgeting_process: str | None = None,
+    movement_type: str | None = None,
+    correlation_id: str | None = None,
+    top: int = 100,
+) -> Any:
+    """Retrieve budget movement and transfer records from SAP S/4HANA for detailed drill-down."""
+    fma = financial_management_area or "1000"
+    filters = build_budget_transfer_filters(
+        financial_management_area=fma,
+        funds_center=funds_center,
+        commitment_item=commitment_item,
+        fiscal_year=fiscal_year,
+        budget_period=budget_period,
+        currency=currency,
+        budgeting_process=budgeting_process,
+        movement_type=movement_type,
+    )
+    result = await client.query(
+        client.settings.s4_budget_transfer_entity,
+        "BudgetTransfer",
+        filters,
+        period=fiscal_year,
+        currency=currency,
+        correlation_id=correlation_id,
+        top=top,
+    )
+    if result.get("status") != "error":
+        calc = calculate_budget_movements(
+            result.get("data", {}).get("records", []),
+            requested_currency=currency,
+        )
+        result["calculations"] = calc
+        if calc.get("status") == "ERROR" or not calc.get("is_valid", True):
+            result["status"] = ReportStatus.CONTRACT_MISMATCH.value
+            result["code"] = calc.get("code") or "CONTRACT_MISMATCH"
+            result["message"] = calc.get("error") or "Contract validation failed on budget movement records."
+    return response(result)
 
 
 
@@ -572,11 +608,12 @@ async def s4__get_profit_center_master(
     ))
 
 
-# Authoritative tool specifications: exactly 3 primary finance reports + master data tools
-# (s4__get_profit_and_loss and s4__get_budget_transfers are explicitly excluded from discovery)
+# Authoritative tool specifications: 4 primary finance reports + master data tools
+# (s4__get_profit_and_loss remains explicitly excluded from discovery)
 TOOL_SPECS = [
     ("s4__get_receivables_aging", "Retrieve permission-trimmed accounts-receivable aging from SAP S/4HANA.", s4__get_receivables_aging),
     ("s4__get_payables_aging", "Retrieve permission-trimmed accounts-payable aging from SAP S/4HANA.", s4__get_payables_aging),
+    ("s4__get_budget_transfers", "Retrieve budget movement and transfer records from SAP S/4HANA for detailed drill-down.", s4__get_budget_transfers),
     ("s4__get_budget_consumption", "Retrieve budget consumption summary records from SAP S/4HANA.", s4__get_budget_consumption),
     ("s4__get_customer_master", "Retrieve customer master records from SAP S/4HANA.", s4__get_customer_master),
     ("s4__get_cost_center_master", "Retrieve cost center master records from SAP S/4HANA.", s4__get_cost_center_master),

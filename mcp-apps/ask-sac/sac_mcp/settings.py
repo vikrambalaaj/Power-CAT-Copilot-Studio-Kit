@@ -24,5 +24,5 @@ class SACSettings(BaseSettings):
     cache_ttl_seconds: int = 120
     cache_max_entries: int = 512
     oauth_token_cache_skew_seconds: int = 30
-    public_base_url: str = 'https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com'
+    public_base_url: str = 'https://velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io'
 settings = SACSettings()

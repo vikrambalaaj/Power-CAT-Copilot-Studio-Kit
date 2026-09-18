@@ -24,6 +24,7 @@ async def tool_descriptions():
 CARD_BY_TOOL = {
     "s4__get_receivables_aging": "receivables-aging.json",
     "s4__get_payables_aging": "payables-aging.json",
+    "s4__get_budget_transfers": "budget-movements.json",
     "s4__get_budget_consumption": "budget-consumption.json",
     "s4__get_customer_master": "customer-master.json",
     "s4__get_cost_center_master": "cost-center-master.json",
@@ -55,7 +56,7 @@ def main() -> None:
     functions = [function_manifest(tool) for tool in tools]
     base_url = os.getenv(
         "S4_MCP_GATEWAY_URL",
-        "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+        "https://velora-mcp-s4hana.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
     ).rstrip("/")
     auth_type = os.getenv("S4_PLUGIN_AUTH_TYPE", "None")
     reference = os.getenv("S4_PLUGIN_AUTH_REFERENCE_ID", "REPLACE_WITH_S4_PLUGIN_VAULT_REFERENCE_ID")

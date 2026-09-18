@@ -7,7 +7,7 @@ applications:
       - python_buildpack
     command: python run_server.py
     routes:
-      - route: productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com
+      - route: velora-mcp-productivity.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io
     env:
       PYTHONUNBUFFERED: "1"
       VeloraEnvironmentName: Velora-AgenticAD-Dev
@@ -25,6 +25,6 @@ applications:
       MCP_API_KEY_SECRET_REF: "kv://velora/mcp/productivity-api-key"
       PRODUCTIVITY_AUTH_MODE: "entra_delegated"
       DATAVERSE_AUTH_MODE: "client_credentials"
-      ALLOWED_HOSTS: "productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost:*,127.0.0.1:*,*"
+      ALLOWED_HOSTS: "velora-mcp-productivity.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io,localhost:*,127.0.0.1:*,*"
       ALLOW_ANONYMOUS: "false"
       CORS_ORIGINS: "*"

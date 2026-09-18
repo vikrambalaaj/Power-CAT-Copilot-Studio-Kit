@@ -9,7 +9,7 @@ applications:
     env:
       PYTHON_VERSION: 3.11.15
       PYTHONUNBUFFERED: "1"
-      ALLOWED_HOSTS: "sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost,127.0.0.1,*"
+      ALLOWED_HOSTS: "velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io,localhost,127.0.0.1,*"
       ALLOW_ANONYMOUS: "false"
       DEMO_MODE: "false"
       SAC_AUTH_MODE: "oauth"
@@ -22,4 +22,4 @@ applications:
       CACHE_TTL_SECONDS: "120"
       CACHE_MAX_ENTRIES: "512"
       OAUTH_TOKEN_CACHE_SKEW_SECONDS: "30"
-      PUBLIC_BASE_URL: "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      PUBLIC_BASE_URL: "https://velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io"

@@ -9,7 +9,7 @@ applications:
     env:
       PYTHON_VERSION: 3.11.15
       PYTHONUNBUFFERED: "1"
-      ALLOWED_HOSTS: "s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com,localhost,127.0.0.1,*"
+      ALLOWED_HOSTS: "velora-mcp-s4hana.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io,localhost,127.0.0.1,*"
       ALLOW_ANONYMOUS: "false"
       MCP_API_KEY_SECRET_REF: "kv://velora/mcp/s4hana-api-key"
       S4_API_URL: "https://fiori.velora.ae/sap/opu/odata4/sap/zfi_sbn_ageingdata_srv/srvd_a2x/sap/zfi_sdf_ageingdata_srv/0001"
@@ -17,6 +17,7 @@ applications:
       S4_SAP_CLIENT: "100"
       S4_AR_ENTITY: "ARageingData"
       S4_AP_ENTITY: "APageingData"
+      S4_BUDGET_TRANSFER_ENTITY: "BudgetTransfer"
       S4_BUDGET_CONSUMPTION_ENTITY: "BudgetConsumSummary"
       S4_ENVIRONMENT_LABEL: "Production"
       S4_VERIFY_TLS: "true"
@@ -24,4 +25,4 @@ applications:
       CACHE_TTL_SECONDS: "60"
       CACHE_MAX_ENTRIES: "512"
       OAUTH_TOKEN_CACHE_SKEW_SECONDS: "30"
-      PUBLIC_BASE_URL: "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com"
+      PUBLIC_BASE_URL: "https://velora-mcp-s4hana.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io"

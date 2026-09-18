@@ -1,0 +1,8 @@
+{
+  "worker_calls_kpi_scan": false,
+  "worker_calls_meeting_reminder_evaluator": false,
+  "decision_card_has_actions": false,
+  "feature_rows_reviewed": 52,
+  "matrix_references_valid": true,
+  "test_attempt": "Blocked before collection: ModuleNotFoundError pydantic_settings in bundled Python runtime."
+}

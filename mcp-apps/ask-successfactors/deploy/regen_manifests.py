@@ -25,7 +25,7 @@ from successfactors_mcp.successfactors_server import mcp  # noqa: E402
 
 SERVER_PATH    = "/mcp"
 TOOL_PREFIX    = "sf__"
-TUNNEL_BASE    = os.getenv("MCP_GATEWAY_URL", "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com")
+TUNNEL_BASE    = os.getenv("MCP_GATEWAY_URL", "https://velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io")
 AUTH_TYPE      = os.getenv("MCP_PLUGIN_AUTH_TYPE", "ApiKeyPluginVault")
 AUTH_REFERENCE = os.getenv("MCP_PLUGIN_AUTH_REFERENCE_ID", "")
 CONTACT_EMAIL  = os.getenv("PUBLISHER_CONTACT_EMAIL", "")

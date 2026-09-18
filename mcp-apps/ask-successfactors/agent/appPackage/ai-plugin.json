@@ -351,7 +351,7 @@
         {
             "type": "RemoteMCPServer",
             "spec": {
-                "url": "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com/mcp",
+                "url": "https://velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/mcp",
                 "mcp_tool_description": {
                     "tools": [
                         {

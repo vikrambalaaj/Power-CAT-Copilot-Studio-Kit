@@ -1,0 +1,12 @@
+{
+  "prior_matrix_A_to_N_preserved": true,
+  "feature_rows_annotated": 52,
+  "changes_reviewed": 5,
+  "acceptance_criteria_mapped": 9,
+  "uat_executed": false,
+  "application_instructions_modified": false,
+  "input_workbook_sha256": "bc0704f45ddc21bba55ca4169a8cf9a0946ef23ff5c2d96e791c26db97ea7f86",
+  "input_docx_sha256": "6e6f4c9b1a8e1c15a3c06bee863ef1573494ca7dc5a3b7f5162ef62a96fe90f1",
+  "local_instruction_sha256": "804de5d0189e137eca15d227fd372ee367ea3a59bff6237d07b3098d1e11cc06",
+  "output": "/Users/vikrambala/copilotstudio/review-evidence/agentic-ad-gap-review-20260917/tcr-vai-001-review/Agentic_AD_Capability_Review_with_TCR_VAI_001.xlsx"
+}

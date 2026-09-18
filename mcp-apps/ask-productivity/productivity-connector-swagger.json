@@ -5,7 +5,7 @@
     "description": "Microsoft 365, Mail, Calendar, Teams, Planner, and Fail-Closed Dataverse Audit Connector for Velora Executive Agent Platform.",
     "version": "1.0.0"
   },
-  "host": "productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com",
+  "host": "velora-mcp-productivity.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
   "basePath": "/",
   "schemes": [
     "https"

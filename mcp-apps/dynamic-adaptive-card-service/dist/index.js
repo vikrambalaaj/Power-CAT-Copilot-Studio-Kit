@@ -62,7 +62,7 @@ fastify.post("/validate-submission", async (request, reply) => {
     });
 });
 const start = async () => {
-    const port = Number(process.env.PORT) || 8080;
+    const port = Number(process.env.PORT) || 8086;
     const host = process.env.HOST || "0.0.0.0";
     try {
         await fastify.listen({ port, host });

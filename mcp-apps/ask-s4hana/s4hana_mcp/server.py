@@ -166,6 +166,21 @@ SCHEMAS: dict[str, dict[str, Any]] = {
             "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
         },
     },
+    "s4__get_budget_transfers": {
+        "type": "object",
+        "properties": {
+            "financial_management_area": {"type": "string", "description": "Financial management area, default 1000"},
+            "funds_center": {"type": "string", "description": "Funds center code"},
+            "commitment_item": {"type": "string", "description": "Commitment item code"},
+            "fiscal_year": {"type": "string", "description": "Fiscal year, e.g. 2026"},
+            "budget_period": {"type": "string", "description": "Budget period, e.g. 008 or 08"},
+            "currency": {"type": "string", "description": "Currency filter, e.g. AED"},
+            "budgeting_process": {"type": "string", "description": "Budgeting process code (e.g. ENTR, TRAN)"},
+            "movement_type": {"type": "string", "description": "Budget movement type"},
+            "correlation_id": {"type": "string", "description": "Correlation ID for request tracing"},
+            "top": {"type": "integer", "description": "Maximum rows to return, default 100"},
+        },
+    },
     "s4__get_budget_consumption": {
         "type": "object",
         "properties": {
@@ -179,10 +194,11 @@ SCHEMAS: dict[str, dict[str, Any]] = {
     },
 }
 
-# Approved 3 core reports for tool discovery
+# Approved 4 core reports for tool discovery
 CORE_REPORT_SPECS = [
     ("s4__get_receivables_aging", "Retrieve accounts-receivable aging from SAP S/4HANA.", s4__get_receivables_aging),
     ("s4__get_payables_aging", "Retrieve accounts-payable aging from SAP S/4HANA.", s4__get_payables_aging),
+    ("s4__get_budget_transfers", "Retrieve budget movement and transfer records from SAP S/4HANA for detailed drill-down.", s4__get_budget_transfers),
     ("s4__get_budget_consumption", "Retrieve budget consumption summary records from SAP S/4HANA.", s4__get_budget_consumption),
 ]
 

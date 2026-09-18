@@ -41,6 +41,23 @@
             }
         },
         {
+            "name": "s4__get_budget_transfers",
+            "description": "Retrieve budget movement and transfer records from SAP S/4HANA for detailed drill-down.",
+            "capabilities": {
+                "response_semantics": {
+                    "data_path": "$",
+                    "properties": {
+                        "title": "$.cardTitle",
+                        "subtitle": "$.cardSubtitle",
+                        "template_selector": "$.adaptiveCard"
+                    },
+                    "static_template": {
+                        "file": "./adaptive-cards/budget-movements.json"
+                    }
+                }
+            }
+        },
+        {
             "name": "s4__get_budget_consumption",
             "description": "Retrieve budget consumption summary records from SAP S/4HANA.",
             "capabilities": {
@@ -113,7 +130,7 @@
         {
             "type": "RemoteMCPServer",
             "spec": {
-                "url": "https://agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/mcp",
+                "url": "https://velora-mcp-s4hana.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/mcp",
                 "mcp_tool_description": {
                     "tools": [
                         {
@@ -335,6 +352,129 @@
                                     }
                                 },
                                 "title": "s4__get_payables_agingArguments",
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "s4__get_budget_transfers",
+                            "description": "Retrieve budget movement and transfer records from SAP S/4HANA for detailed drill-down.",
+                            "inputSchema": {
+                                "properties": {
+                                    "financial_management_area": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Financial Management Area"
+                                    },
+                                    "funds_center": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Funds Center"
+                                    },
+                                    "commitment_item": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Commitment Item"
+                                    },
+                                    "fiscal_year": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Fiscal Year"
+                                    },
+                                    "budget_period": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Budget Period"
+                                    },
+                                    "currency": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Currency"
+                                    },
+                                    "budgeting_process": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Budgeting Process"
+                                    },
+                                    "movement_type": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Movement Type"
+                                    },
+                                    "correlation_id": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "default": null,
+                                        "title": "Correlation Id"
+                                    },
+                                    "top": {
+                                        "default": 100,
+                                        "title": "Top",
+                                        "type": "integer"
+                                    }
+                                },
+                                "title": "s4__get_budget_transfersArguments",
                                 "type": "object"
                             }
                         },
@@ -668,6 +808,7 @@
             "run_for_functions": [
                 "s4__get_receivables_aging",
                 "s4__get_payables_aging",
+                "s4__get_budget_transfers",
                 "s4__get_budget_consumption",
                 "s4__get_customer_master",
                 "s4__get_cost_center_master",

@@ -9,12 +9,12 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=8080
+ENV PORT=8086
 
 COPY package*.json ./
 RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 COPY src/templates ./dist/templates
 
-EXPOSE 8080
+EXPOSE 8086
 CMD ["node", "dist/index.js"]

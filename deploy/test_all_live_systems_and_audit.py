@@ -10,38 +10,45 @@ import urllib.error
 SERVICES = [
     {
         "name": "SAP SuccessFactors HCM",
-        "app": "sf-hcm-mcp-server",
-        "health_url": "https://sf-hcm-mcp-server.cfapps.eu10-005.hana.ondemand.com/health",
+        "app": "velora-mcp-sf",
+        "health_url": "https://velora-mcp-sf.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/health",
         "source_system": "SuccessFactors",
         "sample_tool": "aggregate_headcount_by_department"
     },
     {
         "name": "SAP S/4HANA Finance",
-        "app": "s4-finance-mcp-server",
-        "health_url": "https://s4-finance-mcp-server.cfapps.eu10-005.hana.ondemand.com/health",
+        "app": "velora-mcp-s4hana",
+        "health_url": "https://velora-mcp-s4hana.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/health",
         "source_system": "S4HANA",
         "sample_tool": "get_profit_and_loss_summary"
     },
     {
         "name": "SAP Analytics Cloud (SAC)",
-        "app": "sac-analytics-mcp-server",
-        "health_url": "https://sac-analytics-mcp-server.cfapps.eu10-005.hana.ondemand.com/health",
+        "app": "velora-mcp-sac",
+        "health_url": "https://velora-mcp-sac.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/health",
         "source_system": "SAC",
         "sample_tool": "get_sac_kpis"
     },
     {
         "name": "Velora Productivity Agent (Child Connected Agent)",
-        "app": "productivity-mcp-server",
-        "health_url": "https://productivity-mcp-server.cfapps.eu10-005.hana.ondemand.com/health",
+        "app": "velora-mcp-productivity",
+        "health_url": "https://velora-mcp-productivity.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/health",
         "source_system": "Microsoft365",
         "sample_tool": "PrepareEmail"
     },
     {
         "name": "Velora Facilitator",
-        "app": "facilitator-mcp-server",
-        "health_url": "https://facilitator-mcp-server.cfapps.eu10-005.hana.ondemand.com/health",
+        "app": "velora-mcp-facilitator",
+        "health_url": "https://velora-mcp-facilitator.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/health",
         "source_system": "Facilitator",
         "sample_tool": "get_facilitator_guide"
+    },
+    {
+        "name": "Dynamic Adaptive Card Service",
+        "app": "velora-mcp-card-service",
+        "health_url": "https://velora-mcp-card-service.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io/health",
+        "source_system": "AdaptiveCards",
+        "sample_tool": "render_card"
     }
 ]
 

@@ -8,4 +8,4 @@ applications:
     command: node dist/index.js
     env:
       NODE_ENV: "production"
-      PUBLIC_BASE_URL: "https://adaptive-card-service.cfapps.eu10-005.hana.ondemand.com"
+      PUBLIC_BASE_URL: "https://velora-mcp-card-service.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io"

@@ -123,4 +123,19 @@ describe("Dynamic Adaptive Card Service Unit & Integration Tests", () => {
     expect(check.valid).toBe(false);
     expect(check.error).toContain("Invalid signature");
   });
+
+  it("7. Should enforce durable shared idempotency across separate instances", () => {
+    const signer1 = new IdempotencySigner("test-secret-key-12345");
+    const signer2 = new IdempotencySigner("test-secret-key-12345");
+    const { ticketToken } = signer1.generateTicket("session-shared", "approval-card", 3600);
+
+    // Instance 1 consumes ticket
+    const res1 = signer1.verifyAndConsumeTicket(ticketToken);
+    expect(res1.valid).toBe(true);
+
+    // Instance 2 (different replica) attempts to consume the same ticket
+    const res2 = signer2.verifyAndConsumeTicket(ticketToken);
+    expect(res2.valid).toBe(false);
+    expect(res2.error).toContain("already consumed");
+  });
 });
