@@ -17,7 +17,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "📊",
+                  "text": "⚖️",
                   "size": "Large"
                 }
               ]
@@ -28,15 +28,16 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "Peer Benchmark Intelligence",
+                  "text": "${decisionTitle}",
                   "weight": "Bolder",
-                  "size": "Medium"
+                  "size": "Medium",
+                  "wrap": true
                 },
                 {
                   "type": "TextBlock",
-                  "text": "${metricName} • ${period}",
-                  "size": "Small",
-                  "isSubtle": true
+                  "text": "Decision ID: ${decisionId} • ${evaluatedDate}",
+                  "isSubtle": true,
+                  "size": "Small"
                 }
               ]
             },
@@ -46,7 +47,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "${percentileBadge}",
+                  "text": "${decisionOutcome}",
                   "weight": "Bolder",
                   "color": "Good",
                   "size": "Small"
@@ -67,14 +68,14 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "INTERNAL VALUE",
+              "text": "STRATEGIC ALIGNMENT",
               "size": "Small",
               "isSubtle": true,
               "weight": "Bolder"
             },
             {
               "type": "TextBlock",
-              "text": "${internalValue}",
+              "text": "${scoreStrategic}/100",
               "size": "Large",
               "weight": "Bolder",
               "color": "Accent"
@@ -87,16 +88,17 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "PEER MEDIAN (P50)",
+              "text": "FISCAL IMPACT",
               "size": "Small",
               "isSubtle": true,
               "weight": "Bolder"
             },
             {
               "type": "TextBlock",
-              "text": "${peerMedian}",
+              "text": "${scoreFiscal}/100",
               "size": "Large",
-              "weight": "Bolder"
+              "weight": "Bolder",
+              "color": "Good"
             }
           ]
         },
@@ -106,73 +108,104 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "TOP QUARTILE (P75)",
+              "text": "PEER BENCHMARK",
               "size": "Small",
               "isSubtle": true,
               "weight": "Bolder"
             },
             {
               "type": "TextBlock",
-              "text": "${topQuartile}",
+              "text": "${scorePeer}/100",
               "size": "Large",
               "weight": "Bolder",
-              "color": "Good"
+              "color": "Warning"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "HISTORICAL PRECEDENT",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${scoreHistorical}/100",
+              "size": "Large",
+              "weight": "Bolder"
             }
           ]
         }
       ]
     },
     {
-      "type": "FactSet",
-      "facts": [
-        {"title": "Peer Cohort", "value": "${cohort}"},
-        {"title": "Sample Size", "value": "${sampleSize} Regional Carriers"},
-        {"title": "Confidence Score", "value": "${confidenceScore}"},
-        {"title": "Licensed Source", "value": "${sourceCitation}"}
-      ]
-    },
-    {
       "type": "Container",
-      "id": "benchmarkMethodologyPanel",
+      "id": "decisionRationalePanel",
       "isVisible": false,
       "separator": true,
       "items": [
         {
           "type": "TextBlock",
-          "text": "📐 Normalization Methodology & Sample Governance",
+          "text": "📜 Auditable Rationale & Precedent Analysis",
           "weight": "Bolder"
         },
         {
           "type": "TextBlock",
-          "text": "${methodology}",
-          "size": "Small",
-          "wrap": true
+          "text": "${rationaleSummary}",
+          "wrap": true,
+          "size": "Small"
+        },
+        {
+          "type": "FactSet",
+          "facts": [
+            {
+              "title": "Comparable Precedent",
+              "value": "${comparablePrecedent}"
+            },
+            {
+              "title": "Identified Risks",
+              "value": "${identifiedRisks}"
+            },
+            {
+              "title": "Questions to Probe",
+              "value": "${openQuestions}"
+            },
+            {
+              "title": "Confidence Rating",
+              "value": "${confidenceRating}"
+            }
+          ]
         }
       ]
     },
     {
       "type": "TextBlock",
-      "text": "Dataset SLA: Monthly Verified Refresh • Strict Unit & Currency Alignment",
-      "size": "Small",
+      "text": "Dataverse Audit Ref: ${auditRef} • SHA-256 Merkle Hash: ${merkleRoot}",
       "isSubtle": true,
+      "size": "Small",
       "separator": true
     }
   ],
   "actions": [
     {
       "type": "Action.ToggleVisibility",
-      "title": "Methodology & Governance",
+      "title": "Why this result?",
       "targetElements": [
-        "benchmarkMethodologyPanel"
+        "decisionRationalePanel"
       ]
     },
     {
       "type": "Action.Execute",
-      "title": "Download Comparative Dataset",
-      "verb": "BENCHMARK_EXPORT_DATASET",
+      "title": "Export Audit Manifest (JSON)",
+      "verb": "AUDIT_EXPORT_MANIFEST",
       "data": {
-        "action": "BENCHMARK_EXPORT_DATASET",
-        "metricId": "${metricId}"
+        "action": "AUDIT_EXPORT_MANIFEST",
+        "decisionId": "${decisionId}"
       }
     }
   ]

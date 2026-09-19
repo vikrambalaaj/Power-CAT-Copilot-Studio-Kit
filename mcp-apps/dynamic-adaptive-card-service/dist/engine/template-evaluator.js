@@ -99,4 +99,7 @@ export class TemplateEvaluator {
     getSigner() {
         return this.signer;
     }
+    getRegistry() {
+        return this.registry;
+    }
 }

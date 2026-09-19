@@ -1,0 +1,229 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📅",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${briefingTitle}",
+                  "weight": "Bolder",
+                  "size": "Medium",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${meetingTime} • ${location} • ${participantsCount} Attendees",
+                  "isSubtle": true,
+                  "size": "Small",
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${priorityBadge}",
+                  "weight": "Bolder",
+                  "color": "Accent",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "CORE AGENDA",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${agendaFocus}",
+              "size": "Medium",
+              "weight": "Bolder",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "${decisionRequired}",
+              "size": "Small",
+              "color": "Warning",
+              "wrap": true
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "PRIOR DECISIONS",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${priorDecisionsStatus}",
+              "size": "Medium",
+              "weight": "Bolder",
+              "color": "Good"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${priorDecisionsNote}",
+              "size": "Small",
+              "isSubtle": true,
+              "wrap": true
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "KEY STAKEHOLDER",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${keyStakeholder}",
+              "size": "Medium",
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${stakeholderStance}",
+              "size": "Small",
+              "isSubtle": true,
+              "wrap": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "id": "attendeeDossierDetails",
+      "isVisible": false,
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "👥 Attendee Dossiers & Recent Communications (Last 72h)",
+          "weight": "Bolder"
+        },
+        {
+          "type": "Container",
+          "$data": "${attendeeDossiers}",
+          "separator": true,
+          "items": [
+            {
+              "type": "ColumnSet",
+              "columns": [
+                {
+                  "type": "Column",
+                  "width": "stretch",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "text": "${name} (${role})",
+                      "weight": "Bolder"
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "${recentNote}",
+                      "size": "Small",
+                      "isSubtle": true,
+                      "wrap": true
+                    }
+                  ]
+                },
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "text": "${alignment}",
+                      "size": "Small",
+                      "weight": "Bolder"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "📌 Sources: Microsoft Graph Calendar, Exchange Online, Teams Transcript",
+      "isSubtle": true,
+      "size": "Small",
+      "separator": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.ToggleVisibility",
+      "title": "🔍 Toggle Attendee Dossiers",
+      "targetElements": [
+        "attendeeDossierDetails"
+      ]
+    },
+    {
+      "type": "Action.Execute",
+      "title": "Send Brief to Outlook",
+      "verb": "BRIEFING_EMAIL_DISPATCH",
+      "data": {
+        "action": "BRIEFING_EMAIL_DISPATCH",
+        "briefingId": "${briefingId}"
+      }
+    }
+  ]
+}

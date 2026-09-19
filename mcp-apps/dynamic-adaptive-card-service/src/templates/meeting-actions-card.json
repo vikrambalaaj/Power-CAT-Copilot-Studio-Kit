@@ -1,0 +1,138 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📋",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${meetingTitle}",
+                  "weight": "Bolder",
+                  "size": "Medium",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Live Action Tracker • ${meetingDate}",
+                  "isSubtle": true,
+                  "size": "Small"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${syncStatus}",
+                  "weight": "Bolder",
+                  "color": "Good",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Extracted Action Items & Deliverables",
+      "weight": "Bolder",
+      "separator": true
+    },
+    {
+      "type": "Container",
+      "$data": "${actions}",
+      "separator": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${description}",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "👤 Owner: ${namedOwner} • Due: ${dueDate}",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${statusBadge}",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "color": "${statusColor}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Synchronized with Microsoft Planner & Graph Tasks • Rechecks occur hourly",
+      "isSubtle": true,
+      "size": "Small",
+      "separator": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "title": "Sync with Microsoft Planner",
+      "verb": "MEETING_ACTIONS_SYNC_PLANNER",
+      "data": {
+        "action": "MEETING_ACTIONS_SYNC_PLANNER",
+        "meetingId": "${meetingId}"
+      }
+    },
+    {
+      "type": "Action.Execute",
+      "title": "Dispatch Deadline Nudges",
+      "verb": "MEETING_ACTIONS_DISPATCH_NUDGES",
+      "data": {
+        "action": "MEETING_ACTIONS_DISPATCH_NUDGES",
+        "meetingId": "${meetingId}"
+      }
+    }
+  ]
+}

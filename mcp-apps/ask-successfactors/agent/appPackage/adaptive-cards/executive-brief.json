@@ -3,12 +3,122 @@
   "type": "AdaptiveCard",
   "version": "1.5",
   "body": [
-    {"type": "TextBlock", "text": "Executive brief", "weight": "Bolder", "size": "Medium"},
-    {"type": "TextBlock", "text": "${briefingPeriod}", "isSubtle": true},
-    {"type": "TextBlock", "text": "Facts", "weight": "Bolder", "separator": true},
-    {"type": "TextBlock", "text": "${factsSummary}", "wrap": true},
-    {"type": "TextBlock", "text": "Recommendations", "weight": "Bolder", "separator": true},
-    {"type": "TextBlock", "text": "${recommendationSummary}", "wrap": true},
-    {"type": "TextBlock", "text": "${sourceSummary}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "🌅",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Executive Daily Briefing",
+                  "weight": "Bolder",
+                  "size": "Medium"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${briefingPeriod} • Synthesized Intelligence",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "HIGH PRIORITY",
+                  "weight": "Bolder",
+                  "color": "Accent",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Executive Summary & Core Agenda",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${factsSummary}",
+          "wrap": true,
+          "size": "Small"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "id": "detailedBriefingFacts",
+      "isVisible": false,
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "💡 Strategic Priorities & Recommendations",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${recommendationSummary}",
+          "wrap": true,
+          "size": "Small"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Sources: ${sourceSummary} • Bound to authenticated executive mailbox",
+      "size": "Small",
+      "isSubtle": true,
+      "wrap": true,
+      "separator": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.ToggleVisibility",
+      "title": "View Strategic Recommendations",
+      "targetElements": [
+        "detailedBriefingFacts"
+      ]
+    },
+    {
+      "type": "Action.Execute",
+      "title": "Dispatch Summary Email",
+      "verb": "DISPATCH_BRIEFING_EMAIL",
+      "data": {
+        "action": "DISPATCH_BRIEFING_EMAIL",
+        "period": "${briefingPeriod}"
+      }
+    }
   ]
 }

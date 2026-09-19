@@ -17,7 +17,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "📊",
+                  "text": "⚡",
                   "size": "Large"
                 }
               ]
@@ -28,15 +28,16 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "Peer Benchmark Intelligence",
+                  "text": "${cardTitle}",
                   "weight": "Bolder",
-                  "size": "Medium"
+                  "size": "Medium",
+                  "wrap": true
                 },
                 {
                   "type": "TextBlock",
-                  "text": "${metricName} • ${period}",
-                  "size": "Small",
-                  "isSubtle": true
+                  "text": "${asOfDate} • ${userPrincipal}",
+                  "isSubtle": true,
+                  "size": "Small"
                 }
               ]
             },
@@ -46,9 +47,9 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "${percentileBadge}",
+                  "text": "${urgencyLevel}",
                   "weight": "Bolder",
-                  "color": "Good",
+                  "color": "Attention",
                   "size": "Small"
                 }
               ]
@@ -67,112 +68,137 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "INTERNAL VALUE",
+              "text": "OVERDUE / URGENT",
               "size": "Small",
               "isSubtle": true,
               "weight": "Bolder"
             },
             {
               "type": "TextBlock",
-              "text": "${internalValue}",
+              "text": "${urgentCount} Items",
+              "size": "Large",
+              "weight": "Bolder",
+              "color": "Attention"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "PENDING APPROVALS",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${pendingApprovalsCount} Items",
+              "size": "Large",
+              "weight": "Bolder",
+              "color": "Warning"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "FINANCIAL EXPOSURE",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${financialExposure}",
               "size": "Large",
               "weight": "Bolder",
               "color": "Accent"
             }
           ]
-        },
-        {
-          "type": "Column",
-          "width": "stretch",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "PEER MEDIAN (P50)",
-              "size": "Small",
-              "isSubtle": true,
-              "weight": "Bolder"
-            },
-            {
-              "type": "TextBlock",
-              "text": "${peerMedian}",
-              "size": "Large",
-              "weight": "Bolder"
-            }
-          ]
-        },
-        {
-          "type": "Column",
-          "width": "stretch",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "TOP QUARTILE (P75)",
-              "size": "Small",
-              "isSubtle": true,
-              "weight": "Bolder"
-            },
-            {
-              "type": "TextBlock",
-              "text": "${topQuartile}",
-              "size": "Large",
-              "weight": "Bolder",
-              "color": "Good"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "FactSet",
-      "facts": [
-        {"title": "Peer Cohort", "value": "${cohort}"},
-        {"title": "Sample Size", "value": "${sampleSize} Regional Carriers"},
-        {"title": "Confidence Score", "value": "${confidenceScore}"},
-        {"title": "Licensed Source", "value": "${sourceCitation}"}
-      ]
-    },
-    {
-      "type": "Container",
-      "id": "benchmarkMethodologyPanel",
-      "isVisible": false,
-      "separator": true,
-      "items": [
-        {
-          "type": "TextBlock",
-          "text": "📐 Normalization Methodology & Sample Governance",
-          "weight": "Bolder"
-        },
-        {
-          "type": "TextBlock",
-          "text": "${methodology}",
-          "size": "Small",
-          "wrap": true
         }
       ]
     },
     {
       "type": "TextBlock",
-      "text": "Dataset SLA: Monthly Verified Refresh • Strict Unit & Currency Alignment",
-      "size": "Small",
+      "text": "High Priority Deliverables & Action Items",
+      "weight": "Bolder",
+      "separator": true
+    },
+    {
+      "type": "Container",
+      "$data": "${items}",
+      "separator": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${title}",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${details}",
+                  "size": "Small",
+                  "isSubtle": true,
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${dueLabel}",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "color": "Attention"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Source: M365 Mail & Planner • S/4HANA Open Line Items",
       "isSubtle": true,
+      "size": "Small",
       "separator": true
     }
   ],
   "actions": [
     {
-      "type": "Action.ToggleVisibility",
-      "title": "Methodology & Governance",
-      "targetElements": [
-        "benchmarkMethodologyPanel"
-      ]
+      "type": "Action.Execute",
+      "title": "Review Full Triage Queue",
+      "verb": "TRIAGE_OPEN_QUEUE",
+      "data": {
+        "action": "TRIAGE_OPEN_QUEUE",
+        "sessionId": "${sessionId}"
+      }
     },
     {
       "type": "Action.Execute",
-      "title": "Download Comparative Dataset",
-      "verb": "BENCHMARK_EXPORT_DATASET",
+      "title": "Acknowledge All",
+      "verb": "TRIAGE_ACKNOWLEDGE_ALL",
       "data": {
-        "action": "BENCHMARK_EXPORT_DATASET",
-        "metricId": "${metricId}"
+        "action": "TRIAGE_ACKNOWLEDGE_ALL",
+        "sessionId": "${sessionId}"
       }
     }
   ]

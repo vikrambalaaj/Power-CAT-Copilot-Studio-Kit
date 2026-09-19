@@ -3,15 +3,148 @@
   "type": "AdaptiveCard",
   "version": "1.5",
   "body": [
-    {"type": "TextBlock", "text": "KPI recommendation", "weight": "Bolder", "size": "Medium"},
-    {"type": "TextBlock", "text": "${metricName}", "weight": "Bolder"},
-    {"type": "FactSet", "facts": [
-      {"title": "Actual", "value": "${actual}"},
-      {"title": "Target", "value": "${target}"},
-      {"title": "Variance", "value": "${variance}"},
-      {"title": "Rule", "value": "${ruleVersion}"}
-    ]},
-    {"type": "TextBlock", "text": "${recommendation}", "wrap": true, "separator": true},
-    {"type": "TextBlock", "text": "Confirmation is required before any write action.", "size": "Small", "isSubtle": true, "wrap": true}
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "💡",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Proactive Executive Recommendation",
+                  "weight": "Bolder",
+                  "size": "Medium"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${metricName} • ${reportingPeriod}",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${categoryBadge}",
+                  "weight": "Bolder",
+                  "color": "Attention",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {"title": "Observed Value", "value": "${actual}"},
+        {"title": "Target / Baseline", "value": "${target}"},
+        {"title": "Variance Exposure", "value": "${variance}"},
+        {"title": "Confidence Score", "value": "${confidenceScore}"},
+        {"title": "Policy Rule", "value": "${ruleVersion}"}
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Recommended Executive Action",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${recommendation}",
+          "wrap": true,
+          "size": "Small"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "id": "underlyingDriversPanel",
+      "isVisible": false,
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "🔍 Underlying Drivers & Policy Evaluation",
+          "weight": "Bolder"
+        },
+        {
+          "type": "FactSet",
+          "facts": [
+            {"title": "Step 1: ERP Trigger", "value": "${triggerDetail}"},
+            {"title": "Step 2: Rule Logic", "value": "${ruleDetail}"},
+            {"title": "Step 3: Quantified Impact", "value": "${impactDetail}"},
+            {"title": "Step 4: Prescribed Intervention", "value": "${interventionDetail}"}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Source: ${sourceCitation} • Confirmation required before any write action.",
+      "size": "Small",
+      "isSubtle": true,
+      "wrap": true,
+      "separator": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.ToggleVisibility",
+      "title": "Why this recommendation?",
+      "targetElements": [
+        "underlyingDriversPanel"
+      ]
+    },
+    {
+      "type": "Action.Execute",
+      "title": "👍 Helpful",
+      "verb": "FEEDBACK_SUBMIT",
+      "data": {
+        "action": "FEEDBACK_SUBMIT",
+        "rating": "HELPFUL",
+        "alertId": "${alertId}",
+        "category": "${categoryBadge}"
+      }
+    },
+    {
+      "type": "Action.Execute",
+      "title": "👎 Not Helpful",
+      "verb": "FEEDBACK_SUBMIT",
+      "data": {
+        "action": "FEEDBACK_SUBMIT",
+        "rating": "NOT_HELPFUL",
+        "alertId": "${alertId}",
+        "category": "${categoryBadge}"
+      }
+    }
   ]
 }

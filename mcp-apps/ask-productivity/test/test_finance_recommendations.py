@@ -94,7 +94,7 @@ class TestFinanceRecommendationsAcceptanceT08(unittest.IsolatedAsyncioTestCase):
                 "environment": "Production",
                 "organizationScope": "1000",
                 "currency": currency,
-                "retrievedAt": "2026-09-14T08:00:00Z",
+                "retrievedAt": datetime.now(timezone.utc).isoformat(),
                 "completeness": completion_state,
             },
             "calculations": {

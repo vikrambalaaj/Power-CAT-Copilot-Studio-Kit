@@ -45,8 +45,115 @@
   
   .banner-scheduled { background: #102534; border: 1px solid #1B4561; border-radius: 6px; padding: 8px 14px; font-size: 11.5px; color: #60A5FA; display: flex; align-items: center; justify-content: space-between; }
   .code-box { background: #0B141C; border-radius: 6px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: #7DD3FC; border: 1px solid #1E3345; overflow-x: auto; }
+
+  /* Modern UI/UX Polish, Micro-interactions & Accessibility */
+  .btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+  }
+  .btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .btn.active-btn {
+    background: #13A6A6 !important;
+    color: #FFFFFF !important;
+    border-color: #13A6A6 !important;
+    box-shadow: 0 0 0 2px rgba(19, 166, 166, 0.4);
+  }
+  .expandable-panel {
+    display: none;
+    animation: slideDownFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .expandable-panel.visible {
+    display: block;
+  }
+  @keyframes slideDownFade {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #112536;
+    color: #FFFFFF;
+    border: 1px solid #13A6A6;
+    border-left: 5px solid #13A6A6;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .gap-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #09131B;
+    border-bottom: 1px solid #1C3042;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+  .gap-nav-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .gap-nav a {
+    color: #8EA0B0;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+  }
+  .gap-nav a:hover {
+    color: #FFFFFF;
+    background: #162B3D;
+    border-color: #23425E;
+  }
+  .gap-nav a.active {
+    color: #13A6A6;
+    background: rgba(19, 166, 166, 0.15);
+    border-color: #13A6A6;
+    font-weight: 700;
+  }
+
 </style></head><body>
 <div class="window">
+<div class="gap-nav">
+  <span class="gap-nav-label">VELORA CAPABILITIES:</span>
+  <a href='gap1_source_attribution.html'>1. Attribution</a> <a href='gap2_automated_pre_meeting_briefs.html'>2. Pre-Meeting</a> <a href='gap3_end_of_day_digests.html'>3. EOD Digest</a> <a href='gap4_inbox_triage.html'>4. Inbox Triage</a> <a href='gap5_recommendation_feedback.html'>5. Feedback</a> <a href='gap6_confidence_scoring.html'>6. Confidence</a> <a href='gap7_reasoning_chain_explainability.html'>7. Reasoning</a> <a href='gap8_audit_ready_traceability.html'>8. Audit Trace</a> <a href='gap9_institutional_memory.html'>9. Memory</a> <a href='gap10_in_person_meeting_intelligence.html' class='active'>10. In-Person</a> <a href='gap11_peer_benchmarking.html'>11. Benchmark</a> <a href='gap12_proactive_recommendations.html'>12. Proactive</a>
+</div>
   <div class="titlebar">
     <div class="window-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
     <div class="app-title"><span class="app-badge">FACILITATOR MCP</span> Velora One — In-Person Meeting Intelligence</div>
@@ -94,10 +201,50 @@
         <strong style="color:#60A5FA;">Safety Gate Verified:</strong> Draft follow-up email prepared for session attendees. Automatic dispatch suppressed awaiting executive review.
       </div>
       <div style="display:flex; gap:8px;">
-        <button class="btn btn-primary">Review & Send Email Summary</button>
-        <button class="btn btn-outline">View Diarized Transcript</button>
+        <button class="btn btn-primary" onclick="confirmStageAction('Create Approved Actions', 'Stage A preview generated: 2 tasks mapped; Stage B confirmation required')">Create Tasks in Planner</button>
+        <button class="btn btn-outline" onclick="showToast('Dispatching nudges: Suppressed for already-completed tasks')">Dispatch Follow-up Nudges</button>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+function showToast(msg, isSuccess = true) {
+  let toast = document.getElementById('exec-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'exec-toast';
+    toast.className = 'toast-notification';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = (isSuccess ? '✅ ' : 'ℹ️ ') + msg;
+  toast.classList.add('show');
+  clearTimeout(window.__toastTimeout);
+  window.__toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3400);
+}
+
+function togglePanel(panelId, btn) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const isVisible = panel.classList.toggle('visible');
+  if (btn) {
+    btn.classList.toggle('active-btn', isVisible);
+  }
+  showToast(isVisible ? 'Panel expanded' : 'Panel collapsed');
+}
+
+function submitFeedback(rating, alertId, btn) {
+  const container = btn.closest('div');
+  if (container) {
+    container.querySelectorAll('.feedback-btn').forEach(b => b.classList.remove('active-btn'));
+  }
+  btn.classList.add('active-btn');
+  showToast('Rating recorded: ' + rating + ' for ' + alertId + ' (Saved in feedback_service)');
+}
+
+function confirmStageAction(actionTitle, stageDetails) {
+  showToast('Stage A Preview generated: ' + actionTitle + ' (' + stageDetails + ')');
+}
+</script>
+
 </body></html>

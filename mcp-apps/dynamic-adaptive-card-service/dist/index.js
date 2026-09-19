@@ -16,7 +16,7 @@ fastify.get("/health", async () => {
 // 2. List Available Templates
 fastify.get("/templates", async () => {
     return {
-        templates: ["approval-card", "fact-grid-card", "input-form-card", "metrics-card"],
+        templates: evaluator.getRegistry().listTemplates(),
         targetSchemaVersion: "1.5",
     };
 });

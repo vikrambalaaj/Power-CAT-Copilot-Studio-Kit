@@ -3,15 +3,116 @@
   "type": "AdaptiveCard",
   "version": "1.5",
   "body": [
-    {"type": "TextBlock", "text": "Meeting intelligence", "weight": "Bolder", "size": "Medium"},
-    {"type": "TextBlock", "text": "${meetingTitle}", "isSubtle": true, "wrap": true},
-    {"type": "TextBlock", "text": "Decision", "weight": "Bolder", "separator": true},
-    {"type": "TextBlock", "text": "${decision}", "wrap": true},
-    {"type": "FactSet", "facts": [
-      {"title": "Action owner", "value": "${actionOwner}"},
-      {"title": "Due date", "value": "${dueDate}"},
-      {"title": "Confirmation", "value": "${confirmationState}"}
-    ]},
-    {"type": "TextBlock", "text": "Task write-back is disabled until the user confirms.", "size": "Small", "isSubtle": true, "wrap": true}
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📝",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Meeting Intelligence & Action Tracker",
+                  "weight": "Bolder",
+                  "size": "Medium"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${meetingTitle} • ${meetingDate}",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${trackerStatus}",
+                  "weight": "Bolder",
+                  "color": "Good",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Key Meeting Decision",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${decisionSummary}",
+          "wrap": true,
+          "size": "Small"
+        }
+      ]
+    },
+    {
+      "type": "FactSet",
+      "separator": true,
+      "facts": [
+        {"title": "Named Assignee", "value": "${actionOwner} (Entra ID Verified)"},
+        {"title": "Deliverable", "value": "${deliverableDescription}"},
+        {"title": "Due Date", "value": "${dueDate}"},
+        {"title": "Current Status", "value": "${actionStatus}"},
+        {"title": "Planner Mapping", "value": "${plannerTaskRef}"}
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Stage A Preview: 0 tasks created until explicit confirmation • Recheck suppresses completed tasks.",
+      "size": "Small",
+      "isSubtle": true,
+      "wrap": true,
+      "separator": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "title": "Create Tasks in Microsoft Planner",
+      "verb": "CREATE_APPROVED_MEETING_ACTIONS",
+      "data": {
+        "action": "CREATE_APPROVED_MEETING_ACTIONS",
+        "meetingId": "${meetingId}"
+      }
+    },
+    {
+      "type": "Action.Execute",
+      "title": "Dispatch Follow-up Nudges",
+      "verb": "MEETING_ACTIONS_DISPATCH_NUDGES",
+      "data": {
+        "action": "MEETING_ACTIONS_DISPATCH_NUDGES",
+        "meetingId": "${meetingId}"
+      }
+    }
   ]
 }

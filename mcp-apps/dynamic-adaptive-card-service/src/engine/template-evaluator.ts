@@ -134,4 +134,8 @@ export class TemplateEvaluator {
   public getSigner(): IdempotencySigner {
     return this.signer;
   }
+
+  public getRegistry(): TemplateRegistry {
+    return this.registry;
+  }
 }

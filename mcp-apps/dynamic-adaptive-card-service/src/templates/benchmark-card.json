@@ -28,15 +28,16 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "Peer Benchmark Intelligence",
+                  "text": "${metricName}",
                   "weight": "Bolder",
-                  "size": "Medium"
+                  "size": "Medium",
+                  "wrap": true
                 },
                 {
                   "type": "TextBlock",
-                  "text": "${metricName} • ${period}",
-                  "size": "Small",
-                  "isSubtle": true
+                  "text": "Peer Cohort: ${cohortName} • ${observationPeriod}",
+                  "isSubtle": true,
+                  "size": "Small"
                 }
               ]
             },
@@ -123,17 +124,8 @@
       ]
     },
     {
-      "type": "FactSet",
-      "facts": [
-        {"title": "Peer Cohort", "value": "${cohort}"},
-        {"title": "Sample Size", "value": "${sampleSize} Regional Carriers"},
-        {"title": "Confidence Score", "value": "${confidenceScore}"},
-        {"title": "Licensed Source", "value": "${sourceCitation}"}
-      ]
-    },
-    {
       "type": "Container",
-      "id": "benchmarkMethodologyPanel",
+      "id": "methodologyDetails",
       "isVisible": false,
       "separator": true,
       "items": [
@@ -143,27 +135,42 @@
           "weight": "Bolder"
         },
         {
-          "type": "TextBlock",
-          "text": "${methodology}",
-          "size": "Small",
-          "wrap": true
+          "type": "FactSet",
+          "facts": [
+            {
+              "title": "Sample Size",
+              "value": "${sampleSize} Regional Carriers"
+            },
+            {
+              "title": "Currency Basis",
+              "value": "AED (Normalized at 3.6725 USD/AED)"
+            },
+            {
+              "title": "Confidence Score",
+              "value": "${confidenceScore}"
+            },
+            {
+              "title": "Licensed Source",
+              "value": "${licensedSource}"
+            }
+          ]
         }
       ]
     },
     {
       "type": "TextBlock",
-      "text": "Dataset SLA: Monthly Verified Refresh • Strict Unit & Currency Alignment",
-      "size": "Small",
+      "text": "Verified Dataset Version: ${datasetVersion} • Refresh SLA: Monthly",
       "isSubtle": true,
+      "size": "Small",
       "separator": true
     }
   ],
   "actions": [
     {
       "type": "Action.ToggleVisibility",
-      "title": "Methodology & Governance",
+      "title": "Methodology & Sources",
       "targetElements": [
-        "benchmarkMethodologyPanel"
+        "methodologyDetails"
       ]
     },
     {

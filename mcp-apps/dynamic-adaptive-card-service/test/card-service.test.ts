@@ -138,4 +138,62 @@ describe("Dynamic Adaptive Card Service Unit & Integration Tests", () => {
     expect(res2.valid).toBe(false);
     expect(res2.error).toContain("already consumed");
   });
+
+  it("8. Should register and render all new enterprise templates under 15KB", () => {
+    const templates = evaluator.getRegistry().listTemplates();
+    expect(templates).toContain("executive-attention-card");
+    expect(templates).toContain("executive-briefing-card");
+    expect(templates).toContain("recommendation-card");
+    expect(templates).toContain("vendor-decision-card");
+    expect(templates).toContain("meeting-actions-card");
+    expect(templates).toContain("benchmark-card");
+
+    // Test recommendation-card render
+    const recResult = evaluator.renderCard({
+      templateId: "recommendation-card",
+      data: {
+        recommendationTitle: "Freeze Credit for Delinquent Accounts",
+        reportingPeriod: "Q3 2026",
+        categoryBadge: "RISK",
+        actualValue: "AED 42.8M Overdue",
+        targetValue: "< AED 10M",
+        financialImpact: "+8.4 Days DSO Drag",
+        prescribedAction: "Suspend credit facility and dispatch dunning notice.",
+        reasoningStep1: "S/4HANA CDS detected >180d balances",
+        reasoningStep2: "Credit policy rule §4.2 applies",
+        reasoningStep3: "AED 720k bad debt provisioning required",
+        reasoningStep4: "Condition sales release on 30% upfront wire",
+        confidenceScore: "94% High",
+        evidenceQuality: "Authoritative S/4HANA Ledger",
+        sourceCitation: "SAP S/4HANA BSID CDS View",
+        alertId: "alert-rec-001",
+      },
+    });
+    expect(recResult.success).toBe(true);
+    expect(recResult.validation.payloadSizeBytes).toBeLessThan(15360);
+
+    // Test vendor-decision-card render with progressive disclosure
+    const decisionResult = evaluator.renderCard({
+      templateId: "vendor-decision-card",
+      data: {
+        decisionTitle: "Vendor Evaluation: Engine Overhaul MRO",
+        decisionId: "DEC-2026-881",
+        evaluatedDate: "2026-09-19",
+        decisionOutcome: "RECOMMENDED",
+        scoreStrategic: 92,
+        scoreFiscal: 88,
+        scorePeer: 84,
+        scoreHistorical: 90,
+        rationaleSummary: "Highest alignment score with contractual guarantees.",
+        comparablePrecedent: "2024 fleet retrofit agreement",
+        identifiedRisks: "Supply chain turnaround buffer",
+        openQuestions: "Can turnaround be capped at 45 days?",
+        confidenceRating: "HIGH (Authoritative)",
+        auditRef: "AUD-REF-9921",
+        merkleRoot: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      },
+    });
+    expect(decisionResult.success).toBe(true);
+    expect(decisionResult.validation.payloadSizeBytes).toBeLessThan(15360);
+  });
 });

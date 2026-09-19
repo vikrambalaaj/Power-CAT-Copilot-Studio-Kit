@@ -17,7 +17,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "📊",
+                  "text": "🤖",
                   "size": "Large"
                 }
               ]
@@ -28,15 +28,16 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "Peer Benchmark Intelligence",
+                  "text": "${recommendationTitle}",
                   "weight": "Bolder",
-                  "size": "Medium"
+                  "size": "Medium",
+                  "wrap": true
                 },
                 {
                   "type": "TextBlock",
-                  "text": "${metricName} • ${period}",
-                  "size": "Small",
-                  "isSubtle": true
+                  "text": "Autonomous KPI Scan • ${reportingPeriod}",
+                  "isSubtle": true,
+                  "size": "Small"
                 }
               ]
             },
@@ -46,9 +47,9 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "${percentileBadge}",
+                  "text": "${categoryBadge}",
                   "weight": "Bolder",
-                  "color": "Good",
+                  "color": "Attention",
                   "size": "Small"
                 }
               ]
@@ -67,35 +68,15 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "INTERNAL VALUE",
+              "text": "ACTUAL / OBSERVED",
               "size": "Small",
               "isSubtle": true,
               "weight": "Bolder"
             },
             {
               "type": "TextBlock",
-              "text": "${internalValue}",
-              "size": "Large",
-              "weight": "Bolder",
-              "color": "Accent"
-            }
-          ]
-        },
-        {
-          "type": "Column",
-          "width": "stretch",
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "PEER MEDIAN (P50)",
-              "size": "Small",
-              "isSubtle": true,
-              "weight": "Bolder"
-            },
-            {
-              "type": "TextBlock",
-              "text": "${peerMedian}",
-              "size": "Large",
+              "text": "${actualValue}",
+              "size": "Medium",
               "weight": "Bolder"
             }
           ]
@@ -106,73 +87,136 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "TOP QUARTILE (P75)",
+              "text": "BENCHMARK / TARGET",
               "size": "Small",
               "isSubtle": true,
               "weight": "Bolder"
             },
             {
               "type": "TextBlock",
-              "text": "${topQuartile}",
-              "size": "Large",
+              "text": "${targetValue}",
+              "size": "Medium",
+              "weight": "Bolder"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "FINANCIAL IMPACT",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${financialImpact}",
+              "size": "Medium",
               "weight": "Bolder",
-              "color": "Good"
+              "color": "Attention"
             }
           ]
         }
       ]
     },
     {
-      "type": "FactSet",
-      "facts": [
-        {"title": "Peer Cohort", "value": "${cohort}"},
-        {"title": "Sample Size", "value": "${sampleSize} Regional Carriers"},
-        {"title": "Confidence Score", "value": "${confidenceScore}"},
-        {"title": "Licensed Source", "value": "${sourceCitation}"}
+      "type": "Container",
+      "style": "default",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "💡 Prescribed Executive Action",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${prescribedAction}",
+          "wrap": true,
+          "size": "Small"
+        }
       ]
     },
     {
       "type": "Container",
-      "id": "benchmarkMethodologyPanel",
+      "id": "underlyingDriversPanel",
       "isVisible": false,
       "separator": true,
       "items": [
         {
           "type": "TextBlock",
-          "text": "📐 Normalization Methodology & Sample Governance",
+          "text": "🔍 Auditable Reasoning Chain & Underlying Drivers",
           "weight": "Bolder"
         },
         {
+          "type": "FactSet",
+          "facts": [
+            {
+              "title": "Step 1: ERP Trigger",
+              "value": "${reasoningStep1}"
+            },
+            {
+              "title": "Step 2: Policy Rule",
+              "value": "${reasoningStep2}"
+            },
+            {
+              "title": "Step 3: Quantified Impact",
+              "value": "${reasoningStep3}"
+            },
+            {
+              "title": "Step 4: Prescribed Intervention",
+              "value": "${reasoningStep4}"
+            }
+          ]
+        },
+        {
           "type": "TextBlock",
-          "text": "${methodology}",
+          "text": "Confidence Level: ${confidenceScore} • Evidence: ${evidenceQuality}",
           "size": "Small",
-          "wrap": true
+          "weight": "Bolder",
+          "color": "Good"
         }
       ]
     },
     {
       "type": "TextBlock",
-      "text": "Dataset SLA: Monthly Verified Refresh • Strict Unit & Currency Alignment",
-      "size": "Small",
+      "text": "Source: ${sourceCitation} • Governed Write: Confirmation required before execution.",
       "isSubtle": true,
+      "size": "Small",
       "separator": true
     }
   ],
   "actions": [
     {
       "type": "Action.ToggleVisibility",
-      "title": "Methodology & Governance",
+      "title": "Why this recommendation?",
       "targetElements": [
-        "benchmarkMethodologyPanel"
+        "underlyingDriversPanel"
       ]
     },
     {
       "type": "Action.Execute",
-      "title": "Download Comparative Dataset",
-      "verb": "BENCHMARK_EXPORT_DATASET",
+      "title": "👍 Helpful",
+      "verb": "FEEDBACK_SUBMIT",
       "data": {
-        "action": "BENCHMARK_EXPORT_DATASET",
-        "metricId": "${metricId}"
+        "action": "FEEDBACK_SUBMIT",
+        "rating": "HELPFUL",
+        "alertId": "${alertId}",
+        "category": "${categoryBadge}"
+      }
+    },
+    {
+      "type": "Action.Execute",
+      "title": "👎 Not Helpful",
+      "verb": "FEEDBACK_SUBMIT",
+      "data": {
+        "action": "FEEDBACK_SUBMIT",
+        "rating": "NOT_HELPFUL",
+        "alertId": "${alertId}",
+        "category": "${categoryBadge}"
       }
     }
   ]

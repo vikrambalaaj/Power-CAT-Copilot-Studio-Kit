@@ -3,15 +3,199 @@
   "type": "AdaptiveCard",
   "version": "1.5",
   "body": [
-    {"type": "TextBlock", "text": "End-of-day closure", "weight": "Bolder", "size": "Medium"},
-    {"type": "TextBlock", "text": "${localDate}", "isSubtle": true},
-    {"type": "FactSet", "facts": [
-      {"title": "Completed", "value": "${completedCount}"},
-      {"title": "Carried forward", "value": "${carryForwardCount}"},
-      {"title": "Blocked", "value": "${blockedCount}"},
-      {"title": "Tomorrow meetings", "value": "${tomorrowMeetingCount}"}
-    ]},
-    {"type": "TextBlock", "text": "${closureSummary}", "wrap": true, "separator": true},
-    {"type": "TextBlock", "text": "${tomorrowPreparation}", "size": "Small", "isSubtle": true, "wrap": true, "separator": true}
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "🌇",
+                  "size": "Large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "End-of-Day Executive Wrap-up",
+                  "weight": "Bolder",
+                  "size": "Medium"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${localDate} • Daily Closure & Governance",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "CLOSURE SUMMARY",
+                  "weight": "Bolder",
+                  "color": "Good",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "COMPLETED",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${completedCount} Tasks",
+              "size": "Medium",
+              "weight": "Bolder",
+              "color": "Good"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "CARRIED FORWARD",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${carryForwardCount} Items",
+              "size": "Medium",
+              "weight": "Bolder",
+              "color": "Warning"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "BLOCKED DECISIONS",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${blockedCount}",
+              "size": "Medium",
+              "weight": "Bolder",
+              "color": "Attention"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "TOMORROW MTGS",
+              "size": "Small",
+              "isSubtle": true,
+              "weight": "Bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "${tomorrowMeetingCount}",
+              "size": "Medium",
+              "weight": "Bolder",
+              "color": "Accent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Today's Verified Achievements",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${closureSummary}",
+          "wrap": true,
+          "size": "Small"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Tomorrow's Priority Preparation",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${tomorrowPreparation}",
+          "wrap": true,
+          "size": "Small"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Durable Outbox Delivery • Draft wrap-up email prepared without auto-send",
+      "size": "Small",
+      "isSubtle": true,
+      "separator": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "title": "Dispatch Wrap-up Summary Email",
+      "verb": "DISPATCH_EOD_EMAIL",
+      "data": {
+        "action": "DISPATCH_EOD_EMAIL",
+        "date": "${localDate}"
+      }
+    }
   ]
 }

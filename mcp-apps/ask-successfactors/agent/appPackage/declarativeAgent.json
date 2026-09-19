@@ -72,8 +72,8 @@
             "text": "Summarize receivables and payables exposure from S/4HANA for the requested company and key date."
         },
         {
-            "title": "P&L and budget variance",
-            "text": "Summarize P&L and budget variance for the requested fiscal period, with supported drivers and citations."
+            "title": "Budget consumption and transfers",
+            "text": "Summarize budget consumption and transfer drilldowns from S/4HANA for the requested company and key date."
         },
         {
             "title": "Meeting decisions and actions",
