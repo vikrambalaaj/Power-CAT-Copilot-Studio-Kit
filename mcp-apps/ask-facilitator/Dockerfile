@@ -14,9 +14,14 @@ COPY productivity_mcp/ productivity_mcp/
 COPY shared_mcp/ shared_mcp/
 COPY run_server.py .
 
-EXPOSE 8080
+EXPOSE 8085
 
 ENV PYTHONUNBUFFERED=1 \
-    PORT=8080
+    PORT=8085 \
+    ALLOWED_HOSTS=* \
+    CORS_ORIGINS=*
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://127.0.0.1:${PORT:-8085}/health || exit 1
 
 CMD ["python", "-m", "facilitator_mcp"]

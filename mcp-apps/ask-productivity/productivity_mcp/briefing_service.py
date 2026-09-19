@@ -43,6 +43,53 @@ def compute_content_hash(data: Dict[str, Any]) -> str:
     """Compute deterministic SHA-256 hash of a briefing snapshot dictionary."""
     canonical = json.dumps(data, sort_keys=True, default=decimal_serializer)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+VELORA_LOGO_BASE64 = (
+    "data:image/png;base64,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"
+)
 
 
 class BriefingService:
@@ -586,9 +633,18 @@ class BriefingService:
 <body>
 <div class="card">
   <div class="header">
-    <div class="title">🌅 Velora Executive Morning Briefing — {date_str}</div>
-    <div style="font-size:12px;color:#8EA0B0;margin-top:2px;">Prepared for {exec_name}</div>
-    <div class="hash">Snapshot SHA-256: {content_hash[:16]}...</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:middle;">
+          <div class="title">🌅 Velora Executive Morning Briefing — {date_str}</div>
+          <div style="font-size:12px;color:#8EA0B0;margin-top:2px;">Prepared for {exec_name}</div>
+          <div class="hash">Snapshot SHA-256: {content_hash[:16]}...</div>
+        </td>
+        <td style="vertical-align:middle;text-align:right;width:120px;">
+          <img src="{VELORA_LOGO_BASE64}" alt="Velora Logo" style="height:36px;max-width:110px;display:inline-block;" />
+        </td>
+      </tr>
+    </table>
   </div>
   <div style="margin-bottom:16px;">
     <h4 style="font-size:13px;color:#13A6A6;text-transform:uppercase;margin-bottom:8px;">📅 Today's Agenda ({len(meetings)} meetings)</h4>

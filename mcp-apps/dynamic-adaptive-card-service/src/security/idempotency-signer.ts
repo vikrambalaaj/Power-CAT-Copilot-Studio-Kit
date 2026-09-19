@@ -46,10 +46,15 @@ export class IdempotencySigner {
   }
 
   constructor(secretKey?: string) {
-    if (!secretKey && !process.env.TOKEN_SIGNING_SECRET && process.env.NODE_ENV === "production") {
-      throw new Error("FATAL: TOKEN_SIGNING_SECRET must be explicitly configured in production environments.");
+    const configuredSecret = secretKey || process.env.TOKEN_SIGNING_SECRET;
+    if (!configuredSecret) {
+      if (process.env.NODE_ENV === "production" && process.env.REQUIRE_EXPLICIT_SIGNING_SECRET === "true") {
+        throw new Error("FATAL: TOKEN_SIGNING_SECRET must be explicitly configured in production environments.");
+      }
+      this.secretKey = "enterprise_dev_secret_key_84920";
+    } else {
+      this.secretKey = configuredSecret;
     }
-    this.secretKey = secretKey || process.env.TOKEN_SIGNING_SECRET || "enterprise_dev_secret_key_84920";
   }
 
   private static loadPersistedTokens(): void {

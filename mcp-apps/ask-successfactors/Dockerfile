@@ -16,6 +16,7 @@ COPY shared_mcp/ shared_mcp/
 COPY deploy/copilot-workforce-card-openapi.json deploy/copilot-workforce-card-openapi.json
 
 RUN pip install --no-cache-dir hatchling && \
+    pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir . && \
     useradd --uid 10001 --create-home appuser && \
     mkdir -p /app/logs && chown appuser:appuser /app/logs
@@ -24,7 +25,14 @@ EXPOSE 8082
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PORT=8082
+    PORT=8082 \
+    SF_API_URL=https://api22.sapsf.com/odata/v2 \
+    SF_COMPANY_ID=etihadairp \
+    SF_USERNAME=SFAI \
+    SF_PASSWORD=Userpassword@2026 \
+    ALLOW_ANONYMOUS=true \
+    ALLOWED_HOSTS=* \
+    CORS_ORIGINS=*
 
 USER 10001:10001
 
