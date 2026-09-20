@@ -4,7 +4,7 @@
     "status": 403,
     "handler_received": {
       "error": "Forbidden",
-      "message": "Supplied tenant 'other-tenant' does not match authenticated tenant 'review-tenant'"
+      "message": "You are not authorized to access this information."
     }
   },
   "facilitator_export_default_role": {
@@ -15,10 +15,10 @@
     }
   },
   "facilitator_sync_async_ingestion": {
-    "status": 500,
+    "status": 403,
     "response": {
-      "error": "Invalid event_type 'x'. Must be one of: ['AUDIT_NONCOMPLIANCE', 'CONTRACT_FULFILLMENT', 'DELIVERY_DELAY', 'MILESTONE_SUCCESS', 'PRICE_VARIANCE', 'QUALITY_DEFECT', 'SECURITY_INCIDENT', 'SLA_BREACH'].",
-      "status": "error"
+      "error": "Forbidden",
+      "message": "You are not authorized to access this information."
     }
   },
   "facilitator_unauthenticated_mcp_initialize": {
@@ -339,7 +339,7 @@
         "businessTitle": "Unverified Technical Input for Synthetic Vendor",
         "providerRecordId": "USER_PROVIDED",
         "url": null,
-        "retrievedAt": "2026-09-20T11:05:12.772313+00:00",
+        "retrievedAt": "2026-09-20T18:01:35.103148+00:00",
         "sourceUpdatedAt": null,
         "measurementPeriod": null,
         "scope": "1000",
@@ -360,7 +360,7 @@
         "businessTitle": "Unverified Commercial Offer for Synthetic Vendor",
         "providerRecordId": "USER_PROVIDED",
         "url": null,
-        "retrievedAt": "2026-09-20T11:05:12.772870+00:00",
+        "retrievedAt": "2026-09-20T18:01:35.103862+00:00",
         "sourceUpdatedAt": null,
         "measurementPeriod": null,
         "scope": "1000",
@@ -381,7 +381,7 @@
         "businessTitle": "Verified Institutional Vendor Performance Profile for Synthetic Vendor",
         "providerRecordId": "VPH-QUERY-v1",
         "url": null,
-        "retrievedAt": "2026-09-20T11:05:12.772910+00:00",
+        "retrievedAt": "2026-09-20T18:01:35.103911+00:00",
         "sourceUpdatedAt": null,
         "measurementPeriod": null,
         "scope": "1000",
@@ -408,7 +408,7 @@
       "recordId": "DEC-077e7eabff87",
       "version": "1.0.0"
     },
-    "generatedAt": "2026-09-20T11:05:12.785840+00:00",
+    "generatedAt": "2026-09-20T18:01:35.120787+00:00",
     "typedResult": {
       "decisionId": "DEC-077e7eabff87",
       "version": "1.0.0",
@@ -613,21 +613,8 @@
     "operationStatus": "SUCCESS"
   },
   "worker_cross_mailbox": {
-    "dispatched": 2,
-    "deliveries": [
-      {
-        "to": [
-          "alice@velora.ae"
-        ],
-        "body": "PRIVATE DATA OF alice@velora.ae"
-      },
-      {
-        "to": [
-          "bob@velora.ae"
-        ],
-        "body": "PRIVATE DATA OF bob@velora.ae"
-      }
-    ]
+    "dispatched": 0,
+    "deliveries": []
   },
   "subscription_after_send_before_receipt_crash": {
     "first_claim": true,
