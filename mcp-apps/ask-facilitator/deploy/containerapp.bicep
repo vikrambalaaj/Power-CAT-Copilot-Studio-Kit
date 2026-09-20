@@ -79,6 +79,9 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'ENTRA_CLIENT_ID', value: entraClientId }
             { name: 'ENTRA_CLIENT_SECRET', secretRef: 'entra-client-secret' }
             { name: 'SVC_SENDER_EMAIL', value: svcSenderEmail }
+            { name: 'DATABASE_URL', value: 'postgresql://veloraadmin@psql-velora-prod:5432/veloradb?sslmode=require' }
+            { name: 'VELORA_ENV', value: 'production' }
+            { name: 'ENVIRONMENT', value: 'production' }
             { name: 'FACILITATOR_STORAGE_DIR', value: '${volumeMountPath}/facilitator' }
             { name: 'AZURE_STORAGE_MOUNT_PATH', value: '${volumeMountPath}/facilitator' }
           ]

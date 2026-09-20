@@ -2,46 +2,46 @@
   {
     "name": "ask-successfactors",
     "exit_code": 0,
-    "seconds": 14.43
+    "seconds": 15.6
   },
   {
     "name": "ask-productivity",
     "exit_code": 0,
-    "seconds": 17.68
+    "seconds": 17.46
   },
   {
     "name": "ask-s4hana",
     "exit_code": 0,
-    "seconds": 10.16
+    "seconds": 10.63
   },
   {
     "name": "ask-facilitator",
     "exit_code": 0,
-    "seconds": 7.18
+    "seconds": 6.67
   },
   {
     "name": "ask-sac",
     "exit_code": 0,
-    "seconds": 1.39
+    "seconds": 2.23
   },
   {
     "name": "architecture",
     "exit_code": 0,
-    "seconds": 0.97
+    "seconds": 1.59
   },
   {
     "name": "cleanup",
     "exit_code": 0,
-    "seconds": 2.02
+    "seconds": 2.57
   },
   {
     "name": "cards",
     "exit_code": 0,
-    "seconds": 5.37
+    "seconds": 5.53
   },
   {
     "name": "pipeline",
     "exit_code": 0,
-    "seconds": 3.33
+    "seconds": 3.72
   }
 ]

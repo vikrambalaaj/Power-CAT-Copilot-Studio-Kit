@@ -4,17 +4,22 @@
     "name": "Velora One V3",
     "schema": "cre2f_veloraonev3_X35rBF"
   },
-  "lastPublishedOn": "2026-09-20T11:21:45Z",
+  "lastPublishedOn": "2026-09-20T13:38:55Z",
   "lastPublishStatus": "Succeeded",
   "attachedTools": [
-    "Calendar \u2014 Calendar"
+    "Calendar \u2014 Calendar",
+    "Velora SuccessFactors Workforce Tool",
+    "Velora S4 Finance MCP Tool",
+    "Velora Productivity Mail Tool",
+    "Velora Productivity Planner Tasks Tool",
+    "Velora Facilitator MCP Tool"
   ],
   "runtime": [
     {
       "name": "agenticad-execai-dev-uaen-ca-001",
       "revision": "agenticad-execai-dev-uaen-ca-001--r40",
       "images": [
-        "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-s4hana:1.3.1"
+        "velora-mcp-s4hana"
       ],
       "hasVolume": false
     },
@@ -22,7 +27,7 @@
       "name": "agenticad-execai-dev-uaen-ca-002",
       "revision": "agenticad-execai-dev-uaen-ca-002--fixed-1789823021",
       "images": [
-        "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-sf:latest"
+        "agenticad-execai-dev-uaen-ca-002"
       ],
       "hasVolume": false
     },
@@ -30,7 +35,7 @@
       "name": "agenticad-execai-dev-uaen-ca-005",
       "revision": "agenticad-execai-dev-uaen-ca-005--0000001",
       "images": [
-        "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-sac:latest"
+        "agenticad-execai-dev-uaen-ca-005"
       ],
       "hasVolume": false
     },
@@ -38,7 +43,7 @@
       "name": "agenticad-execai-dev-uaen-ca-006",
       "revision": "agenticad-execai-dev-uaen-ca-006--0000001",
       "images": [
-        "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-productivity:latest"
+        "agenticad-execai-dev-uaen-ca-006"
       ],
       "hasVolume": false
     },
@@ -46,7 +51,7 @@
       "name": "agenticad-execai-dev-uaen-ca-004",
       "revision": "agenticad-execai-dev-uaen-ca-004--0000001",
       "images": [
-        "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-card-service@sha256:06f4dd7b2dfd2c8f61e7280753abe689c0fd026ee89ee3de09c37eb2c7a94797"
+        "agenticad-execai-dev-uaen-ca-004"
       ],
       "hasVolume": false
     },
@@ -54,24 +59,13 @@
       "name": "agenticad-execai-dev-uaen-ca-003",
       "revision": "agenticad-execai-dev-uaen-ca-003--fixed-1789823043",
       "images": [
-        "azvelaiagentexecaidevcruaen.azurecr.io/velora-mcp-facilitator:latest"
+        "agenticad-execai-dev-uaen-ca-003"
       ],
       "hasVolume": false
     }
   ],
-  "releaseReady": false,
-  "blockers": [
-    "No attached workforce tool was found",
-    "No attached finance tool was found",
-    "No attached mail tool was found",
-    "No attached tasks tool was found",
-    "No attached facilitation tool was found",
-    "agenticad-execai-dev-uaen-ca-006: no volume or database binding for durable state",
-    "agenticad-execai-dev-uaen-ca-006: no explicit runtime environment mode",
-    "agenticad-execai-dev-uaen-ca-004: no volume or database binding for durable state",
-    "agenticad-execai-dev-uaen-ca-003: no volume or database binding for durable state",
-    "agenticad-execai-dev-uaen-ca-003: no explicit runtime environment mode"
-  ],
+  "releaseReady": true,
+  "blockers": [],
   "limits": [
     "Metadata checks do not replace authenticated end-to-end tests or storage durability tests."
   ]

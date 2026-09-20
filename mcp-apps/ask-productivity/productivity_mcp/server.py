@@ -260,6 +260,33 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
         enforce_mcp_policy(identity=identity, mcp_server="ask-productivity", tool_name=op)
     except AuthorizationError as exc:
         raise HTTPException(status_code=403, detail=exc.message)
+
+    # Enforce Centralized Dataverse Tool Authorization Policy
+    from shared_mcp.tool_authorization import get_tool_authorizer, AuthorizationDenied
+    canonical_tool = op.lower()
+    tool_map = {
+        "searchmail": "search_mail",
+        "prepareemail": "prepare_email",
+        "sendapprovedemail": "send_approved_email",
+        "listcalendarevents": "list_calendar_events",
+        "preparemeeting": "prepare_meeting",
+        "createapprovedevent": "create_approved_event",
+        "listmytasks": "list_my_tasks",
+        "preparetask": "prepare_task",
+        "createapprovedtask": "create_approved_task",
+        "updateapprovedtask": "update_approved_task",
+        "getexecutivebriefing": "get_executive_briefing",
+    }
+    canonical_tool = tool_map.get(canonical_tool.replace("_", ""), canonical_tool)
+    authorizer = get_tool_authorizer()
+    try:
+        await authorizer.authorize(
+            identity=identity,
+            tool_name=canonical_tool,
+            correlation_id=request.rootCorrelationId,
+        )
+    except AuthorizationDenied:
+        raise HTTPException(status_code=403, detail="You are not authorized to access this information.")
     params = request.parameters
     corr_id = request.rootCorrelationId
     conv_id = request.conversationId

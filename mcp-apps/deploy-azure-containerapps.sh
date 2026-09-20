@@ -317,6 +317,8 @@ az containerapp create \
         AZURE_CLIENT_SECRET="secretref:m365-client-secret" \
         AZURE_TENANT_ID="${M365_TENANT_ID:-$ENTRA_TENANT_ID}" \
         DATABASE_URL="secretref:database-url" \
+        VELORA_ENV="production" \
+        ENVIRONMENT="production" \
         VELORA_APPROVAL_HMAC_SECRET="secretref:approval-hmac-secret" \
         ENTRA_TENANT_ID="$ENTRA_TENANT_ID" \
         ENTRA_INBOUND_AUDIENCE="$ENTRA_INBOUND_AUDIENCE" \
@@ -348,6 +350,8 @@ az containerapp create \
         PORT="8085" \
         MCP_API_KEY="secretref:mcp-api-key" \
         DATABASE_URL="secretref:database-url" \
+        VELORA_ENV="production" \
+        ENVIRONMENT="production" \
         ENTRA_TENANT_ID="$ENTRA_TENANT_ID" \
         ENTRA_INBOUND_AUDIENCE="$ENTRA_INBOUND_AUDIENCE" \
         API_AUDIENCE="$ENTRA_INBOUND_AUDIENCE" \

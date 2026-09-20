@@ -123,10 +123,18 @@ def _company_scoped_handler(handler, tool_name: str = ""):
                     display_email="finance@velora.ae",
                 )
             enforce_mcp_policy(identity=identity, mcp_server="ask-s4hana", tool_name=tool_name or handler.__name__)
+
+            from shared_mcp.tool_authorization import get_tool_authorizer, AuthorizationDenied
+            authorizer = get_tool_authorizer()
+            eff_tool = tool_name or handler.__name__
+            if not eff_tool.startswith("s4__") and f"s4__{eff_tool}" in authorizer.registry:
+                eff_tool = f"s4__{eff_tool}"
+            await authorizer.authorize(identity=identity, tool_name=eff_tool)
         except Exception as e:
             from shared_mcp.identity import AuthorizationError
-            if isinstance(e, AuthorizationError):
-                raise PermissionError(str(e))
+            from shared_mcp.tool_authorization import AuthorizationDenied
+            if isinstance(e, (AuthorizationError, AuthorizationDenied)):
+                raise PermissionError("You are not authorized to access this information.")
         return await handler(*args, **kwargs)
     wrapped.__signature__ = sig
     return wrapped

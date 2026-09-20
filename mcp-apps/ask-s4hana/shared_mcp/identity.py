@@ -53,10 +53,19 @@ class VerifiedIdentity:
     client_application_id: str
     scopes: Set[str] = field(default_factory=set)
     roles: Set[str] = field(default_factory=set)
+    groups: Set[str] = field(default_factory=set)
     display_email: Optional[str] = None
     username: Optional[str] = None
     subject: str = ""
     raw_claims: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def tid(self) -> str:
+        return self.tenant_id
+
+    @property
+    def oid(self) -> str:
+        return self.object_id
 
     @property
     def identity_tuple(self) -> Tuple[str, str]:
@@ -306,6 +315,14 @@ def verify_bearer_token(
     elif isinstance(raw_roles, str):
         roles = {raw_roles}
 
+    groups = set()
+    raw_groups = payload.get("groups")
+    if isinstance(raw_groups, list):
+        if all(isinstance(v, str) for v in raw_groups):
+            groups = set(raw_groups)
+    elif isinstance(raw_groups, str):
+        groups = {raw_groups}
+
     # Enforce Required Scopes / Roles
     if required_scope and required_scope not in scopes:
         log.warning(f"Missing required scope '{required_scope}' (present: {scopes})")
@@ -329,6 +346,7 @@ def verify_bearer_token(
         client_application_id=client_app_id,
         scopes=scopes,
         roles=roles,
+        groups=groups,
         display_email=display_email,
         username=payload.get("name"),
         subject=payload.get("sub", oid),

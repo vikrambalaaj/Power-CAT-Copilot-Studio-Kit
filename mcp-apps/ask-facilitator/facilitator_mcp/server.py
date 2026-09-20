@@ -248,6 +248,14 @@ async def handle_facilitator_tool_rest(request):
     except AuthorizationError as e:
         return JSONResponse({"error": "Forbidden", "message": str(e)}, status_code=403)
 
+    # 6. Enforce Centralized Dataverse Tool Authorization
+    try:
+        from shared_mcp.tool_authorization import get_tool_authorizer, AuthorizationDenied
+        authorizer = get_tool_authorizer()
+        await authorizer.authorize(identity=identity, tool_name=name)
+    except AuthorizationDenied:
+        return JSONResponse({"error": "Forbidden", "message": "You are not authorized to access this information."}, status_code=403)
+
     args = dict(request.query_params)
     if request.method == "POST":
         try:

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- 1. Velora Tool -->
+  <Entity>
+    <Name LocalizedName="Velora Tool" OriginalName="Velora Tool">cre2f_veloratool</Name>
+    <EntityInfo>
+      <entity Name="cre2f_veloratool">
+        <LocalizedNames>
+          <LocalizedName description="Velora Tool" languagecode="1033" />
+        </LocalizedNames>
+        <LocalizedCollectionNames>
+          <LocalizedCollectionName description="Velora Tools" languagecode="1033" />
+        </LocalizedCollectionNames>
+        <Descriptions>
+          <Description description="Registry of protected MCP tools, their parent service, action types, and active status." languagecode="1033" />
+        </Descriptions>
+        <attributes>
+          <attribute PhysicalName="cre2f_veloratoolid">
+            <Type>primarykey</Type>
+            <Name>cre2f_veloratoolid</Name>
+            <LogicalName>cre2f_veloratoolid</LogicalName>
+            <RequiredLevel>systemrequired</RequiredLevel>
+            <displaynames><displayname description="Velora Tool ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_toolname">
+            <Type>nvarchar</Type>
+            <Name>cre2f_toolname</Name>
+            <LogicalName>cre2f_toolname</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Tool Name" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_servicename">
+            <Type>nvarchar</Type>
+            <Name>cre2f_servicename</Name>
+            <LogicalName>cre2f_servicename</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Service Name" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_actiontype">
+            <Type>nvarchar</Type>
+            <Name>cre2f_actiontype</Name>
+            <LogicalName>cre2f_actiontype</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>50</MaxLength>
+            <displaynames><displayname description="Action Type" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_enabled">
+            <Type>boolean</Type>
+            <Name>cre2f_enabled</Name>
+            <LogicalName>cre2f_enabled</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <displaynames><displayname description="Enabled" languagecode="1033" /></displaynames>
+          </attribute>
+        </attributes>
+      </entity>
+    </EntityInfo>
+  </Entity>
+
+  <!-- 2. Velora Tool Permission -->
+  <Entity>
+    <Name LocalizedName="Velora Tool Permission" OriginalName="Velora Tool Permission">cre2f_veloratoolpermission</Name>
+    <EntityInfo>
+      <entity Name="cre2f_veloratoolpermission">
+        <LocalizedNames>
+          <LocalizedName description="Velora Tool Permission" languagecode="1033" />
+        </LocalizedNames>
+        <LocalizedCollectionNames>
+          <LocalizedCollectionName description="Velora Tool Permissions" languagecode="1033" />
+        </LocalizedCollectionNames>
+        <Descriptions>
+          <Description description="Access control policies granting users or Entra security groups permission to run specific tools with actions and entity scopes." languagecode="1033" />
+        </Descriptions>
+        <attributes>
+          <attribute PhysicalName="cre2f_veloratoolpermissionid">
+            <Type>primarykey</Type>
+            <Name>cre2f_veloratoolpermissionid</Name>
+            <LogicalName>cre2f_veloratoolpermissionid</LogicalName>
+            <RequiredLevel>systemrequired</RequiredLevel>
+            <displaynames><displayname description="Tool Permission ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_name">
+            <Type>nvarchar</Type>
+            <Name>cre2f_name</Name>
+            <LogicalName>cre2f_name</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>150</MaxLength>
+            <displaynames><displayname description="Permission Name" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_toolname">
+            <Type>nvarchar</Type>
+            <Name>cre2f_toolname</Name>
+            <LogicalName>cre2f_toolname</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Tool Name" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_entraobjectid">
+            <Type>nvarchar</Type>
+            <Name>cre2f_entraobjectid</Name>
+            <LogicalName>cre2f_entraobjectid</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Entra Object ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_entragroupid">
+            <Type>nvarchar</Type>
+            <Name>cre2f_entragroupid</Name>
+            <LogicalName>cre2f_entragroupid</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Entra Group ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_tenantid">
+            <Type>nvarchar</Type>
+            <Name>cre2f_tenantid</Name>
+            <LogicalName>cre2f_tenantid</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Tenant ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_allowedaction">
+            <Type>nvarchar</Type>
+            <Name>cre2f_allowedaction</Name>
+            <LogicalName>cre2f_allowedaction</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>50</MaxLength>
+            <displaynames><displayname description="Allowed Action" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_entityscope">
+            <Type>nvarchar</Type>
+            <Name>cre2f_entityscope</Name>
+            <LogicalName>cre2f_entityscope</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Entity Scope" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_validfrom">
+            <Type>datetime</Type>
+            <Name>cre2f_validfrom</Name>
+            <LogicalName>cre2f_validfrom</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <displaynames><displayname description="Valid From" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_validuntil">
+            <Type>datetime</Type>
+            <Name>cre2f_validuntil</Name>
+            <LogicalName>cre2f_validuntil</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <displaynames><displayname description="Valid Until" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_enabled">
+            <Type>boolean</Type>
+            <Name>cre2f_enabled</Name>
+            <LogicalName>cre2f_enabled</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <displaynames><displayname description="Enabled" languagecode="1033" /></displaynames>
+          </attribute>
+        </attributes>
+      </entity>
+    </EntityInfo>
+  </Entity>
+
+  <!-- 3. Velora Authorization Audit -->
+  <Entity>
+    <Name LocalizedName="Velora Authorization Audit" OriginalName="Velora Authorization Audit">cre2f_veloraauthorizationaudit</Name>
+    <EntityInfo>
+      <entity Name="cre2f_veloraauthorizationaudit">
+        <LocalizedNames>
+          <LocalizedName description="Velora Authorization Audit" languagecode="1033" />
+        </LocalizedNames>
+        <LocalizedCollectionNames>
+          <LocalizedCollectionName description="Velora Authorization Audits" languagecode="1033" />
+        </LocalizedCollectionNames>
+        <Descriptions>
+          <Description description="Audit trail recording all authorization decisions, user identities, correlation IDs, and rationale." languagecode="1033" />
+        </Descriptions>
+        <attributes>
+          <attribute PhysicalName="cre2f_veloraauthorizationauditid">
+            <Type>primarykey</Type>
+            <Name>cre2f_veloraauthorizationauditid</Name>
+            <LogicalName>cre2f_veloraauthorizationauditid</LogicalName>
+            <RequiredLevel>systemrequired</RequiredLevel>
+            <displaynames><displayname description="Authorization Audit ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_name">
+            <Type>nvarchar</Type>
+            <Name>cre2f_name</Name>
+            <LogicalName>cre2f_name</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>150</MaxLength>
+            <displaynames><displayname description="Audit Record Name" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_userobjectid">
+            <Type>nvarchar</Type>
+            <Name>cre2f_userobjectid</Name>
+            <LogicalName>cre2f_userobjectid</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="User Object ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_toolname">
+            <Type>nvarchar</Type>
+            <Name>cre2f_toolname</Name>
+            <LogicalName>cre2f_toolname</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Tool Name" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_decision">
+            <Type>nvarchar</Type>
+            <Name>cre2f_decision</Name>
+            <LogicalName>cre2f_decision</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <MaxLength>20</MaxLength>
+            <displaynames><displayname description="Decision" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_reason">
+            <Type>nvarchar</Type>
+            <Name>cre2f_reason</Name>
+            <LogicalName>cre2f_reason</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <MaxLength>255</MaxLength>
+            <displaynames><displayname description="Reason" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_correlationid">
+            <Type>nvarchar</Type>
+            <Name>cre2f_correlationid</Name>
+            <LogicalName>cre2f_correlationid</LogicalName>
+            <RequiredLevel>none</RequiredLevel>
+            <MaxLength>100</MaxLength>
+            <displaynames><displayname description="Correlation ID" languagecode="1033" /></displaynames>
+          </attribute>
+          <attribute PhysicalName="cre2f_createdon">
+            <Type>datetime</Type>
+            <Name>cre2f_createdon</Name>
+            <LogicalName>cre2f_createdon</LogicalName>
+            <RequiredLevel>required</RequiredLevel>
+            <displaynames><displayname description="Created On" languagecode="1033" /></displaynames>
+          </attribute>
+        </attributes>
+      </entity>
+    </EntityInfo>
+  </Entity>
+</Entities>

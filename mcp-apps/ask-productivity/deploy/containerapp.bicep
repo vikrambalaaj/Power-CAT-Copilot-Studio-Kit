@@ -91,6 +91,9 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'DATAVERSE_URL', value: dataverseUrl }
             { name: 'DATAVERSE_CLIENT_SECRET', secretRef: 'dataverse-client-secret' }
             { name: 'VELORA_APPROVAL_HMAC_SECRET', secretRef: 'approval-hmac-secret' }
+            { name: 'DATABASE_URL', value: 'postgresql://veloraadmin@psql-velora-prod:5432/veloradb?sslmode=require' }
+            { name: 'VELORA_ENV', value: 'production' }
+            { name: 'ENVIRONMENT', value: 'production' }
             { name: 'VELORA_OUTBOX_DIR', value: '${volumeMountPath}/outbox' }
             { name: 'AZURE_STORAGE_MOUNT_PATH', value: '${volumeMountPath}/outbox' }
           ]

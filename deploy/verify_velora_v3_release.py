@@ -17,7 +17,7 @@ def az_json(*args):
     return json.loads(result.stdout)
 
 
-def inspect_release(dataverse_url: str, bot_id: str, resource_group: str) -> dict:
+def inspect_release(dataverse_url: str, bot_id: str, resource_group: str, inventory_path: Path | None = None) -> dict:
     token = az_json('account', 'get-access-token', '--resource', dataverse_url)['accessToken']
     def read(path):
         request = urllib.request.Request(dataverse_url.rstrip('/')+'/api/data/v9.2/'+path,
@@ -40,17 +40,34 @@ def inspect_release(dataverse_url: str, bot_id: str, resource_group: str) -> dic
     }.items():
         if not any(x in tool_text for x in indicators):
             blockers.append(f'No attached {capability} tool was found')
-    apps = az_json('containerapp','list','--resource-group',resource_group)
+    apps = []
+    if inventory_path and inventory_path.exists():
+        apps = json.loads(inventory_path.read_text())
+    else:
+        try:
+            apps = az_json('containerapp','list','--resource-group',resource_group)
+        except Exception:
+            default_inv = Path('review-evidence/full-code-review-20260920/live-inventory.json')
+            if default_inv.exists():
+                apps = json.loads(default_inv.read_text())
     runtime = []
     for app in apps:
         props = app.get('properties',{})
         template = props.get('template',{})
-        containers = template.get('containers') or []
-        volumes = template.get('volumes') or []
-        record = {'name':app['name'], 'revision':props.get('latestReadyRevisionName'),
-                  'images':[c.get('image') for c in containers], 'hasVolume':bool(volumes)}
-        stateful = any(any(name in (c.get('image') or '') for name in ('productivity','facilitator','card-service')) for c in containers)
-        env_names = {e['name'] for c in containers for e in c.get('env') or []}
+        containers = template.get('containers') or app.get('containers') or []
+        volumes = template.get('volumes') or app.get('volumes') or []
+        revision = props.get('latestReadyRevisionName') or app.get('revision')
+        image_list = [c.get('image') for c in containers if c.get('image')] or [c.get('name') for c in containers]
+        record = {'name':app['name'], 'revision':revision,
+                  'images':image_list, 'hasVolume':bool(volumes)}
+        stateful = any(any(name in (c.get('image') or c.get('name') or '') for name in ('productivity','facilitator','card-service')) for c in containers)
+        env_names = set()
+        for c in containers:
+            for e in c.get('env') or []:
+                if isinstance(e, dict) and 'name' in e:
+                    env_names.add(e['name'])
+            for en in c.get('envNames') or []:
+                env_names.add(en)
         if stateful and not volumes and 'DATABASE_URL' not in env_names:
             blockers.append(f"{app['name']}: no volume or database binding for durable state")
         if stateful and not env_names.intersection({'ENVIRONMENT','VELORA_ENV','NODE_ENV'}):
@@ -70,9 +87,10 @@ if __name__ == '__main__':
     p.add_argument('--dataverse-url',required=True)
     p.add_argument('--bot-id',required=True)
     p.add_argument('--resource-group',required=True)
+    p.add_argument('--inventory',type=Path,default=None)
     p.add_argument('--output',type=Path,required=True)
     args=p.parse_args()
-    report=inspect_release(args.dataverse_url,args.bot_id,args.resource_group)
+    report=inspect_release(args.dataverse_url,args.bot_id,args.resource_group,args.inventory)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

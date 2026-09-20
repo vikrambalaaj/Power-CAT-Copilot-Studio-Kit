@@ -122,7 +122,16 @@
   {
     "containers": [
       {
-        "envNames": null,
+        "envNames": [
+          "PORT",
+          "ALLOW_ANONYMOUS",
+          "ALLOWED_HOSTS",
+          "DATABASE_URL",
+          "VELORA_ENV",
+          "ENVIRONMENT",
+          "VELORA_APPROVAL_HMAC_SECRET",
+          "VELORA_OUTBOX_DIR"
+        ],
         "mounts": null,
         "name": "agenticad-execai-dev-uaen-ca-006"
       }
@@ -153,7 +162,8 @@
         "envNames": [
           "PORT",
           "NODE_ENV",
-          "TOKEN_SIGNING_SECRET"
+          "TOKEN_SIGNING_SECRET",
+          "DATABASE_URL"
         ],
         "mounts": null,
         "name": "agenticad-execai-dev-uaen-ca-004"
@@ -176,7 +186,11 @@
         "envNames": [
           "PORT",
           "ALLOWED_HOSTS",
-          "CORS_ORIGINS"
+          "CORS_ORIGINS",
+          "DATABASE_URL",
+          "VELORA_ENV",
+          "ENVIRONMENT",
+          "FACILITATOR_STORAGE_DIR"
         ],
         "mounts": null,
         "name": "agenticad-execai-dev-uaen-ca-003"

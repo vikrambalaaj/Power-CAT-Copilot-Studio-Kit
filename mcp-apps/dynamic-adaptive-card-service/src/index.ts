@@ -7,6 +7,37 @@ const fastify = Fastify({
 
 const evaluator = new TemplateEvaluator();
 
+// 0. Root Status Endpoint
+fastify.get("/", async (request, reply) => {
+  reply.header("Content-Type", "text/html; charset=utf-8");
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Velora Dynamic Adaptive Card Service</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+    .card { background: #1e293b; border-radius: 12px; padding: 2rem; max-width: 650px; margin: 0 auto; border: 1px solid #334155; }
+    h1 { color: #38bdf8; margin-top: 0; }
+    a { color: #38bdf8; }
+    .badge { background: #10b981; color: #042f2e; padding: 3px 8px; border-radius: 9999px; font-weight: bold; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Velora Adaptive Card Service <span class="badge">ACTIVE</span></h1>
+    <p>Enterprise Dynamic Adaptive Card Rendering &amp; Validation Service for Copilot Studio and Velora One.</p>
+    <ul>
+      <li><a href="/health">/health</a> - Service health check &amp; uptime</li>
+      <li><a href="/templates">/templates</a> - List registered templates</li>
+      <li><code>POST /render-card</code> - Render card with template data</li>
+      <li><code>POST /validate-submission</code> - Verify and consume idempotency ticket</li>
+    </ul>
+  </div>
+</body>
+</html>`;
+});
+
 // 1. Healthcheck Endpoint
 fastify.get("/health", async () => {
   return {
