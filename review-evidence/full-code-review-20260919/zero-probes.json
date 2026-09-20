@@ -1,19 +1,19 @@
 {
   "status": "SUCCESS",
   "resultSummary": "Evaluated KPI SYNTHETIC_ZERO (Value: 0 currency). Zero breaches detected (operating within approved limits).",
-  "correlationId": "corr-kpi-eval-1789890122441",
-  "snapshotId": "SNAP-1789890122441",
+  "correlationId": "corr-kpi-eval-1789902322299",
+  "snapshotId": "SNAP-1789902322299",
   "recommendationsCount": 0,
   "recommendations": [],
   "claims": [],
   "sources": [
     {
-      "sourceId": "SNAP-1789890122441",
+      "sourceId": "SNAP-1789902322299",
       "system": "S4HANA",
       "businessTitle": "KPI Snapshot SYNTHETIC_ZERO",
       "providerRecordId": null,
       "url": null,
-      "retrievedAt": "2026-09-20T07:42:02.442457+00:00",
+      "retrievedAt": "2026-09-20T11:05:22.300023+00:00",
       "sourceUpdatedAt": null,
       "measurementPeriod": "2026-09",
       "scope": "1000",
