@@ -17,15 +17,15 @@ s4_swagger = {
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "securityDefinitions": {
-        "BearerAuth": {
+        "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "Authorization",
+            "name": "X-API-Key",
             "in": "header",
-            "description": "JWT Bearer token. Enter: Bearer <token>"
+            "description": "API key required for service authentication. Provide your MCP API Key via X-API-Key or Authorization header as 'Bearer <api_key>'."
         }
     },
     "security": [
-        {"BearerAuth": []}
+        {"ApiKeyAuth": []}
     ],
     "paths": {
         "/health": {
@@ -142,15 +142,15 @@ sac_swagger = {
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "securityDefinitions": {
-        "BearerAuth": {
+        "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "Authorization",
+            "name": "X-API-Key",
             "in": "header",
-            "description": "JWT Bearer token. Enter: Bearer <token>"
+            "description": "API key required for service authentication. Provide your MCP API Key via X-API-Key or Authorization header as 'Bearer <api_key>'."
         }
     },
     "security": [
-        {"BearerAuth": []}
+        {"ApiKeyAuth": []}
     ],
     "paths": {
         "/health": {

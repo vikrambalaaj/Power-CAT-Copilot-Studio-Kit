@@ -29,6 +29,14 @@ export interface InstructionEvaluation {
     }>;
 }
 /**
+ * Validate an individual pattern record returned by Stage B.
+ */
+export declare function validatePattern(p: unknown): boolean;
+/**
+ * Validate an individual compliance issue returned by Stage C.
+ */
+export declare function validateIssue(i: unknown): boolean;
+/**
  * Invoke Stage B: Pattern Evaluation
  *
  * @param dataverseHost - Dataverse host (e.g., org.crm.dynamics.com)

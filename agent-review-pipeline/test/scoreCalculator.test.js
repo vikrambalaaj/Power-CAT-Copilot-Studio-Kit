@@ -34,3 +34,23 @@ test('overall evaluation gate fails when a mandatory stage is missing', () => {
   assert.equal(result.passed, false);
 });
 
+test('nameless pattern causes pattern score to return zero', () => {
+  assert.equal(calculatePatternScore({
+    Patterns: [
+      { Status: true },
+    ],
+  }), 0);
+});
+
+test('unknown issue ID causes instruction score to return zero', () => {
+  assert.equal(calculateInstructionScore({
+    compliancePercentage: 100,
+    issues: [{
+      id: 'unknown-criterion',
+      title: 'Unknown issue',
+      severity: 'High',
+      description: 'Not in known criteria',
+    }],
+  }), 0);
+});
+

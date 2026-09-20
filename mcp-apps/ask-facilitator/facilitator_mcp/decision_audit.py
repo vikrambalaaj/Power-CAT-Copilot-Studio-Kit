@@ -110,14 +110,28 @@ def compute_manifest_root_hash(record_hashes: Dict[str, str]) -> str:
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
-def get_audit_signing_key() -> str:
+def get_audit_signing_key() -> Optional[str]:
     """Retrieve external signing key from environment or fallback test secret."""
-    return os.getenv("VELORA_AUDIT_SIGNING_KEY", DEFAULT_SIGNING_KEY)
+    is_prod = (
+        os.getenv("VELORA_ENV", "").lower() == "production"
+        or os.getenv("ENVIRONMENT", "").lower() == "production"
+        or os.getenv("NODE_ENV", "").lower() == "production"
+    )
+    key = os.getenv("VELORA_AUDIT_SIGNING_KEY")
+    if key:
+        if is_prod and key == DEFAULT_SIGNING_KEY:
+            raise RuntimeError("DEFAULT_SIGNING_KEY cannot be used in production environment.")
+        return key
+    if is_prod:
+        return None
+    return DEFAULT_SIGNING_KEY
 
 
 def sign_root_hash(root_hash: str, secret_key: Optional[str] = None) -> Dict[str, str]:
     """Cryptographically sign the manifest root hash using external key custody."""
     secret = secret_key or get_audit_signing_key()
+    if not secret:
+        raise RuntimeError("Missing required VELORA_AUDIT_SIGNING_KEY in production environment.")
     key_id = os.getenv("VELORA_AUDIT_KEY_ID", DEFAULT_KEY_ID)
     algorithm = DEFAULT_ALGORITHM
     key_version = DEFAULT_KEY_VERSION

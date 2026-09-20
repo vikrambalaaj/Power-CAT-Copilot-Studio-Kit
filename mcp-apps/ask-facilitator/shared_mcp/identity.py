@@ -364,16 +364,12 @@ def verify_gateway_assertion(
 
     # Build canonical string with method, path, and body hash when available
     if req_method or req_path or req_body_hash:
-        canonical_data = f"{req_method}:{req_path}:{req_body_hash}:{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
+        canonical_data = f"{req_method}:{req_path}:{req_body_hash}:{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{user_email}:{roles_str}".encode("utf-8")
         expected_sig = hmac.new(gateway_secret.encode("utf-8"), canonical_data, hashlib.sha256).hexdigest()
         if not hmac.compare_digest(sig, expected_sig):
-            # Fall back to legacy canonical string only if caller passed empty method/path/body_hash
-            legacy_data = f"{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
-            legacy_sig = hmac.new(gateway_secret.encode("utf-8"), legacy_data, hashlib.sha256).hexdigest()
-            if not hmac.compare_digest(sig, legacy_sig):
-                raise AuthenticationError("Invalid gateway authorization signature")
+            raise AuthenticationError("Invalid gateway authorization signature: request binding mismatch or tampered payload")
     else:
-        canonical_data = f"{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{roles_str}".encode("utf-8")
+        canonical_data = f"{ts_str}:{nonce}:{principal_raw}:{tenant_id}:{object_id}:{user_email}:{roles_str}".encode("utf-8")
         expected_sig = hmac.new(gateway_secret.encode("utf-8"), canonical_data, hashlib.sha256).hexdigest()
         if not hmac.compare_digest(sig, expected_sig):
             raise AuthenticationError("Invalid gateway authorization signature")
@@ -383,9 +379,10 @@ def verify_gateway_assertion(
     _GATEWAY_NONCE_CACHE.clear()
     _GATEWAY_NONCE_CACHE.update(cleaned_cache)
 
-    if nonce in _GATEWAY_NONCE_CACHE:
+    nonce_key = f"{tenant_id}:{nonce}"
+    if nonce_key in _GATEWAY_NONCE_CACHE:
         raise AuthenticationError("Gateway assertion nonce replay detected")
-    _GATEWAY_NONCE_CACHE[nonce] = now + GATEWAY_NONCE_TTL_SECONDS
+    _GATEWAY_NONCE_CACHE[nonce_key] = now + GATEWAY_NONCE_TTL_SECONDS
 
     # Parse validated roles
     roles = set()

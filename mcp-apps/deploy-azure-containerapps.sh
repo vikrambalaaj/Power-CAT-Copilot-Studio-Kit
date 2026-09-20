@@ -304,6 +304,7 @@ az containerapp create \
         mcp-api-key="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-productivity-api-key,identityref:${IDENTITY_ID}" \
         m365-client-secret="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-m365-client-secret,identityref:${IDENTITY_ID}" \
         database-url="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-database-url,identityref:${IDENTITY_ID}" \
+        approval-hmac-secret="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-approval-hmac-secret,identityref:${IDENTITY_ID}" \
     --env-vars \
         ALLOWED_HOSTS="$APPROVED_ALLOWED_HOSTS" \
         ALLOW_ANONYMOUS="false" \
@@ -316,6 +317,7 @@ az containerapp create \
         AZURE_CLIENT_SECRET="secretref:m365-client-secret" \
         AZURE_TENANT_ID="${M365_TENANT_ID:-$ENTRA_TENANT_ID}" \
         DATABASE_URL="secretref:database-url" \
+        VELORA_APPROVAL_HMAC_SECRET="secretref:approval-hmac-secret" \
         ENTRA_TENANT_ID="$ENTRA_TENANT_ID" \
         ENTRA_INBOUND_AUDIENCE="$ENTRA_INBOUND_AUDIENCE" \
         API_AUDIENCE="$ENTRA_INBOUND_AUDIENCE" \
@@ -399,10 +401,12 @@ az containerapp job create \
     --secrets \
         database-url="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-database-url,identityref:${IDENTITY_ID}" \
         m365-client-secret="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-m365-client-secret,identityref:${IDENTITY_ID}" \
+        approval-hmac-secret="keyvaultref:${KEY_VAULT_NAME}/secrets/velora-approval-hmac-secret,identityref:${IDENTITY_ID}" \
     --env-vars \
         VELORA_OUTBOX_DIR="${MOUNT_PATH}/outbox" \
         AZURE_STORAGE_MOUNT_PATH="${MOUNT_PATH}/outbox" \
         DATABASE_URL="secretref:database-url" \
+        VELORA_APPROVAL_HMAC_SECRET="secretref:approval-hmac-secret" \
         AZURE_CLIENT_ID="${M365_CLIENT_ID:-}" \
         AZURE_CLIENT_SECRET="secretref:m365-client-secret" \
         AZURE_TENANT_ID="${M365_TENANT_ID:-$ENTRA_TENANT_ID}" \

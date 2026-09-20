@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
+from decimal import Decimal
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import uvicorn
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -67,6 +70,17 @@ from shared_mcp.kill_switch import check_kill_switch, KillSwitchActiveError
 
 
 def _wrap_tool_handler(tool_name: str, fn):
+    import inspect
+    from functools import wraps
+
+    sig = inspect.signature(fn, eval_str=True)
+    clean_params = [
+        p for p in sig.parameters.values()
+        if p.name not in ("db_path", "__caller_role__")
+    ]
+    tool_sig = sig.replace(parameters=clean_params)
+
+    @wraps(fn)
     async def wrapped(*args, **kwargs):
         # Enforce kill switch evaluation
         check_kill_switch(tool_name=tool_name)
@@ -80,8 +94,11 @@ def _wrap_tool_handler(tool_name: str, fn):
         if asyncio.iscoroutinefunction(fn):
             return await fn(*args, **kwargs)
         return fn(*args, **kwargs)
+
     wrapped.__name__ = fn.__name__
     wrapped.__doc__ = fn.__doc__
+    wrapped.__wrapped__ = fn
+    wrapped.__signature__ = tool_sig
     return wrapped
 
 for name, description, handler in TOOL_SPECS:
@@ -124,10 +141,14 @@ async def handle_facilitator_tool_rest(request):
     name, _, handler = tool_entry
 
     # 1. Enforce Authentication (never permit anonymous bypass in production)
-    is_prod = os.getenv("ENVIRONMENT", "").lower() == "production" or os.getenv("NODE_ENV") == "production"
+    is_prod = (
+        os.getenv("VELORA_ENV", "").lower() == "production"
+        or os.getenv("ENVIRONMENT", "").lower() == "production"
+        or os.getenv("NODE_ENV", "").lower() == "production"
+    )
     allow_anon = (not is_prod) and (os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1"))
-    identity = None
-    if not allow_anon:
+    identity = getattr(request.state, "identity", None) if hasattr(request, "state") else None
+    if not identity and not allow_anon:
         try:
             identity = extract_verified_identity(dict(request.headers))
         except AuthenticationError as e:
@@ -166,6 +187,16 @@ async def handle_facilitator_tool_rest(request):
                 status_code=403,
             )
 
+    if name == "export_decision_trail":
+        if not identity or not ("AUDITOR" in identity.roles or identity.is_admin):
+            return JSONResponse(
+                {
+                    "error": "Forbidden",
+                    "message": "Tool 'export_decision_trail' requires AUDITOR or Administrator role.",
+                },
+                status_code=403,
+            )
+
     args = dict(request.query_params)
     if request.method == "POST":
         try:
@@ -174,6 +205,68 @@ async def handle_facilitator_tool_rest(request):
                 args.update(body.get("arguments", body.get("params", body)))
         except Exception:
             pass
+
+    # Security parameter validation & identity binding (F01)
+    if "db_path" in args:
+        return JSONResponse(
+            {"error": "Forbidden", "message": "Client cannot specify internal db_path."},
+            status_code=403,
+        )
+
+    import inspect
+    handler_params = inspect.signature(handler).parameters
+    has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in handler_params.values())
+
+    if identity:
+        supplied_tenant = args.get("tenant_id")
+        if supplied_tenant and supplied_tenant != identity.tenant_id:
+            return JSONResponse(
+                {"error": "Forbidden", "message": f"Supplied tenant '{supplied_tenant}' does not match authenticated tenant '{identity.tenant_id}'"},
+                status_code=403,
+            )
+        if "tenant_id" in handler_params or has_var_keyword:
+            args["tenant_id"] = identity.tenant_id
+        else:
+            args.pop("tenant_id", None)
+
+        supplied_actor = args.get("actor_object_id") or args.get("user_object_id")
+        if supplied_actor and supplied_actor != identity.object_id:
+            return JSONResponse(
+                {"error": "Forbidden", "message": f"Supplied actor '{supplied_actor}' does not match authenticated user '{identity.object_id}'"},
+                status_code=403,
+            )
+        if "actor_object_id" in handler_params:
+            args["actor_object_id"] = identity.object_id
+        elif "user_object_id" in handler_params:
+            args["user_object_id"] = identity.object_id
+        elif not has_var_keyword:
+            args.pop("actor_object_id", None)
+            args.pop("user_object_id", None)
+
+        supplied_roles = args.get("caller_roles")
+        if supplied_roles:
+            if isinstance(supplied_roles, str):
+                supplied_roles = [supplied_roles]
+            for r in supplied_roles:
+                if r not in identity.roles:
+                    return JSONResponse(
+                        {"error": "Forbidden", "message": f"Caller is not authorized for requested role '{r}'"},
+                        status_code=403,
+                    )
+        elif "caller_roles" in handler_params:
+            args["caller_roles"] = list(identity.roles)
+
+        supplied_scopes = args.get("caller_entity_scopes")
+        if supplied_scopes:
+            if isinstance(supplied_scopes, str):
+                supplied_scopes = [supplied_scopes]
+            if not identity.is_admin and not any(s in identity.scopes for s in supplied_scopes):
+                return JSONResponse(
+                    {"error": "Forbidden", "message": "Caller is not authorized for requested entity scope"},
+                    status_code=403,
+                )
+        elif "caller_entity_scopes" in handler_params:
+            args["caller_entity_scopes"] = list(identity.scopes)
 
     try:
         if asyncio.iscoroutinefunction(handler):
@@ -186,6 +279,53 @@ async def handle_facilitator_tool_rest(request):
         return JSONResponse({"error": str(ex), "status": "error"}, status_code=500)
 
 
+class McpAuthMiddleware:
+    """Protect native MCP endpoints and REST transports with verified identity."""
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            path = scope.get("path", "")
+            if path in ("/health", "/healthz") or scope.get("method") == "OPTIONS":
+                await self.app(scope, receive, send)
+                return
+
+            is_prod = (
+                os.getenv("VELORA_ENV", "").lower() == "production"
+                or os.getenv("ENVIRONMENT", "").lower() == "production"
+                or os.getenv("NODE_ENV", "").lower() == "production"
+            )
+            allow_anon = (not is_prod) and (os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1"))
+
+            if not allow_anon:
+                raw_headers = scope.get("headers", [])
+                norm_headers = {k.decode("latin1").lower(): v.decode("latin1") for k, v in raw_headers}
+                try:
+                    identity = extract_verified_identity(norm_headers)
+                    if "state" not in scope:
+                        scope["state"] = {}
+                    scope["state"]["identity"] = identity
+                except (AuthenticationError, AuthorizationError) as e:
+                    status = 401 if isinstance(e, AuthenticationError) else 403
+                    body = json.dumps({"error": "Unauthorized" if status == 401 else "Forbidden", "message": str(e)}).encode("utf-8")
+                    await send({
+                        "type": "http.response.start",
+                        "status": status,
+                        "headers": [
+                            (b"content-type", b"application/json"),
+                            (b"content-length", str(len(body)).encode("latin1")),
+                        ],
+                    })
+                    await send({
+                        "type": "http.response.body",
+                        "body": body,
+                    })
+                    return
+
+        await self.app(scope, receive, send)
+
+
 def create_app():
     app = mcp.streamable_http_app()
     app.routes.append(Route("/health", health, methods=["GET"]))
@@ -194,7 +334,8 @@ def create_app():
     for name, _, _ in TOOL_SPECS:
         app.routes.append(Route(f"/{name}", handle_facilitator_tool_rest, methods=["GET", "POST"]))
         app.routes.append(Route(f"/tools/{name}", handle_facilitator_tool_rest, methods=["GET", "POST"]))
-    
+
+    app.add_middleware(McpAuthMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=allowed_origins if allowed_origins else ["https://copilotstudio.microsoft.com"],

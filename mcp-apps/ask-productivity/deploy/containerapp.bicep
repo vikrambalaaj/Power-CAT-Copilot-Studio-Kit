@@ -12,6 +12,7 @@ param externalIngress bool = false
 param publicBaseUrl string = ''
 param allowedHosts string = 'teams.microsoft.com,*.azurecontainerapps.io,localhost'
 param mcpApiKeySecretUrl string
+param approvalHmacSecretUrl string
 param m365ClientId string = ''
 param m365ClientSecretUrl string = ''
 param m365TenantId string = ''
@@ -49,6 +50,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
         { name: 'mcp-api-key', keyVaultUrl: mcpApiKeySecretUrl, identity: userAssignedIdentityId }
         { name: 'm365-client-secret', keyVaultUrl: m365ClientSecretUrl, identity: userAssignedIdentityId }
         { name: 'dataverse-client-secret', keyVaultUrl: dataverseClientSecretUrl, identity: userAssignedIdentityId }
+        { name: 'approval-hmac-secret', keyVaultUrl: approvalHmacSecretUrl, identity: userAssignedIdentityId }
       ]
     }
     template: {
@@ -88,6 +90,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'AZURE_TENANT_ID', value: m365TenantId }
             { name: 'DATAVERSE_URL', value: dataverseUrl }
             { name: 'DATAVERSE_CLIENT_SECRET', secretRef: 'dataverse-client-secret' }
+            { name: 'VELORA_APPROVAL_HMAC_SECRET', secretRef: 'approval-hmac-secret' }
             { name: 'VELORA_OUTBOX_DIR', value: '${volumeMountPath}/outbox' }
             { name: 'AZURE_STORAGE_MOUNT_PATH', value: '${volumeMountPath}/outbox' }
           ]
@@ -151,6 +154,7 @@ resource workerJob 'Microsoft.App/jobs@2024-03-01' = {
         { name: 'mcp-api-key', keyVaultUrl: mcpApiKeySecretUrl, identity: userAssignedIdentityId }
         { name: 'm365-client-secret', keyVaultUrl: m365ClientSecretUrl, identity: userAssignedIdentityId }
         { name: 'dataverse-client-secret', keyVaultUrl: dataverseClientSecretUrl, identity: userAssignedIdentityId }
+        { name: 'approval-hmac-secret', keyVaultUrl: approvalHmacSecretUrl, identity: userAssignedIdentityId }
       ]
     }
     template: {
@@ -193,6 +197,7 @@ resource workerJob 'Microsoft.App/jobs@2024-03-01' = {
             { name: 'AZURE_TENANT_ID', value: m365TenantId }
             { name: 'DATAVERSE_URL', value: dataverseUrl }
             { name: 'DATAVERSE_CLIENT_SECRET', secretRef: 'dataverse-client-secret' }
+            { name: 'VELORA_APPROVAL_HMAC_SECRET', secretRef: 'approval-hmac-secret' }
             { name: 'VELORA_OUTBOX_DIR', value: '${volumeMountPath}/outbox' }
             { name: 'AZURE_STORAGE_MOUNT_PATH', value: '${volumeMountPath}/outbox' }
             { name: 'VELORA_SUBSCRIPTION_DB', value: '${volumeMountPath}/velora_subscriptions.db' }

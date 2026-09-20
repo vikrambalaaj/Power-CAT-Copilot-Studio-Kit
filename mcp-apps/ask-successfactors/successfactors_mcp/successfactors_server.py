@@ -118,6 +118,23 @@ class ApiKeyMiddleware:
         if scope.get("type") == "http":
             path = scope.get("path", "")
             if path not in PUBLIC_PATHS:
+                is_prod = (
+                    os.getenv("VELORA_ENV", "").lower() == "production"
+                    or os.getenv("ENVIRONMENT", "").lower() == "production"
+                    or os.getenv("NODE_ENV", "").lower() == "production"
+                )
+                if is_prod and (settings.allow_anonymous or os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1")):
+                    response = JSONResponse(
+                        {
+                            "status": "error",
+                            "code": "CONFIGURATION_ERROR",
+                            "message": "FATAL: ALLOW_ANONYMOUS cannot be enabled in production environments.",
+                        },
+                        status_code=500,
+                    )
+                    await response(scope, receive, send)
+                    return
+
                 if not settings.allow_anonymous:
                     headers = {key.lower(): value for key, value in scope.get("headers", [])}
                     supplied = headers.get(b"x-api-key", b"").decode("utf-8")
@@ -263,22 +280,30 @@ class CopilotStudioAcceptMiddleware:
 
                             arguments = params.get("arguments") or {}
                             
-                            # Extract user context headers
+                            # Extract user context headers from verified identity only
                             headers_dict = {k.decode("latin1").lower(): v.decode("latin1") for k, v in headers}
-                            user_obj_id = headers_dict.get("x-user-object-id", "")
-                            user_email_hdr = headers_dict.get("x-user-email", "")
-                            user_display_name_hdr = headers_dict.get("x-user-display-name", "")
-                            user_roles_hdr = [r.strip() for r in headers_dict.get("x-user-roles", "").split(",") if r.strip()]
+                            try:
+                                from shared_mcp.identity import extract_verified_identity
+                                v_ident = extract_verified_identity(headers_dict)
+                                user_obj_id = v_ident.object_id
+                                user_email_hdr = v_ident.display_email or ""
+                                user_display_name_hdr = v_ident.username or ""
+                                user_roles_hdr = list(v_ident.roles)
+                            except Exception:
+                                user_obj_id = ""
+                                user_email_hdr = ""
+                                user_display_name_hdr = ""
+                                user_roles_hdr = []
 
                             if handler:
                                 try:
                                     parameters = inspect.signature(handler).parameters
-                                    # Inject user identity if parameter accepted and not already supplied
-                                    if "user_object_id" in parameters and "user_object_id" not in arguments and user_obj_id:
+                                    # Inject user identity if parameter accepted and verified
+                                    if "user_object_id" in parameters and user_obj_id:
                                         arguments["user_object_id"] = user_obj_id
-                                    if "user_email" in parameters and "user_email" not in arguments and user_email_hdr:
+                                    if "user_email" in parameters and user_email_hdr:
                                         arguments["user_email"] = user_email_hdr
-                                    if "user_display_name" in parameters and "user_display_name" not in arguments and user_display_name_hdr:
+                                    if "user_display_name" in parameters and user_display_name_hdr:
                                         arguments["user_display_name"] = user_display_name_hdr
 
                                     if "ctx" in parameters:
@@ -566,34 +591,151 @@ async def api_policy_preview(request):
 
 async def api_consent(request):
     """REST API for consent verification and recording."""
-    from .consent_service import get_consent_service
+    from .consent_service import get_consent_service, CURRENT_NOTICE_VERSION
+    from shared_mcp.identity import extract_verified_identity, AuthenticationError, AuthorizationError
+
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    try:
+        identity = extract_verified_identity(headers, require_user_principal=True)
+    except (AuthenticationError, AuthorizationError) as e:
+        return JSONResponse(
+            {
+                "status": "error",
+                "code": "AUTHENTICATION_REQUIRED",
+                "message": f"Consent operations require a verified user identity (Bearer token or signed gateway assertion): {e}",
+            },
+            status_code=401 if isinstance(e, AuthenticationError) else 403,
+        )
+
     svc = get_consent_service()
     if request.method == "POST":
         try:
             body = await request.json()
         except Exception:
             body = {}
+
+        if "accepted" not in body or not isinstance(body.get("accepted"), bool):
+            return JSONResponse(
+                {
+                    "status": "error",
+                    "code": "INVALID_ARGUMENT",
+                    "message": "Field 'accepted' is required and must be a strict boolean (true or false). Strings or numbers are rejected.",
+                },
+                status_code=400,
+            )
+
+        body_uid = body.get("user_object_id")
+        if body_uid and body_uid.strip() != identity.object_id:
+            return JSONResponse(
+                {
+                    "status": "error",
+                    "code": "FORBIDDEN",
+                    "message": f"Supplied user_object_id '{body_uid}' does not match authenticated user '{identity.object_id}'",
+                },
+                status_code=403,
+            )
+
+        body_email = body.get("user_email")
+        if body_email and identity.display_email and body_email.strip().lower() != identity.display_email.lower():
+            return JSONResponse(
+                {
+                    "status": "error",
+                    "code": "FORBIDDEN",
+                    "message": f"Supplied user_email '{body_email}' does not match authenticated user '{identity.display_email}'",
+                },
+                status_code=403,
+            )
+
+        notice_ver = body.get("notice_version", CURRENT_NOTICE_VERSION)
+        if notice_ver != CURRENT_NOTICE_VERSION:
+            return JSONResponse(
+                {
+                    "status": "error",
+                    "code": "INVALID_NOTICE_VERSION",
+                    "message": f"Unsupported or stale notice_version '{notice_ver}'. Current is '{CURRENT_NOTICE_VERSION}'.",
+                },
+                status_code=400,
+            )
+
         res = await svc.record_user_consent(
-            user_object_id=body.get("user_object_id", ""),
-            user_email=body.get("user_email", ""),
-            accepted=bool(body.get("accepted", False)),
-            notice_version=body.get("notice_version", "2026.1"),
+            user_object_id=identity.object_id,
+            user_email=identity.display_email or body_email or "",
+            accepted=body["accepted"],
+            notice_version=notice_ver,
         )
         return JSONResponse(res)
-    user_object_id = request.query_params.get("user_object_id", "")
-    user_email = request.query_params.get("user_email", "")
-    is_consented, card = await svc.verify_user_consent(user_object_id, user_email)
+
+    query_uid = request.query_params.get("user_object_id")
+    if query_uid and query_uid.strip() != identity.object_id:
+        return JSONResponse(
+            {
+                "status": "error",
+                "code": "FORBIDDEN",
+                "message": f"Supplied user_object_id '{query_uid}' does not match authenticated user '{identity.object_id}'",
+            },
+            status_code=403,
+        )
+    query_email = request.query_params.get("user_email")
+    if query_email and identity.display_email and query_email.strip().lower() != identity.display_email.lower():
+        return JSONResponse(
+            {
+                "status": "error",
+                "code": "FORBIDDEN",
+                "message": f"Supplied user_email '{query_email}' does not match authenticated user '{identity.display_email}'",
+            },
+            status_code=403,
+        )
+
+    is_consented, card = await svc.verify_user_consent(identity.object_id, identity.display_email or query_email or "")
     return JSONResponse({"is_consented": is_consented, "card": card})
 
 
 async def api_memory(request):
     """REST API for 30-day user memory recall."""
     from .memory_service import get_memory_service
+    from shared_mcp.identity import extract_verified_identity, AuthenticationError, AuthorizationError
+
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    try:
+        identity = extract_verified_identity(headers, require_user_principal=True)
+    except (AuthenticationError, AuthorizationError) as e:
+        return JSONResponse(
+            {
+                "status": "error",
+                "code": "AUTHENTICATION_REQUIRED",
+                "message": f"Memory recall requires a verified user identity (Bearer token or signed gateway assertion): {e}",
+            },
+            status_code=401 if isinstance(e, AuthenticationError) else 403,
+        )
+
+    query_uid = request.query_params.get("user_object_id")
+    if query_uid and query_uid.strip() != identity.object_id:
+        return JSONResponse(
+            {
+                "status": "error",
+                "code": "FORBIDDEN",
+                "message": f"Supplied user_object_id '{query_uid}' does not match authenticated user '{identity.object_id}'",
+            },
+            status_code=403,
+        )
+    query_email = request.query_params.get("user_email")
+    if query_email and identity.display_email and query_email.strip().lower() != identity.display_email.lower():
+        return JSONResponse(
+            {
+                "status": "error",
+                "code": "FORBIDDEN",
+                "message": f"Supplied user_email '{query_email}' does not match authenticated user '{identity.display_email}'",
+            },
+            status_code=403,
+        )
+
     svc = get_memory_service()
-    user_object_id = request.query_params.get("user_object_id", "")
-    user_email = request.query_params.get("user_email", "")
     topic = request.query_params.get("topic")
-    res = await svc.recall_user_context(user_object_id, user_email, topic_query=topic)
+    res = await svc.recall_user_context(
+        identity.object_id,
+        identity.display_email or query_email or "",
+        topic_query=topic,
+    )
     return JSONResponse(res)
 
 

@@ -9,6 +9,9 @@ dependencies = [
     "uvicorn>=0.29",
     "starlette>=0.37",
     "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "cryptography>=46.0.5",
+    "pyjwt>=2.8.0",
 ]
 
 [project.scripts]

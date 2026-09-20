@@ -196,4 +196,43 @@ describe("Dynamic Adaptive Card Service Unit & Integration Tests", () => {
     expect(decisionResult.success).toBe(true);
     expect(decisionResult.validation.payloadSizeBytes).toBeLessThan(15360);
   });
+
+  it("9. Should reject invalid, non-integer, or non-finite ttlSeconds", () => {
+    const signer = new IdempotencySigner("test-secret-key-12345");
+    expect(() => signer.generateTicket("s1", "t1", "not-a-number" as any)).toThrow();
+    expect(() => signer.generateTicket("s1", "t1", -10)).toThrow();
+    expect(() => signer.generateTicket("s1", "t1", 3.14)).toThrow();
+
+    const renderInvalid = evaluator.renderCard({
+      templateId: "approval-card",
+      data: { cardTitle: "Test" },
+      ttlSeconds: -1,
+    });
+    expect(renderInvalid.success).toBe(false);
+    expect(renderInvalid.validation.errors.some((e) => e.includes("Invalid ttlSeconds"))).toBe(true);
+  });
+
+  it("10. Should reject submission when sessionId or approved data has been tampered with", () => {
+    const signer = new IdempotencySigner("test-secret-key-12345");
+    const approvedData = { amount: 100, vendor: "Acme" };
+    const { ticketToken } = signer.generateTicket("session-orig", "approval-card", 3600, approvedData);
+
+    // Mismatched session
+    const resWrongSession = signer.verifyAndConsumeTicket(ticketToken, {
+      ...approvedData,
+      sessionId: "session-attacker",
+    });
+    expect(resWrongSession.valid).toBe(false);
+    expect(resWrongSession.error).toContain("sessionId does not match");
+
+    // Tampered data
+    const resTampered = signer.verifyAndConsumeTicket(ticketToken, {
+      amount: 999999,
+      vendor: "Acme",
+      sessionId: "session-orig",
+    });
+    expect(resTampered.valid).toBe(false);
+    expect(resTampered.error).toContain("tampered with");
+  });
 });
+

@@ -1,0 +1,637 @@
+{
+  "facilitator_rest_anonymous_status": 401,
+  "facilitator_rest_identity_forwarding": {
+    "status": 403,
+    "handler_received": {
+      "error": "Forbidden",
+      "message": "Supplied tenant 'other-tenant' does not match authenticated tenant 'review-tenant'"
+    }
+  },
+  "facilitator_export_default_role": {
+    "status": 403,
+    "handler_received": {
+      "error": "Forbidden",
+      "message": "Tool 'export_decision_trail' requires AUDITOR or Administrator role."
+    }
+  },
+  "facilitator_sync_async_ingestion": {
+    "status": 500,
+    "response": {
+      "error": "Invalid event_type 'x'. Must be one of: ['AUDIT_NONCOMPLIANCE', 'CONTRACT_FULFILLMENT', 'DELIVERY_DELAY', 'MILESTONE_SUCCESS', 'PRICE_VARIANCE', 'QUALITY_DEFECT', 'SECURITY_INCIDENT', 'SLA_BREACH'].",
+      "status": "error"
+    }
+  },
+  "facilitator_unauthenticated_mcp_initialize": {
+    "status": 401,
+    "has_initialize_result": false
+  },
+  "facilitator_unauthenticated_mcp_tool": {
+    "status": 401,
+    "body": "{\"error\": \"Unauthorized\", \"message\": \"Missing Authorization Bearer token\"}"
+  },
+  "facilitator_native_tool_schema": {
+    "properties": {},
+    "title": "get_facilitator_guideArguments",
+    "type": "object"
+  },
+  "audit_production_uses_default_key": false,
+  "vendor_unverified_input_result": {
+    "schemaVersion": "1.0.0",
+    "operation": "EVALUATE_VENDOR_OPTIONS",
+    "status": "SUCCESS",
+    "resultSummary": "Recommended Supplier: Synthetic Vendor (Composite Score: 76.00 / 100).",
+    "result": {
+      "decisionId": "DEC-077e7eabff87",
+      "version": "1.0.0",
+      "useCase": "VENDOR_SELECTION",
+      "evaluatedOptions": [
+        {
+          "vendor_id": "v1",
+          "vendor_name": "Synthetic Vendor",
+          "technical_score": "90",
+          "technical_source_ref": "USER_PROVIDED",
+          "commercial_price": "100",
+          "commercial_currency": "AED",
+          "commercial_tax_basis": "EXCLUDING_VAT",
+          "commercial_term_basis": "ANNUALIZED",
+          "commercial_scope": "1000",
+          "commercial_source_ref": "USER_PROVIDED",
+          "historical_score": null,
+          "historical_record_count": 0,
+          "historical_caveat": "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+        }
+      ],
+      "criteriaWeightsDirections": [
+        {
+          "criterionId": "TECH_COMPETENCE",
+          "name": "Technical Competence & Capability",
+          "direction": "HIGHER_IS_BETTER",
+          "weight": "0.40",
+          "unit": "POINTS_0_100"
+        },
+        {
+          "criterionId": "COMMERCIAL_PRICE",
+          "name": "Commercial Price",
+          "direction": "LOWER_IS_BETTER",
+          "weight": "0.40",
+          "unit": "AED"
+        },
+        {
+          "criterionId": "HISTORICAL_PERFORMANCE",
+          "name": "Historical Delivery & Institutional Performance",
+          "direction": "HIGHER_IS_BETTER",
+          "weight": "0.20",
+          "unit": "POINTS_0_100"
+        }
+      ],
+      "inputSnapshotIds": [
+        "INP-TECH-v1",
+        "INP-COMM-v1"
+      ],
+      "baselineScore": {
+        "v1": {
+          "totalScore": "95.00",
+          "contributions": {
+            "TECH_COMPETENCE": "45.00",
+            "COMMERCIAL_PRICE": "50.00"
+          }
+        }
+      },
+      "memoryContributions": {
+        "v1": {
+          "historyScore": "0.00",
+          "historyContribution": "0.00",
+          "scoreDelta": "-19.00",
+          "contributionDeltas": {
+            "TECH_COMPETENCE": "-9.00",
+            "COMMERCIAL_PRICE": "-10.00",
+            "HISTORICAL_PERFORMANCE": "0.00"
+          },
+          "recordCount": 0,
+          "caveat": "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+        }
+      },
+      "finalScore": {
+        "v1": {
+          "totalScore": "76.00",
+          "contributions": {
+            "TECH_COMPETENCE": "36.00",
+            "COMMERCIAL_PRICE": "40.00",
+            "HISTORICAL_PERFORMANCE": "0.00"
+          },
+          "normalizedScores": {
+            "TECH_COMPETENCE": "90.00",
+            "COMMERCIAL_PRICE": "100.00",
+            "HISTORICAL_PERFORMANCE": "0.00"
+          }
+        }
+      },
+      "finalRank": [
+        "v1"
+      ],
+      "tiePolicy": "HIGHER_TECHNICAL_WINS",
+      "missingDataPolicy": "FAIL_CLOSED_NO_WINNER",
+      "selectedOption": "v1",
+      "claims": [
+        {
+          "claimId": "CLM-TECH-v1",
+          "kind": "FACT",
+          "text": "Synthetic Vendor reported unverified technical input of 90 / 100.",
+          "numericValue": "90",
+          "unit": "POINTS_0_100",
+          "currency": null,
+          "sourceIds": [
+            "SRC-TECH-v1"
+          ],
+          "derivedFromClaimIds": [],
+          "calculationVersion": "1.0.0",
+          "policyVersion": "1.0.0",
+          "confidenceAssessment": {
+            "label": "LOW",
+            "frameworkVersion": "1.0.0",
+            "sourceReliability": "USER_PROVIDED",
+            "corroboration": "UNVERIFIED",
+            "timeliness": "CURRENT",
+            "completeness": "INCOMPLETE",
+            "comparability": "UNVERIFIED",
+            "reason": "Unverified user input without referenced technical audit scorecard.",
+            "limitingFactors": [
+              "CALLER_SUPPLIED_DATA",
+              "MISSING_SOURCE_DOCUMENT"
+            ],
+            "score": null
+          },
+          "limitations": []
+        },
+        {
+          "claimId": "CLM-COMM-v1",
+          "kind": "FACT",
+          "text": "Synthetic Vendor reported unverified commercial price of 100 AED.",
+          "numericValue": "100",
+          "unit": "AED",
+          "currency": "AED",
+          "sourceIds": [
+            "SRC-COMM-v1"
+          ],
+          "derivedFromClaimIds": [],
+          "calculationVersion": "1.0.0",
+          "policyVersion": "1.0.0",
+          "confidenceAssessment": {
+            "label": "LOW",
+            "frameworkVersion": "1.0.0",
+            "sourceReliability": "USER_PROVIDED",
+            "corroboration": "UNVERIFIED",
+            "timeliness": "CURRENT",
+            "completeness": "INCOMPLETE",
+            "comparability": "UNVERIFIED",
+            "reason": "Unverified user input without referenced commercial tender proposal.",
+            "limitingFactors": [
+              "CALLER_SUPPLIED_DATA",
+              "MISSING_SOURCE_DOCUMENT"
+            ],
+            "score": null
+          },
+          "limitations": []
+        },
+        {
+          "claimId": "CLM-HIST-EMPTY-v1",
+          "kind": "FACT",
+          "text": "No prior institutional performance history exists for Synthetic Vendor.",
+          "numericValue": null,
+          "unit": null,
+          "currency": null,
+          "sourceIds": [
+            "SRC-HIST-v1"
+          ],
+          "derivedFromClaimIds": [],
+          "calculationVersion": "1.0.0",
+          "policyVersion": "1.0.0",
+          "confidenceAssessment": {
+            "label": "LOW",
+            "frameworkVersion": "1.0.0",
+            "sourceReliability": "UNVERIFIED",
+            "corroboration": "UNCORROBORATED",
+            "timeliness": "STALE",
+            "completeness": "INCOMPLETE",
+            "comparability": "NON_COMPARABLE",
+            "reason": "Absence of historical corporate records.",
+            "limitingFactors": [
+              "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+            ],
+            "score": null
+          },
+          "limitations": []
+        }
+      ],
+      "conciseRationale": "Evaluation performed under approved policy 'Standard Technical and Commercial Procurement Policy' (POLICY-VENDOR-PROC-V1 v1.0.0).\nRecommended Supplier: Synthetic Vendor (Composite Score: 76.00 / 100).\n\u2022 Synthetic Vendor: Baseline=95.00 pts; History Delta=-19.00 pts (0 verified events); Final=76.00 pts.\nTie & Decision Policy: HIGHER_TECHNICAL_WINS. Commercial basis: AED EXCLUDING_VAT ANNUALIZED.",
+      "policyVersion": "1.0.0",
+      "codeVersion": "2026.9.11-w11",
+      "authenticatedActor": {
+        "tenantId": "review-tenant",
+        "actorObjectId": "system-facilitator",
+        "actorType": "WORKLOAD",
+        "onBehalfOfUserObjectId": null,
+        "organizationScopes": [
+          "1000"
+        ],
+        "correlationId": "corr-dec-DEC-077e7eabff87",
+        "conversationId": null,
+        "turnId": null,
+        "policyVersion": "1.0.0"
+      },
+      "auditManifestRef": "MAN-DEC-DEC-077e7eabff87-1.0.0"
+    },
+    "claims": [
+      {
+        "claimId": "CLM-TECH-v1",
+        "kind": "FACT",
+        "text": "Synthetic Vendor reported unverified technical input of 90 / 100.",
+        "numericValue": "90",
+        "unit": "POINTS_0_100",
+        "currency": null,
+        "sourceIds": [
+          "SRC-TECH-v1"
+        ],
+        "derivedFromClaimIds": [],
+        "calculationVersion": "1.0.0",
+        "policyVersion": "1.0.0",
+        "confidenceAssessment": {
+          "label": "LOW",
+          "frameworkVersion": "1.0.0",
+          "sourceReliability": "USER_PROVIDED",
+          "corroboration": "UNVERIFIED",
+          "timeliness": "CURRENT",
+          "completeness": "INCOMPLETE",
+          "comparability": "UNVERIFIED",
+          "reason": "Unverified user input without referenced technical audit scorecard.",
+          "limitingFactors": [
+            "CALLER_SUPPLIED_DATA",
+            "MISSING_SOURCE_DOCUMENT"
+          ],
+          "score": null
+        },
+        "limitations": []
+      },
+      {
+        "claimId": "CLM-COMM-v1",
+        "kind": "FACT",
+        "text": "Synthetic Vendor reported unverified commercial price of 100 AED.",
+        "numericValue": "100",
+        "unit": "AED",
+        "currency": "AED",
+        "sourceIds": [
+          "SRC-COMM-v1"
+        ],
+        "derivedFromClaimIds": [],
+        "calculationVersion": "1.0.0",
+        "policyVersion": "1.0.0",
+        "confidenceAssessment": {
+          "label": "LOW",
+          "frameworkVersion": "1.0.0",
+          "sourceReliability": "USER_PROVIDED",
+          "corroboration": "UNVERIFIED",
+          "timeliness": "CURRENT",
+          "completeness": "INCOMPLETE",
+          "comparability": "UNVERIFIED",
+          "reason": "Unverified user input without referenced commercial tender proposal.",
+          "limitingFactors": [
+            "CALLER_SUPPLIED_DATA",
+            "MISSING_SOURCE_DOCUMENT"
+          ],
+          "score": null
+        },
+        "limitations": []
+      },
+      {
+        "claimId": "CLM-HIST-EMPTY-v1",
+        "kind": "FACT",
+        "text": "No prior institutional performance history exists for Synthetic Vendor.",
+        "numericValue": null,
+        "unit": null,
+        "currency": null,
+        "sourceIds": [
+          "SRC-HIST-v1"
+        ],
+        "derivedFromClaimIds": [],
+        "calculationVersion": "1.0.0",
+        "policyVersion": "1.0.0",
+        "confidenceAssessment": {
+          "label": "LOW",
+          "frameworkVersion": "1.0.0",
+          "sourceReliability": "UNVERIFIED",
+          "corroboration": "UNCORROBORATED",
+          "timeliness": "STALE",
+          "completeness": "INCOMPLETE",
+          "comparability": "NON_COMPARABLE",
+          "reason": "Absence of historical corporate records.",
+          "limitingFactors": [
+            "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+          ],
+          "score": null
+        },
+        "limitations": []
+      }
+    ],
+    "sources": [
+      {
+        "sourceId": "SRC-TECH-v1",
+        "system": "USER_INPUT",
+        "businessTitle": "Unverified Technical Input for Synthetic Vendor",
+        "providerRecordId": "USER_PROVIDED",
+        "url": null,
+        "retrievedAt": "2026-09-20T07:42:32.054412+00:00",
+        "sourceUpdatedAt": null,
+        "measurementPeriod": null,
+        "scope": "1000",
+        "currency": null,
+        "unit": null,
+        "coverage": null,
+        "limitations": [
+          "Unverified caller-supplied technical score without formal audit scorecard document."
+        ],
+        "classification": "CONFIDENTIAL",
+        "accessScopeReference": null,
+        "contentHash": null,
+        "version": "1.0.0"
+      },
+      {
+        "sourceId": "SRC-COMM-v1",
+        "system": "USER_INPUT",
+        "businessTitle": "Unverified Commercial Offer for Synthetic Vendor",
+        "providerRecordId": "USER_PROVIDED",
+        "url": null,
+        "retrievedAt": "2026-09-20T07:42:32.057541+00:00",
+        "sourceUpdatedAt": null,
+        "measurementPeriod": null,
+        "scope": "1000",
+        "currency": "AED",
+        "unit": null,
+        "coverage": null,
+        "limitations": [
+          "ANNUALIZED unverified commercial input, EXCLUDING_VAT. Missing formal proposal."
+        ],
+        "classification": "CONFIDENTIAL",
+        "accessScopeReference": null,
+        "contentHash": null,
+        "version": "1.0.0"
+      },
+      {
+        "sourceId": "SRC-HIST-v1",
+        "system": "INSTITUTIONAL_MEMORY",
+        "businessTitle": "Verified Institutional Vendor Performance Profile for Synthetic Vendor",
+        "providerRecordId": "VPH-QUERY-v1",
+        "url": null,
+        "retrievedAt": "2026-09-20T07:42:32.057645+00:00",
+        "sourceUpdatedAt": null,
+        "measurementPeriod": null,
+        "scope": "1000",
+        "currency": null,
+        "unit": null,
+        "coverage": null,
+        "limitations": [
+          "0 verified institutional records.",
+          "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+        ],
+        "classification": "CONFIDENTIAL",
+        "accessScopeReference": null,
+        "contentHash": null,
+        "version": "1.0.0"
+      }
+    ],
+    "warnings": [
+      "Unverified caller-provided inputs present without formal evidence citations; confidence degraded to LOW."
+    ],
+    "missingSources": [],
+    "correlationId": "corr-dec-DEC-077e7eabff87",
+    "audit": {
+      "status": "COMMITTED",
+      "recordId": "DEC-077e7eabff87",
+      "version": "1.0.0"
+    },
+    "generatedAt": "2026-09-20T07:42:32.387503+00:00",
+    "typedResult": {
+      "decisionId": "DEC-077e7eabff87",
+      "version": "1.0.0",
+      "useCase": "VENDOR_SELECTION",
+      "evaluatedOptions": [
+        {
+          "vendor_id": "v1",
+          "vendor_name": "Synthetic Vendor",
+          "technical_score": "90",
+          "technical_source_ref": "USER_PROVIDED",
+          "commercial_price": "100",
+          "commercial_currency": "AED",
+          "commercial_tax_basis": "EXCLUDING_VAT",
+          "commercial_term_basis": "ANNUALIZED",
+          "commercial_scope": "1000",
+          "commercial_source_ref": "USER_PROVIDED",
+          "historical_score": null,
+          "historical_record_count": 0,
+          "historical_caveat": "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+        }
+      ],
+      "criteriaWeightsDirections": [
+        {
+          "criterionId": "TECH_COMPETENCE",
+          "name": "Technical Competence & Capability",
+          "direction": "HIGHER_IS_BETTER",
+          "weight": "0.40",
+          "unit": "POINTS_0_100"
+        },
+        {
+          "criterionId": "COMMERCIAL_PRICE",
+          "name": "Commercial Price",
+          "direction": "LOWER_IS_BETTER",
+          "weight": "0.40",
+          "unit": "AED"
+        },
+        {
+          "criterionId": "HISTORICAL_PERFORMANCE",
+          "name": "Historical Delivery & Institutional Performance",
+          "direction": "HIGHER_IS_BETTER",
+          "weight": "0.20",
+          "unit": "POINTS_0_100"
+        }
+      ],
+      "inputSnapshotIds": [
+        "INP-TECH-v1",
+        "INP-COMM-v1"
+      ],
+      "baselineScore": {
+        "v1": {
+          "totalScore": "95.00",
+          "contributions": {
+            "TECH_COMPETENCE": "45.00",
+            "COMMERCIAL_PRICE": "50.00"
+          }
+        }
+      },
+      "memoryContributions": {
+        "v1": {
+          "historyScore": "0.00",
+          "historyContribution": "0.00",
+          "scoreDelta": "-19.00",
+          "contributionDeltas": {
+            "TECH_COMPETENCE": "-9.00",
+            "COMMERCIAL_PRICE": "-10.00",
+            "HISTORICAL_PERFORMANCE": "0.00"
+          },
+          "recordCount": 0,
+          "caveat": "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+        }
+      },
+      "finalScore": {
+        "v1": {
+          "totalScore": "76.00",
+          "contributions": {
+            "TECH_COMPETENCE": "36.00",
+            "COMMERCIAL_PRICE": "40.00",
+            "HISTORICAL_PERFORMANCE": "0.00"
+          },
+          "normalizedScores": {
+            "TECH_COMPETENCE": "90.00",
+            "COMMERCIAL_PRICE": "100.00",
+            "HISTORICAL_PERFORMANCE": "0.00"
+          }
+        }
+      },
+      "finalRank": [
+        "v1"
+      ],
+      "tiePolicy": "HIGHER_TECHNICAL_WINS",
+      "missingDataPolicy": "FAIL_CLOSED_NO_WINNER",
+      "selectedOption": "v1",
+      "claims": [
+        {
+          "claimId": "CLM-TECH-v1",
+          "kind": "FACT",
+          "text": "Synthetic Vendor reported unverified technical input of 90 / 100.",
+          "numericValue": "90",
+          "unit": "POINTS_0_100",
+          "currency": null,
+          "sourceIds": [
+            "SRC-TECH-v1"
+          ],
+          "derivedFromClaimIds": [],
+          "calculationVersion": "1.0.0",
+          "policyVersion": "1.0.0",
+          "confidenceAssessment": {
+            "label": "LOW",
+            "frameworkVersion": "1.0.0",
+            "sourceReliability": "USER_PROVIDED",
+            "corroboration": "UNVERIFIED",
+            "timeliness": "CURRENT",
+            "completeness": "INCOMPLETE",
+            "comparability": "UNVERIFIED",
+            "reason": "Unverified user input without referenced technical audit scorecard.",
+            "limitingFactors": [
+              "CALLER_SUPPLIED_DATA",
+              "MISSING_SOURCE_DOCUMENT"
+            ],
+            "score": null
+          },
+          "limitations": []
+        },
+        {
+          "claimId": "CLM-COMM-v1",
+          "kind": "FACT",
+          "text": "Synthetic Vendor reported unverified commercial price of 100 AED.",
+          "numericValue": "100",
+          "unit": "AED",
+          "currency": "AED",
+          "sourceIds": [
+            "SRC-COMM-v1"
+          ],
+          "derivedFromClaimIds": [],
+          "calculationVersion": "1.0.0",
+          "policyVersion": "1.0.0",
+          "confidenceAssessment": {
+            "label": "LOW",
+            "frameworkVersion": "1.0.0",
+            "sourceReliability": "USER_PROVIDED",
+            "corroboration": "UNVERIFIED",
+            "timeliness": "CURRENT",
+            "completeness": "INCOMPLETE",
+            "comparability": "UNVERIFIED",
+            "reason": "Unverified user input without referenced commercial tender proposal.",
+            "limitingFactors": [
+              "CALLER_SUPPLIED_DATA",
+              "MISSING_SOURCE_DOCUMENT"
+            ],
+            "score": null
+          },
+          "limitations": []
+        },
+        {
+          "claimId": "CLM-HIST-EMPTY-v1",
+          "kind": "FACT",
+          "text": "No prior institutional performance history exists for Synthetic Vendor.",
+          "numericValue": null,
+          "unit": null,
+          "currency": null,
+          "sourceIds": [
+            "SRC-HIST-v1"
+          ],
+          "derivedFromClaimIds": [],
+          "calculationVersion": "1.0.0",
+          "policyVersion": "1.0.0",
+          "confidenceAssessment": {
+            "label": "LOW",
+            "frameworkVersion": "1.0.0",
+            "sourceReliability": "UNVERIFIED",
+            "corroboration": "UNCORROBORATED",
+            "timeliness": "STALE",
+            "completeness": "INCOMPLETE",
+            "comparability": "NON_COMPARABLE",
+            "reason": "Absence of historical corporate records.",
+            "limitingFactors": [
+              "MANDATORY AUDIT CAVEAT: Absence of documented negative events or complaints cannot be interpreted as confirmed satisfactory performance. Supplier evaluation must be grounded strictly in verified, positive evidence."
+            ],
+            "score": null
+          },
+          "limitations": []
+        }
+      ],
+      "conciseRationale": "Evaluation performed under approved policy 'Standard Technical and Commercial Procurement Policy' (POLICY-VENDOR-PROC-V1 v1.0.0).\nRecommended Supplier: Synthetic Vendor (Composite Score: 76.00 / 100).\n\u2022 Synthetic Vendor: Baseline=95.00 pts; History Delta=-19.00 pts (0 verified events); Final=76.00 pts.\nTie & Decision Policy: HIGHER_TECHNICAL_WINS. Commercial basis: AED EXCLUDING_VAT ANNUALIZED.",
+      "policyVersion": "1.0.0",
+      "codeVersion": "2026.9.11-w11",
+      "authenticatedActor": {
+        "tenantId": "review-tenant",
+        "actorObjectId": "system-facilitator",
+        "actorType": "WORKLOAD",
+        "onBehalfOfUserObjectId": null,
+        "organizationScopes": [
+          "1000"
+        ],
+        "correlationId": "corr-dec-DEC-077e7eabff87",
+        "conversationId": null,
+        "turnId": null,
+        "policyVersion": "1.0.0"
+      },
+      "auditManifestRef": "MAN-DEC-DEC-077e7eabff87-1.0.0"
+    },
+    "operationStatus": "SUCCESS"
+  },
+  "worker_cross_mailbox": {
+    "dispatched": 2,
+    "deliveries": [
+      {
+        "to": [
+          "alice@velora.ae"
+        ],
+        "body": "PRIVATE DATA OF alice@velora.ae"
+      },
+      {
+        "to": [
+          "bob@velora.ae"
+        ],
+        "body": "PRIVATE DATA OF bob@velora.ae"
+      }
+    ]
+  },
+  "subscription_after_send_before_receipt_crash": {
+    "first_claim": true,
+    "reclaimed_without_provider_reconciliation": false,
+    "explanation": "Row is exactly the persisted state if process dies after provider accepts but before complete_subscription_run."
+  }
+}

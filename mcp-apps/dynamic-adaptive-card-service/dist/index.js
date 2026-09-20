@@ -29,6 +29,18 @@ fastify.post("/render-card", async (request, reply) => {
             message: "Field 'data' object is required.",
         });
     }
+    if (ttlSeconds !== undefined) {
+        if (typeof ttlSeconds !== "number" ||
+            !Number.isFinite(ttlSeconds) ||
+            !Number.isInteger(ttlSeconds) ||
+            ttlSeconds <= 0 ||
+            ttlSeconds > 86400) {
+            return reply.status(400).send({
+                error: "Bad Request",
+                message: "Field 'ttlSeconds' must be a finite positive integer <= 86400.",
+            });
+        }
+    }
     const result = evaluator.renderCard({
         templateId,
         sessionId,
@@ -47,7 +59,7 @@ fastify.post("/validate-submission", async (request, reply) => {
         });
     }
     const signer = evaluator.getSigner();
-    const outcome = signer.verifyAndConsumeTicket(ticketToken);
+    const outcome = signer.verifyAndConsumeTicket(ticketToken, submittedData);
     if (!outcome.valid) {
         return reply.status(403).send({
             valid: false,

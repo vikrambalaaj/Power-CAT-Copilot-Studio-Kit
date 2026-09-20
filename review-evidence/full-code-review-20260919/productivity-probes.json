@@ -1,0 +1,7 @@
+{
+  "status": 403,
+  "handler_kwargs": null,
+  "response": {
+    "detail": "Request body tenantId 'other-tenant' does not match token tenantId 'review-tenant'"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "anonymous_render": {
+    "status": 400,
+    "hasTicket": false
+  },
+  "production_accepts_missing_signing_secret": false,
+  "two_replicas_local_storage": [
+    {
+      "exit": 0,
+      "result": {
+        "valid": true
+      }
+    },
+    {
+      "exit": 0,
+      "result": {
+        "valid": true
+      }
+    }
+  ],
+  "pipeline_malformed_success": {
+    "scores": {
+      "patternScore": 0,
+      "instructionScore": 0,
+      "overallScore": 0,
+      "passed": false,
+      "threshold": 60,
+      "stageBPatternCount": 0,
+      "stageBPassingCount": 0,
+      "stageCIssueCount": 0
+    },
+    "errors": [
+      "Stage B failed: Stage B pattern is missing a valid PatternName: {\"Status\":true}",
+      "Stage C failed: Stage C issue contains unknown criterion ID: \"unknown-criterion\""
+    ]
+  }
+}

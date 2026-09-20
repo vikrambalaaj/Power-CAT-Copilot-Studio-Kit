@@ -10,7 +10,7 @@ import asyncio
 import os
 import time
 from datetime import datetime, timezone as dt_timezone, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from .audit_client import get_productivity_audit_service
 from .m365_client import Microsoft365Client, ALLOWED_PLANNER_PLANS, ALLOWED_TEAMS_DESTINATIONS
@@ -313,6 +313,17 @@ async def prepare_email(
     idemp_key = f"idemp-email-{int(time.time() * 1000)}-{os.urandom(3).hex()}"
     client = Microsoft365Client(user_email=userEmail)
 
+    if not to:
+        return {
+            "status": "VALIDATION_ERROR",
+            "approvalRequired": False,
+            "resultSummary": "Missing required email recipient ('to').",
+            "confirmationToken": None,
+            "correlationId": corr_id,
+            "auditStatus": "REJECTED",
+            "warnings": ["Recipient list is empty."],
+        }
+
     resolved_to, unres_to, ext_to = client.resolve_recipients(to)
     resolved_cc, unres_cc, ext_cc = client.resolve_recipients(cc or [])
 
@@ -326,7 +337,7 @@ async def prepare_email(
 
     token_mgr = get_token_manager()
     preview_data = {
-        "actingUser": userEmail or "balaadm@velora.ae",
+        "actingUser": userEmail or "unspecified@velora.ae",
         "to": resolved_to,
         "cc": resolved_cc,
         "subject": subject,
@@ -563,7 +574,17 @@ async def prepare_end_of_day_wrapup_email(
     client = Microsoft365Client(user_email=userEmail)
     wrapup = client.prepare_end_of_day_wrapup(user_timezone=userTimezone, user_email=userEmail)
 
-    target_recipient = recipientOverride or wrapup["recipient"] or userEmail or "balaadm@velora.ae"
+    target_recipient = recipientOverride or wrapup.get("recipient") or userEmail
+    if not target_recipient:
+        return {
+            "status": "VALIDATION_ERROR",
+            "approvalRequired": False,
+            "resultSummary": "Target recipient for wrapup email must be explicitly specified when userEmail is unavailable.",
+            "confirmationToken": None,
+            "correlationId": rootCorrelationId,
+            "auditStatus": "REJECTED",
+            "warnings": ["No recipient specified."],
+        }
 
     return await prepare_email(
         to=[target_recipient],
@@ -598,6 +619,51 @@ async def prepare_meeting_creation(
     """Stage A: Prepare meeting creation preview, check conflicts, and issue approval token."""
     corr_id = rootCorrelationId or f"corr-cal-{int(time.time() * 1000)}"
     idemp_key = f"idemp-meet-{int(time.time() * 1000)}"
+
+    if not attendees:
+        return {
+            "status": "VALIDATION_ERROR",
+            "approvalRequired": False,
+            "resultSummary": "Meeting attendees must be explicitly provided.",
+            "confirmationToken": None,
+            "correlationId": corr_id,
+            "auditStatus": "REJECTED",
+            "warnings": ["Empty attendees list."],
+        }
+    if not startTime or not endTime:
+        return {
+            "status": "VALIDATION_ERROR",
+            "approvalRequired": False,
+            "resultSummary": "Meeting startTime and endTime must both be explicitly provided.",
+            "confirmationToken": None,
+            "correlationId": corr_id,
+            "auditStatus": "REJECTED",
+            "warnings": ["Missing startTime or endTime."],
+        }
+    try:
+        dt_start = datetime.fromisoformat(startTime.replace("Z", "+00:00"))
+        dt_end = datetime.fromisoformat(endTime.replace("Z", "+00:00"))
+    except Exception as ex:
+        return {
+            "status": "VALIDATION_ERROR",
+            "approvalRequired": False,
+            "resultSummary": f"Invalid ISO 8601 meeting time format: {ex}",
+            "confirmationToken": None,
+            "correlationId": corr_id,
+            "auditStatus": "REJECTED",
+            "warnings": [str(ex)],
+        }
+    if dt_end <= dt_start:
+        return {
+            "status": "VALIDATION_ERROR",
+            "approvalRequired": False,
+            "resultSummary": f"Meeting endTime ({endTime}) must be strictly after startTime ({startTime}).",
+            "confirmationToken": None,
+            "correlationId": corr_id,
+            "auditStatus": "REJECTED",
+            "warnings": ["endTime must be after startTime."],
+        }
+
     client = Microsoft365Client(user_email=userEmail)
 
     resolved_att, unres_att, ext_att = client.resolve_recipients(attendees)
@@ -610,7 +676,7 @@ async def prepare_meeting_creation(
         warnings.append(f"Scheduling conflict detected for {len(conflicts_info.get('conflicts', []))} participant(s).")
 
     preview_data = {
-        "organizer": userEmail or "balaadm@velora.ae",
+        "organizer": userEmail or "unspecified@velora.ae",
         "subject": subject,
         "attendees": resolved_att,
         "startTime": startTime,

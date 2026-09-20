@@ -1,0 +1,8 @@
+{
+  "legacy_assertion_accepted_for_modified_request": {
+    "object_id": "alice-id",
+    "email": "bob@velora.ae",
+    "changed_method_path_body_accepted": true,
+    "unsigned_email_change_accepted": true
+  }
+}

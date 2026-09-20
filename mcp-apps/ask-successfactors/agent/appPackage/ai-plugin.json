@@ -1343,7 +1343,8 @@
                 "sf__get_org_units"
             ],
             "auth": {
-                "type": "None"
+                "type": "ApiKeyPluginVault",
+                "reference_id": "velora-sf-apikey"
             }
         }
     ]

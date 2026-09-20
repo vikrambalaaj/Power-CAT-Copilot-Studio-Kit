@@ -61,12 +61,36 @@ export class TemplateEvaluator {
       };
     }
 
+    if (request.ttlSeconds !== undefined) {
+      if (
+        typeof request.ttlSeconds !== "number" ||
+        !Number.isFinite(request.ttlSeconds) ||
+        !Number.isInteger(request.ttlSeconds) ||
+        request.ttlSeconds <= 0 ||
+        request.ttlSeconds > 86400
+      ) {
+        const latencyMs = Math.round(performance.now() - startTime);
+        return {
+          success: false,
+          templateUsed: templateId,
+          latencyMs,
+          fallback,
+          validation: {
+            valid: false,
+            errors: ["Invalid ttlSeconds: must be a finite positive integer <= 86400."],
+            payloadSizeBytes: 0,
+          },
+        };
+      }
+    }
+
     try {
       // 2. Generate signed one-time ticket token for idempotency
       const { ticketToken, actionIdPrefix } = this.signer.generateTicket(
         sessionId,
         templateId,
-        request.ttlSeconds || 3600
+        request.ttlSeconds || 3600,
+        request.data
       );
 
       // 3. Prepare data payload

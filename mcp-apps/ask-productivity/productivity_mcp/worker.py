@@ -34,6 +34,28 @@ from shared_mcp.kill_switch import check_kill_switch, KillSwitchActiveError
 from productivity_mcp.standing_authorization import get_standing_authorization_store
 
 
+def get_scoped_provider_client(base_client: Any, mailbox: str) -> Any:
+    """Obtains a provider client appropriately scoped to the given mailbox owner.
+    Prevents cross-mailbox disclosure where one client context is reused across multiple users.
+    """
+    if not mailbox:
+        raise ValueError("Mailbox is required to scope provider client.")
+
+    if getattr(base_client, "user_email", None) == mailbox:
+        return base_client
+
+    if isinstance(base_client, Microsoft365Client):
+        scoped = Microsoft365Client(user_email=mailbox)
+        scoped.graph_access_token = base_client.graph_access_token
+        scoped.force_mock = base_client.force_mock
+        return scoped
+
+    import copy
+    scoped = copy.copy(base_client)
+    scoped.user_email = mailbox
+    return scoped
+
+
 def evaluate_and_dispatch_subscriptions(
     client: Microsoft365Client,
     tenant_id: str = "velora-tenant",
@@ -61,11 +83,13 @@ def evaluate_and_dispatch_subscriptions(
         if not sub.enabled:
             continue
 
+        scoped_client = get_scoped_provider_client(client, sub.mailbox)
+
         # For PRE_MEETING, retrieve eligible calendar events (excluding cancelled)
         eligible_events = None
         if sub.kind == SubscriptionKind.PRE_MEETING:
             try:
-                raw_events = client.list_calendar_events()
+                raw_events = scoped_client.list_calendar_events()
                 eligible_events = [ev for ev in raw_events if not ev.get("isCancelled")]
             except Exception as ex:
                 log.error(f"failed_fetching_calendar_for_pre_meeting sub={sub.subscriptionId} error={ex}")
@@ -106,7 +130,7 @@ def evaluate_and_dispatch_subscriptions(
             subscription_version=sub.version,
             execution_id=execution_id,
             scheduled_occurrence=exec_ctx.get("scheduledOccurrence", ""),
-            details={"sub_id": sub.subscriptionId, "kind": sub.kind.value},
+            details={"sub_id": sub.subscriptionId, "kind": sub.kind.value, "mailbox": sub.mailbox},
         )
         if not claimed:
             log.info(f"subscription_run_claim_contested_or_already_taken run_key={run_key}")
@@ -118,23 +142,46 @@ def evaluate_and_dispatch_subscriptions(
             brief_content_hash = ""
 
             if sub.kind == SubscriptionKind.MORNING:
-                brief = briefing_svc.get_morning_briefing(client, user_email=sub.mailbox, reference_time=eval_now)
+                brief = briefing_svc.get_morning_briefing(scoped_client, user_email=sub.mailbox, reference_time=eval_now)
                 subject = f"Executive Daily Briefing | Velora Aviation Holding - {brief.get('date', '')}"
                 html_body = brief.get("renderedHtml", "")
                 brief_content_hash = brief.get("contentHash", "")
 
             elif sub.kind == SubscriptionKind.PRE_MEETING:
                 evt_id = exec_ctx.get("eventId")
-                brief = briefing_svc.get_pre_meeting_briefing(client, user_email=sub.mailbox, event_id=evt_id, reference_time=eval_now)
+                brief = briefing_svc.get_pre_meeting_briefing(scoped_client, user_email=sub.mailbox, event_id=evt_id, reference_time=eval_now)
                 subject = f"Pre-Meeting Briefing: {exec_ctx.get('eventSubject') or 'Executive Alignment'}"
                 html_body = brief.get("renderedHtml", "")
                 brief_content_hash = brief.get("contentHash", "")
 
             elif sub.kind == SubscriptionKind.EOD:
-                brief = briefing_svc.get_end_of_day_digest(client, user_email=sub.mailbox, local_schedule=sub.localSchedule, reference_time=eval_now)
+                brief = briefing_svc.get_end_of_day_digest(scoped_client, user_email=sub.mailbox, local_schedule=sub.localSchedule, reference_time=eval_now)
                 subject = f"Executive End-of-Day Digest | {brief.get('date', '')}"
                 html_body = brief.get("renderedHtml", "")
                 brief_content_hash = brief.get("contentHash", "")
+
+            elif sub.kind == SubscriptionKind.ACTION_REMINDER:
+                from productivity_mcp.meeting_actions import evaluate_meeting_action_reminders
+                reminders = evaluate_meeting_action_reminders(
+                    tenant_id=tenant_id,
+                    reference_time=eval_now,
+                    client=scoped_client,
+                )
+                actionable = [r for r in reminders if r.get("status") in ("OVERDUE", "DUE_SOON")]
+                if not actionable:
+                    log.info(f"no_actionable_reminders_due sub={sub.subscriptionId}")
+                    sub_service.complete_subscription_run(
+                        run_key=run_key,
+                        status="SKIPPED",
+                        details={"reason": "No pending action reminders due"},
+                        execution_id=execution_id,
+                    )
+                    continue
+
+                subject = f"Action Items Reminder | {len(actionable)} Pending Deliverables"
+                items_html = "".join([f"<li><b>{a.get('title')}</b>: {a.get('status')} (Due: {a.get('due')})</li>" for a in actionable])
+                html_body = f"<p>The following action items require your attention:</p><ul>{items_html}</ul>"
+                brief_content_hash = f"reminders-{len(actionable)}-{eval_now.strftime('%Y%m%d%H')}"
 
             else:
                 log.warning(f"unsupported_subscription_kind sub={sub.subscriptionId} kind={sub.kind}")
@@ -142,11 +189,28 @@ def evaluate_and_dispatch_subscriptions(
                     run_key=run_key,
                     status="FAILED",
                     details={"error": f"Unsupported subscription kind: {sub.kind}"},
+                    execution_id=execution_id,
                 )
                 continue
 
+            # Transition to SUBMITTING before external provider call to prevent blind duplicate retry on crash
+            if hasattr(sub_service, "transition_subscription_run"):
+                sub_service.transition_subscription_run(
+                    run_key=run_key,
+                    execution_id=execution_id,
+                    from_status="CLAIMED",
+                    to_status="SUBMITTING",
+                    details={
+                        "subject": subject,
+                        "contentHash": brief_content_hash,
+                        "kind": sub.kind.value,
+                        "recipients": sub.recipients,
+                        "mailbox": sub.mailbox,
+                    },
+                )
+
             # Dispatch via email channel and capture receipt
-            send_res = client.execute_send_email(
+            send_res = scoped_client.execute_send_email(
                 to=sub.recipients,
                 cc=[],
                 subject=subject,
@@ -163,7 +227,7 @@ def evaluate_and_dispatch_subscriptions(
             if not receipt and send_res.get("status") not in ("ACCEPTED", "SENT", "SUCCESS"):
                 raise RuntimeError(f"Subscription delivery failed: missing provider dispatch receipt. Response: {send_res}")
 
-            # Record run success atomically
+            # Record run success atomically with lease token match
             sub_service.complete_subscription_run(
                 run_key=run_key,
                 status="SUCCESS",
@@ -173,7 +237,9 @@ def evaluate_and_dispatch_subscriptions(
                     "kind": sub.kind.value,
                     "recipients": sub.recipients,
                     "providerReceipt": receipt,
+                    "mailbox": sub.mailbox,
                 },
+                execution_id=execution_id,
             )
             dispatched_count += 1
             log.info(f"subscription_dispatched_successfully run_key={run_key} sub_id={sub.subscriptionId}")
@@ -184,6 +250,7 @@ def evaluate_and_dispatch_subscriptions(
                 run_key=run_key,
                 status="FAILED",
                 details={"error": str(ex)},
+                execution_id=execution_id,
             )
 
     return dispatched_count

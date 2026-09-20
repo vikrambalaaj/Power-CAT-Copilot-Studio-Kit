@@ -815,7 +815,8 @@
                 "s4__get_profit_center_master"
             ],
             "auth": {
-                "type": "None"
+                "type": "ApiKeyPluginVault",
+                "reference_id": "velora-s4hana-apikey"
             }
         }
     ]

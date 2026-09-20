@@ -13,8 +13,10 @@ import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone, timedelta
+from decimal import Decimal
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+import concurrent.futures
 
 from .finance_snapshot_service import generate_finance_snapshot, evaluate_finance_snapshot
 from .institutional_memory import ingest_institutional_record, get_vendor_history
@@ -460,9 +462,9 @@ def ingest_vendor_performance_record(
     legal_hold: bool = False,
     tenant_id: str = "velora-tenant",
 ) -> Dict[str, Any]:
-    """Synchronous wrapper for MCP tool execution to ingest approved vendor performance record."""
+    """Synchronous/async wrapper for MCP tool execution to ingest approved vendor performance record."""
     import asyncio
-    return asyncio.run(ingest_institutional_record(
+    coro = ingest_institutional_record(
         vendor_id=vendor_id,
         vendor_name=vendor_name,
         entity_scope=entity_scope,
@@ -486,7 +488,17 @@ def ingest_vendor_performance_record(
         retention_policy=retention_policy,
         legal_hold=legal_hold,
         tenant_id=tenant_id,
-    ))
+    )
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(asyncio.run, coro).result()
+    else:
+        return asyncio.run(coro)
 
 
 def get_vendor_performance_history(
@@ -560,19 +572,22 @@ def export_decision_trail(
     version: Optional[str] = None,
     format: str = "JSON",
     caller_roles: Optional[List[str]] = None,
-    actor_object_id: str = "auditor-officer@velora.ae",
+    actor_object_id: Optional[str] = None,
     ttl_seconds: int = 3600,
     redacted_fields: Optional[List[str]] = None,
     db_path: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Export decision manifest with cryptographic signature and formula-safe CSV view."""
+    roles = caller_roles or []
+    if not any(r in ("AUDITOR", "Admin", "Velora_Admin", "GlobalAdmin") for r in roles):
+        raise PermissionError("Exporting decision trail requires AUDITOR or Administrator role.")
     return _export_decision_trail(
         decision_id=decision_id,
         tenant_id=tenant_id,
         version=version,
         export_format=format,
-        caller_roles=caller_roles or ["AUDITOR"],
-        actor_object_id=actor_object_id,
+        caller_roles=roles,
+        actor_object_id=actor_object_id or "unspecified",
         ttl_seconds=ttl_seconds,
         redacted_fields=redacted_fields,
         db_path=db_path,

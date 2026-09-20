@@ -193,7 +193,8 @@
                 "get_sac_model_data"
             ],
             "auth": {
-                "type": "None"
+                "type": "ApiKeyPluginVault",
+                "reference_id": "velora-sac-apikey"
             }
         }
     ]

@@ -17,6 +17,7 @@ const { values } = parseArgs({
         threshold: { type: 'string', default: '60' },
         output: { type: 'string' },
         'pdf-output': { type: 'string' },
+        'report-only': { type: 'boolean', default: false },
     },
 });
 function parseThreshold(value) {
@@ -77,6 +78,9 @@ if (validOutputs.length === 0) {
         errors: ['No evaluatable agent content was found in the Stage A output'],
     };
     writeResult(emptyResult);
+    if (!values['report-only']) {
+        process.exit(1);
+    }
     process.exit(0);
 }
 const { CLIENT_ID, TENANT_ID, CLIENT_SECRET } = process.env;
@@ -151,4 +155,8 @@ if (values['pdf-output']) {
     catch (err) {
         console.error(`PDF generation failed: ${err instanceof Error ? err.message : err}`);
     }
+}
+if (!values['report-only'] && !allPassed) {
+    console.error(`Quality gate failed: lowest score ${lowestScore} < threshold ${threshold} or stage errors present.`);
+    process.exit(1);
 }

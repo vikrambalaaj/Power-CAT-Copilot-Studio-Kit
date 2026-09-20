@@ -1,0 +1,12 @@
+{
+  "memory": {
+    "status": 401,
+    "provider_calls": 0,
+    "provider_args": null
+  },
+  "consent": {
+    "status": 401,
+    "provider_calls": 0,
+    "provider_kwargs": null
+  }
+}

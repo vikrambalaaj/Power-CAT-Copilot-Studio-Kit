@@ -1,0 +1,23 @@
+{
+  "processExitCode": 0,
+  "output": {
+    "agents": [],
+    "overall": {
+      "passed": false,
+      "lowestScore": 0,
+      "threshold": 60,
+      "agentCount": 0
+    },
+    "scores": {
+      "passed": false,
+      "overallScore": 0,
+      "threshold": 60,
+      "patternScore": 0,
+      "instructionScore": 0
+    },
+    "reportUrl": "",
+    "errors": [
+      "No evaluatable agent content was found in the Stage A output"
+    ]
+  }
+}

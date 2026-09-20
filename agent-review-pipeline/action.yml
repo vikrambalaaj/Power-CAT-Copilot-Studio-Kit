@@ -108,13 +108,15 @@ runs:
         GITHUB_SERVER_URL: ${{ github.server_url }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_RUN_ID: ${{ github.run_id }}
+        THRESHOLD_INPUT: ${{ inputs.threshold }}
       run: |
         node dist/evaluate.js \
           --stage-a "${{ steps.stage-a.outputs.stage_a_path }}" \
           --dataverse-host "${{ steps.download.outputs.dataverse_host }}" \
-          --threshold "${{ inputs.threshold }}" \
+          --threshold "${THRESHOLD_INPUT:-60}" \
           --output "${GITHUB_WORKSPACE}/evaluation-result.json" \
-          --pdf-output "${GITHUB_WORKSPACE}/agent-review-report.pdf"
+          --pdf-output "${GITHUB_WORKSPACE}/agent-review-report.pdf" \
+          --report-only
         RESULT=$(cat "${GITHUB_WORKSPACE}/evaluation-result.json")
         echo "result<<EOF" >> "$GITHUB_OUTPUT"
         echo "$RESULT" >> "$GITHUB_OUTPUT"
@@ -163,3 +165,13 @@ runs:
         printf '%s' "$PAYLOAD" | curl --fail-with-body --show-error --silent --retry 3 -X POST "$CALLBACK_URL" \
           "${HEADERS[@]}" \
           --data-binary @-
+
+    - name: Enforce Quality Gate
+      shell: bash
+      env:
+        PASSED: ${{ steps.evaluate.outputs.passed }}
+      run: |
+        if [ "$PASSED" != "true" ]; then
+          echo "::error::Agent review failed quality gate (passed=${PASSED})"
+          exit 1
+        fi

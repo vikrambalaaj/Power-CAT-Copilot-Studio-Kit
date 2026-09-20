@@ -8,12 +8,13 @@ services:
     image: velora-mcp-sf:latest
     container_name: velora-mcp-sf
     ports:
-      - "8082:8082"
+      - "127.0.0.1:8082:8082"
     environment:
       - PORT=8082
-      - ALLOW_ANONYMOUS=true
-      - ALLOWED_HOSTS=*
-      - CORS_ORIGINS=*
+      - ALLOW_ANONYMOUS=false
+      - MCP_API_KEY=${MCP_API_KEY:-velora-local-dev-api-key}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,testserver
+      - CORS_ORIGINS=http://localhost:*,http://127.0.0.1:*
       - LOG_LEVEL=INFO
     restart: unless-stopped
 
@@ -24,12 +25,13 @@ services:
     image: velora-mcp-s4hana:latest
     container_name: velora-mcp-s4hana
     ports:
-      - "8083:8083"
+      - "127.0.0.1:8083:8083"
     environment:
       - PORT=8083
-      - ALLOW_ANONYMOUS=true
-      - ALLOWED_HOSTS=*
-      - CORS_ORIGINS=*
+      - ALLOW_ANONYMOUS=false
+      - MCP_API_KEY=${MCP_API_KEY:-velora-local-dev-api-key}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,testserver
+      - CORS_ORIGINS=http://localhost:*,http://127.0.0.1:*
       - LOG_LEVEL=INFO
     restart: unless-stopped
 
@@ -40,12 +42,13 @@ services:
     image: velora-mcp-sac:latest
     container_name: velora-mcp-sac
     ports:
-      - "8084:8084"
+      - "127.0.0.1:8084:8084"
     environment:
       - PORT=8084
-      - ALLOW_ANONYMOUS=true
-      - ALLOWED_HOSTS=*
-      - CORS_ORIGINS=*
+      - ALLOW_ANONYMOUS=false
+      - MCP_API_KEY=${MCP_API_KEY:-velora-local-dev-api-key}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,testserver
+      - CORS_ORIGINS=http://localhost:*,http://127.0.0.1:*
       - LOG_LEVEL=INFO
     restart: unless-stopped
 
@@ -56,12 +59,12 @@ services:
     image: velora-mcp-facilitator:latest
     container_name: velora-mcp-facilitator
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       - PORT=8080
-      - ALLOW_ANONYMOUS=true
-      - ALLOWED_HOSTS=*
-      - CORS_ORIGINS=*
+      - ALLOW_ANONYMOUS=false
+      - ALLOWED_HOSTS=localhost,127.0.0.1,testserver
+      - CORS_ORIGINS=http://localhost:*,http://127.0.0.1:*
       - LOG_LEVEL=INFO
     restart: unless-stopped
 
@@ -72,10 +75,9 @@ services:
     image: velora-mcp-card-service:latest
     container_name: velora-mcp-card-service
     ports:
-      - "8085:8080"
+      - "127.0.0.1:8085:8080"
     environment:
       - PORT=8080
       - NODE_ENV=production
       - TOKEN_SIGNING_SECRET=${TOKEN_SIGNING_SECRET:?TOKEN_SIGNING_SECRET must be explicitly set}
     restart: unless-stopped
-

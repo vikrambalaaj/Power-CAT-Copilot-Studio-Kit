@@ -9,3 +9,5 @@ pydantic-settings>=2.0.0
 tenacity>=8.3.0
 cryptography>=46.0.5
 psycopg2-binary>=2.9.9
+rich>=13.7.0
+pyjwt>=2.8.0

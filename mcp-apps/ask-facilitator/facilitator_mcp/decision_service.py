@@ -169,18 +169,19 @@ async def evaluate_vendor_options(
         # Parse Technical Score
         raw_tech = c.get("technical_score")
         tech_score = Decimal(str(raw_tech)) if raw_tech is not None else None
-        tech_ref = c.get("technical_source_ref") or f"DOC-TECH-{v_id}"
-        input_snapshot_ids.append(tech_ref)
+        tech_source_provided = bool(c.get("technical_source_ref"))
+        tech_ref = c.get("technical_source_ref") if tech_source_provided else "USER_PROVIDED"
+        input_snapshot_ids.append(f"INP-TECH-{v_id}" if not tech_source_provided else tech_ref)
 
         sources.append(
             EvidenceSource(
                 sourceId=f"SRC-TECH-{v_id}",
-                system="RFP_TECHNICAL_EVALUATION",
-                businessTitle=f"Engineering Audit Scorecard for {v_name}",
+                system="RFP_TECHNICAL_EVALUATION" if tech_source_provided else "USER_INPUT",
+                businessTitle=f"Engineering Audit Scorecard for {v_name}" if tech_source_provided else f"Unverified Technical Input for {v_name}",
                 providerRecordId=tech_ref,
                 retrievedAt=datetime.now(timezone.utc).isoformat(),
                 scope=caller_entity_scopes[0] if caller_entity_scopes else "1000",
-                limitations=["Certified technical audit by engineering evaluation panel."],
+                limitations=["Certified technical audit by engineering evaluation panel."] if tech_source_provided else ["Unverified caller-supplied technical score without formal audit scorecard document."],
             )
         )
 
@@ -191,19 +192,20 @@ async def evaluate_vendor_options(
         price_tax = str(c.get("commercial_tax_basis", "EXCLUDING_VAT")).upper()
         price_term = str(c.get("commercial_term_basis", "ANNUALIZED")).upper()
         price_scope = str(c.get("commercial_scope", caller_entity_scopes[0] if caller_entity_scopes else "1000"))
-        comm_ref = c.get("commercial_source_ref") or f"DOC-COMM-{v_id}"
-        input_snapshot_ids.append(comm_ref)
+        comm_source_provided = bool(c.get("commercial_source_ref"))
+        comm_ref = c.get("commercial_source_ref") if comm_source_provided else "USER_PROVIDED"
+        input_snapshot_ids.append(f"INP-COMM-{v_id}" if not comm_source_provided else comm_ref)
 
         sources.append(
             EvidenceSource(
                 sourceId=f"SRC-COMM-{v_id}",
-                system="COMMERCIAL_PROPOSAL",
-                businessTitle=f"Formal Commercial Tender Proposal for {v_name}",
+                system="COMMERCIAL_PROPOSAL" if comm_source_provided else "USER_INPUT",
+                businessTitle=f"Formal Commercial Tender Proposal for {v_name}" if comm_source_provided else f"Unverified Commercial Offer for {v_name}",
                 providerRecordId=comm_ref,
                 retrievedAt=datetime.now(timezone.utc).isoformat(),
                 scope=price_scope,
                 currency=price_curr,
-                limitations=[f"{price_term} fixed commercial offer, {price_tax}."],
+                limitations=[f"{price_term} fixed commercial offer, {price_tax}."] if comm_source_provided else [f"{price_term} unverified commercial input, {price_tax}. Missing formal proposal."],
             )
         )
 
@@ -290,9 +292,21 @@ async def evaluate_vendor_options(
     else:
         final_rank = [r.vendor_id for r in scoring_results]
 
+    # Check if any caller input is unverified
+    has_unverified_inputs = any(
+        c.technical_source_ref == "USER_PROVIDED" or c.commercial_source_ref == "USER_PROVIDED"
+        for c in candidate_inputs
+    )
+    if has_unverified_inputs and "Unverified caller-provided inputs present without formal evidence citations; confidence degraded to LOW." not in eval_warnings:
+        eval_warnings.append("Unverified caller-provided inputs present without formal evidence citations; confidence degraded to LOW.")
+
     # 6. Generate Auditable MaterialClaims
     claims: List[MaterialClaim] = []
     for res in scoring_results:
+        cand_input = next((c for c in candidate_inputs if c.vendor_id == res.vendor_id), None)
+        tech_verified = bool(cand_input and cand_input.technical_source_ref != "USER_PROVIDED")
+        comm_verified = bool(cand_input and cand_input.commercial_source_ref != "USER_PROVIDED")
+
         # Technical claim
         t_val = res.raw_values.get("TECH_COMPETENCE")
         if t_val is not None:
@@ -300,22 +314,22 @@ async def evaluate_vendor_options(
                 MaterialClaim(
                     claimId=f"CLM-TECH-{res.vendor_id}",
                     kind=ClaimKind.FACT,
-                    text=f"{res.vendor_name} achieved technical audit score of {t_val} / 100.",
+                    text=f"{res.vendor_name} achieved technical score of {t_val} / 100." if tech_verified else f"{res.vendor_name} reported unverified technical input of {t_val} / 100.",
                     numericValue=t_val,
                     unit="POINTS_0_100",
                     sourceIds=[f"SRC-TECH-{res.vendor_id}"],
                     calculationVersion=policy.version,
                     policyVersion=policy.version,
                     confidenceAssessment=ConfidenceAssessment(
-                        label=ConfidenceLabel.HIGH,
+                        label=ConfidenceLabel.HIGH if tech_verified else ConfidenceLabel.LOW,
                         frameworkVersion="1.0.0",
-                        sourceReliability="AUTHORITATIVE",
-                        corroboration="VERIFIED",
+                        sourceReliability="AUTHORITATIVE" if tech_verified else "USER_PROVIDED",
+                        corroboration="VERIFIED" if tech_verified else "UNVERIFIED",
                         timeliness="CURRENT",
-                        completeness="COMPLETE",
-                        comparability="COMPARABLE",
-                        reason="Verified formal engineering audit scorecard.",
-                        limitingFactors=[],
+                        completeness="COMPLETE" if tech_verified else "INCOMPLETE",
+                        comparability="COMPARABLE" if tech_verified else "UNVERIFIED",
+                        reason="Verified formal engineering audit scorecard." if tech_verified else "Unverified user input without referenced technical audit scorecard.",
+                        limitingFactors=[] if tech_verified else ["CALLER_SUPPLIED_DATA", "MISSING_SOURCE_DOCUMENT"],
                     ),
                 )
             )
@@ -327,7 +341,7 @@ async def evaluate_vendor_options(
                 MaterialClaim(
                     claimId=f"CLM-COMM-{res.vendor_id}",
                     kind=ClaimKind.FACT,
-                    text=f"{res.vendor_name} submitted annualized commercial proposal of {p_val} AED.",
+                    text=f"{res.vendor_name} submitted annualized commercial proposal of {p_val} AED." if comm_verified else f"{res.vendor_name} reported unverified commercial price of {p_val} AED.",
                     numericValue=p_val,
                     currency="AED",
                     unit="AED",
@@ -335,15 +349,15 @@ async def evaluate_vendor_options(
                     calculationVersion=policy.version,
                     policyVersion=policy.version,
                     confidenceAssessment=ConfidenceAssessment(
-                        label=ConfidenceLabel.HIGH,
+                        label=ConfidenceLabel.HIGH if comm_verified else ConfidenceLabel.LOW,
                         frameworkVersion="1.0.0",
-                        sourceReliability="AUTHORITATIVE",
-                        corroboration="VERIFIED",
+                        sourceReliability="AUTHORITATIVE" if comm_verified else "USER_PROVIDED",
+                        corroboration="VERIFIED" if comm_verified else "UNVERIFIED",
                         timeliness="CURRENT",
-                        completeness="COMPLETE",
-                        comparability="COMPARABLE",
-                        reason="Formal signed tender proposal in AED excluding VAT.",
-                        limitingFactors=[],
+                        completeness="COMPLETE" if comm_verified else "INCOMPLETE",
+                        comparability="COMPARABLE" if comm_verified else "UNVERIFIED",
+                        reason="Formal signed tender proposal in AED excluding VAT." if comm_verified else "Unverified user input without referenced commercial tender proposal.",
+                        limitingFactors=[] if comm_verified else ["CALLER_SUPPLIED_DATA", "MISSING_SOURCE_DOCUMENT"],
                     ),
                 )
             )

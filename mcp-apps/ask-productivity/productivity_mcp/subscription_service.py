@@ -24,7 +24,19 @@ class SubscriptionService:
     """Thread-safe persistent store and lifecycle manager for AutomationSubscriptions."""
 
     def __init__(self, db_path: Optional[str] = None):
-        self.db_path = db_path or os.getenv("VELORA_SUBSCRIPTION_DB", "/tmp/velora_subscriptions.db")
+        if not db_path:
+            configured = os.getenv("VELORA_SUBSCRIPTION_DB")
+            if configured:
+                db_path = configured
+            else:
+                base_dir = (
+                    os.getenv("AZURE_STORAGE_MOUNT_PATH")
+                    or os.getenv("VELORA_STATE_DIR")
+                    or os.getenv("VELORA_STORAGE_DIR")
+                    or "/tmp"
+                )
+                db_path = os.path.join(base_dir, "velora_subscriptions.db")
+        self.db_path = db_path
         self._init_db()
 
     def _init_db(self) -> None:
@@ -286,18 +298,18 @@ class SubscriptionService:
             if not row:
                 return False
             status, executed_at = row
-            if status == "CLAIMED":
+            if status in ("CLAIMED", "SUBMITTING"):
                 # Check for crashed worker (stale claim > 10 minutes)
                 try:
                     claimed_dt = datetime.fromisoformat(executed_at)
                     if (now - claimed_dt).total_seconds() > 600:
-                        cursor.execute("UPDATE subscription_run_history SET status = 'EXPIRED_CLAIM' WHERE run_key = ?", (run_key,))
+                        cursor.execute("UPDATE subscription_run_history SET status = 'RECONCILIATION_REQUIRED' WHERE run_key = ?", (run_key,))
                         conn.commit()
-                        return False
+                        return True
                 except Exception:
                     pass
                 return True
-            return status in ("SUCCESS", "FAILED")
+            return status in ("SUCCESS", "FAILED", "RECONCILIATION_REQUIRED")
 
     def claim_subscription_run(
         self,
@@ -327,11 +339,11 @@ class SubscriptionService:
                 return True
             except sqlite3.IntegrityError:
                 # Contest detected or already claimed/run. Check if existing row was an expired claim or crashed worker.
-                cursor.execute("SELECT status, details_json FROM subscription_run_history WHERE run_key = ?", (run_key,))
+                cursor.execute("SELECT status, details_json, execution_id, executed_at FROM subscription_run_history WHERE run_key = ?", (run_key,))
                 row = cursor.fetchone()
                 if row:
-                    curr_status, curr_details_raw = row
-                    if curr_status in ("SUCCESS", "FAILED"):
+                    curr_status, curr_details_raw, curr_exec_id, curr_exec_at = row
+                    if curr_status in ("SUCCESS", "FAILED", "RECONCILIATION_REQUIRED"):
                         return False
                     # Reconcile potentially submitted messages before retrying to prevent duplicate sends
                     if curr_details_raw:
@@ -345,49 +357,82 @@ class SubscriptionService:
                         except Exception:
                             pass
 
-                # Atomically claim expired pre-submission claim
-                cursor.execute("""
-                    UPDATE subscription_run_history
-                    SET status = 'CLAIMED',
-                        execution_id = ?,
-                        executed_at = ?,
-                        details_json = ?
-                    WHERE run_key = ? AND (
-                        status = 'EXPIRED_CLAIM'
-                        OR (status = 'CLAIMED' AND datetime(executed_at) <= datetime(?, '-600 seconds'))
-                    )
-                """, (
-                    execution_id, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key, now_iso
-                ))
-                if cursor.rowcount > 0:
-                    conn.commit()
-                    return True
+                    # If status is SUBMITTING or expired CLAIMED (>600s), transition to RECONCILIATION_REQUIRED.
+                    # Do NOT blindly reclaim without provider reconciliation!
+                    try:
+                        exec_dt = datetime.fromisoformat(curr_exec_at)
+                        is_stale = (datetime.now(timezone.utc) - exec_dt).total_seconds() > 600
+                    except Exception:
+                        is_stale = True
+
+                    if curr_status == "SUBMITTING" or is_stale:
+                        cursor.execute("UPDATE subscription_run_history SET status = 'RECONCILIATION_REQUIRED' WHERE run_key = ?", (run_key,))
+                        conn.commit()
+                        return False
+
                 return False
 
-    def complete_subscription_run(
+    def transition_subscription_run(
         self,
         run_key: str,
-        status: str,
+        execution_id: str,
+        from_status: str,
+        to_status: str,
         details: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        """Update a claimed subscription run to final status (SUCCESS, FAILED) with provider receipts."""
+    ) -> bool:
+        """Atomically transition a subscription run between states (e.g. CLAIMED -> SUBMITTING)."""
         now_iso = datetime.now(timezone.utc).isoformat()
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE subscription_run_history
                 SET status = ?, executed_at = ?, details_json = ?
-                WHERE run_key = ?
+                WHERE run_key = ? AND execution_id = ? AND status = ?
             """, (
-                status, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key,
+                to_status, now_iso, json.dumps(details or {}, default=decimal_serializer),
+                run_key, execution_id, from_status
             ))
-            if status == "SUCCESS":
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def complete_subscription_run(
+        self,
+        run_key: str,
+        status: str,
+        details: Optional[Dict[str, Any]] = None,
+        execution_id: Optional[str] = None,
+    ) -> bool:
+        """Update a claimed subscription run to final status (SUCCESS, FAILED) with provider receipts.
+        Requires execution_id match if provided to ensure stale workers cannot overwrite newer leases.
+        """
+        now_iso = datetime.now(timezone.utc).isoformat()
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            if execution_id:
+                cursor.execute("""
+                    UPDATE subscription_run_history
+                    SET status = ?, executed_at = ?, details_json = ?
+                    WHERE run_key = ? AND execution_id = ?
+                """, (
+                    status, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key, execution_id
+                ))
+            else:
+                cursor.execute("""
+                    UPDATE subscription_run_history
+                    SET status = ?, executed_at = ?, details_json = ?
+                    WHERE run_key = ?
+                """, (
+                    status, now_iso, json.dumps(details or {}, default=decimal_serializer), run_key,
+                ))
+            updated = cursor.rowcount > 0
+            if updated and status == "SUCCESS":
                 cursor.execute("""
                     UPDATE automation_subscriptions
                     SET last_run_at = ?
                     WHERE subscription_id = (SELECT subscription_id FROM subscription_run_history WHERE run_key = ?)
                 """, (now_iso, run_key))
             conn.commit()
+            return updated
 
     def record_subscription_run(
         self,

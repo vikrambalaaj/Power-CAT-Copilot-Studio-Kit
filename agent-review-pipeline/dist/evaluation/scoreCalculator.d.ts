@@ -18,12 +18,14 @@ export interface ScoreResult {
 /**
  * Calculate pattern score from Stage B output.
  * Formula: (passing / total) × 100
+ * Any nameless pattern invalidates the evaluation and scores 0.
  */
 export declare function calculatePatternScore(evaluation?: PatternEvaluation): number;
 /**
  * Calculate instruction compliance score from Stage C output.
  * Uses severity-weighted scoring (High=3, Medium=2, Low=1).
  * A criterion passes if no issue ID starts with its prefix.
+ * Any unknown criterion issue ID invalidates the evaluation and scores 0.
  */
 export declare function calculateInstructionScore(evaluation?: InstructionEvaluation): number;
 export interface ScoreCalculationOptions {

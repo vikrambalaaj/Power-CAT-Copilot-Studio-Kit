@@ -828,7 +828,7 @@
                 "ingest_chat_to_knowledge_graph"
             ],
             "auth": {
-                "type": "None"
+                "type": "OAuth2ClientCredentials"
             }
         }
     ]

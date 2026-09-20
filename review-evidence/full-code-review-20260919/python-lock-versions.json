@@ -1,0 +1,34 @@
+[
+  {
+    "path": "mcp-apps/ask-facilitator/uv.lock",
+    "packages": {
+      "cryptography": "50.0.1",
+      "mcp": "2.2.0",
+      "pyjwt": "2.14.0"
+    }
+  },
+  {
+    "path": "mcp-apps/ask-successfactors/uv.lock",
+    "packages": {
+      "cryptography": "50.0.1",
+      "mcp": "2.2.0",
+      "pyjwt": "2.13.0"
+    }
+  },
+  {
+    "path": "mcp-apps/ask-s4hana/uv.lock",
+    "packages": {
+      "cryptography": "50.0.1",
+      "mcp": "2.2.0",
+      "pyjwt": "2.13.0"
+    }
+  },
+  {
+    "path": "mcp-apps/ask-productivity/uv.lock",
+    "packages": {
+      "cryptography": "50.0.1",
+      "mcp": "2.2.0",
+      "pyjwt": "2.13.0"
+    }
+  }
+]

@@ -143,14 +143,32 @@ async def connector_spec() -> Dict[str, Any]:
 
 
 @app.get("/health")
-async def health_check() -> Dict[str, Any]:
-    return {
-        "status": "HEALTHY",
+async def health_check(request: Request = None) -> Any:
+    from fastapi.responses import JSONResponse
+    is_prod = (
+        os.getenv("VELORA_ENV", "").lower() == "production"
+        or os.getenv("ENVIRONMENT", "").lower() == "production"
+        or os.getenv("NODE_ENV", "").lower() == "production"
+    )
+    has_approval_secret = bool(os.getenv("VELORA_APPROVAL_HMAC_SECRET"))
+    is_ready = True
+    readiness_reason = "Ready"
+    if is_prod and not has_approval_secret:
+        is_ready = False
+        readiness_reason = "Missing required VELORA_APPROVAL_HMAC_SECRET"
+
+    payload = {
+        "status": "HEALTHY" if is_ready else "DEGRADED",
+        "ready": is_ready,
+        "readiness_reason": readiness_reason,
         "service": "Velora Productivity Agent",
         "version": "1.0.0",
         "capabilities": ["Mail", "Calendar", "Teams", "Planner", "WorkIQ", "DataverseAudit"],
         "audit_table": "cre2f_veloraagentauditlog",
     }
+    if not is_ready:
+        return JSONResponse(payload, status_code=503)
+    return payload
 
 
 # --- Hand-off Router Endpoint (Section 12 & 13) ---
@@ -179,11 +197,27 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
                 method=raw_request.method,
                 path=raw_request.url.path,
                 body=body_bytes,
-                require_user_principal=True,
+                require_user_principal=False,
             )
-            verify_body_identity_binding(identity, body_user_id=request.userObjectId, body_email=request.userEmail)
-            uid = identity.object_id
-            email = identity.display_email or request.userEmail or "executive@velora.ae"
+            if identity.is_user:
+                verify_body_identity_binding(identity, body_user_id=request.userObjectId, body_email=request.userEmail)
+                uid = identity.object_id
+                email = identity.display_email or request.userEmail or "executive@velora.ae"
+            else:
+                uid = identity.object_id
+                email = identity.display_email or request.userEmail or "workload@velora.ae"
+
+            # Enforce tenant matching to prevent cross-tenant parameter forgery
+            if request.tenantId and request.tenantId.strip() != identity.tenant_id:
+                raise AuthorizationError(
+                    f"Request body tenantId '{request.tenantId}' does not match token tenantId '{identity.tenant_id}'"
+                )
+            if request.parameters and isinstance(request.parameters, dict):
+                p_tid = request.parameters.get("tenantId")
+                if p_tid and p_tid.strip() != identity.tenant_id:
+                    raise AuthorizationError(
+                        f"Parameters tenantId '{p_tid}' does not match token tenantId '{identity.tenant_id}'"
+                    )
         except AuthenticationError as exc:
             raise HTTPException(status_code=401, detail=exc.message)
         except AuthorizationError as exc:
@@ -239,8 +273,19 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
             )
 
         elif op in ("PREPARE_EMAIL", "PREPAREEMAIL"):
+            to_val = params.get("recipientNames") or params.get("to")
+            if not to_val:
+                return HandoffResponse(
+                    status="VALIDATION_ERROR",
+                    approvalRequired=False,
+                    resultSummary="Missing required field: recipients ('to' or 'recipientNames') must be explicitly provided.",
+                    correlationId=corr_id,
+                    warnings=["Recipients were not provided."],
+                )
+            if isinstance(to_val, str):
+                to_val = [r.strip() for r in to_val.split(",") if r.strip()]
             res = await prepare_email(
-                to=params.get("recipientNames") or params.get("to") or ["financeleadership@velora.ae"],
+                to=to_val,
                 subject=params.get("subject", "Executive Follow-up"),
                 body=params.get("body", params.get("bodySource", "")),
                 cc=params.get("cc"),
@@ -284,11 +329,32 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
             )
 
         elif op in ("PREPARE_MEETING_CREATION", "PREPAREMEETING"):
+            att_val = params.get("attendees")
+            if not att_val:
+                return HandoffResponse(
+                    status="VALIDATION_ERROR",
+                    approvalRequired=False,
+                    resultSummary="Missing required field: 'attendees' must be explicitly provided.",
+                    correlationId=corr_id,
+                    warnings=["Meeting attendees were not provided."],
+                )
+            if isinstance(att_val, str):
+                att_val = [a.strip() for a in att_val.split(",") if a.strip()]
+            start_time = params.get("startTime")
+            end_time = params.get("endTime")
+            if not start_time or not end_time:
+                return HandoffResponse(
+                    status="VALIDATION_ERROR",
+                    approvalRequired=False,
+                    resultSummary="Missing required fields: 'startTime' and 'endTime' must be explicitly provided.",
+                    correlationId=corr_id,
+                    warnings=["Meeting startTime or endTime was not provided."],
+                )
             res = await prepare_meeting_creation(
                 subject=params.get("subject", "Executive Strategy Alignment"),
-                attendees=params.get("attendees", ["leadership@velora.ae"]),
-                startTime=params.get("startTime", "2026-08-27T10:00:00Z"),
-                endTime=params.get("endTime", "2026-08-27T11:00:00Z"),
+                attendees=att_val,
+                startTime=start_time,
+                endTime=end_time,
                 timeZone=request.userTimezone or "Asia/Dubai",
                 location=params.get("location", "Microsoft Teams Meeting"),
                 body=params.get("body", ""),
@@ -582,16 +648,29 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
             )
 
         elif op in ("EVALUATE_VERIFIED_KPI_SNAPSHOT", "EVALUATEVERIFIEDKPISNAPSHOT"):
+            is_workload = (
+                (identity and identity.principal_type == "application")
+                or (identity and "WORKLOAD_AUTHORIZED" in identity.roles)
+                or (identity and "Velora_Admin" in identity.roles)
+                or (identity and "Admin" in identity.roles)
+                or (identity and "KPI.Ingest" in identity.scopes)
+            )
+            if not is_workload:
+                raise HTTPException(
+                    status_code=403,
+                    detail="EVALUATE_VERIFIED_KPI_SNAPSHOT requires workload-authorized identity or KPI.Ingest application permission",
+                )
             snap_payload = params.get("snapshot") or params
+            effective_tenant = identity.tenant_id if identity else (getattr(request, "tenantId", None) or "velora-tenant")
             res = await evaluate_verified_kpi_snapshot(
                 snapshot=snap_payload,
-                caller_role=params.get("callerRole", "WORKLOAD_AUTHORIZED"),
+                caller_role="WORKLOAD_AUTHORIZED",
                 rootCorrelationId=corr_id,
                 conversationId=conv_id,
                 turnId=turn_id,
                 userObjectId=uid,
                 userEmail=email,
-                tenantId=getattr(request, "tenantId", None) or params.get("tenantId") or "velora-tenant",
+                tenantId=effective_tenant,
             )
             return HandoffResponse(
                 status=res["status"],

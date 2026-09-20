@@ -7,10 +7,16 @@ import { COMPLIANCE_CRITERIA, SEVERITY_POINTS, MAX_INSTRUCTION_POINTS, DEFAULT_T
 /**
  * Calculate pattern score from Stage B output.
  * Formula: (passing / total) × 100
+ * Any nameless pattern invalidates the evaluation and scores 0.
  */
 export function calculatePatternScore(evaluation) {
     if (!evaluation?.Patterns?.length)
         return 0;
+    for (const p of evaluation.Patterns) {
+        if (!p.PatternName || typeof p.PatternName !== 'string' || p.PatternName.trim().length === 0) {
+            return 0;
+        }
+    }
     const total = evaluation.Patterns.length;
     const passing = evaluation.Patterns.filter((p) => p.Status === true).length;
     return Math.round((passing / total) * 100);
@@ -19,6 +25,7 @@ export function calculatePatternScore(evaluation) {
  * Calculate instruction compliance score from Stage C output.
  * Uses severity-weighted scoring (High=3, Medium=2, Low=1).
  * A criterion passes if no issue ID starts with its prefix.
+ * Any unknown criterion issue ID invalidates the evaluation and scores 0.
  */
 export function calculateInstructionScore(evaluation) {
     if (!evaluation?.issues)
@@ -26,6 +33,14 @@ export function calculateInstructionScore(evaluation) {
     // Missing instructions = all criteria fail = 0%
     if (evaluation.issues.some((i) => i.id === 'missing-instruction-input'))
         return 0;
+    for (const i of evaluation.issues) {
+        if (!i.id || typeof i.id !== 'string' || !i.id.trim())
+            return 0;
+        const isValid = i.id === 'missing-instruction-input' ||
+            COMPLIANCE_CRITERIA.some((c) => i.id === c.id || i.id.startsWith(c.id));
+        if (!isValid)
+            return 0;
+    }
     const issueIds = evaluation.issues.map((i) => i.id);
     const earnedPoints = COMPLIANCE_CRITERIA.reduce((sum, criterion) => {
         const failed = issueIds.some((id) => id.startsWith(criterion.id));

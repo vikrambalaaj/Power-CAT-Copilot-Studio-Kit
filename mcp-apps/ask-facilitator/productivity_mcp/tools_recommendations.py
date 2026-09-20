@@ -80,8 +80,10 @@ async def evaluate_verified_kpi_snapshot(
 
     # 1. Parse and validate snapshot
     if isinstance(snapshot, dict):
-        val_raw = snapshot.get("value") or snapshot.get("metric_value")
-        if val_raw is None:
+        has_val = "value" in snapshot and snapshot["value"] is not None
+        has_metric = "metric_value" in snapshot and snapshot["metric_value"] is not None
+
+        if not has_val and not has_metric:
             return {
                 "status": "VALIDATION_ERROR",
                 "resultSummary": "Missing required metric value in KPI snapshot payload.",
@@ -89,8 +91,40 @@ async def evaluate_verified_kpi_snapshot(
                 "recommendations": [],
                 "warnings": ["Missing 'value' field in snapshot dictionary."],
             }
+
+        if has_val and has_metric:
+            val_a = snapshot["value"]
+            val_b = snapshot["metric_value"]
+            if str(val_a).strip() != str(val_b).strip():
+                return {
+                    "status": "VALIDATION_ERROR",
+                    "resultSummary": f"Conflicting metric values provided: value='{val_a}' vs metric_value='{val_b}'",
+                    "correlationId": corr_id,
+                    "recommendations": [],
+                    "warnings": ["Conflicting 'value' and 'metric_value' fields in snapshot."],
+                }
+            val_raw = val_a
+        elif has_val:
+            val_raw = snapshot["value"]
+        else:
+            val_raw = snapshot["metric_value"]
+
+        if isinstance(val_raw, bool):
+            return {
+                "status": "VALIDATION_ERROR",
+                "resultSummary": f"Invalid metric value: boolean not permitted ({val_raw})",
+                "correlationId": corr_id,
+                "recommendations": [],
+                "warnings": ["Metric value cannot be boolean."],
+            }
+
         try:
-            val_dec = Decimal(str(val_raw))
+            val_str = str(val_raw).strip()
+            if val_str.lower() in {"nan", "inf", "-inf", "+inf", "infinity", "-infinity", "+infinity"}:
+                raise ValueError(f"Non-finite value '{val_raw}' is not allowed.")
+            val_dec = Decimal(val_str)
+            if not val_dec.is_finite():
+                raise ValueError(f"Non-finite value '{val_raw}' is not allowed.")
         except Exception as ex:
             return {
                 "status": "VALIDATION_ERROR",

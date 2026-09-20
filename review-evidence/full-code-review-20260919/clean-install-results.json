@@ -1,0 +1,12 @@
+[
+  {
+    "name": "cards",
+    "exit": 0,
+    "scripts": "disabled"
+  },
+  {
+    "name": "pipeline",
+    "exit": 0,
+    "scripts": "disabled"
+  }
+]

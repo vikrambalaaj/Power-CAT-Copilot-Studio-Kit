@@ -8,6 +8,7 @@ export interface TicketPayload {
   templateId: string;
   issuedAt: number;
   expiresAt: number;
+  dataHash?: string;
 }
 
 export class IdempotencySigner {
@@ -47,12 +48,16 @@ export class IdempotencySigner {
 
   constructor(secretKey?: string) {
     const configuredSecret = secretKey || process.env.TOKEN_SIGNING_SECRET;
+    const isProd = process.env.NODE_ENV === "production" || process.env.VELORA_ENV === "production";
     if (!configuredSecret) {
-      if (process.env.NODE_ENV === "production" && process.env.REQUIRE_EXPLICIT_SIGNING_SECRET === "true") {
+      if (isProd) {
         throw new Error("FATAL: TOKEN_SIGNING_SECRET must be explicitly configured in production environments.");
       }
       this.secretKey = "enterprise_dev_secret_key_84920";
     } else {
+      if (isProd && configuredSecret === "enterprise_dev_secret_key_84920") {
+        throw new Error("FATAL: Development signing secret cannot be used in production.");
+      }
       this.secretKey = configuredSecret;
     }
   }
@@ -90,12 +95,24 @@ export class IdempotencySigner {
   }
 
   /**
-   * Generates a signed, tamper-proof ticket token containing session and timing metadata.
+   * Generates a signed, tamper-proof ticket token containing session, data hash, and timing metadata.
    */
-  public generateTicket(sessionId: string, templateId: string, ttlSeconds: number = 3600): { ticketToken: string; actionIdPrefix: string } {
+  public generateTicket(
+    sessionId: string,
+    templateId: string,
+    ttlSeconds: number = 3600,
+    approvedData?: Record<string, any>
+  ): { ticketToken: string; actionIdPrefix: string } {
+    if (typeof ttlSeconds !== "number" || !Number.isFinite(ttlSeconds) || !Number.isInteger(ttlSeconds) || ttlSeconds <= 0) {
+      throw new Error("ttlSeconds must be a finite positive integer.");
+    }
     const actionIdPrefix = `act_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiresAt = issuedAt + ttlSeconds;
+
+    const dataHash = approvedData
+      ? crypto.createHash("sha256").update(JSON.stringify(approvedData)).digest("hex")
+      : undefined;
 
     const payload: TicketPayload = {
       sessionId,
@@ -103,6 +120,7 @@ export class IdempotencySigner {
       templateId,
       issuedAt,
       expiresAt,
+      dataHash,
     };
 
     const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -118,10 +136,13 @@ export class IdempotencySigner {
   }
 
   /**
-   * Verifies ticket authenticity, expiration, and ensures one-time execution (idempotency).
+   * Verifies ticket authenticity, expiration, data binding, and ensures one-time execution (idempotency).
    * Backed by durable shared multi-replica atomic storage.
    */
-  public verifyAndConsumeTicket(ticketToken: string): { valid: boolean; error?: string; payload?: TicketPayload } {
+  public verifyAndConsumeTicket(
+    ticketToken: string,
+    submittedData?: Record<string, any>
+  ): { valid: boolean; error?: string; payload?: TicketPayload } {
     if (!ticketToken || typeof ticketToken !== "string") {
       return { valid: false, error: "Malformed or missing ticket token." };
     }
@@ -164,9 +185,30 @@ export class IdempotencySigner {
       return { valid: false, error: "Token already consumed: stale or duplicate click." };
     }
 
+    if (typeof payload.expiresAt !== "number" || !Number.isFinite(payload.expiresAt)) {
+      return { valid: false, error: "Invalid token expiration metadata." };
+    }
+    if (typeof payload.issuedAt !== "number" || !Number.isFinite(payload.issuedAt) || payload.expiresAt <= payload.issuedAt) {
+      return { valid: false, error: "Invalid token timing metadata." };
+    }
+
     const now = Math.floor(Date.now() / 1000);
     if (now > payload.expiresAt) {
       return { valid: false, error: "Token has expired." };
+    }
+
+    if (submittedData && typeof submittedData === "object") {
+      if (submittedData.sessionId && submittedData.sessionId !== payload.sessionId) {
+        return { valid: false, error: "Submitted sessionId does not match ticket sessionId." };
+      }
+      if (payload.dataHash) {
+        const subCopy = { ...submittedData };
+        delete subCopy.sessionId;
+        const subHash = crypto.createHash("sha256").update(JSON.stringify(subCopy)).digest("hex");
+        if (payload.dataHash !== subHash) {
+          return { valid: false, error: "Submitted data has been tampered with or differs from approved preview." };
+        }
+      }
     }
 
     // 2. Durable atomic shared directory verification

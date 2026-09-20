@@ -1,0 +1,10 @@
+{
+  "http_status": 403,
+  "provider_calls": 0,
+  "provider_args": null,
+  "response": {
+    "status": "error",
+    "code": "ACCESS_DENIED",
+    "message": "Caller organization scope '1000' is not entitled to query company_code '9999'. Approved: ['1000', 'VELORA_UAE']."
+  }
+}

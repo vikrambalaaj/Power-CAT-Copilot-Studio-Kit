@@ -4,6 +4,7 @@ from __future__ import annotations
 import hmac
 import json
 import logging
+import os
 import re
 import sys
 import uuid
@@ -101,6 +102,22 @@ class ApiKeyMiddleware:
         if scope.get("type") == "http":
             path = scope.get("path", "")
             if path not in PUBLIC_PATHS:
+                is_prod = (
+                    os.getenv("VELORA_ENV", "").lower() == "production"
+                    or os.getenv("ENVIRONMENT", "").lower() == "production"
+                    or os.getenv("NODE_ENV", "").lower() == "production"
+                )
+                if is_prod and (settings.allow_anonymous or os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1")):
+                    await SafeJSONResponse(
+                        {
+                            "status": "error",
+                            "code": "CONFIGURATION_ERROR",
+                            "message": "FATAL: ALLOW_ANONYMOUS cannot be enabled in production environments.",
+                        },
+                        status_code=500,
+                    )(scope, receive, send)
+                    return
+
                 if not settings.allow_anonymous:
                     headers = {key.lower(): value for key, value in scope.get("headers", [])}
                     supplied = headers.get(b"x-api-key", b"").decode("utf-8")
@@ -324,6 +341,23 @@ async def handle_tool_rest(request):
                 args.update(body.get("arguments", body.get("params", body)))
         except Exception:
             pass
+
+    # Authorize requested company_code against caller's organization scope (F05)
+    headers_dict = {k.lower(): v for k, v in request.headers.items()}
+    org_scope = headers_dict.get("x-organization-scope", "").strip()
+    req_company_code = args.get("company_code")
+    if org_scope and req_company_code:
+        norm_company_code = str(req_company_code).strip()
+        allowed_for_scope = {"1000", "VELORA_UAE"} if org_scope in {"1000", "VELORA_UAE"} else {org_scope}
+        if norm_company_code not in allowed_for_scope:
+            return SafeJSONResponse(
+                {
+                    "status": "error",
+                    "code": "ACCESS_DENIED",
+                    "message": f"Caller organization scope '{org_scope}' is not entitled to query company_code '{norm_company_code}'. Approved: {sorted(list(allowed_for_scope))}.",
+                },
+                status_code=403,
+            )
 
     try:
         res = await handler(**args)

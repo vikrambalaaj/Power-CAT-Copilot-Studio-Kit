@@ -4,7 +4,7 @@
  * Uses the same SPN OAuth token already acquired for artifact download.
  */
 
-import { AI_MODEL_IDS } from './constants.js';
+import { AI_MODEL_IDS, COMPLIANCE_CRITERIA } from './constants.js';
 
 /** Stage B response: list of patterns with pass/fail status */
 export interface PatternEvaluation {
@@ -57,34 +57,70 @@ function parseModelJson<T>(text: string, label: string): T {
 }
 
 /**
+ * Validate an individual pattern record returned by Stage B.
+ */
+export function validatePattern(p: unknown): boolean {
+  if (!p || typeof p !== 'object') {
+    throw new Error('Pattern item must be a non-null object');
+  }
+  const item = p as Record<string, unknown>;
+  if (typeof item.PatternName !== 'string' || item.PatternName.trim().length === 0) {
+    throw new Error(`Stage B pattern is missing a valid PatternName: ${JSON.stringify(p)}`);
+  }
+  if (typeof item.Status !== 'boolean') {
+    throw new Error(`Stage B pattern "${item.PatternName}" Status must be a boolean, got ${typeof item.Status}`);
+  }
+  return true;
+}
+
+/**
+ * Validate an individual compliance issue returned by Stage C.
+ */
+export function validateIssue(i: unknown): boolean {
+  if (!i || typeof i !== 'object') {
+    throw new Error('Issue item must be a non-null object');
+  }
+  const item = i as Record<string, unknown>;
+  if (typeof item.id !== 'string' || item.id.trim().length === 0) {
+    throw new Error(`Stage C issue is missing a valid id: ${JSON.stringify(i)}`);
+  }
+  const id = item.id.trim();
+  const isValidCriterion =
+    id === 'missing-instruction-input' ||
+    COMPLIANCE_CRITERIA.some((c) => id === c.id || id.startsWith(c.id));
+  if (!isValidCriterion) {
+    throw new Error(`Stage C issue contains unknown criterion ID: "${id}"`);
+  }
+  if (item.severity && !['High', 'Medium', 'Low'].includes(String(item.severity))) {
+    throw new Error(`Stage C issue "${id}" has invalid severity: "${item.severity}"`);
+  }
+  return true;
+}
+
+/**
  * Call AI Builder PredictV2 unbound action on Dataverse.
+ *
+ * Endpoint: POST https://<dataverseHost>/api/data/v9.2/PredictV2
+ *
+ * Payload:
+ * {
+ *   "predictionName": "<AI_MODEL_ID>",
+ *   "operationType": "ExecutePrompt",
+ *   "predictionInput": { ...parameters }
+ * }
  */
 async function callPredictV2(
   dataverseHost: string,
   accessToken: string,
-  modelId: string,
-  requestv2: Record<string, unknown>
+  predictionName: string,
+  predictionInput: Record<string, unknown>
 ): Promise<string> {
-  const url = `https://${dataverseHost}/api/data/v9.2/msdyn_aimodels(${modelId})/Microsoft.Dynamics.CRM.Predict`;
+  const url = `https://${dataverseHost}/api/data/v9.2/PredictV2`;
 
-  const body = {
-    version: '2.0',
-    source: JSON.stringify({
-      consumptionSource: 'Api',
-      partnerSource: 'PVA',
-      consumptionSourceVersion: 'GptApiClient',
-    }),
-    requestv2: {
-      '@odata.type': '#Microsoft.Dynamics.CRM.expando',
-      ...requestv2,
-      $customConfig: {
-        '@odata.type': '#Microsoft.Dynamics.CRM.expando',
-        settings: {
-          '@odata.type': '#Microsoft.Dynamics.CRM.expando',
-          runtime: null,
-        },
-      },
-    },
+  const payload = {
+    predictionName,
+    operationType: 'ExecutePrompt',
+    predictionInput,
   };
 
   const response = await fetch(url, {
@@ -92,20 +128,22 @@ async function callPredictV2(
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
-      'OData-MaxVersion': '4.0',
-      'OData-Version': '4.0',
+      Accept: 'application/json',
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   if (!response.ok) {
-    const errorText = (await response.text()).slice(0, MAX_ERROR_BODY_LENGTH);
-    throw new Error(`PredictV2 failed (${response.status}): ${errorText}`);
+    const errorBody = await response.text().catch(() => '');
+    const truncated = errorBody.slice(0, MAX_ERROR_BODY_LENGTH);
+    throw new Error(
+      `PredictV2 HTTP ${response.status} for model ${predictionName}: ${truncated}`
+    );
   }
 
-  const result = (await response.json()) as PredictV2Response;
-  const textOutput = result.responsev2?.predictionOutput?.text;
+  const data = (await response.json()) as PredictV2Response;
+  const textOutput = data.responsev2?.predictionOutput?.text;
 
   if (!textOutput) {
     throw new Error('PredictV2 returned no text output');
@@ -137,6 +175,9 @@ export async function invokeStageB(
   if (!Array.isArray(evaluation.Patterns)) {
     throw new Error('Stage B response is missing the Patterns array');
   }
+  for (const p of evaluation.Patterns) {
+    validatePattern(p);
+  }
   return evaluation;
 }
 
@@ -162,6 +203,9 @@ export async function invokeStageC(
   const evaluation = parseModelJson<InstructionEvaluation>(textOutput, 'Stage C');
   if (!Array.isArray(evaluation.issues)) {
     throw new Error('Stage C response is missing the issues array');
+  }
+  for (const issue of evaluation.issues) {
+    validateIssue(issue);
   }
   return evaluation;
 }

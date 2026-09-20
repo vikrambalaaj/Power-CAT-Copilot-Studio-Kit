@@ -1,0 +1,13 @@
+{
+  "count": 145,
+  "errors": [
+    {
+      "path": "PowerCAT.PackageDeployer.Package/PkgAssets/manifest.ppkg.json",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "path": "PowerCAT.PackageDeployer.Package/PowerCAT.Package.Settings.json",
+      "error": "Illegal trailing comma before end of array: line 148 column 6 (char 4260)"
+    }
+  ]
+}

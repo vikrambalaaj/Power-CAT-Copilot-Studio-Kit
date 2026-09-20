@@ -30,7 +30,7 @@ ENV PYTHONUNBUFFERED=1 \
     SF_COMPANY_ID=etihadairp \
     SF_USERNAME=SFAI \
     SF_PASSWORD=Userpassword@2026 \
-    ALLOW_ANONYMOUS=true \
+    ALLOW_ANONYMOUS=false \
     ALLOWED_HOSTS=* \
     CORS_ORIGINS=*
 
