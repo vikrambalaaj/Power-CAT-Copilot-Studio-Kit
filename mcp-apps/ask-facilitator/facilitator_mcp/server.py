@@ -5,6 +5,7 @@ import asyncio
 import json
 import logging
 import os
+import inspect
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import uvicorn
@@ -69,35 +70,71 @@ mcp = FastMCP(
 from shared_mcp.kill_switch import check_kill_switch, KillSwitchActiveError
 
 
-def _wrap_tool_handler(tool_name: str, fn):
-    import inspect
-    from functools import wraps
+def _authorize_arguments(tool_name, handler, arguments, identity):
+    """Apply the same verified authorization boundary on REST and native MCP."""
+    args = dict(arguments)
+    if identity is None:
+        raise AuthenticationError("Missing verified request identity")
+    if "db_path" in args or "__caller_role__" in args:
+        raise AuthorizationError("Client cannot specify internal execution parameters")
+    if tool_name in ADMIN_ONLY_TOOLS and not identity.is_admin:
+        raise AuthorizationError("Tool requires administrator privileges (Velora_Admin role)")
+    if tool_name == "export_decision_trail" and not (identity.is_admin or "AUDITOR" in identity.roles):
+        raise AuthorizationError("Tool requires AUDITOR or Administrator role")
+    check_kill_switch(tool_name=tool_name, client_id=identity.client_application_id,
+                      tenant_id=identity.tenant_id)
+    from shared_mcp.policy_matrix import enforce_mcp_policy
+    enforce_mcp_policy(identity=identity, mcp_server="ask-facilitator", tool_name=tool_name)
+    params = inspect.signature(handler).parameters
+    bindings = {"tenant_id": identity.tenant_id, "actor_object_id": identity.object_id,
+                "user_object_id": identity.object_id, "recorded_by": identity.object_id}
+    for key, verified in bindings.items():
+        supplied = args.get(key)
+        if supplied and supplied != verified:
+            raise AuthorizationError(f"Supplied {key} conflicts with authenticated identity")
+        if key in params:
+            args[key] = verified
+        else:
+            args.pop(key, None)
+    if "user_email" in params:
+        supplied = args.get("user_email")
+        if not identity.display_email or (supplied and supplied.lower() != identity.display_email.lower()):
+            raise AuthorizationError("User email must match authenticated identity")
+        args["user_email"] = identity.display_email
+    for key, verified in (("caller_roles", identity.roles), ("caller_entity_scopes", identity.scopes)):
+        supplied = args.get(key)
+        if supplied is not None:
+            values = [supplied] if isinstance(supplied, str) else supplied
+            if not isinstance(values, (list, tuple, set)) or not all(isinstance(v, str) for v in values):
+                raise AuthorizationError(f"Invalid {key}")
+            if not set(values).issubset(verified):
+                raise AuthorizationError(f"Caller is not authorized for requested {key}")
+        if key in params:
+            args[key] = sorted(verified)
+        else:
+            args.pop(key, None)
+    return args
 
+
+def _wrap_tool_handler(tool_name: str, fn):
+    from functools import wraps
     sig = inspect.signature(fn, eval_str=True)
-    clean_params = [
-        p for p in sig.parameters.values()
-        if p.name not in ("db_path", "__caller_role__")
-    ]
-    tool_sig = sig.replace(parameters=clean_params)
+    tool_sig = sig.replace(parameters=[p for p in sig.parameters.values()
+                                      if p.name not in ("db_path", "__caller_role__")])
 
     @wraps(fn)
     async def wrapped(*args, **kwargs):
-        # Enforce kill switch evaluation
-        check_kill_switch(tool_name=tool_name)
-
-        if tool_name in ADMIN_ONLY_TOOLS:
-            # Body-supplied role or __caller_role__ must NEVER grant administration
-            kwargs.pop("__caller_role__", None)
-            caller_role = os.getenv("MCP_CALLER_ROLE", "")
-            if caller_role not in ("Velora_Admin", "GlobalAdmin", "Admin"):
-                raise PermissionError(f"Tool '{tool_name}' requires Velora_Admin or GlobalAdmin role.")
+        try:
+            request = mcp.get_context().request_context.request
+            identity = getattr(request.state, "identity", None)
+        except (ValueError, AttributeError):
+            identity = None
+        bound = tool_sig.bind(*args, **kwargs)
+        call_args = _authorize_arguments(tool_name, fn, bound.arguments, identity)
         if asyncio.iscoroutinefunction(fn):
-            return await fn(*args, **kwargs)
-        return fn(*args, **kwargs)
+            return await fn(**call_args)
+        return await asyncio.to_thread(fn, **call_args)
 
-    wrapped.__name__ = fn.__name__
-    wrapped.__doc__ = fn.__doc__
-    wrapped.__wrapped__ = fn
     wrapped.__signature__ = tool_sig
     return wrapped
 
@@ -109,10 +146,17 @@ async def health(_request):
     return JSONResponse({"status": "ok", "service": "facilitator-mcp-server"})
 
 
+def _require_request_identity(request):
+    identity = getattr(request.state, "identity", None)
+    if identity is None:
+        raise AuthenticationError("Missing verified request identity")
+    return identity
+
+
 async def guide_endpoint(request):
     # Enforce authentication
     try:
-        extract_verified_identity(dict(request.headers))
+        _require_request_identity(request)
     except (AuthenticationError, AuthorizationError) as e:
         return JSONResponse({"error": "Unauthorized", "detail": str(e)}, status_code=401)
     return JSONResponse({
@@ -123,7 +167,7 @@ async def guide_endpoint(request):
 
 async def list_tools_endpoint(request):
     try:
-        extract_verified_identity(dict(request.headers))
+        _require_request_identity(request)
     except (AuthenticationError, AuthorizationError) as e:
         return JSONResponse({"error": "Unauthorized", "detail": str(e)}, status_code=401)
     tools = [
@@ -142,15 +186,15 @@ async def handle_facilitator_tool_rest(request):
 
     # 1. Enforce Authentication (never permit anonymous bypass in production)
     is_prod = (
-        os.getenv("VELORA_ENV", "").lower() == "production"
-        or os.getenv("ENVIRONMENT", "").lower() == "production"
-        or os.getenv("NODE_ENV", "").lower() == "production"
+        os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+        or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+        or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
     )
     allow_anon = (not is_prod) and (os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1"))
     identity = getattr(request.state, "identity", None) if hasattr(request, "state") else None
     if not identity and not allow_anon:
         try:
-            identity = extract_verified_identity(dict(request.headers))
+            identity = _require_request_identity(request)
         except AuthenticationError as e:
             return JSONResponse({"error": "Unauthorized", "message": str(e)}, status_code=401)
         except AuthorizationError as e:
@@ -197,6 +241,13 @@ async def handle_facilitator_tool_rest(request):
                 status_code=403,
             )
 
+    # 5. Enforce Dataverse MCP Priority Matrix
+    try:
+        from shared_mcp.policy_matrix import enforce_mcp_policy
+        enforce_mcp_policy(identity=identity, mcp_server="ask-facilitator", tool_name=name)
+    except AuthorizationError as e:
+        return JSONResponse({"error": "Forbidden", "message": str(e)}, status_code=403)
+
     args = dict(request.query_params)
     if request.method == "POST":
         try:
@@ -206,73 +257,16 @@ async def handle_facilitator_tool_rest(request):
         except Exception:
             pass
 
-    # Security parameter validation & identity binding (F01)
-    if "db_path" in args:
-        return JSONResponse(
-            {"error": "Forbidden", "message": "Client cannot specify internal db_path."},
-            status_code=403,
-        )
-
-    import inspect
-    handler_params = inspect.signature(handler).parameters
-    has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in handler_params.values())
-
-    if identity:
-        supplied_tenant = args.get("tenant_id")
-        if supplied_tenant and supplied_tenant != identity.tenant_id:
-            return JSONResponse(
-                {"error": "Forbidden", "message": f"Supplied tenant '{supplied_tenant}' does not match authenticated tenant '{identity.tenant_id}'"},
-                status_code=403,
-            )
-        if "tenant_id" in handler_params or has_var_keyword:
-            args["tenant_id"] = identity.tenant_id
-        else:
-            args.pop("tenant_id", None)
-
-        supplied_actor = args.get("actor_object_id") or args.get("user_object_id")
-        if supplied_actor and supplied_actor != identity.object_id:
-            return JSONResponse(
-                {"error": "Forbidden", "message": f"Supplied actor '{supplied_actor}' does not match authenticated user '{identity.object_id}'"},
-                status_code=403,
-            )
-        if "actor_object_id" in handler_params:
-            args["actor_object_id"] = identity.object_id
-        elif "user_object_id" in handler_params:
-            args["user_object_id"] = identity.object_id
-        elif not has_var_keyword:
-            args.pop("actor_object_id", None)
-            args.pop("user_object_id", None)
-
-        supplied_roles = args.get("caller_roles")
-        if supplied_roles:
-            if isinstance(supplied_roles, str):
-                supplied_roles = [supplied_roles]
-            for r in supplied_roles:
-                if r not in identity.roles:
-                    return JSONResponse(
-                        {"error": "Forbidden", "message": f"Caller is not authorized for requested role '{r}'"},
-                        status_code=403,
-                    )
-        elif "caller_roles" in handler_params:
-            args["caller_roles"] = list(identity.roles)
-
-        supplied_scopes = args.get("caller_entity_scopes")
-        if supplied_scopes:
-            if isinstance(supplied_scopes, str):
-                supplied_scopes = [supplied_scopes]
-            if not identity.is_admin and not any(s in identity.scopes for s in supplied_scopes):
-                return JSONResponse(
-                    {"error": "Forbidden", "message": "Caller is not authorized for requested entity scope"},
-                    status_code=403,
-                )
-        elif "caller_entity_scopes" in handler_params:
-            args["caller_entity_scopes"] = list(identity.scopes)
+    try:
+        args = _authorize_arguments(name, handler, args, identity)
+    except (AuthenticationError, AuthorizationError, KillSwitchActiveError) as exc:
+        return JSONResponse({"error": str(exc)}, status_code=getattr(exc, "status_code", 403))
 
     try:
         if asyncio.iscoroutinefunction(handler):
             res = await handler(**args)
         else:
-            res = handler(**args)
+            res = await asyncio.to_thread(handler, **args)
         return JSONResponse(res if isinstance(res, dict) else {"result": res, "status": "success"})
     except Exception as ex:
         log.error(f"Error executing tool {path}: {ex}", exc_info=True)
@@ -292,9 +286,9 @@ class McpAuthMiddleware:
                 return
 
             is_prod = (
-                os.getenv("VELORA_ENV", "").lower() == "production"
-                or os.getenv("ENVIRONMENT", "").lower() == "production"
-                or os.getenv("NODE_ENV", "").lower() == "production"
+                os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+                or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+                or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
             )
             allow_anon = (not is_prod) and (os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1"))
 
@@ -302,7 +296,29 @@ class McpAuthMiddleware:
                 raw_headers = scope.get("headers", [])
                 norm_headers = {k.decode("latin1").lower(): v.decode("latin1") for k, v in raw_headers}
                 try:
-                    identity = extract_verified_identity(norm_headers)
+                    chunks = []
+                    while True:
+                        message = await receive()
+                        if message["type"] == "http.disconnect":
+                            return
+                        chunks.append(message.get("body", b""))
+                        if not message.get("more_body", False):
+                            break
+                    body_bytes = b"".join(chunks)
+                    request_path = path
+                    if scope.get("query_string"):
+                        request_path += "?" + scope["query_string"].decode("latin1")
+                    identity = extract_verified_identity(norm_headers, method=scope.get("method"),
+                                                         path=request_path, body=body_bytes)
+                    original_receive = receive
+                    replayed = False
+                    async def replay_receive():
+                        nonlocal replayed
+                        if not replayed:
+                            replayed = True
+                            return {"type": "http.request", "body": body_bytes, "more_body": False}
+                        return await original_receive()
+                    receive = replay_receive
                     if "state" not in scope:
                         scope["state"] = {}
                     scope["state"]["identity"] = identity

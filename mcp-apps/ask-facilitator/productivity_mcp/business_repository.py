@@ -323,7 +323,14 @@ class SqliteBusinessRepository:
 
     def __init__(self, db_path: Optional[str] = None):
         if not db_path:
-            base_dir = os.getenv("VELORA_STORAGE_DIR") or os.getenv("VELORA_OUTBOX_DIR") or str(Path.home() / ".velora")
+            base_dir = (
+                os.getenv("AZURE_STORAGE_MOUNT_PATH")
+                or os.getenv("VELORA_STATE_DIR")
+                or os.getenv("FACILITATOR_STORAGE_DIR")
+                or os.getenv("VELORA_STORAGE_DIR")
+                or os.getenv("VELORA_OUTBOX_DIR")
+                or str(Path.home() / ".velora")
+            )
             p = Path(base_dir)
             p.mkdir(parents=True, exist_ok=True)
             db_path = str(p / "velora_business.db")

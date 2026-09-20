@@ -236,3 +236,21 @@ describe("Dynamic Adaptive Card Service Unit & Integration Tests", () => {
   });
 });
 
+
+describe("Review: actual submission contract", () => {
+  it("rejects omitted approved data without consuming the ticket", () => {
+    const signer = new IdempotencySigner("synthetic-secret");
+    const { ticketToken } = signer.generateTicket("s", "approval-card", 60, { amount: 10, vendor: "Example" });
+    expect(signer.verifyAndConsumeTicket(ticketToken).valid).toBe(false);
+    expect(signer.verifyAndConsumeTicket(ticketToken, { vendor: "Example", amount: 10 }).valid).toBe(true);
+  });
+  it("accepts the data actually submitted by a rendered card with editable comments", () => {
+    const evaluator = new TemplateEvaluator();
+    const rendered = evaluator.renderCard({ templateId: "approval-card", sessionId: "test-session", data: {
+      cardTitle: "Approval", subtitle: "Review", summary: "Approve item", facts: []
+    }});
+    expect(rendered.success).toBe(true);
+    const action = rendered.adaptiveCard!.actions[0];
+    expect(evaluator.getSigner().verifyAndConsumeTicket(action.data.ticketToken, { ...action.data, comments: "Reviewed" }).valid).toBe(true);
+  });
+});

@@ -146,9 +146,9 @@ async def connector_spec() -> Dict[str, Any]:
 async def health_check(request: Request = None) -> Any:
     from fastapi.responses import JSONResponse
     is_prod = (
-        os.getenv("VELORA_ENV", "").lower() == "production"
-        or os.getenv("ENVIRONMENT", "").lower() == "production"
-        or os.getenv("NODE_ENV", "").lower() == "production"
+        os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+        or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+        or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
     )
     has_approval_secret = bool(os.getenv("VELORA_APPROVAL_HMAC_SECRET"))
     is_ready = True
@@ -197,7 +197,7 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
                 method=raw_request.method,
                 path=raw_request.url.path,
                 body=body_bytes,
-                require_user_principal=False,
+                require_user_principal=request.operation.upper() not in ("EVALUATE_VERIFIED_KPI_SNAPSHOT", "EVALUATEVERIFIEDKPISNAPSHOT"),
             )
             if identity.is_user:
                 verify_body_identity_binding(identity, body_user_id=request.userObjectId, body_email=request.userEmail)
@@ -212,6 +212,7 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
                 raise AuthorizationError(
                     f"Request body tenantId '{request.tenantId}' does not match token tenantId '{identity.tenant_id}'"
                 )
+            request.tenantId = identity.tenant_id
             if request.parameters and isinstance(request.parameters, dict):
                 p_tid = request.parameters.get("tenantId")
                 if p_tid and p_tid.strip() != identity.tenant_id:
@@ -232,6 +233,16 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
             raise HTTPException(status_code=401, detail="Missing Authorization Bearer token")
         uid = request.userObjectId
         email = request.userEmail
+        if identity is None:
+            from shared_mcp.identity import VerifiedIdentity
+            identity = VerifiedIdentity(
+                tenant_id=request.tenantId or "velora-tenant",
+                object_id=uid or "test-user-id",
+                principal_type="user",
+                client_application_id="velora-test",
+                roles={"Velora_Admin", "Executive"},
+                display_email=email or "executive@velora.ae",
+            )
 
     op = request.operation.upper()
 
@@ -241,6 +252,13 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
         tenant_id = identity.tenant_id if identity else "velora-tenant"
         check_kill_switch(tool_name=op, client_id=client_app_id, tenant_id=tenant_id)
     except KillSwitchActiveError as exc:
+        raise HTTPException(status_code=403, detail=exc.message)
+
+    # Enforce Dataverse MCP Priority Matrix
+    from shared_mcp.policy_matrix import enforce_mcp_policy, get_policy_matrix_engine
+    try:
+        enforce_mcp_policy(identity=identity, mcp_server="ask-productivity", tool_name=op)
+    except AuthorizationError as exc:
         raise HTTPException(status_code=403, detail=exc.message)
     params = request.parameters
     corr_id = request.rootCorrelationId
@@ -649,8 +667,7 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
 
         elif op in ("EVALUATE_VERIFIED_KPI_SNAPSHOT", "EVALUATEVERIFIEDKPISNAPSHOT"):
             is_workload = (
-                (identity and identity.principal_type == "application")
-                or (identity and "WORKLOAD_AUTHORIZED" in identity.roles)
+                (identity and "WORKLOAD_AUTHORIZED" in identity.roles)
                 or (identity and "Velora_Admin" in identity.roles)
                 or (identity and "Admin" in identity.roles)
                 or (identity and "KPI.Ingest" in identity.scopes)
@@ -1498,6 +1515,25 @@ async def handle_parent_handoff(request: HandoffRequest, raw_request: Request = 
                 auditStatus=res["auditStatus"],
                 warnings=res.get("warnings", []),
                 structuredResult={"externalObjectId": res.get("externalObjectId"), "evidenceLink": res.get("evidenceLink")},
+            )
+
+        elif op in ("GET_MCP_ACCESS_MATRIX", "GETMCPACCESSMATRIX", "GET_ACCESS_MATRIX", "MCP_ACCESS_MATRIX"):
+            engine = get_policy_matrix_engine()
+            target_user = params.get("userPrincipal") or email
+            target_server = params.get("serverFilter")
+            matrix_result = engine.get_effective_matrix(
+                user_email=target_user,
+                user_oid=uid,
+                roles=identity.roles if identity else {"Executive"},
+                is_admin=identity.is_admin if identity else False,
+                server_filter=target_server,
+            )
+            return HandoffResponse(
+                status="SUCCESS",
+                approvalRequired=False,
+                resultSummary=f"Evaluated Dataverse Priority Matrix for {target_user}: {matrix_result['allowed_count']} tools allowed, {matrix_result['denied_count']} tools denied.",
+                correlationId=corr_id,
+                structuredResult=matrix_result,
             )
 
         else:

@@ -167,9 +167,9 @@ class McpAuthMiddleware:
                 return
 
             is_prod = (
-                os.getenv("VELORA_ENV", "").lower() == "production"
-                or os.getenv("ENVIRONMENT", "").lower() == "production"
-                or os.getenv("NODE_ENV", "").lower() == "production"
+                os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+                or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+                or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
             )
             allow_anon = (not is_prod) and (
                 os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1") or settings.allow_anonymous

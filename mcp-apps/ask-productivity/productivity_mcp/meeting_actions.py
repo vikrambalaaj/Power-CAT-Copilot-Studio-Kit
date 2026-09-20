@@ -859,7 +859,9 @@ def evaluate_meeting_action_reminders(
         if not reminder_window:
             continue
 
-        recipient = m.owner_email or "balaadm@velora.ae"
+        recipient = m.owner_email
+        if not recipient:
+            continue
         deadline_version = due_str.replace(":", "-").replace("+", "_")
         # Deduplication key format: (taskId, policyVersion, deadlineVersion, reminderWindow, recipient)
         dedup_run_key = f"{m.planner_task_id}:{policy_version}:{deadline_version}:{reminder_window}:{recipient}"
@@ -884,6 +886,7 @@ def evaluate_meeting_action_reminders(
             "title": m.title,
             "status": "REMINDER_DUE",
             "reminderWindow": reminder_window,
+            "dueDateTime": due_str,
             "recipient": recipient,
             "subject": subject,
             "body": body,

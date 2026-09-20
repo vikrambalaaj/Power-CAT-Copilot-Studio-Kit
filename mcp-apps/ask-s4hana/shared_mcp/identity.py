@@ -19,6 +19,7 @@ import hashlib
 import hmac
 import json
 import logging
+import math
 import os
 import time
 from dataclasses import dataclass, field
@@ -102,6 +103,8 @@ def parse_unverified_token(token: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     try:
         header = json.loads(_b64_decode(parts[0]).decode("utf-8"))
         payload = json.loads(_b64_decode(parts[1]).decode("utf-8"))
+        if not isinstance(header, dict) or not isinstance(payload, dict):
+            raise AuthenticationError("JWT header and payload must be objects")
         return header, payload
     except Exception as exc:
         raise AuthenticationError("Malformed token structure") from exc
@@ -164,7 +167,10 @@ def verify_bearer_token(
     # Verify signature
     parts = token.split(".")
     signed_content = f"{parts[0]}.{parts[1]}".encode("utf-8")
-    sig_bytes = _b64_decode(parts[2])
+    try:
+        sig_bytes = _b64_decode(parts[2])
+    except Exception as exc:
+        raise AuthenticationError("Malformed token signature") from exc
 
     if alg == "HS256":
         expected_sig = hmac.new(configured_test_secret.encode("utf-8"), signed_content, hashlib.sha256).digest()
@@ -201,12 +207,14 @@ def verify_bearer_token(
     exp = payload.get("exp")
     if exp is None:
         raise AuthenticationError("Token missing expiration claim (exp)")
-    if not isinstance(exp, (int, float)):
+    if isinstance(exp, bool) or not isinstance(exp, (int, float)) or not math.isfinite(exp):
         raise AuthenticationError("Invalid expiration claim format")
     if now > (exp + 30):  # 30 second clock skew tolerance
         raise AuthenticationError("Token has expired")
 
     nbf = payload.get("nbf")
+    if nbf is not None and (isinstance(nbf, bool) or not isinstance(nbf, (int, float)) or not math.isfinite(nbf)):
+        raise AuthenticationError("Invalid not-before claim format")
     if nbf is not None and now < (nbf - 30):
         raise AuthenticationError("Token not yet valid")
 
@@ -219,6 +227,8 @@ def verify_bearer_token(
 
     # Enforce Exact Issuer matching (no prefix leniency)
     iss = payload.get("iss", "")
+    if not isinstance(iss, str):
+        raise AuthenticationError("Invalid token issuer format")
     if not iss:
         if not configured_test_secret:
             raise AuthenticationError("Token missing issuer claim (iss)")
@@ -255,7 +265,7 @@ def verify_bearer_token(
     if allowed_audiences:
         valid_aud = False
         if isinstance(aud, list):
-            valid_aud = any(a in allowed_audiences for a in aud)
+            valid_aud = all(isinstance(a, str) for a in aud) and any(a in allowed_audiences for a in aud)
         elif isinstance(aud, str):
             valid_aud = aud in allowed_audiences
         if not valid_aud:
@@ -264,7 +274,7 @@ def verify_bearer_token(
 
     # Extract Subject & Identity
     oid = payload.get("oid") or payload.get("sub") or ""
-    if not oid:
+    if not isinstance(oid, str) or not oid.strip():
         raise AuthenticationError("Missing required subject/object identifier in token")
 
     # Distinguish Delegated User Token vs Application Token
@@ -283,11 +293,15 @@ def verify_bearer_token(
     if isinstance(raw_scp, str):
         scopes = set(raw_scp.split())
     elif isinstance(raw_scp, list):
+        if not all(isinstance(v, str) for v in raw_scp):
+            raise AuthenticationError("Invalid scopes format")
         scopes = set(raw_scp)
 
     roles = set()
     raw_roles = payload.get("roles")
     if isinstance(raw_roles, list):
+        if not all(isinstance(v, str) for v in raw_roles):
+            raise AuthenticationError("Invalid roles format")
         roles = set(raw_roles)
     elif isinstance(raw_roles, str):
         roles = {raw_roles}
@@ -303,6 +317,8 @@ def verify_bearer_token(
 
     client_app_id = payload.get("appid") or payload.get("azp") or ""
     display_email = payload.get("preferred_username") or payload.get("email") or payload.get("upn")
+    if display_email is not None and not isinstance(display_email, str):
+        raise AuthenticationError("Invalid email claim format")
     if display_email:
         display_email = display_email.strip().lower()
 
@@ -349,7 +365,7 @@ def verify_gateway_assertion(
         raise AuthenticationError("Invalid gateway timestamp")
 
     now = time.time()
-    if abs(now - ts) > GATEWAY_NONCE_TTL_SECONDS:
+    if not math.isfinite(ts) or abs(now - ts) > GATEWAY_NONCE_TTL_SECONDS:
         raise AuthenticationError("Gateway signature has expired or timestamp skew too large")
 
     principal_raw = headers.get("x-ms-client-principal", "")
@@ -476,6 +492,8 @@ def verify_body_identity_binding(
             )
             raise AuthorizationError("Request body user identity conflicts with authenticated token identity")
 
+    if body_email and body_email.strip() and not identity.display_email:
+        raise AuthorizationError("Token does not contain a verified mailbox identity")
     if body_email and body_email.strip() and identity.display_email:
         sanitized_body_email = body_email.strip().lower()
         if sanitized_body_email != identity.display_email:

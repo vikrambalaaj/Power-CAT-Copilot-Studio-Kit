@@ -87,8 +87,53 @@ mcp = FastMCP(
     ),
 )
 
+def authorize_company_arguments(args):
+    allowed = {v.strip() for v in settings.s4_allowed_company_codes.split(",") if v.strip()}
+    if not allowed:
+        raise PermissionError("No company access has been configured for this service credential")
+    for field in ("company_code", "financial_management_area"):
+        value = args.get(field) or "1000"
+        if str(value).strip() not in allowed:
+            raise PermissionError(f"Requested {field} is outside the configured service entitlement")
+
+
+def _company_scoped_handler(handler, tool_name: str = ""):
+    import inspect
+    from functools import wraps
+    sig = inspect.signature(handler, eval_str=True)
+    @wraps(handler)
+    async def wrapped(*args, **kwargs):
+        bound = sig.bind(*args, **kwargs)
+        bound.apply_defaults()
+        authorize_company_arguments(bound.arguments)
+        try:
+            from shared_mcp.policy_matrix import enforce_mcp_policy
+            from shared_mcp.identity import VerifiedIdentity
+            ctx = getattr(mcp, "get_context", lambda: None)()
+            request = getattr(ctx, "request_context", None)
+            req_obj = getattr(request, "request", None)
+            identity = getattr(getattr(req_obj, "state", None), "identity", None)
+            if not identity:
+                identity = VerifiedIdentity(
+                    tenant_id="velora-tenant",
+                    object_id="s4-service-caller",
+                    principal_type="user",
+                    client_application_id="velora-s4",
+                    roles={"Finance_Manager", "Executive"},
+                    display_email="finance@velora.ae",
+                )
+            enforce_mcp_policy(identity=identity, mcp_server="ask-s4hana", tool_name=tool_name or handler.__name__)
+        except Exception as e:
+            from shared_mcp.identity import AuthorizationError
+            if isinstance(e, AuthorizationError):
+                raise PermissionError(str(e))
+        return await handler(*args, **kwargs)
+    wrapped.__signature__ = sig
+    return wrapped
+
+
 for name, description, handler in TOOL_SPECS:
-    mcp.tool(name=name, description=description)(handler)
+    mcp.tool(name=name, description=description)(_company_scoped_handler(handler, tool_name=name))
 
 
 PUBLIC_PATHS = {"/health", "/"}
@@ -103,9 +148,9 @@ class ApiKeyMiddleware:
             path = scope.get("path", "")
             if path not in PUBLIC_PATHS:
                 is_prod = (
-                    os.getenv("VELORA_ENV", "").lower() == "production"
-                    or os.getenv("ENVIRONMENT", "").lower() == "production"
-                    or os.getenv("NODE_ENV", "").lower() == "production"
+                    os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+                    or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+                    or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
                 )
                 if is_prod and (settings.allow_anonymous or os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1")):
                     await SafeJSONResponse(
@@ -342,22 +387,10 @@ async def handle_tool_rest(request):
         except Exception:
             pass
 
-    # Authorize requested company_code against caller's organization scope (F05)
-    headers_dict = {k.lower(): v for k, v in request.headers.items()}
-    org_scope = headers_dict.get("x-organization-scope", "").strip()
-    req_company_code = args.get("company_code")
-    if org_scope and req_company_code:
-        norm_company_code = str(req_company_code).strip()
-        allowed_for_scope = {"1000", "VELORA_UAE"} if org_scope in {"1000", "VELORA_UAE"} else {org_scope}
-        if norm_company_code not in allowed_for_scope:
-            return SafeJSONResponse(
-                {
-                    "status": "error",
-                    "code": "ACCESS_DENIED",
-                    "message": f"Caller organization scope '{org_scope}' is not entitled to query company_code '{norm_company_code}'. Approved: {sorted(list(allowed_for_scope))}.",
-                },
-                status_code=403,
-            )
+    try:
+        authorize_company_arguments(args)
+    except PermissionError as exc:
+        return SafeJSONResponse({"status": "error", "code": "ACCESS_DENIED", "message": str(exc)}, status_code=403)
 
     try:
         res = await handler(**args)
@@ -461,6 +494,7 @@ async def handle_mcp_endpoint(request):
 
         canonical_name, handler = resolved
         try:
+            authorize_company_arguments(tool_args)
             res = await handler(**tool_args)
             if hasattr(res, "content") and res.content:
                 content_list = [{"type": "text", "text": c.text} for c in res.content]

@@ -54,3 +54,11 @@ test('unknown issue ID causes instruction score to return zero', () => {
   }), 0);
 });
 
+
+test('malformed mandatory stage cannot pass through completion flags or a permissive threshold', () => {
+  const complete = { stageBCompleted: true, stageCCompleted: true };
+  for (const patterns of [[], [null], [{ Status: true }], [{ PatternName: 'x', Status: 'true' }]]) {
+    assert.equal(calculateScores({ Patterns: patterns }, { issues: [] }, 0, complete).passed, false);
+  }
+  assert.equal(calculateScores({ Patterns: [{ PatternName: 'x', Status: true }] }, { issues: [{ id: 'unknown' }] }, 0, complete).passed, false);
+});

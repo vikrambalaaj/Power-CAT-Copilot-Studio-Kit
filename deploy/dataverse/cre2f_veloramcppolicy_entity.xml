@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name LocalizedName="Velora MCP Server &amp; Tool Access Policy" OriginalName="Velora MCP Server &amp; Tool Access Policy">cre2f_veloramcppolicy</Name>
+  <EntityInfo>
+    <entity Name="cre2f_veloramcppolicy">
+      <LocalizedNames>
+        <LocalizedName description="Velora MCP Server &amp; Tool Access Policy" languagecode="1033" />
+      </LocalizedNames>
+      <LocalizedCollectionNames>
+        <LocalizedCollectionName description="Velora MCP Server &amp; Tool Access Policies" languagecode="1033" />
+      </LocalizedCollectionNames>
+      <Descriptions>
+        <Description description="Priority Matrix Policy governing which users and roles are permitted to access specific MCP servers and tools in the Velora Autonomous Agent platform." languagecode="1033" />
+      </Descriptions>
+      <attributes>
+        <!-- Primary Key -->
+        <attribute PhysicalName="cre2f_veloramcppolicyid">
+          <Type>primarykey</Type>
+          <Name>cre2f_veloramcppolicyid</Name>
+          <LogicalName>cre2f_veloramcppolicyid</LogicalName>
+          <RequiredLevel>systemrequired</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
+          <ValidForUpdateApi>0</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsCustomField>1</IsCustomField>
+          <IsAuditEnabled>0</IsAuditEnabled>
+          <IsSecured>0</IsSecured>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <IsCustomizable>1</IsCustomizable>
+          <IsRenameable>1</IsRenameable>
+          <CanModifySearchSettings>1</CanModifySearchSettings>
+          <CanModifyRequirementLevelSettings>1</CanModifyRequirementLevelSettings>
+          <CanModifyAdditionalSettings>1</CanModifyAdditionalSettings>
+          <SourceType>0</SourceType>
+          <IsGlobalFilterEnabled>0</IsGlobalFilterEnabled>
+          <IsSortableEnabled>0</IsSortableEnabled>
+          <CanModifyGlobalFilterSettings>1</CanModifyGlobalFilterSettings>
+          <CanModifyIsSortableSettings>1</CanModifyIsSortableSettings>
+          <IsDataSourceSecret>0</IsDataSourceSecret>
+          <AutoNumberFormat></AutoNumberFormat>
+          <IsSearchable>0</IsSearchable>
+          <IsFilterable>0</IsFilterable>
+          <IsRetrievable>1</IsRetrievable>
+          <IsLocalizable>0</IsLocalizable>
+          <Format></Format>
+          <MaxLength></MaxLength>
+          <displaynames>
+            <displayname description="Policy ID" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Unique identifier for the policy rule." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Primary Name: Policy Name -->
+        <attribute PhysicalName="cre2f_policyname">
+          <Type>nvarchar</Type>
+          <Name>cre2f_policyname</Name>
+          <LogicalName>cre2f_policyname</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsCustomField>1</IsCustomField>
+          <IsAuditEnabled>1</IsAuditEnabled>
+          <IsSecured>0</IsSecured>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <MaxLength>150</MaxLength>
+          <Format>text</Format>
+          <displaynames>
+            <displayname description="Policy Name" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Human-readable title describing the policy rule (e.g. Executive Full Access, HR Headcount Tool Access)." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Matrix Priority (Integer: Lower = Higher Precedence) -->
+        <attribute PhysicalName="cre2f_priority">
+          <Type>integer</Type>
+          <Name>cre2f_priority</Name>
+          <LogicalName>cre2f_priority</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsCustomField>1</IsCustomField>
+          <IsAuditEnabled>1</IsAuditEnabled>
+          <MinValue>1</MinValue>
+          <MaxValue>10000</MaxValue>
+          <displaynames>
+            <displayname description="Priority" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Priority ranking in the matrix. Lower integer numbers have higher evaluation precedence (e.g. Priority 10 takes precedence over Priority 100)." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- User Principal: UPN, Email, Object ID or '*' -->
+        <attribute PhysicalName="cre2f_user_principal">
+          <Type>nvarchar</Type>
+          <Name>cre2f_user_principal</Name>
+          <LogicalName>cre2f_user_principal</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>255</MaxLength>
+          <Format>text</Format>
+          <displaynames>
+            <displayname description="User Principal" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="User UPN, email address, or Entra Object ID to which this policy applies. Use '*' to match any user." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Security Role: Role Name or '*' -->
+        <attribute PhysicalName="cre2f_role">
+          <Type>nvarchar</Type>
+          <Name>cre2f_role</Name>
+          <LogicalName>cre2f_role</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>100</MaxLength>
+          <Format>text</Format>
+          <displaynames>
+            <displayname description="Security Role" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Entra ID or application role (e.g. Velora_Admin, Executive, HR_Specialist, Finance_Manager). Use '*' for any role." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Target MCP Server: Server name or '*' -->
+        <attribute PhysicalName="cre2f_mcpserver">
+          <Type>nvarchar</Type>
+          <Name>cre2f_mcpserver</Name>
+          <LogicalName>cre2f_mcpserver</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>100</MaxLength>
+          <Format>text</Format>
+          <displaynames>
+            <displayname description="MCP Server" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Target MCP server identifier (e.g. ask-productivity, ask-s4hana, ask-successfactors, ask-sac, ask-facilitator). Use '*' for all servers." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Target Tool Name: Tool name or '*' -->
+        <attribute PhysicalName="cre2f_toolname">
+          <Type>nvarchar</Type>
+          <Name>cre2f_toolname</Name>
+          <LogicalName>cre2f_toolname</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>150</MaxLength>
+          <Format>text</Format>
+          <displaynames>
+            <displayname description="Tool Name" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Target MCP tool name (e.g. get_headcount_summary, send_executive_email, execute_payment). Use '*' for all tools on the server." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Permission: ALLOW or DENY -->
+        <attribute PhysicalName="cre2f_permission">
+          <Type>nvarchar</Type>
+          <Name>cre2f_permission</Name>
+          <LogicalName>cre2f_permission</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>20</MaxLength>
+          <Format>text</Format>
+          <displaynames>
+            <displayname description="Permission" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Decision effect: 'ALLOW' or 'DENY'." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Is Active: True/False -->
+        <attribute PhysicalName="cre2f_isactive">
+          <Type>boolean</Type>
+          <Name>cre2f_isactive</Name>
+          <LogicalName>cre2f_isactive</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <DefaultValue>1</DefaultValue>
+          <displaynames>
+            <displayname description="Is Active" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Whether this policy rule is active and evaluated in the priority matrix." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Conditions (JSON payload for context filters) -->
+        <attribute PhysicalName="cre2f_conditions">
+          <Type>nvarchar</Type>
+          <Name>cre2f_conditions</Name>
+          <LogicalName>cre2f_conditions</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>4000</MaxLength>
+          <Format>textarea</Format>
+          <displaynames>
+            <displayname description="Conditions" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="JSON-serialized context conditions (e.g. {'allowed_company_codes': ['1000'], 'require_mfa': true})." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+
+        <!-- Description / Audit Justification -->
+        <attribute PhysicalName="cre2f_description">
+          <Type>nvarchar</Type>
+          <Name>cre2f_description</Name>
+          <LogicalName>cre2f_description</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <MaxLength>1000</MaxLength>
+          <Format>textarea</Format>
+          <displaynames>
+            <displayname description="Description" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Administrative notes and business justification for the policy." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+      </attributes>
+    </entity>
+  </EntityInfo>
+</Entity>

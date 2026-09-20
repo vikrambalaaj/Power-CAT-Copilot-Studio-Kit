@@ -1,0 +1,32 @@
+[
+  {
+    "service": "ask-productivity",
+    "exit_code": 0,
+    "seconds": 47.8
+  },
+  {
+    "service": "ask-facilitator",
+    "exit_code": 0,
+    "seconds": 68.1
+  },
+  {
+    "service": "ask-sac",
+    "exit_code": 0,
+    "seconds": 58.5
+  },
+  {
+    "service": "ask-s4hana",
+    "exit_code": 0,
+    "seconds": 76.1
+  },
+  {
+    "service": "ask-successfactors",
+    "exit_code": 0,
+    "seconds": 73.4
+  },
+  {
+    "service": "dynamic-adaptive-card-service",
+    "exit_code": 0,
+    "seconds": 33.3
+  }
+]

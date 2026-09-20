@@ -1,0 +1,18 @@
+[
+  {
+    "service": "ask-productivity",
+    "exit_code": 0
+  },
+  {
+    "service": "ask-facilitator",
+    "exit_code": 0
+  },
+  {
+    "service": "ask-s4hana",
+    "exit_code": 0
+  },
+  {
+    "service": "ask-successfactors",
+    "exit_code": 0
+  }
+]

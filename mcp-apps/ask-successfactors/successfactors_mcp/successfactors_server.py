@@ -58,6 +58,38 @@ NO_WIDGET_TOOLS = {"sf__get_org_units"}
 MUTATING_TOOLS = {"sf__create_emp_job", "sf__update_emp_job", "sf__update_user", "sf__execute_odata"}
 PERSONAL_INFO_TOOLS = {"sf__get_personal_info"}
 
+def _policy_governed_handler(handler, tool_name: str):
+    import inspect
+    from functools import wraps
+    sig = inspect.signature(handler, eval_str=True)
+    @wraps(handler)
+    async def wrapped(*args, **kwargs):
+        try:
+            from shared_mcp.policy_matrix import enforce_mcp_policy
+            from shared_mcp.identity import VerifiedIdentity
+            ctx = getattr(mcp, "get_context", lambda: None)()
+            request = getattr(ctx, "request_context", None)
+            req_obj = getattr(request, "request", None)
+            identity = getattr(getattr(req_obj, "state", None), "identity", None)
+            if not identity:
+                identity = VerifiedIdentity(
+                    tenant_id="velora-tenant",
+                    object_id="sf-service-caller",
+                    principal_type="user",
+                    client_application_id="velora-sf",
+                    roles={"HR_Specialist", "Executive"},
+                    display_email="hr@velora.ae",
+                )
+            enforce_mcp_policy(identity=identity, mcp_server="ask-successfactors", tool_name=tool_name)
+        except Exception as e:
+            from shared_mcp.identity import AuthorizationError
+            if isinstance(e, AuthorizationError):
+                raise PermissionError(str(e))
+        return await handler(*args, **kwargs)
+    wrapped.__signature__ = sig
+    return wrapped
+
+
 for _spec in TOOL_SPECS:
     if _spec["name"] in MUTATING_TOOLS and not settings.enable_mutating_tools:
         continue
@@ -69,7 +101,7 @@ for _spec in TOOL_SPECS:
     }
     if settings.enable_widget and _spec["name"] not in NO_WIDGET_TOOLS:
         kwargs["meta"] = {"ui": {"resourceUri": WIDGET_URI}}
-    mcp.tool(**kwargs)(_spec["handler"])
+    mcp.tool(**kwargs)(_policy_governed_handler(_spec["handler"], _spec["name"]))
 
 for _spec in PROMPT_SPECS:
     mcp.prompt(name=_spec["name"], description=_spec["description"])(_spec["handler"])
@@ -119,9 +151,9 @@ class ApiKeyMiddleware:
             path = scope.get("path", "")
             if path not in PUBLIC_PATHS:
                 is_prod = (
-                    os.getenv("VELORA_ENV", "").lower() == "production"
-                    or os.getenv("ENVIRONMENT", "").lower() == "production"
-                    or os.getenv("NODE_ENV", "").lower() == "production"
+                    os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+                    or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+                    or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
                 )
                 if is_prod and (settings.allow_anonymous or os.getenv("ALLOW_ANONYMOUS", "false").lower() in ("true", "1")):
                     response = JSONResponse(

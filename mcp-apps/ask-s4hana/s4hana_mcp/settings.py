@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     s4_total_timeout_seconds: float = 60.0
 
     port: int = 8083
+    s4_allowed_company_codes: str = "1000"
     mcp_api_key: str = ""
     allow_anonymous: bool = False
     allowed_hosts: str = "localhost:*,127.0.0.1:*,*"

@@ -2,6 +2,16 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 
+// Object property order is not part of the approved business payload.
+function canonicalJson(value: any): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value !== null && typeof value === "object") {
+    return `{${Object.keys(value).sort().filter(k => value[k] !== undefined)
+      .map(k => `${JSON.stringify(k)}:${canonicalJson(value[k])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
 export interface TicketPayload {
   sessionId: string;
   actionIdPrefix: string;
@@ -48,7 +58,7 @@ export class IdempotencySigner {
 
   constructor(secretKey?: string) {
     const configuredSecret = secretKey || process.env.TOKEN_SIGNING_SECRET;
-    const isProd = process.env.NODE_ENV === "production" || process.env.VELORA_ENV === "production";
+    const isProd = [process.env.NODE_ENV, process.env.VELORA_ENV, process.env.ENVIRONMENT].some(v => ["production", "prod"].includes((v || "").toLowerCase()));
     if (!configuredSecret) {
       if (isProd) {
         throw new Error("FATAL: TOKEN_SIGNING_SECRET must be explicitly configured in production environments.");
@@ -103,7 +113,7 @@ export class IdempotencySigner {
     ttlSeconds: number = 3600,
     approvedData?: Record<string, any>
   ): { ticketToken: string; actionIdPrefix: string } {
-    if (typeof ttlSeconds !== "number" || !Number.isFinite(ttlSeconds) || !Number.isInteger(ttlSeconds) || ttlSeconds <= 0) {
+    if (typeof ttlSeconds !== "number" || !Number.isFinite(ttlSeconds) || !Number.isInteger(ttlSeconds) || ttlSeconds <= 0 || ttlSeconds > 86400) {
       throw new Error("ttlSeconds must be a finite positive integer.");
     }
     const actionIdPrefix = `act_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
@@ -111,7 +121,7 @@ export class IdempotencySigner {
     const expiresAt = issuedAt + ttlSeconds;
 
     const dataHash = approvedData
-      ? crypto.createHash("sha256").update(JSON.stringify(approvedData)).digest("hex")
+      ? crypto.createHash("sha256").update(canonicalJson(approvedData)).digest("hex")
       : undefined;
 
     const payload: TicketPayload = {
@@ -171,6 +181,10 @@ export class IdempotencySigner {
       return { valid: false, error: "Failed to decode token payload." };
     }
 
+    if (!payload || typeof payload !== "object" || typeof payload.sessionId !== "string" ||
+        typeof payload.actionIdPrefix !== "string" || !payload.actionIdPrefix || typeof payload.templateId !== "string") {
+      return { valid: false, error: "Invalid ticket payload." };
+    }
     const canonicalToken = `${payloadB64}.${signature}`;
     const stableId = payload.actionIdPrefix;
     const tokenHash = crypto.createHash("sha256").update(canonicalToken).digest("hex");
@@ -193,18 +207,24 @@ export class IdempotencySigner {
     }
 
     const now = Math.floor(Date.now() / 1000);
-    if (now > payload.expiresAt) {
+    if (now >= payload.expiresAt) {
       return { valid: false, error: "Token has expired." };
     }
 
+    if (payload.dataHash && (!submittedData || typeof submittedData !== "object" || Array.isArray(submittedData))) {
+      return { valid: false, error: "Approved submission data is required." };
+    }
     if (submittedData && typeof submittedData === "object") {
       if (submittedData.sessionId && submittedData.sessionId !== payload.sessionId) {
         return { valid: false, error: "Submitted sessionId does not match ticket sessionId." };
       }
       if (payload.dataHash) {
-        const subCopy = { ...submittedData };
-        delete subCopy.sessionId;
-        const subHash = crypto.createHash("sha256").update(JSON.stringify(subCopy)).digest("hex");
+        const subCopy = submittedData.approvedData !== undefined
+          ? submittedData.approvedData : Object.fromEntries(Object.entries(submittedData).filter(([k]) => k !== "sessionId"));
+        if (!subCopy || typeof subCopy !== "object" || Array.isArray(subCopy)) {
+          return { valid: false, error: "Approved submission data is required." };
+        }
+        const subHash = crypto.createHash("sha256").update(canonicalJson(subCopy)).digest("hex");
         if (payload.dataHash !== subHash) {
           return { valid: false, error: "Submitted data has been tampered with or differs from approved preview." };
         }

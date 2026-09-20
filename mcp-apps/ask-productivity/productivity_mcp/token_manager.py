@@ -26,6 +26,9 @@ log = logging.getLogger("productivity_mcp.token_manager")
 
 def get_hmac_secret() -> str:
     secret = os.getenv("VELORA_APPROVAL_HMAC_SECRET")
+    is_prod = any(os.getenv(k, "").lower() in ("production", "prod") for k in ("VELORA_ENV", "ENVIRONMENT", "NODE_ENV"))
+    if is_prod and (not secret or secret == "velora-test-approval-hmac-secret-key-32ch"):
+        raise ValueError("Explicit production VELORA_APPROVAL_HMAC_SECRET is required")
     if not secret:
         is_test_env = (
             os.getenv("ALLOW_OFFLINE_TEST_TOKENS", "").lower() in ("1", "true", "yes")

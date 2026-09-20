@@ -104,6 +104,21 @@ export class TemplateEvaluator {
       const expanded = template.expand({ $root: hydrationContext });
       const rawEvaluatedCard = typeof expanded === "string" ? JSON.parse(expanded) : expanded;
 
+      // Include the immutable preview separately from editable card inputs. Teams
+      // submits action data plus input fields, not the original render request.
+      const bindActions = (node: any): void => {
+        if (!node || typeof node !== "object") return;
+        if (node.type === "Action.Submit") {
+          node.data = { ...(node.data || {}), ticketToken, sessionId, approvedData: request.data };
+          return;
+        }
+        for (const value of Object.values(node)) {
+          if (Array.isArray(value)) value.forEach(bindActions);
+          else bindActions(value);
+        }
+      };
+      bindActions(rawEvaluatedCard);
+
       // 5. Sanitize & Validate (Schema v1.5, URL whitelist, 15KB size check)
       const validation = this.validator.sanitizeAndValidate(rawEvaluatedCard);
 

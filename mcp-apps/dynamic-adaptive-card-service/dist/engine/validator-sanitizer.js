@@ -51,7 +51,7 @@ export class ValidatorSanitizer {
             try {
                 const parsedUrl = new URL(node.url);
                 const isAllowed = this.allowedDomains.some((d) => parsedUrl.hostname === d || parsedUrl.hostname.endsWith(`.${d}`));
-                if (!isAllowed) {
+                if (!isAllowed || parsedUrl.protocol !== "https:" || parsedUrl.username || parsedUrl.password) {
                     errors.push(`Disallowed domain in Action.OpenUrl: ${parsedUrl.hostname}`);
                 }
             }
@@ -61,6 +61,8 @@ export class ValidatorSanitizer {
         }
         // Walk child properties
         for (const key of Object.keys(node)) {
+            if (node.type === "Action.Submit" && key === "data")
+                continue;
             if (typeof node[key] === "object") {
                 this.walkAndSanitize(node[key], errors);
             }

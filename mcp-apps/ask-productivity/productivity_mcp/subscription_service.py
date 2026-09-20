@@ -309,7 +309,7 @@ class SubscriptionService:
                 except Exception:
                     pass
                 return True
-            return status in ("SUCCESS", "FAILED", "RECONCILIATION_REQUIRED")
+            return status in ("SUCCESS", "FAILED", "SKIPPED", "RECONCILIATION_REQUIRED")
 
     def claim_subscription_run(
         self,
@@ -343,7 +343,7 @@ class SubscriptionService:
                 row = cursor.fetchone()
                 if row:
                     curr_status, curr_details_raw, curr_exec_id, curr_exec_at = row
-                    if curr_status in ("SUCCESS", "FAILED", "RECONCILIATION_REQUIRED"):
+                    if curr_status in ("SUCCESS", "FAILED", "SKIPPED", "RECONCILIATION_REQUIRED"):
                         return False
                     # Reconcile potentially submitted messages before retrying to prevent duplicate sends
                     if curr_details_raw:

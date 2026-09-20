@@ -13,6 +13,8 @@ import logging
 import os
 import sys
 import time
+import uuid
+import html
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 
@@ -32,6 +34,28 @@ log = logging.getLogger("productivity_mcp.worker")
 
 from shared_mcp.kill_switch import check_kill_switch, KillSwitchActiveError
 from productivity_mcp.standing_authorization import get_standing_authorization_store
+
+
+def get_scoped_provider_client(base_client: Any, mailbox: str) -> Any:
+    """Obtains a provider client appropriately scoped to the given mailbox owner.
+    Prevents cross-mailbox disclosure where one client context is reused across multiple users.
+    """
+    if not mailbox:
+        raise ValueError("Mailbox is required to scope provider client.")
+
+    if getattr(base_client, "user_email", None) == mailbox:
+        return base_client
+
+    if isinstance(base_client, Microsoft365Client):
+        scoped = Microsoft365Client(user_email=mailbox)
+        scoped.graph_access_token = base_client.graph_access_token
+        scoped.force_mock = base_client.force_mock
+        return scoped
+
+    import copy
+    scoped = copy.copy(base_client)
+    scoped.user_email = mailbox
+    return scoped
 
 
 def evaluate_and_dispatch_subscriptions(
@@ -57,19 +81,21 @@ def evaluate_and_dispatch_subscriptions(
 
     eval_now = now or datetime.now(timezone.utc)
 
-    for sub in active_subs:
+    pending = [(sub, None) for sub in active_subs]
+    for sub, selected_event in pending:
         if not sub.enabled:
             continue
-
-        # For PRE_MEETING, retrieve eligible calendar events (excluding cancelled)
+        scoped_client = get_scoped_provider_client(client, sub.mailbox)
         eligible_events = None
         if sub.kind == SubscriptionKind.PRE_MEETING:
-            try:
-                raw_events = client.list_calendar_events()
-                eligible_events = [ev for ev in raw_events if not ev.get("isCancelled")]
-            except Exception as ex:
-                log.error(f"failed_fetching_calendar_for_pre_meeting sub={sub.subscriptionId} error={ex}")
+            if selected_event is None:
+                try:
+                    events = scoped_client.list_calendar_events()
+                    pending.extend((sub, ev) for ev in events if not ev.get("isCancelled") and ev.get("id"))
+                except Exception as ex:
+                    log.error("failed_fetching_calendar_for_pre_meeting sub=%s error=%s", sub.subscriptionId, ex)
                 continue
+            eligible_events = [selected_event]
 
         is_due, run_key, exec_ctx = is_subscription_due(
             subscription=sub,
@@ -78,6 +104,10 @@ def evaluate_and_dispatch_subscriptions(
         )
 
         if not is_due or not run_key or not exec_ctx:
+            continue
+
+        if sub.kind == SubscriptionKind.ACTION_REMINDER:
+            dispatched_count += _dispatch_action_reminders(sub_service, sub, scoped_client, tenant_id, eval_now, require_live_delivery)
             continue
 
         # Check idempotency barrier
@@ -98,7 +128,7 @@ def evaluate_and_dispatch_subscriptions(
             continue
 
         # Atomically claim run BEFORE sending to prevent race conditions across concurrent replicas
-        execution_id = f"exec-{int(time.time() * 1000)}"
+        execution_id = "exec-" + uuid.uuid4().hex
         claimed = sub_service.claim_subscription_run(
             run_key=run_key,
             tenant_id=tenant_id,
@@ -106,32 +136,33 @@ def evaluate_and_dispatch_subscriptions(
             subscription_version=sub.version,
             execution_id=execution_id,
             scheduled_occurrence=exec_ctx.get("scheduledOccurrence", ""),
-            details={"sub_id": sub.subscriptionId, "kind": sub.kind.value},
+            details={"sub_id": sub.subscriptionId, "kind": sub.kind.value, "mailbox": sub.mailbox},
         )
         if not claimed:
             log.info(f"subscription_run_claim_contested_or_already_taken run_key={run_key}")
             continue
 
+        submitting = False
         try:
             subject = ""
             html_body = ""
             brief_content_hash = ""
 
             if sub.kind == SubscriptionKind.MORNING:
-                brief = briefing_svc.get_morning_briefing(client, user_email=sub.mailbox, reference_time=eval_now)
+                brief = briefing_svc.get_morning_briefing(scoped_client, user_email=sub.mailbox, reference_time=eval_now)
                 subject = f"Executive Daily Briefing | Velora Aviation Holding - {brief.get('date', '')}"
                 html_body = brief.get("renderedHtml", "")
                 brief_content_hash = brief.get("contentHash", "")
 
             elif sub.kind == SubscriptionKind.PRE_MEETING:
                 evt_id = exec_ctx.get("eventId")
-                brief = briefing_svc.get_pre_meeting_briefing(client, user_email=sub.mailbox, event_id=evt_id, reference_time=eval_now)
+                brief = briefing_svc.get_pre_meeting_briefing(scoped_client, user_email=sub.mailbox, event_id=evt_id, reference_time=eval_now)
                 subject = f"Pre-Meeting Briefing: {exec_ctx.get('eventSubject') or 'Executive Alignment'}"
                 html_body = brief.get("renderedHtml", "")
                 brief_content_hash = brief.get("contentHash", "")
 
             elif sub.kind == SubscriptionKind.EOD:
-                brief = briefing_svc.get_end_of_day_digest(client, user_email=sub.mailbox, local_schedule=sub.localSchedule, reference_time=eval_now)
+                brief = briefing_svc.get_end_of_day_digest(scoped_client, user_email=sub.mailbox, local_schedule=sub.localSchedule, reference_time=eval_now)
                 subject = f"Executive End-of-Day Digest | {brief.get('date', '')}"
                 html_body = brief.get("renderedHtml", "")
                 brief_content_hash = brief.get("contentHash", "")
@@ -142,11 +173,34 @@ def evaluate_and_dispatch_subscriptions(
                     run_key=run_key,
                     status="FAILED",
                     details={"error": f"Unsupported subscription kind: {sub.kind}"},
+                    execution_id=execution_id,
                 )
                 continue
 
+            # Transition to SUBMITTING before external provider call to prevent blind duplicate retry on crash
+            if hasattr(sub_service, "transition_subscription_run"):
+                transitioned = sub_service.transition_subscription_run(
+                    run_key=run_key,
+                    execution_id=execution_id,
+                    from_status="CLAIMED",
+                    to_status="SUBMITTING",
+                    details={
+                        "subject": subject,
+                        "contentHash": brief_content_hash,
+                        "kind": sub.kind.value,
+                        "recipients": sub.recipients,
+                        "mailbox": sub.mailbox,
+                    },
+                )
+                if not transitioned:
+                    log.warning("subscription_lease_lost run_key=%s", run_key)
+                    continue
+            else:
+                raise RuntimeError("Durable submission transition is required")
+            submitting = True
+
             # Dispatch via email channel and capture receipt
-            send_res = client.execute_send_email(
+            send_res = scoped_client.execute_send_email(
                 to=sub.recipients,
                 cc=[],
                 subject=subject,
@@ -163,7 +217,7 @@ def evaluate_and_dispatch_subscriptions(
             if not receipt and send_res.get("status") not in ("ACCEPTED", "SENT", "SUCCESS"):
                 raise RuntimeError(f"Subscription delivery failed: missing provider dispatch receipt. Response: {send_res}")
 
-            # Record run success atomically
+            # Record run success atomically with lease token match
             sub_service.complete_subscription_run(
                 run_key=run_key,
                 status="SUCCESS",
@@ -173,7 +227,9 @@ def evaluate_and_dispatch_subscriptions(
                     "kind": sub.kind.value,
                     "recipients": sub.recipients,
                     "providerReceipt": receipt,
+                    "mailbox": sub.mailbox,
                 },
+                execution_id=execution_id,
             )
             dispatched_count += 1
             log.info(f"subscription_dispatched_successfully run_key={run_key} sub_id={sub.subscriptionId}")
@@ -182,11 +238,60 @@ def evaluate_and_dispatch_subscriptions(
             log.error(f"subscription_dispatch_failed run_key={run_key} error={ex}", exc_info=True)
             sub_service.complete_subscription_run(
                 run_key=run_key,
-                status="FAILED",
+                status="RECONCILIATION_REQUIRED" if submitting else "FAILED",
                 details={"error": str(ex)},
+                execution_id=execution_id,
             )
 
     return dispatched_count
+
+
+def _dispatch_action_reminders(service, sub, client, tenant_id, now, require_live_delivery):
+    """Send each approved owner's reminder once per task/deadline/window."""
+    from productivity_mcp.meeting_actions import evaluate_meeting_action_reminders
+    if sub.channel.upper() != "EMAIL":
+        return 0
+    check_kill_switch(tool_name="send_email", tenant_id=tenant_id)
+    approved = {r.lower() for r in sub.recipients}
+    delivered = 0
+    reminders = evaluate_meeting_action_reminders(tenant_id=tenant_id, reference_time=now, client=client)
+    for reminder in reminders:
+        recipient = (reminder.get("recipient") or "").lower()
+        if reminder.get("status") != "REMINDER_DUE" or recipient not in approved or recipient != sub.mailbox.lower():
+            continue
+        run_key = f"{tenant_id}:action-reminder:{reminder['dedupRunKey']}"
+        execution_id = "exec-" + uuid.uuid4().hex
+        if not service.claim_subscription_run(run_key=run_key, tenant_id=tenant_id,
+                subscription_id=sub.subscriptionId, subscription_version=sub.version,
+                execution_id=execution_id, scheduled_occurrence=reminder['dedupRunKey']):
+            continue
+        submitting = False
+        try:
+            # Re-read status immediately before the external effect.
+            task = client.get_planner_task(reminder['taskId'])
+            if not task or task.get('percentComplete', 0) >= 100:
+                service.complete_subscription_run(run_key, "SKIPPED", execution_id=execution_id)
+                continue
+            if task.get('dueDateTime') and task['dueDateTime'] != reminder.get('dueDateTime'):
+                service.complete_subscription_run(run_key, "SKIPPED", execution_id=execution_id)
+                continue
+            if not service.transition_subscription_run(run_key, execution_id, "CLAIMED", "SUBMITTING",
+                    {"recipient": recipient, "taskId": reminder['taskId']}):
+                continue
+            submitting = True
+            result = client.execute_send_email(to=[recipient], cc=[], subject=reminder['subject'],
+                    body="<p>" + html.escape(reminder['body']).replace("\n", "<br>") + "</p>", attachments=[])
+            if require_live_delivery and result.get('simulated', True):
+                raise RuntimeError("Live delivery required")
+            receipt = result.get('providerReceipt') or result.get('requestId') or result.get('id') or result.get('message_id')
+            if not receipt and result.get('status') not in ('ACCEPTED', 'SENT', 'SUCCESS'):
+                raise RuntimeError("Missing provider receipt")
+            service.complete_subscription_run(run_key, "SUCCESS", {"providerReceipt": receipt}, execution_id=execution_id)
+            delivered += 1
+        except Exception as exc:
+            service.complete_subscription_run(run_key, "RECONCILIATION_REQUIRED" if submitting else "FAILED",
+                    {"error": str(exc)}, execution_id=execution_id)
+    return delivered
 
 
 def run_worker_pass(

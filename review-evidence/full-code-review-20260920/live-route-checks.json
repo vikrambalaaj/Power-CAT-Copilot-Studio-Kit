@@ -1,0 +1,79 @@
+[
+  {
+    "name": "agenticad-execai-dev-uaen-ca-001",
+    "fqdn": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "checks": {
+      "/health": {
+        "status": 200,
+        "bytes": 67
+      },
+      "/mcp/tools": {
+        "status": 401
+      }
+    }
+  },
+  {
+    "name": "agenticad-execai-dev-uaen-ca-002",
+    "fqdn": "agenticad-execai-dev-uaen-ca-002.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "checks": {
+      "/health": {
+        "status": 200,
+        "bytes": 986
+      },
+      "/mcp/tools": {
+        "status": 404
+      }
+    }
+  },
+  {
+    "name": "agenticad-execai-dev-uaen-ca-005",
+    "fqdn": "agenticad-execai-dev-uaen-ca-005.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "checks": {
+      "/health": {
+        "status": 200,
+        "bytes": 70
+      },
+      "/mcp/tools": {
+        "status": 401
+      }
+    }
+  },
+  {
+    "name": "agenticad-execai-dev-uaen-ca-006",
+    "fqdn": "agenticad-execai-dev-uaen-ca-006.internal.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "checks": {
+      "/health": {
+        "status": 404
+      },
+      "/mcp/tools": {
+        "status": 404
+      }
+    }
+  },
+  {
+    "name": "agenticad-execai-dev-uaen-ca-004",
+    "fqdn": "agenticad-execai-dev-uaen-ca-004.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "checks": {
+      "/health": {
+        "status": 200,
+        "bytes": 97
+      },
+      "/mcp/tools": {
+        "status": 404
+      }
+    }
+  },
+  {
+    "name": "agenticad-execai-dev-uaen-ca-003",
+    "fqdn": "agenticad-execai-dev-uaen-ca-003.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "checks": {
+      "/health": {
+        "status": 200,
+        "bytes": 50
+      },
+      "/mcp/tools": {
+        "status": 401
+      }
+    }
+  }
+]

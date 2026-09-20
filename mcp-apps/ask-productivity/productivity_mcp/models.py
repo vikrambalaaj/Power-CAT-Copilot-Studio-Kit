@@ -251,7 +251,7 @@ class HandoffRequest(BaseModel):
     userObjectId: str = Field(description="Signed-in Entra Object ID")
     userEmail: str = Field(description="Signed-in user email")
     userTimezone: str = Field(default="Asia/Dubai", description="User preferred IANA time zone")
-    tenantId: Optional[str] = Field(default="velora-tenant", description="Entra Directory Tenant ID")
+    tenantId: Optional[str] = Field(default=None, description="Entra Directory Tenant ID; bound to authenticated claims")
     channel: str = Field(default="Microsoft365Copilot", description="Client channel")
     dataClassification: str = Field(default="CONFIDENTIAL", description="Data sensitivity classification")
     parameters: Dict[str, Any] = Field(default_factory=dict, description="Operation specific parameters")

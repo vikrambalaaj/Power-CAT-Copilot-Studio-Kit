@@ -113,9 +113,9 @@ def compute_manifest_root_hash(record_hashes: Dict[str, str]) -> str:
 def get_audit_signing_key() -> Optional[str]:
     """Retrieve external signing key from environment or fallback test secret."""
     is_prod = (
-        os.getenv("VELORA_ENV", "").lower() == "production"
-        or os.getenv("ENVIRONMENT", "").lower() == "production"
-        or os.getenv("NODE_ENV", "").lower() == "production"
+        os.getenv("VELORA_ENV", "").lower() in ("production", "prod")
+        or os.getenv("ENVIRONMENT", "").lower() in ("production", "prod")
+        or os.getenv("NODE_ENV", "").lower() in ("production", "prod")
     )
     key = os.getenv("VELORA_AUDIT_SIGNING_KEY")
     if key:

@@ -194,8 +194,8 @@ class ReviewerFindingsTests(unittest.IsolatedAsyncioTestCase):
 
         # Budget variance rejecting unmapped company code
         resp_comp = self.client.get("/s4__get_budget_variance?company_code=2000", headers={"X-API-Key": self.api_key})
-        self.assertEqual(resp_comp.status_code, 400)
-        self.assertIn("no approved Financial Management Area mapping", resp_comp.text)
+        self.assertEqual(resp_comp.status_code, 403)
+        self.assertIn("configured service entitlement", resp_comp.text)
 
     def test_r08_contract_mismatch_on_unexpected_shape(self):
         """R08: Malformed OData JSON shape returns CONTRACT_MISMATCH instead of silently returning empty list."""

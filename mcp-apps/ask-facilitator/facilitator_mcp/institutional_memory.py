@@ -388,7 +388,7 @@ def get_vendor_history(
 
     # 2. Subsidiary Scope Filtering (Multi-subsidiary isolation)
     scoped_records: List[VendorPerformanceHistoryRecord] = []
-    scopes_set = set(caller_entity_scopes) if caller_entity_scopes else None
+    scopes_set = set(caller_entity_scopes) if caller_entity_scopes is not None else None
     has_wildcard_scope = scopes_set is not None and ("*" in scopes_set or "CORP_ALL" in scopes_set)
 
     for r in raw_records:
@@ -400,7 +400,7 @@ def get_vendor_history(
 
     # 3. Access Scope & Role Authorization (Dynamic permission revocation)
     authorized_records: List[VendorPerformanceHistoryRecord] = []
-    roles_set = set(caller_roles or ["CORP_PROCUREMENT"])
+    roles_set = set(caller_roles if caller_roles is not None else ["CORP_PROCUREMENT"])
 
     for r in scoped_records:
         if r.access_scope == "RESTRICTED_LEGAL":
@@ -411,6 +411,9 @@ def get_vendor_history(
             if "EXECUTIVE_OFFICE" not in roles_set and "C_SUITE" not in roles_set:
                 log.info("executive_only_record_filtered", record_id=r.record_id, vendor_id=v_id)
                 continue
+
+        if not roles_set:
+            continue
 
         if not include_superseded and r.verification_status == "SUPERSEDED":
             continue

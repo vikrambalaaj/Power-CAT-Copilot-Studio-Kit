@@ -1,0 +1,37 @@
+{
+  "@odata.context": "https://org4b098979.crm15.dynamics.com/api/data/v9.2/$metadata#bots(botid,name,schemaname,statecode,statuscode)",
+  "value": [
+    {
+      "@odata.etag": "W/\"4044292\"",
+      "botid": "d5e8cb8d-bd83-4868-8cca-126b5a0ca101",
+      "statecode": 0,
+      "name": "Velora One V3",
+      "schemaname": "cre2f_veloraonev3_X35rBF",
+      "statuscode": 1
+    },
+    {
+      "@odata.etag": "W/\"3851424\"",
+      "botid": "6c0f4483-3ab1-f111-aaac-7ced8dac2bdc",
+      "statecode": 0,
+      "name": "Velora One v2",
+      "schemaname": "cre2f_veloraonev2",
+      "statuscode": 1
+    },
+    {
+      "@odata.etag": "W/\"3931406\"",
+      "botid": "8bf961c8-f496-f111-b8db-7ced8dac2bdc",
+      "statecode": 0,
+      "name": "Velora One",
+      "schemaname": "new_VeloraExecutiveAgent",
+      "statuscode": 1
+    },
+    {
+      "@odata.etag": "W/\"3844365\"",
+      "botid": "bf52d31c-b1a2-f111-b8dd-7ced8dac2bdc",
+      "statecode": 0,
+      "name": "Velora Productivity Agent",
+      "schemaname": "cre2f_VeloraProductivityAgent",
+      "statuscode": 1
+    }
+  ]
+}

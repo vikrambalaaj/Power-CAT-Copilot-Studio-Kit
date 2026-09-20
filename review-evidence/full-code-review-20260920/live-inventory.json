@@ -1,0 +1,196 @@
+[
+  {
+    "containers": [
+      {
+        "envNames": [
+          "PORT",
+          "ALLOW_ANONYMOUS",
+          "ALLOWED_HOSTS",
+          "CORS_ORIGINS",
+          "S4_API_URL",
+          "S4_AUTH_MODE",
+          "S4_USERNAME",
+          "S4_PASSWORD",
+          "S4_SAP_CLIENT",
+          "S4_AP_ENTITY",
+          "S4_AR_ENTITY",
+          "S4_BUDGET_API_URL",
+          "S4_BUDGET_ENTITY",
+          "MCP_API_KEY",
+          "S4_CUSTOMER_API_URL",
+          "S4_CUSTOMER_ENTITY",
+          "S4_COSTCENTER_API_URL",
+          "S4_COSTCENTER_ENTITY",
+          "S4_PROFITCENTER_API_URL",
+          "S4_PROFITCENTER_ENTITY",
+          "S4_BUDGET_CONSUMPTION_ENTITY",
+          "S4_ENVIRONMENT_LABEL",
+          "S4_BUDGET_TRANSFER_ENTITY"
+        ],
+        "mounts": null,
+        "name": "velora-mcp-s4hana"
+      }
+    ],
+    "external": true,
+    "fqdn": "agenticad-execai-dev-uaen-ca-001.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "name": "agenticad-execai-dev-uaen-ca-001",
+    "revision": "agenticad-execai-dev-uaen-ca-001--r40",
+    "scale": {
+      "maxReplicas": 10,
+      "minReplicas": 1,
+      "rules": [
+        {
+          "http": {
+            "metadata": {
+              "concurrentRequests": "4"
+            }
+          },
+          "name": "http-scaler"
+        }
+      ]
+    },
+    "volumes": []
+  },
+  {
+    "containers": [
+      {
+        "envNames": [
+          "PORT",
+          "ALLOW_ANONYMOUS",
+          "ALLOWED_HOSTS",
+          "CORS_ORIGINS",
+          "SF_API_URL",
+          "SF_COMPANY_ID",
+          "SF_USERNAME",
+          "SF_PASSWORD",
+          "ENABLE_MUTATING_TOOLS",
+          "ENABLE_PERSONAL_INFO_TOOL",
+          "ENFORCE_CONSENT_GATE"
+        ],
+        "mounts": null,
+        "name": "agenticad-execai-dev-uaen-ca-002"
+      }
+    ],
+    "external": true,
+    "fqdn": "agenticad-execai-dev-uaen-ca-002.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "name": "agenticad-execai-dev-uaen-ca-002",
+    "revision": "agenticad-execai-dev-uaen-ca-002--fixed-1789823021",
+    "scale": {
+      "maxReplicas": 10,
+      "minReplicas": 1,
+      "rules": [
+        {
+          "http": {
+            "metadata": {
+              "concurrentRequests": "10"
+            }
+          },
+          "name": "http-scaler"
+        }
+      ]
+    },
+    "volumes": []
+  },
+  {
+    "containers": [
+      {
+        "envNames": null,
+        "mounts": null,
+        "name": "agenticad-execai-dev-uaen-ca-005"
+      }
+    ],
+    "external": true,
+    "fqdn": "agenticad-execai-dev-uaen-ca-005.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "name": "agenticad-execai-dev-uaen-ca-005",
+    "revision": "agenticad-execai-dev-uaen-ca-005--0000001",
+    "scale": {
+      "maxReplicas": 10,
+      "minReplicas": 1,
+      "rules": [
+        {
+          "http": {
+            "metadata": {
+              "concurrentRequests": "10"
+            }
+          },
+          "name": "http-scaler"
+        }
+      ]
+    },
+    "volumes": null
+  },
+  {
+    "containers": [
+      {
+        "envNames": null,
+        "mounts": null,
+        "name": "agenticad-execai-dev-uaen-ca-006"
+      }
+    ],
+    "external": false,
+    "fqdn": "agenticad-execai-dev-uaen-ca-006.internal.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "name": "agenticad-execai-dev-uaen-ca-006",
+    "revision": "agenticad-execai-dev-uaen-ca-006--0000001",
+    "scale": {
+      "maxReplicas": 10,
+      "minReplicas": 1,
+      "rules": [
+        {
+          "http": {
+            "metadata": {
+              "concurrentRequests": "10"
+            }
+          },
+          "name": "http-scaler"
+        }
+      ]
+    },
+    "volumes": null
+  },
+  {
+    "containers": [
+      {
+        "envNames": [
+          "PORT",
+          "NODE_ENV",
+          "TOKEN_SIGNING_SECRET"
+        ],
+        "mounts": null,
+        "name": "agenticad-execai-dev-uaen-ca-004"
+      }
+    ],
+    "external": true,
+    "fqdn": "agenticad-execai-dev-uaen-ca-004.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "name": "agenticad-execai-dev-uaen-ca-004",
+    "revision": "agenticad-execai-dev-uaen-ca-004--0000001",
+    "scale": {
+      "maxReplicas": 10,
+      "minReplicas": 1,
+      "rules": null
+    },
+    "volumes": null
+  },
+  {
+    "containers": [
+      {
+        "envNames": [
+          "PORT",
+          "ALLOWED_HOSTS",
+          "CORS_ORIGINS"
+        ],
+        "mounts": null,
+        "name": "agenticad-execai-dev-uaen-ca-003"
+      }
+    ],
+    "external": true,
+    "fqdn": "agenticad-execai-dev-uaen-ca-003.icyriver-9c0a7af6.uaenorth.azurecontainerapps.io",
+    "name": "agenticad-execai-dev-uaen-ca-003",
+    "revision": "agenticad-execai-dev-uaen-ca-003--fixed-1789823043",
+    "scale": {
+      "maxReplicas": 10,
+      "minReplicas": 1,
+      "rules": null
+    },
+    "volumes": null
+  }
+]
