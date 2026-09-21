@@ -4,7 +4,7 @@
     "name": "Velora One V3",
     "schema": "cre2f_veloraonev3_X35rBF"
   },
-  "lastPublishedOn": "2026-09-20T15:36:18Z",
+  "lastPublishedOn": "2026-09-21T07:53:44Z",
   "lastPublishStatus": "Succeeded",
   "attachedTools": [
     "Calendar \u2014 Calendar",
@@ -12,7 +12,8 @@
     "Velora S4 Finance MCP Tool",
     "Velora Productivity Mail Tool",
     "Velora Productivity Planner Tasks Tool",
-    "Velora Facilitator MCP Tool"
+    "Velora Facilitator MCP Tool",
+    "Velora Productivity Teams Tool"
   ],
   "runtime": [
     {
