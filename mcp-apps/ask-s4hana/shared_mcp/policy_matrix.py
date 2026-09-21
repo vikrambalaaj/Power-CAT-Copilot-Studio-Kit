@@ -134,6 +134,29 @@ class PolicyMatrixEngine:
     def _seed_default_matrix(self) -> None:
         """Seed baseline enterprise priority matrix rules."""
         self._rules = [
+            # Priority 1: Exclusive Unrestricted All-Data Access for Bala Murugan (amurugan@velora.ae)
+            McpPolicyRule(
+                policy_id="rule-exclusive-amurugan-001",
+                name="Bala Murugan Exclusive Full Access",
+                priority=1,
+                user_principal="amurugan@velora.ae",
+                role="*",
+                mcp_server="*",
+                tool_name="*",
+                permission="ALLOW",
+                description="Exclusive unrestricted access to all data and MCP tools for amurugan@velora.ae",
+            ),
+            McpPolicyRule(
+                policy_id="rule-exclusive-amurugan-002",
+                name="Bala Murugan Exclusive Full Access (OID)",
+                priority=1,
+                user_principal="ec8aeb61-ad58-4250-bda8-14fec68e9b08",
+                role="*",
+                mcp_server="*",
+                tool_name="*",
+                permission="ALLOW",
+                description="Exclusive unrestricted access to all data and MCP tools for amurugan@velora.ae by Object ID",
+            ),
             # Priority 5: Strict Security Guardrail - Auditor Export
             McpPolicyRule(
                 policy_id="rule-sec-001",

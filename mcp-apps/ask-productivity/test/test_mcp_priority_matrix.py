@@ -48,6 +48,33 @@ def test_default_enterprise_matrix_admin_access(clean_engine):
     assert decision.matched_rule.role == "Velora_Admin"
 
 
+def test_amurugan_exclusive_priority_1_all_data_access(clean_engine):
+    """Bala Murugan (amurugan@velora.ae) must have Priority 1 exclusive full access across all servers and tools."""
+    amurugan_ident = VerifiedIdentity(
+        tenant_id="7d167021-f5e9-4331-9b75-d44d55a1ce9b",
+        object_id="ec8aeb61-ad58-4250-bda8-14fec68e9b08",
+        principal_type="user",
+        client_application_id="copilot",
+        roles=set(), # Even without explicit admin or executive roles
+        display_email="amurugan@velora.ae",
+    )
+
+    # Test all MCP servers: productivity, successfactors, s4hana, facilitator, sac
+    for server in ["ask-productivity", "ask-successfactors", "ask-s4hana", "ask-facilitator", "ask-sac"]:
+        decision = clean_engine.evaluate_access(
+            user_email=amurugan_ident.display_email,
+            user_oid=amurugan_ident.object_id,
+            roles=amurugan_ident.roles,
+            is_admin=amurugan_ident.is_admin,
+            mcp_server=server,
+            tool_name="any_sensitive_tool",
+        )
+        assert decision.allowed is True
+        assert decision.matched_rule.priority == 1
+        assert "murugan" in decision.matched_rule.name.lower()
+        assert decision.matched_rule.user_principal == "amurugan@velora.ae"
+
+
 def test_priority_override_lower_number_wins(clean_engine):
     """Lower priority number (e.g. 5) strictly overrides higher priority number (e.g. 20)."""
     # Add high-priority DENY rule (Priority 5) for a specific executive
