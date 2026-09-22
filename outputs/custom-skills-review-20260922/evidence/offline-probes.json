@@ -1,0 +1,27 @@
+{
+  "facilitator_unverified_confirmation": {
+    "returned_status": "EMAIL_SENT",
+    "mocked_provider_calls": 2
+  },
+  "channel_scope": {
+    "result": [
+      {
+        "chatId": "unrelated-chat",
+        "content": "unrelated fixture"
+      }
+    ],
+    "search_arguments": "call(query='*', max_results=5)"
+  },
+  "live_pending_approvals": {
+    "result": []
+  },
+  "conversational_action_extraction": {
+    "input": "Alex: I will send the revised budget by Friday.",
+    "extracted_count": 0
+  },
+  "briefing_auto_send": {
+    "prepare_calls": 1,
+    "send_calls_without_intermediate_user_input": 1
+  },
+  "facilitator_local_finance_import": "ModuleNotFoundError for s4hana_mcp when only facilitator package is on path"
+}

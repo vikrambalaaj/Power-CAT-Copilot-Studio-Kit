@@ -1,0 +1,5 @@
+Command: npm test -- --reporter=dot
+Component: mcp-apps/dynamic-adaptive-card-service
+Vitest v1.6.1
+1 test file passed; 12 tests passed; duration 1.18s.
+Executed locally 2026-09-22. This summary records the observed tool output.

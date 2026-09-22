@@ -1,0 +1,64 @@
+FILE test_validate_against_headcount_report.py
+....                                                                     [100%]
+4 passed in 3.81s
+
+
+FILE test_consent_greeting.py
+.                                                                        [100%]
+1 passed in 1.83s
+
+
+FILE test_dataverse_audit_and_memory.py
+........                                                                 [100%]
+8 passed in 0.95s
+
+
+FILE test_consent_and_greeting.py
+....                                                                     [100%]
+4 passed in 0.71s
+
+
+FILE test_connection_manager.py
+..........                                                               [100%]
+10 passed in 0.40s
+
+
+FILE test_audit_durability.py
+......                                                                   [100%]
+6 passed in 0.30s
+
+
+FILE test_federated_auth_isolation.py
+..                                                                       [100%]
+2 passed in 0.88s
+
+
+FILE test_cache_and_concurrency.py
+....                                                                     [100%]
+4 passed in 1.65s
+
+
+FILE test_consent_persistence_and_gate.py
+.........                                                                [100%]
+9 passed in 1.17s
+
+
+FILE test_leavers_attrition_trend.py
+.....                                                                    [100%]
+5 passed in 1.19s
+
+
+FILE test_policy_and_drilldown.py
+...........                                                              [100%]
+11 passed in 0.57s
+
+
+FILE test_app.py
+................................                                         [100%]
+=============================== warnings summary ===============================
+../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47
+  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+32 passed, 1 warning in 1.40s

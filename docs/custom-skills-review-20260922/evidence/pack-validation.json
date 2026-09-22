@@ -1,0 +1,69 @@
+{
+  "skills": [
+    {
+      "skill": "velora-board-brief",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-budget-control",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-cash-exposure",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-decision-evidence",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-emiratisation-watch",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-executive-attention",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-governed-correspondence",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-meeting-actions",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-meeting-dossier",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-scheduled-briefings",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-vendor-decision",
+      "valid": true,
+      "message": "Skill is valid!"
+    },
+    {
+      "skill": "velora-workforce-assurance",
+      "valid": true,
+      "message": "Skill is valid!"
+    }
+  ],
+  "local_markdown_links": "all resolve",
+  "tool_name_bindings": "all found in corresponding runtime source",
+  "test_file_references": "all exist",
+  "acceptance_scenarios": 48,
+  "live_deployment_validated": false
+}

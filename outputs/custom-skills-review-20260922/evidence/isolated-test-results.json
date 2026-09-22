@@ -1,0 +1,332 @@
+[
+  {
+    "service": "ask-successfactors",
+    "file": "test_validate_against_headcount_report.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 3.81s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_consent_greeting.py",
+    "exit_code": 0,
+    "output": ".                                                                        [100%]\n1 passed in 1.83s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_dataverse_audit_and_memory.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 0.95s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_consent_and_greeting.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 0.71s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_connection_manager.py",
+    "exit_code": 0,
+    "output": "..........                                                               [100%]\n10 passed in 0.40s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_audit_durability.py",
+    "exit_code": 0,
+    "output": "......                                                                   [100%]\n6 passed in 0.30s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_federated_auth_isolation.py",
+    "exit_code": 0,
+    "output": "..                                                                       [100%]\n2 passed in 0.88s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_cache_and_concurrency.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 1.65s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_consent_persistence_and_gate.py",
+    "exit_code": 0,
+    "output": ".........                                                                [100%]\n9 passed in 1.17s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_leavers_attrition_trend.py",
+    "exit_code": 0,
+    "output": ".....                                                                    [100%]\n5 passed in 1.19s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_policy_and_drilldown.py",
+    "exit_code": 0,
+    "output": "...........                                                              [100%]\n11 passed in 0.57s\n"
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "test_app.py",
+    "exit_code": 0,
+    "output": "................................                                         [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n32 passed, 1 warning in 1.40s\n"
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "test_financial_error_propagation.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 1.11s\n"
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "test_reviewer_findings.py",
+    "exit_code": 0,
+    "output": ".............                                                            [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_reviewer_findings.py:8\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_reviewer_findings.py:8: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n13 passed, 3 warnings in 1.51s\n"
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "test_review_company_boundary.py",
+    "exit_code": 0,
+    "output": "..                                                                       [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_review_company_boundary.py:3\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-s4hana/test/test_review_company_boundary.py:3: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n2 passed, 3 warnings in 1.19s\n"
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "test_app.py",
+    "exit_code": 0,
+    "output": "..................                                                       [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n18 passed, 1 warning in 1.33s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_business_repository.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 0.62s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_dataverse_foundation.py",
+    "exit_code": 0,
+    "output": "......                                                                   [100%]\n6 passed in 0.36s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_evidence_contract.py",
+    "exit_code": 0,
+    "output": ".....                                                                    [100%]\n5 passed in 0.33s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_two_step_pattern.py",
+    "exit_code": 0,
+    "output": ".....                                                                    [100%]\n5 passed in 0.86s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_four_failed_cases.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 0.88s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_daily_briefing.py",
+    "exit_code": 0,
+    "output": ".....                                                                    [100%]\n5 passed in 0.68s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_finance_recommendations.py",
+    "exit_code": 0,
+    "output": "...........                                                              [100%]\n11 passed in 1.61s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_recommendation_feedback.py",
+    "exit_code": 0,
+    "output": "..........                                                               [100%]\n10 passed in 1.99s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_m365_writes.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 1.42s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_operation_store_lifecycle.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 0.21s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_mcp_priority_matrix.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 1.05s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_notification_claims.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n7 passed in 1.41s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_m365_reads.py",
+    "exit_code": 0,
+    "output": "................                                                         [100%]\n16 passed in 0.71s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_review_worker_failures.py",
+    "exit_code": 0,
+    "output": "......                                                                   [100%]\n6 passed in 0.58s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_recommendation_engine.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 0.82s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_meeting_actions.py",
+    "exit_code": 0,
+    "output": "............                                                             [100%]\n12 passed in 1.64s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_triage_engine.py",
+    "exit_code": 0,
+    "output": "..............                                                           [100%]\n14 passed in 1.19s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_graph_configuration.py",
+    "exit_code": 0,
+    "output": "...                                                                      [100%]\n3 passed in 0.25s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_graph_read_contracts.py",
+    "exit_code": 1,
+    "output": "FFFFFF.F.F                                                               [100%]\n=================================== FAILURES ===================================\n______ TestGraphReadContracts.test_01_local_midnight_boundary_asia_dubai _______\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:61: in test_01_local_midnight_boundary_asia_dubai\n    events = self.client.list_calendar_events(time_zone=\"Asia/Dubai\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1131: in list_calendar_events\n    raise GraphSourceUnavailableError(\"SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.\")\nE   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.\n__________ TestGraphReadContracts.test_02_recurrent_meeting_metadata ___________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:72: in test_02_recurrent_meeting_metadata\n    evt = self.client.get_meeting_details(\"EVT-2026-0826-03\")\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1199: in get_meeting_details\n    raise GraphSourceUnavailableError(\"SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.\")\nE   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.\n__________ TestGraphReadContracts.test_03_null_online_meeting_safety ___________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:84: in test_03_null_online_meeting_safety\n    evt = self.client.get_meeting_details(\"EVT-2026-0826-04\")\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1199: in get_meeting_details\n    raise GraphSourceUnavailableError(\"SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.\")\nE   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.\n____________ TestGraphReadContracts.test_04_canceled_event_handling ____________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:100: in test_04_canceled_event_handling\n    events_active = self.client.list_calendar_events(include_cancelled=False)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1131: in list_calendar_events\n    raise GraphSourceUnavailableError(\"SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.\")\nE   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.\n_____________ TestGraphReadContracts.test_05_unread_mail_filtering _____________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:123: in test_05_unread_mail_filtering\n    self.assertEqual(unread_res[\"status\"], \"SUCCESS\")\nE   AssertionError: 'SOURCE_UNAVAILABLE' != 'SUCCESS'\nE   - SOURCE_UNAVAILABLE\nE   + SUCCESS\n________ TestGraphReadContracts.test_06_pagination_and_ssrf_protection _________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:156: in test_06_pagination_and_ssrf_protection\n    self.client.search_mail(max_results=1)\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:935: in search_mail\n    raise GraphSourceUnavailableError(\"SOURCE_UNAVAILABLE: search_mail requires configured Microsoft 365 credentials.\")\nE   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: search_mail requires configured Microsoft 365 credentials.\n_______ TestGraphReadContracts.test_08_timestamp_overdue_task_detection ________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:194: in test_08_timestamp_overdue_task_detection\n    tasks = self.client.list_planner_tasks(overdue_only=True)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1578: in list_planner_tasks\n    raise GraphSourceUnavailableError(\"SOURCE_UNAVAILABLE: list_planner_tasks requires configured Microsoft 365 credentials.\")\nE   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: list_planner_tasks requires configured Microsoft 365 credentials.\n_ TestGraphReadContracts.test_10_meeting_context_exact_vs_uncertain_and_no_work_iq _\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:235: in test_10_meeting_context_exact_vs_uncertain_and_no_work_iq\n    self.assertEqual(exact_res[\"status\"], \"SUCCESS\")\nE   AssertionError: 'SOURCE_UNAVAILABLE' != 'SUCCESS'\nE   - SOURCE_UNAVAILABLE\nE   + SUCCESS\n=========================== short test summary info ============================\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_01_local_midnight_boundary_asia_dubai\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_02_recurrent_meeting_metadata\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_03_null_online_meeting_safety\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_04_canceled_event_handling\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_05_unread_mail_filtering\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_06_pagination_and_ssrf_protection\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_08_timestamp_overdue_task_detection\nFAILED ../../../../../../../dev::TestGraphReadContracts::test_10_meeting_context_exact_vs_uncertain_and_no_work_iq\n8 failed, 2 passed in 1.61s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_schedule_engine.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n7 passed in 0.35s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_federated_auth_isolation.py",
+    "exit_code": 0,
+    "output": "..                                                                       [100%]\n2 passed in 0.47s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_worker_job_durable_reconciliation.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 1.24s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_network_and_killswitch.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 0.14s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_identity_boundary.py",
+    "exit_code": 0,
+    "output": "...............                                                          [100%]\n=============================== warnings summary ===============================\n::TestIdentityBoundary::test_handoff_rejects_body_identity_conflict\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_identity_boundary.py:251: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n::TestIdentityBoundary::test_handoff_rejects_body_identity_conflict\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n15 passed, 2 warnings in 1.02s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_review_identity_failures.py",
+    "exit_code": 0,
+    "output": "........                                                                 [100%]\n8 passed in 0.12s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_briefing_variants.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n7 passed in 1.21s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_operation_state_machine.py",
+    "exit_code": 0,
+    "output": "......                                                                   [100%]\n6 passed in 0.25s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_handoff_contract.py",
+    "exit_code": 1,
+    "output": "FF                                                                       [100%]\n=================================== FAILURES ===================================\n_____ TestHandoffContract.test_parent_email_prepare_and_execution_handoff ______\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_handoff_contract.py:58: in test_parent_email_prepare_and_execution_handoff\n    self.assertEqual(resp2.status, \"SUCCESS\")\nE   AssertionError: 'FAIL_CLOSED_BLOCKED' != 'SUCCESS'\nE   - FAIL_CLOSED_BLOCKED\nE   + SUCCESS\n___________ TestHandoffContract.test_parent_search_mail_read_handoff ___________\n/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_handoff_contract.py:77: in test_parent_search_mail_read_handoff\n    self.assertEqual(resp.status, \"SUCCESS\")\nE   AssertionError: 'SOURCE_UNAVAILABLE' != 'SUCCESS'\nE   - SOURCE_UNAVAILABLE\nE   + SUCCESS\n=========================== short test summary info ============================\nFAILED ../../../../../../../dev::TestHandoffContract::test_parent_email_prepare_and_execution_handoff\nFAILED ../../../../../../../dev::TestHandoffContract::test_parent_search_mail_read_handoff\n2 failed in 1.07s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_audit_buffering_repair.py",
+    "exit_code": 0,
+    "output": "....                                                                     [100%]\n4 passed in 0.35s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_confidence_policy.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n7 passed in 0.28s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_dataverse_tool_authorization.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n7 passed in 0.13s\n"
+  },
+  {
+    "service": "ask-productivity",
+    "file": "test_governed_execution_boundary.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n7 passed in 0.84s\n"
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "test_decision_audit_export.py",
+    "exit_code": 0,
+    "output": "...........                                                              [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_decision_audit_export.py:30\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_decision_audit_export.py:30: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n11 passed, 3 warnings in 3.84s\n"
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "test_review_transport_authorization.py",
+    "exit_code": 0,
+    "output": "...                                                                      [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_review_transport_authorization.py:8\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_review_transport_authorization.py:8: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 3 warnings in 1.47s\n"
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "test_facilitator_governance.py",
+    "exit_code": 0,
+    "output": ".......                                                                  [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_facilitator_governance.py:14\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_facilitator_governance.py:14: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n7 passed, 3 warnings in 1.50s\n"
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "test_vendor_evaluation.py",
+    "exit_code": 0,
+    "output": "...........                                                              [100%]\n=============================== warnings summary ===============================\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_vendor_evaluation.py:28\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-facilitator/test/test_vendor_evaluation.py:28: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]\n\n../../../../../../../Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47\n  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n11 passed, 3 warnings in 2.39s\n"
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "test_institutional_memory.py",
+    "exit_code": 0,
+    "output": "...........                                                              [100%]\n11 passed in 1.00s\n"
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "test_app.py",
+    "exit_code": 0,
+    "output": ".............                                                            [100%]\n13 passed in 0.39s\n"
+  },
+  {
+    "service": "ask-sac",
+    "file": "test_app.py",
+    "exit_code": 0,
+    "output": "...                                                                      [100%]\n3 passed in 0.63s\n"
+  }
+]

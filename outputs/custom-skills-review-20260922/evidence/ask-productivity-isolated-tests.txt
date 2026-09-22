@@ -1,0 +1,247 @@
+FILE test_business_repository.py
+....                                                                     [100%]
+4 passed in 0.62s
+
+
+FILE test_dataverse_foundation.py
+......                                                                   [100%]
+6 passed in 0.36s
+
+
+FILE test_evidence_contract.py
+.....                                                                    [100%]
+5 passed in 0.33s
+
+
+FILE test_two_step_pattern.py
+.....                                                                    [100%]
+5 passed in 0.86s
+
+
+FILE test_four_failed_cases.py
+....                                                                     [100%]
+4 passed in 0.88s
+
+
+FILE test_daily_briefing.py
+.....                                                                    [100%]
+5 passed in 0.68s
+
+
+FILE test_finance_recommendations.py
+...........                                                              [100%]
+11 passed in 1.61s
+
+
+FILE test_recommendation_feedback.py
+..........                                                               [100%]
+10 passed in 1.99s
+
+
+FILE test_m365_writes.py
+........                                                                 [100%]
+8 passed in 1.42s
+
+
+FILE test_operation_store_lifecycle.py
+....                                                                     [100%]
+4 passed in 0.21s
+
+
+FILE test_mcp_priority_matrix.py
+........                                                                 [100%]
+8 passed in 1.05s
+
+
+FILE test_notification_claims.py
+.......                                                                  [100%]
+7 passed in 1.41s
+
+
+FILE test_m365_reads.py
+................                                                         [100%]
+16 passed in 0.71s
+
+
+FILE test_review_worker_failures.py
+......                                                                   [100%]
+6 passed in 0.58s
+
+
+FILE test_recommendation_engine.py
+........                                                                 [100%]
+8 passed in 0.82s
+
+
+FILE test_meeting_actions.py
+............                                                             [100%]
+12 passed in 1.64s
+
+
+FILE test_triage_engine.py
+..............                                                           [100%]
+14 passed in 1.19s
+
+
+FILE test_graph_configuration.py
+...                                                                      [100%]
+3 passed in 0.25s
+
+
+FILE test_graph_read_contracts.py
+FFFFFF.F.F                                                               [100%]
+=================================== FAILURES ===================================
+______ TestGraphReadContracts.test_01_local_midnight_boundary_asia_dubai _______
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:61: in test_01_local_midnight_boundary_asia_dubai
+    events = self.client.list_calendar_events(time_zone="Asia/Dubai")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1131: in list_calendar_events
+    raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.")
+E   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.
+__________ TestGraphReadContracts.test_02_recurrent_meeting_metadata ___________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:72: in test_02_recurrent_meeting_metadata
+    evt = self.client.get_meeting_details("EVT-2026-0826-03")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1199: in get_meeting_details
+    raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.")
+E   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.
+__________ TestGraphReadContracts.test_03_null_online_meeting_safety ___________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:84: in test_03_null_online_meeting_safety
+    evt = self.client.get_meeting_details("EVT-2026-0826-04")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1199: in get_meeting_details
+    raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.")
+E   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: get_meeting_details requires configured Microsoft 365 credentials.
+____________ TestGraphReadContracts.test_04_canceled_event_handling ____________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:100: in test_04_canceled_event_handling
+    events_active = self.client.list_calendar_events(include_cancelled=False)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1131: in list_calendar_events
+    raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.")
+E   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: list_calendar_events requires configured Microsoft 365 credentials.
+_____________ TestGraphReadContracts.test_05_unread_mail_filtering _____________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:123: in test_05_unread_mail_filtering
+    self.assertEqual(unread_res["status"], "SUCCESS")
+E   AssertionError: 'SOURCE_UNAVAILABLE' != 'SUCCESS'
+E   - SOURCE_UNAVAILABLE
+E   + SUCCESS
+________ TestGraphReadContracts.test_06_pagination_and_ssrf_protection _________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:156: in test_06_pagination_and_ssrf_protection
+    self.client.search_mail(max_results=1)
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:935: in search_mail
+    raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: search_mail requires configured Microsoft 365 credentials.")
+E   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: search_mail requires configured Microsoft 365 credentials.
+_______ TestGraphReadContracts.test_08_timestamp_overdue_task_detection ________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:194: in test_08_timestamp_overdue_task_detection
+    tasks = self.client.list_planner_tasks(overdue_only=True)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/productivity_mcp/m365_client.py:1578: in list_planner_tasks
+    raise GraphSourceUnavailableError("SOURCE_UNAVAILABLE: list_planner_tasks requires configured Microsoft 365 credentials.")
+E   productivity_mcp.m365_client.GraphSourceUnavailableError: SOURCE_UNAVAILABLE: list_planner_tasks requires configured Microsoft 365 credentials.
+_ TestGraphReadContracts.test_10_meeting_context_exact_vs_uncertain_and_no_work_iq _
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_graph_read_contracts.py:235: in test_10_meeting_context_exact_vs_uncertain_and_no_work_iq
+    self.assertEqual(exact_res["status"], "SUCCESS")
+E   AssertionError: 'SOURCE_UNAVAILABLE' != 'SUCCESS'
+E   - SOURCE_UNAVAILABLE
+E   + SUCCESS
+=========================== short test summary info ============================
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_01_local_midnight_boundary_asia_dubai
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_02_recurrent_meeting_metadata
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_03_null_online_meeting_safety
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_04_canceled_event_handling
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_05_unread_mail_filtering
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_06_pagination_and_ssrf_protection
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_08_timestamp_overdue_task_detection
+FAILED ../../../../../../../dev::TestGraphReadContracts::test_10_meeting_context_exact_vs_uncertain_and_no_work_iq
+8 failed, 2 passed in 1.61s
+
+
+FILE test_schedule_engine.py
+.......                                                                  [100%]
+7 passed in 0.35s
+
+
+FILE test_federated_auth_isolation.py
+..                                                                       [100%]
+2 passed in 0.47s
+
+
+FILE test_worker_job_durable_reconciliation.py
+....                                                                     [100%]
+4 passed in 1.24s
+
+
+FILE test_network_and_killswitch.py
+........                                                                 [100%]
+8 passed in 0.14s
+
+
+FILE test_identity_boundary.py
+...............                                                          [100%]
+=============================== warnings summary ===============================
+::TestIdentityBoundary::test_handoff_rejects_body_identity_conflict
+  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_identity_boundary.py:251: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient
+
+::TestIdentityBoundary::test_handoff_rejects_body_identity_conflict
+  /Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/.venv/lib/python3.11/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+15 passed, 2 warnings in 1.02s
+
+
+FILE test_review_identity_failures.py
+........                                                                 [100%]
+8 passed in 0.12s
+
+
+FILE test_briefing_variants.py
+.......                                                                  [100%]
+7 passed in 1.21s
+
+
+FILE test_operation_state_machine.py
+......                                                                   [100%]
+6 passed in 0.25s
+
+
+FILE test_handoff_contract.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ TestHandoffContract.test_parent_email_prepare_and_execution_handoff ______
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_handoff_contract.py:58: in test_parent_email_prepare_and_execution_handoff
+    self.assertEqual(resp2.status, "SUCCESS")
+E   AssertionError: 'FAIL_CLOSED_BLOCKED' != 'SUCCESS'
+E   - FAIL_CLOSED_BLOCKED
+E   + SUCCESS
+___________ TestHandoffContract.test_parent_search_mail_read_handoff ___________
+/Users/vikrambala/copilotstudio/mcp-apps/ask-productivity/test/test_handoff_contract.py:77: in test_parent_search_mail_read_handoff
+    self.assertEqual(resp.status, "SUCCESS")
+E   AssertionError: 'SOURCE_UNAVAILABLE' != 'SUCCESS'
+E   - SOURCE_UNAVAILABLE
+E   + SUCCESS
+=========================== short test summary info ============================
+FAILED ../../../../../../../dev::TestHandoffContract::test_parent_email_prepare_and_execution_handoff
+FAILED ../../../../../../../dev::TestHandoffContract::test_parent_search_mail_read_handoff
+2 failed in 1.07s
+
+
+FILE test_audit_buffering_repair.py
+....                                                                     [100%]
+4 passed in 0.35s
+
+
+FILE test_confidence_policy.py
+.......                                                                  [100%]
+7 passed in 0.28s
+
+
+FILE test_dataverse_tool_authorization.py
+.......                                                                  [100%]
+7 passed in 0.13s
+
+
+FILE test_governed_execution_boundary.py
+.......                                                                  [100%]
+7 passed in 0.84s

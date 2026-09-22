@@ -1,0 +1,16 @@
+{
+  "commit": "4e5ffd29ad9d91c4b35bee0dc3086344bce96946",
+  "method": "Targeted static source review; no application tests or live verification",
+  "files": {
+    "mcp-apps/ask-facilitator/facilitator_mcp/server.py": "c5938211099eb385a849b2f894e5ace7871741a62391eac94ffbfdfa9dadbeda",
+    "mcp-apps/ask-facilitator/facilitator_mcp/tools.py": "d7fc79fa846df73d0a57ff02a17480c2e74511c0b982d519eb92119bb3d9948e",
+    "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py": "1061de565a85120bb67e1a474f0dc109a02cc409b95fe420691ecaba17805832",
+    "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py": "b871f6da47292205b1394391f98647ca139236f07118afd33732881ab5fce3d6",
+    "mcp-apps/ask-productivity/productivity_mcp/worker.py": "8de5be4d40979b3519ccc8334d593bf32cf48eea078ecc8d4b45a1a70da5814e",
+    "mcp-apps/ask-productivity/productivity_mcp/business_repository.py": "e5436ed941d702ead76a7b309cefe856294dc301b5b1a27ea580b2b5438ffc7c",
+    "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py": "f3e80e655cba00b217978cd265fc3c8791d4d28d4bf8be4eb7440c1f5b3a24d2",
+    "mcp-apps/ask-successfactors/agent/appPackage/adaptive-cards/decision-trace.json": "c1b021470e9380963d71bad581a7b8fdf1ea7bb23344f4d017a57dd01f65ba33",
+    "mcp-apps/ask-successfactors/agent/appPackage/instruction.txt": "298d4625577ba77ba8eded1d221a5d0fdd057f3a5440277ec982659f9eff71a2",
+    "review-evidence/full-code-review-20260920/release-preflight.json": "ea168767c17050b5d35b6e86180a23b11b57a140d7e5d4dd03466bd8ab6d89c0"
+  }
+}

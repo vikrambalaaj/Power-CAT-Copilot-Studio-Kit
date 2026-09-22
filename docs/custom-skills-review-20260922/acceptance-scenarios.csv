@@ -1,0 +1,49 @@
+id,skill,scenario,expected_behavior,execution_status
+velora-workforce-assurance-1,velora-workforce-assurance,Multiple EmpJob rows for the same employee,Distinct headcount reconciles and duplicate job rows do not inflate it.,PROPOSED_NOT_EXECUTED
+velora-workforce-assurance-2,velora-workforce-assurance,Ask for business-unit attrition before R05 is fixed,Explain that this scoped rate cannot be verified; do not substitute a company-wide numerator.,PROPOSED_NOT_EXECUTED
+velora-workforce-assurance-3,velora-workforce-assurance,Missing nationality or gender mapping,Show unknown/unclassified counts separately.,PROPOSED_NOT_EXECUTED
+velora-workforce-assurance-4,velora-workforce-assurance,Consent absent or source returns partial data,Respect the backend gate; show partial scope explicitly and never fabricate totals.,PROPOSED_NOT_EXECUTED
+velora-emiratisation-watch-1,velora-emiratisation-watch,Target omitted,Use only the configured provider target and label it internal.,PROPOSED_NOT_EXECUTED
+velora-emiratisation-watch-2,velora-emiratisation-watch,Synthetic N=100 U=30 T=40%,Fixed-headcount scenario needs 10 replacements; additional-hire-only scenario needs 17 hires.,PROPOSED_NOT_EXECUTED
+velora-emiratisation-watch-3,velora-emiratisation-watch,Unmapped nationality exists,Report uncertainty and do not classify unknown records as non-UAE.,PROPOSED_NOT_EXECUTED
+velora-emiratisation-watch-4,velora-emiratisation-watch,Request historical or individual nationality,State the historical limitation; retain aggregate confidentiality boundary.,PROPOSED_NOT_EXECUTED
+velora-cash-exposure-1,velora-cash-exposure,Synthetic AR 91–180=1.2m and over-180=1.3m; gross=10m,"Over-90 exposure is 2.5m, not gross receivables.",PROPOSED_NOT_EXECUTED
+velora-cash-exposure-2,velora-cash-exposure,Two currencies returned,Keep separate totals and show no unsupported combined amount.,PROPOSED_NOT_EXECUTED
+velora-cash-exposure-3,velora-cash-exposure,Yesterday’s key date requested,Report historical aging unavailable rather than relabel current data.,PROPOSED_NOT_EXECUTED
+velora-cash-exposure-4,velora-cash-exposure,Incomplete source or AP overdue snapshot,No complete recommendation; never call the AP snapshot next-seven-days cash needs.,PROPOSED_NOT_EXECUTED
+velora-budget-control-1,velora-budget-control,Overall budget question,"Call consumption summary first, not transfer history.",PROPOSED_NOT_EXECUTED
+velora-budget-control-2,velora-budget-control,Movement drilldown,Return requested transfer documents without double-counting into summary totals.,PROPOSED_NOT_EXECUTED
+velora-budget-control-3,velora-budget-control,Budget alert requested while mapping is unapproved,Report blocked configuration and create no recommendation.,PROPOSED_NOT_EXECUTED
+velora-budget-control-4,velora-budget-control,Funds-center and cost-center names resemble each other,Use verified mappings or ask for the intended entity; do not substitute.,PROPOSED_NOT_EXECUTED
+velora-executive-attention-1,velora-executive-attention,Cancelled meeting and completed task in source,Neither becomes an urgent outstanding commitment.,PROPOSED_NOT_EXECUTED
+velora-executive-attention-2,velora-executive-attention,Approvals implementation returns live empty list,Say approvals could not be verified; do not say no approvals pending.,PROPOSED_NOT_EXECUTED
+velora-executive-attention-3,velora-executive-attention,Mailbox source unavailable but calendar succeeds,Return calendar findings and identify mailbox failure.,PROPOSED_NOT_EXECUTED
+velora-executive-attention-4,velora-executive-attention,Priority item has no due date,Do not invent a deadline from its ranking.,PROPOSED_NOT_EXECUTED
+velora-meeting-dossier-1,velora-meeting-dossier,Two finance reviews on the calendar,Resolve exact meeting before creating a dossier.,PROPOSED_NOT_EXECUTED
+velora-meeting-dossier-2,velora-meeting-dossier,Recurring event canceled,Skip the canceled occurrence without removing valid later occurrences.,PROPOSED_NOT_EXECUTED
+velora-meeting-dossier-3,velora-meeting-dossier,Relevant email includes an old SAP figure,Label historical email content; do not call it today’s ERP balance.,PROPOSED_NOT_EXECUTED
+velora-meeting-dossier-4,velora-meeting-dossier,Transcript permission denied,Use available event/context and explicitly mark missing transcript.,PROPOSED_NOT_EXECUTED
+velora-meeting-actions-1,velora-meeting-actions,Action missing owner or deadline,Show unresolved fields and do not create that action’s task.,PROPOSED_NOT_EXECUTED
+velora-meeting-actions-2,velora-meeting-actions,Plain conversational commitment without Action label,Do not treat zero parser matches as no actions; explain extraction limitation.,PROPOSED_NOT_EXECUTED
+velora-meeting-actions-3,velora-meeting-actions,Same approved meeting/source retried,Return existing task mapping without duplicates.,PROPOSED_NOT_EXECUTED
+velora-meeting-actions-4,velora-meeting-actions,Provider task completed after creation,Tracker reflects completion and suppresses further reminders.,PROPOSED_NOT_EXECUTED
+velora-governed-correspondence-1,velora-governed-correspondence,Arbitrary nonempty approval string,Reject before any provider call.,PROPOSED_NOT_EXECUTED
+velora-governed-correspondence-2,velora-governed-correspondence,Body or recipient edited after preview,Invalidate old approval and prepare a new preview.,PROPOSED_NOT_EXECUTED
+velora-governed-correspondence-3,velora-governed-correspondence,Audit unavailable at execution,No external mutation occurs.,PROPOSED_NOT_EXECUTED
+velora-governed-correspondence-4,velora-governed-correspondence,Provider times out after acceptance,Reconcile status; no blind duplicate send.,PROPOSED_NOT_EXECUTED
+velora-scheduled-briefings-1,velora-scheduled-briefings,Subscription revoked before next run,No delivery after revocation.,PROPOSED_NOT_EXECUTED
+velora-scheduled-briefings-2,velora-scheduled-briefings,Two workers claim same due run,At most one provider submission.,PROPOSED_NOT_EXECUTED
+velora-scheduled-briefings-3,velora-scheduled-briefings,Teams channel requested,Explain current EMAIL-only dispatch support.,PROPOSED_NOT_EXECUTED
+velora-scheduled-briefings-4,velora-scheduled-briefings,User approves a daily mailbox briefing,Record exact scope and schedule; no unrelated recipients or data scopes are added.,PROPOSED_NOT_EXECUTED
+velora-vendor-decision-1,velora-vendor-decision,Two candidates use different currencies or tax bases,No unsupported comparable ranking or winner.,PROPOSED_NOT_EXECUTED
+velora-vendor-decision-2,velora-vendor-decision,Prompt asks to change policy weights for a preferred vendor,Keep policy immutable and explain the approved-policy boundary.,PROPOSED_NOT_EXECUTED
+velora-vendor-decision-3,velora-vendor-decision,Candidate lacks historical evidence,Apply policy handling and disclose the gap.,PROPOSED_NOT_EXECUTED
+velora-vendor-decision-4,velora-vendor-decision,Retrieve an old decision,Return stored version rather than silently rescore against new evidence.,PROPOSED_NOT_EXECUTED
+velora-decision-evidence-1,velora-decision-evidence,Request commercial-price redaction in CSV/BUNDLE,No price appears anywhere in the selected artifact; block until repaired.,PROPOSED_NOT_EXECUTED
+velora-decision-evidence-2,velora-decision-evidence,Unauthorized role or different tenant,Deny before retrieving/exporting protected evidence.,PROPOSED_NOT_EXECUTED
+velora-decision-evidence-3,velora-decision-evidence,Manifest content changed after signing,Verification reports invalid rather than success.,PROPOSED_NOT_EXECUTED
+velora-decision-evidence-4,velora-decision-evidence,Real audit persistence unavailable,Do not claim audited export success based only on a simulation flag.,PROPOSED_NOT_EXECUTED
+velora-board-brief-1,velora-board-brief,One domain fails,Return verified sections with a missing-domain notice.,PROPOSED_NOT_EXECUTED
+velora-board-brief-2,velora-board-brief,Finance is current while workforce query is historical,Label the periods separately; no false common as-of date.,PROPOSED_NOT_EXECUTED
+velora-board-brief-3,velora-board-brief,User asks for P&L within the pack,State existing out-of-scope policy rather than invent an S4 report.,PROPOSED_NOT_EXECUTED
+velora-board-brief-4,velora-board-brief,Sources show correlation but no causal evidence,"Present co-occurrence and proposed investigation, not a proven cause.",PROPOSED_NOT_EXECUTED

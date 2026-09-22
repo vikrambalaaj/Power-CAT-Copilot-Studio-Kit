@@ -1,0 +1,4298 @@
+[
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+    "line": 39,
+    "symbol": "load_json",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+    "line": 44,
+    "symbol": "validate",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/deploy/build_agent_package.py",
+    "line": 115,
+    "symbol": "main",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+    "line": 38,
+    "symbol": "_tool_descriptions",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+    "line": 57,
+    "symbol": "_function",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/deploy/regen_manifests.py",
+    "line": 76,
+    "symbol": "main",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "line": 25,
+    "symbol": "_escape_odata_string",
+    "kind": "FunctionDef",
+    "description": "Escape a string literal according to OData v2 quoting rules."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "line": 30,
+    "symbol": "_bounded_top",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "line": 34,
+    "symbol": "_csv_codes",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "line": 38,
+    "symbol": "_parse_sf_date",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "line": 50,
+    "symbol": "_load_env",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+    "line": 66,
+    "symbol": "SuccessFactorsClient",
+    "kind": "ClassDef",
+    "description": "Async OData v2 client for SAP SuccessFactors HCM API supporting Delegated Identity & RBP Trimming."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 81,
+    "symbol": "_parse_date_input",
+    "kind": "FunctionDef",
+    "description": "Safely parse various date formats (date, datetime, OData /Date(...)/, ISO string)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 106,
+    "symbol": "calculate_age",
+    "kind": "FunctionDef",
+    "description": "Calculate integer age in years from date of birth without exposing DOB."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 125,
+    "symbol": "calculate_age_group",
+    "kind": "FunctionDef",
+    "description": "Calculate age bucket on the server. Never return raw date of birth."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 143,
+    "symbol": "calculate_tenure",
+    "kind": "FunctionDef",
+    "description": "Calculate tenure in years and months from original hire/start date."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 171,
+    "symbol": "calculate_length_of_service",
+    "kind": "FunctionDef",
+    "description": "Calculate length of service (alias for tenure)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 176,
+    "symbol": "calculate_tenure_years",
+    "kind": "FunctionDef",
+    "description": "Calculate tenure as fractional years rounded to 1 decimal place."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 192,
+    "symbol": "calculate_tenure_group",
+    "kind": "FunctionDef",
+    "description": "Calculate tenure bracket for aggregate demographic reporting using exact dates."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 219,
+    "symbol": "resolve_country_name",
+    "kind": "FunctionDef",
+    "description": "Resolve ISO country code or nationality text into standardized country name."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 227,
+    "symbol": "normalize_department",
+    "kind": "FunctionDef",
+    "description": "Normalize department names, mapping missing/unknown to Unassigned."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 234,
+    "symbol": "PolicyDecision",
+    "kind": "ClassDef",
+    "description": "Represents the outcome of a disclosure policy evaluation."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 267,
+    "symbol": "PolicyEngine",
+    "kind": "ClassDef",
+    "description": "Evaluates active Dataverse policies and sanitizes outgoing data."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_engine.py",
+    "line": 451,
+    "symbol": "get_policy_engine",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 11,
+    "symbol": "_fact",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 15,
+    "symbol": "_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 42,
+    "symbol": "_headcount_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 108,
+    "symbol": "_joiners_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 146,
+    "symbol": "_delivery_fields",
+    "kind": "FunctionDef",
+    "description": "Expose fallbacks explicitly so Copilot topics can bind them without parsing the card."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 165,
+    "symbol": "_visualization_spec",
+    "kind": "FunctionDef",
+    "description": "Return a compact, model-friendly presentation contract."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 220,
+    "symbol": "_drilldown_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 317,
+    "symbol": "_memory_recall_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/adaptive_cards.py",
+    "line": 376,
+    "symbol": "decorate",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 18,
+    "symbol": "_safe_result",
+    "kind": "FunctionDef",
+    "description": "Keep validation guidance, but never expose backend or Python errors to users."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 33,
+    "symbol": "_card_fallback_text",
+    "kind": "FunctionDef",
+    "description": "Build concise readable fallback text without serializing card JSON."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 60,
+    "symbol": "_json_response",
+    "kind": "FunctionDef",
+    "description": "Prefer an Adaptive Card while retaining the original result as fallback."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 77,
+    "symbol": "build_adaptive_card",
+    "kind": "FunctionDef",
+    "description": "Helper to build an Adaptive Card v1.5 JSON payload with Velora Reasoning, Sources & Audit metadata."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 135,
+    "symbol": "sf__get_emp_jobs",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve headcount and job records allowed by the configured SuccessFactors account."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 159,
+    "symbol": "sf__get_emiratisation_kpi",
+    "kind": "AsyncFunctionDef",
+    "description": "Return an aggregate Emiratisation KPI using the configured tenant-specific filter."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 168,
+    "symbol": "sf__get_workforce_demographics",
+    "kind": "AsyncFunctionDef",
+    "description": "Return governed aggregate workforce composition by nationality, gender, age_group, or tenure_group with optional division, department, or company filtering."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 190,
+    "symbol": "sf__get_headcount",
+    "kind": "AsyncFunctionDef",
+    "description": "Return complete aggregate headcount by department/division with an executive visualization and sources."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 216,
+    "symbol": "sf__get_joiners",
+    "kind": "AsyncFunctionDef",
+    "description": "Return real, aggregate new-hire counts and trends for an inclusive date range. If dates are omitted, defaults to the current reporting period."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 240,
+    "symbol": "sf__get_leavers",
+    "kind": "AsyncFunctionDef",
+    "description": "Return verified aggregate leaver/separation counts and reason breakdown from SAP SuccessFactors."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 266,
+    "symbol": "sf__get_attrition",
+    "kind": "AsyncFunctionDef",
+    "description": "Calculate verified organization-wide and UAE National attrition rates with voluntary/involuntary drivers."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 290,
+    "symbol": "sf__get_joiners_leavers_trend",
+    "kind": "AsyncFunctionDef",
+    "description": "Return net workforce growth; omitted dates use the current year-to-date reporting period."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 314,
+    "symbol": "sf__get_emp_job_detail",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve a specific employee's job history record."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 320,
+    "symbol": "sf__create_emp_job",
+    "kind": "AsyncFunctionDef",
+    "description": "Create a new job history entry (EmpJob) for an employee in SuccessFactors."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 353,
+    "symbol": "sf__update_emp_job",
+    "kind": "AsyncFunctionDef",
+    "description": "Update an existing employee job history record in SuccessFactors."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 380,
+    "symbol": "sf__get_users",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve employee directory profiles allowed by the configured SuccessFactors account."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 391,
+    "symbol": "sf__get_user_detail",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve details for a specific employee user ID."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 397,
+    "symbol": "sf__update_user",
+    "kind": "AsyncFunctionDef",
+    "description": "Update employee profile details in SuccessFactors."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 425,
+    "symbol": "sf__get_employment_info",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve employment history and details (EmpEmployment)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 431,
+    "symbol": "sf__get_personal_info",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve personal information (PerPersonal) by external person ID."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 437,
+    "symbol": "sf__get_org_units",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve master org foundation objects (FOCompany, FOBusinessUnit, FODepartment, FODivision)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 443,
+    "symbol": "sf__get_analytics_dashboard",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve a combined workforce overview from independently verified aggregate queries."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 471,
+    "symbol": "sf__execute_odata",
+    "kind": "AsyncFunctionDef",
+    "description": "Execute an arbitrary OData v2 query against any SAP SuccessFactors entity."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 486,
+    "symbol": "sf__get_workforce_drilldown",
+    "kind": "AsyncFunctionDef",
+    "description": "Drill down into employee-level records for a specific group/department/division governed by Dataverse disclosure policy."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 514,
+    "symbol": "sf__check_and_record_consent",
+    "kind": "AsyncFunctionDef",
+    "description": "Check user confidentiality consent or record consent acceptance in Microsoft Dataverse."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 551,
+    "symbol": "sf__get_session_greeting",
+    "kind": "AsyncFunctionDef",
+    "description": "Generate session start greeting and capability starters while triggering background 30-day memory pre-load."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 569,
+    "symbol": "sf__recall_user_memory",
+    "kind": "AsyncFunctionDef",
+    "description": "Recall 30-day user conversation topics, decisions, and context from Dataverse."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 586,
+    "symbol": "sf__manage_disclosure_policy",
+    "kind": "AsyncFunctionDef",
+    "description": "Manage Dataverse employee disclosure policies (list, activate, create/update)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+    "line": 616,
+    "symbol": "sf__preview_disclosure_policy",
+    "kind": "AsyncFunctionDef",
+    "description": "Preview permitted vs prohibited employee fields under active Dataverse policy."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 118,
+    "symbol": "AuditCommitStatus",
+    "kind": "ClassDef",
+    "description": "Explicit result contract for audit persistence (Defect 5)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 126,
+    "symbol": "sanitize_email",
+    "kind": "FunctionDef",
+    "description": "Normalize email for consistent identity indexing and partitioning."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 131,
+    "symbol": "_odata_escape",
+    "kind": "FunctionDef",
+    "description": "Escape a value for safe inlining into an OData string literal."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 136,
+    "symbol": "compute_content_hash",
+    "kind": "FunctionDef",
+    "description": "Compute deterministic SHA-256 hash for payload reconciliation and deduplication."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 141,
+    "symbol": "compute_approval_token_hash",
+    "kind": "FunctionDef",
+    "description": "Compute HMAC-SHA256 hash of approval token so raw secrets are never persisted."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 148,
+    "symbol": "DataverseAuditRecord",
+    "kind": "ClassDef",
+    "description": "Strongly-typed wrapper for the full `cre2f_veloraagentauditlog` schema."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 559,
+    "symbol": "DataverseClient",
+    "kind": "ClassDef",
+    "description": "Production Dataverse client with fail-closed write semantics and in-memory fallback."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/dataverse_audit.py",
+    "line": 1384,
+    "symbol": "get_dataverse_client",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 52,
+    "symbol": "successfactors_widget",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 61,
+    "symbol": "_policy_governed_handler",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 118,
+    "symbol": "_validate_env",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 151,
+    "symbol": "ApiKeyMiddleware",
+    "kind": "ClassDef",
+    "description": "Protect all non-health endpoints with vault-managed API key."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 199,
+    "symbol": "CopilotStudioAcceptMiddleware",
+    "kind": "ClassDef",
+    "description": "Make Power Platform connector calls compatible with Streamable HTTP."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 407,
+    "symbol": "health",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 427,
+    "symbol": "copilot_openapi",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 431,
+    "symbol": "copilot_plugin_manifest",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 451,
+    "symbol": "copilot_logo",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 461,
+    "symbol": "chart_image",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 473,
+    "symbol": "_CopilotContext",
+    "kind": "ClassDef",
+    "description": "No-op progress context for synchronous Agent Flow HTTP calls."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 494,
+    "symbol": "_copilot_card_payload",
+    "kind": "FunctionDef",
+    "description": "Flatten an MCP card into fields that Agent Flow can bind reliably."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 557,
+    "symbol": "copilot_workforce_card",
+    "kind": "AsyncFunctionDef",
+    "description": "Typed HTTP action for Copilot Studio Adaptive Card completions."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 593,
+    "symbol": "api_policies",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for Dataverse policy listing and management."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 618,
+    "symbol": "api_policy_preview",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for disclosure policy output simulation."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 632,
+    "symbol": "api_consent",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for consent verification and recording."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 733,
+    "symbol": "api_memory",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for 30-day user memory recall."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 782,
+    "symbol": "_extract_and_verify_admin_roles",
+    "kind": "FunctionDef",
+    "description": "Extract verified roles from trusted caller identity (Verified JWT or Signed Gateway Assertion)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 840,
+    "symbol": "api_connections",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for listing and registering managed enterprise connections."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 850,
+    "symbol": "api_connection_test",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for testing an enterprise connection."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 862,
+    "symbol": "api_connection_toggle",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for toggling connection enabled/disabled status."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 880,
+    "symbol": "api_connection_rotate",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for rotating secret references."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 899,
+    "symbol": "api_cache_purge",
+    "kind": "AsyncFunctionDef",
+    "description": "REST API for purging all in-process cache tiers."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 907,
+    "symbol": "create_app",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py",
+    "line": 963,
+    "symbol": "main",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "line": 25,
+    "symbol": "_font",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "line": 38,
+    "symbol": "_render_headcount",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "line": 71,
+    "symbol": "store_headcount_chart",
+    "kind": "FunctionDef",
+    "description": "Render and retain an opaque chart image identifier for fifteen minutes."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "line": 92,
+    "symbol": "_render_joiners",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "line": 126,
+    "symbol": "store_joiners_chart",
+    "kind": "FunctionDef",
+    "description": "Render and retain a joiner chart using the same short-lived image store."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/chart_images.py",
+    "line": 148,
+    "symbol": "get_chart",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "line": 31,
+    "symbol": "CacheInfo",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "line": 46,
+    "symbol": "AsyncTTLCache",
+    "kind": "ClassDef",
+    "description": "In-process TTL cache with deep-copy isolation, miss coalescing, and optional Stale-While-Revalidate (SWR)."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "line": 168,
+    "symbol": "MultiLayerCache",
+    "kind": "ClassDef",
+    "description": "Manages all 5 caching tiers with composite key construction and pre-warming."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/cache.py",
+    "line": 244,
+    "symbol": "get_multi_layer_cache",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+    "line": 34,
+    "symbol": "require_consent",
+    "kind": "FunctionDef",
+    "description": "Decorator gating one tool handler behind an accepted confidentiality notice."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_gate.py",
+    "line": 80,
+    "symbol": "wrap_specs_consent",
+    "kind": "FunctionDef",
+    "description": "Gate the employee-level disclosure tools behind the consent check."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+    "line": 28,
+    "symbol": "ConnectionAdminService",
+    "kind": "ClassDef",
+    "description": "Privileged service managing enterprise connections."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_admin.py",
+    "line": 213,
+    "symbol": "get_connection_admin_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 23,
+    "symbol": "ConnectionType",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 35,
+    "symbol": "ReadWriteClassification",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 42,
+    "symbol": "AuthType",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 51,
+    "symbol": "ConnectionHealthStatus",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 62,
+    "symbol": "EnterpriseConnection",
+    "kind": "ClassDef",
+    "description": "Represents an administrator-managed enterprise connection record."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 98,
+    "symbol": "SecretStoreProvider",
+    "kind": "ClassDef",
+    "description": "Resolves secret references securely without storing plaintext credentials in Dataverse."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 167,
+    "symbol": "ConnectionManager",
+    "kind": "ClassDef",
+    "description": "Manages enterprise connection registry, deterministic resolution, and background health checks."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 635,
+    "symbol": "get_connection_manager",
+    "kind": "FunctionDef",
+    "description": "Retrieve global singleton ConnectionManager."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/connection_manager.py",
+    "line": 643,
+    "symbol": "set_connection_manager",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "line": 20,
+    "symbol": "get_time_aware_salutation",
+    "kind": "FunctionDef",
+    "description": "Return time-appropriate salutation based on user timezone or Asia/Dubai."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "line": 39,
+    "symbol": "build_capabilities_card",
+    "kind": "FunctionDef",
+    "description": "Build a clean greeting card that simply greets the user and says hi without listing capabilities."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "line": 69,
+    "symbol": "build_greeting_card",
+    "kind": "FunctionDef",
+    "description": "Alias for build_capabilities_card returning a concise, friendly greeting card."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "line": 77,
+    "symbol": "GreetingService",
+    "kind": "ClassDef",
+    "description": "Manages session greeting generation and asynchronous background pre-warming."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/greeting_service.py",
+    "line": 162,
+    "symbol": "get_greeting_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+    "line": 26,
+    "symbol": "MemorySnapshot",
+    "kind": "ClassDef",
+    "description": "Bounded, layered snapshot of a user's 30-day interaction history."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+    "line": 64,
+    "symbol": "MemoryService",
+    "kind": "ClassDef",
+    "description": "Manages 30-day historical context indexing, snapshotting, and recall."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/memory_service.py",
+    "line": 235,
+    "symbol": "get_memory_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+    "line": 7,
+    "symbol": "SuccessFactorsSettings",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+    "line": 73,
+    "symbol": "get_settings",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+    "line": 34,
+    "symbol": "build_consent_adaptive_card",
+    "kind": "FunctionDef",
+    "description": "Generate a blocking Adaptive Card v1.5 requiring explicit checkbox selection to proceed."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+    "line": 103,
+    "symbol": "ConsentService",
+    "kind": "ClassDef",
+    "description": "Evaluates and records user confidentiality consent."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/consent_service.py",
+    "line": 185,
+    "symbol": "get_consent_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+    "line": 16,
+    "symbol": "PolicyAdminService",
+    "kind": "ClassDef",
+    "description": "Enterprise policy lifecycle management and preview generation."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/policy_admin.py",
+    "line": 65,
+    "symbol": "get_policy_admin",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+    "line": 31,
+    "symbol": "BackgroundLogger",
+    "kind": "ClassDef",
+    "description": "Non-blocking background queue and async worker for Dataverse audit logging with durable spooling."
+  },
+  {
+    "service": "ask-successfactors",
+    "file": "mcp-apps/ask-successfactors/successfactors_mcp/background_logger.py",
+    "line": 318,
+    "symbol": "get_background_logger",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+    "line": 17,
+    "symbol": "tool_descriptions",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+    "line": 35,
+    "symbol": "function_manifest",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/deploy/generate_plugin.py",
+    "line": 54,
+    "symbol": "main",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "line": 84,
+    "symbol": "build_ar_filters",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "line": 108,
+    "symbol": "build_ap_filters",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "line": 132,
+    "symbol": "build_budget_transfer_filters",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+    "line": 162,
+    "symbol": "build_budget_consumption_filters",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 43,
+    "symbol": "serialize_with_exact_decimals",
+    "kind": "FunctionDef",
+    "description": "Serialize data structure to JSON, preserving Decimals as exact numeric literals without float precision loss (F04, T03)."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 68,
+    "symbol": "SafeJSONResponse",
+    "kind": "ClassDef",
+    "description": "JSONResponse that serializes Decimal values and Enums safely with exact decimal preservation (F04)."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 90,
+    "symbol": "authorize_company_arguments",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 100,
+    "symbol": "_company_scoped_handler",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 150,
+    "symbol": "ApiKeyMiddleware",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 206,
+    "symbol": "health",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 276,
+    "symbol": "_build_mcp_tools",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 362,
+    "symbol": "resolve_tool_handler",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 377,
+    "symbol": "list_tools_endpoint",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 381,
+    "symbol": "handle_tool_rest",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 416,
+    "symbol": "handle_schema_endpoint",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 448,
+    "symbol": "handle_mcp_endpoint",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 544,
+    "symbol": "validate_configuration",
+    "kind": "FunctionDef",
+    "description": "Startup validation for approved S/4HANA roots, hosts, and credentials (F05)."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 551,
+    "symbol": "create_app",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 599,
+    "symbol": "start",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/server.py",
+    "line": 604,
+    "symbol": "main",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+    "line": 10,
+    "symbol": "_fact",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+    "line": 14,
+    "symbol": "_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/adaptive_cards.py",
+    "line": 29,
+    "symbol": "decorate",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "line": 23,
+    "symbol": "escape_odata",
+    "kind": "FunctionDef",
+    "description": "Escape single quotes in OData string literals."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "line": 28,
+    "symbol": "bounded_top",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "line": 36,
+    "symbol": "validate_relative_entity",
+    "kind": "FunctionDef",
+    "description": "Ensure entity is a clean relative path segment, rejecting path traversal or absolute URLs."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/client.py",
+    "line": 44,
+    "symbol": "S4Client",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 31,
+    "symbol": "response",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 51,
+    "symbol": "live_key_date_error",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 84,
+    "symbol": "build_text_summary",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 283,
+    "symbol": "s4__get_receivables_aging",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve accounts-receivable aging from SAP S/4HANA OData v4 service."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 330,
+    "symbol": "s4__get_payables_aging",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve accounts-payable aging from SAP S/4HANA OData v4 service."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 377,
+    "symbol": "s4__get_budget_transfers",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve budget movement and transfer records from SAP S/4HANA for detailed drill-down."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 424,
+    "symbol": "s4__get_budget_consumption",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve budget, commitment, and actual expenditure records from SAP S/4HANA."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 486,
+    "symbol": "s4__get_budget_variance",
+    "kind": "AsyncFunctionDef",
+    "description": "Compatibility adapter routing legacy budget requests to budget consumption."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 527,
+    "symbol": "s4__get_profit_and_loss",
+    "kind": "AsyncFunctionDef",
+    "description": "Legacy endpoint: P&L is removed from S/4HANA service scope. Returns truthful unsupported response."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 538,
+    "symbol": "s4__get_customer_master",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 565,
+    "symbol": "s4__get_cost_center_master",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+    "line": 588,
+    "symbol": "s4__get_profit_center_master",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+    "line": 16,
+    "symbol": "CacheInfo",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/cache.py",
+    "line": 31,
+    "symbol": "AsyncTTLCache",
+    "kind": "ClassDef",
+    "description": "In-process TTL cache with deep-copy isolation and miss coalescing."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "line": 10,
+    "symbol": "ReportStatus",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "line": 24,
+    "symbol": "safe_decimal",
+    "kind": "FunctionDef",
+    "description": "Parse value to Decimal preserving exact precision without binary float distortion (F04)."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "line": 54,
+    "symbol": "format_decimal",
+    "kind": "FunctionDef",
+    "description": "Format decimal value into string representation preserving scale."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "line": 63,
+    "symbol": "to_jsonable_data",
+    "kind": "FunctionDef",
+    "description": "Recursively convert Enums and structures for JSON serialization, preserving exact Decimals (F04)."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "line": 78,
+    "symbol": "create_coverage",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+    "line": 96,
+    "symbol": "create_source_record",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+    "line": 7,
+    "symbol": "Settings",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/settings.py",
+    "line": 70,
+    "symbol": "get_settings",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "line": 10,
+    "symbol": "_get_record_currency",
+    "kind": "FunctionDef",
+    "description": "Extract currency from S/4 OData record using exact per-entity field names (F01)."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "line": 39,
+    "symbol": "_first_present_value",
+    "kind": "FunctionDef",
+    "description": "Return first non-None value among keys, preserving valid numeric zeroes."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "line": 47,
+    "symbol": "_calculate_single_currency_aging",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "line": 179,
+    "symbol": "calculate_aging_buckets",
+    "kind": "FunctionDef",
+    "description": "Calculate deterministic aging buckets from AR/AP records."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "line": 236,
+    "symbol": "calculate_budget_movements",
+    "kind": "FunctionDef",
+    "description": "Classify budget entries into original budget vs transfers vs supplements/returns."
+  },
+  {
+    "service": "ask-s4hana",
+    "file": "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+    "line": 368,
+    "symbol": "calculate_budget_consumption",
+    "kind": "FunctionDef",
+    "description": "Calculate budget consumption measures."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/deploy/generate_plugin.py",
+    "line": 13,
+    "symbol": "generate",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 52,
+    "symbol": "tool_get_sac_kpis",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve executive financial, operational, and strategic KPIs from SAP Analytics Cloud (SAC)."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 61,
+    "symbol": "tool_get_sac_story_analytics",
+    "kind": "AsyncFunctionDef",
+    "description": "Fetch high-level business intelligence story insights, charts, and variances from SAP Analytics Cloud."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 70,
+    "symbol": "tool_get_sac_model_data",
+    "kind": "AsyncFunctionDef",
+    "description": "Query data export model structures and aggregated metric values directly from SAP Analytics Cloud models."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 75,
+    "symbol": "health",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 79,
+    "symbol": "list_tools_endpoint",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 92,
+    "symbol": "call_mcp_rest",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 108,
+    "symbol": "rest_get_sac_kpis",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 122,
+    "symbol": "rest_get_sac_story",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 136,
+    "symbol": "rest_get_sac_model",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 155,
+    "symbol": "McpAuthMiddleware",
+    "kind": "ClassDef",
+    "description": "Authentication middleware protecting MCP and REST endpoints."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 242,
+    "symbol": "create_app",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/server.py",
+    "line": 268,
+    "symbol": "main",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/adaptive_cards.py",
+    "line": 4,
+    "symbol": "build_sac_kpi_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/adaptive_cards.py",
+    "line": 47,
+    "symbol": "build_sac_story_card",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/client.py",
+    "line": 7,
+    "symbol": "SACAuthenticationError",
+    "kind": "ClassDef",
+    "description": "Raised when SAC OAuth authentication fails."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/client.py",
+    "line": 11,
+    "symbol": "SACClient",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/tools.py",
+    "line": 6,
+    "symbol": "get_sac_kpis",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve executive financial, operational, and strategic KPIs from SAP Analytics Cloud (SAC)."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/tools.py",
+    "line": 16,
+    "symbol": "get_sac_story_analytics",
+    "kind": "AsyncFunctionDef",
+    "description": "Fetch high-level business intelligence story insights, charts, and variances from SAP Analytics Cloud."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/tools.py",
+    "line": 26,
+    "symbol": "get_sac_model_data",
+    "kind": "AsyncFunctionDef",
+    "description": "Query data export model structures and aggregated metric values directly from SAP Analytics Cloud models."
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/cache.py",
+    "line": 6,
+    "symbol": "TTLCache",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-sac",
+    "file": "mcp-apps/ask-sac/sac_mcp/settings.py",
+    "line": 4,
+    "symbol": "SACSettings",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 19,
+    "symbol": "CriterionDirection",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 24,
+    "symbol": "TiePolicy",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 31,
+    "symbol": "MissingDataPolicy",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 36,
+    "symbol": "round_decimal",
+    "kind": "FunctionDef",
+    "description": "Round Decimal using ROUND_HALF_UP to exact places."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 43,
+    "symbol": "EvaluationCriterion",
+    "kind": "ClassDef",
+    "description": "Individual scoring criterion within an approved evaluation policy."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 56,
+    "symbol": "CommercialComparabilityBasis",
+    "kind": "ClassDef",
+    "description": "Required parameters for commercial proposals to be comparable."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 65,
+    "symbol": "HistoryInfluencePolicy",
+    "kind": "ClassDef",
+    "description": "Explicit, approved rules for incorporating historical performance."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 81,
+    "symbol": "EvaluationPolicy",
+    "kind": "ClassDef",
+    "description": "Approved evaluation policy with immutable criteria, weights, and comparability rules."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 160,
+    "symbol": "get_approved_policy",
+    "kind": "FunctionDef",
+    "description": "Retrieve approved evaluation policy by ID and version."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 176,
+    "symbol": "CandidateProposalInput",
+    "kind": "ClassDef",
+    "description": "Typed candidate proposal input."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 194,
+    "symbol": "CandidateScoringResult",
+    "kind": "ClassDef",
+    "description": "Computed scoring breakdown for a single candidate."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 212,
+    "symbol": "validate_commercial_comparability",
+    "kind": "FunctionDef",
+    "description": "Validate that all candidate proposals conform to required comparability parameters."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 245,
+    "symbol": "compute_normalized_scores",
+    "kind": "FunctionDef",
+    "description": "Compute normalized 0-100 scores in pure Decimal for all candidates across policy criteria."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+    "line": 302,
+    "symbol": "evaluate_candidate_options",
+    "kind": "FunctionDef",
+    "description": "Execute complete deterministic dual evaluation (baseline + history-informed) in Decimal."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 73,
+    "symbol": "_authorize_arguments",
+    "kind": "FunctionDef",
+    "description": "Apply the same verified authorization boundary on REST and native MCP."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 119,
+    "symbol": "_wrap_tool_handler",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 145,
+    "symbol": "health",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 149,
+    "symbol": "_require_request_identity",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 156,
+    "symbol": "guide_endpoint",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 168,
+    "symbol": "list_tools_endpoint",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 180,
+    "symbol": "handle_facilitator_tool_rest",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 284,
+    "symbol": "McpAuthMiddleware",
+    "kind": "ClassDef",
+    "description": "Protect native MCP endpoints and REST transports with verified identity."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/server.py",
+    "line": 353,
+    "symbol": "create_app",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/finance_snapshot_service.py",
+    "line": 24,
+    "symbol": "generate_finance_snapshot",
+    "kind": "AsyncFunctionDef",
+    "description": "Generate verified KPI snapshot from authoritative SAP S/4HANA financial data."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/finance_snapshot_service.py",
+    "line": 224,
+    "symbol": "evaluate_finance_snapshot",
+    "kind": "AsyncFunctionDef",
+    "description": "Generate and evaluate verified finance snapshot through Productivity recommendation engine."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/finance_snapshot_service.py",
+    "line": 281,
+    "symbol": "_persist_snapshot_if_possible",
+    "kind": "FunctionDef",
+    "description": "Save snapshot into durable Business Repository if available."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 74,
+    "symbol": "get_allowed_recipient_domains",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 81,
+    "symbol": "validate_recipient_policy",
+    "kind": "FunctionDef",
+    "description": "Validate recipients against authorized domain policy."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 96,
+    "symbol": "_load_durable_jsonl",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 115,
+    "symbol": "_append_durable_jsonl",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 130,
+    "symbol": "seed_test_facilitator_data",
+    "kind": "FunctionDef",
+    "description": "Reset / seed test data for test fixture isolation."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 137,
+    "symbol": "query_user_history_from_dataverse",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 145,
+    "symbol": "sync_dataverse_logs_to_memory",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 153,
+    "symbol": "get_facilitator_guide",
+    "kind": "FunctionDef",
+    "description": "Retrieve the official step-by-step Facilitator Copilot auto-send email and meeting workflow setup guide."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 170,
+    "symbol": "get_calendar_meetings",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 178,
+    "symbol": "process_calendar_meeting_workflow",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 193,
+    "symbol": "ingest_chat_to_knowledge_graph",
+    "kind": "FunctionDef",
+    "description": "Ingest chat interaction and response into Institutional Memory Knowledge Graph / Dataverse Knowledge Base."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 232,
+    "symbol": "generate_pre_meeting_briefing",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 246,
+    "symbol": "export_meeting_to_loop_notebook",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 261,
+    "symbol": "send_executive_email_via_graph",
+    "kind": "FunctionDef",
+    "description": "Send executive email via Microsoft Graph API with recipient policy check and confirmation governance."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 371,
+    "symbol": "draft_meeting_summary_email",
+    "kind": "FunctionDef",
+    "description": "Draft an executive meeting summary email with strict HTML escaping to prevent prompt/HTML injection."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 415,
+    "symbol": "configure_auto_send_policy",
+    "kind": "FunctionDef",
+    "description": "Configure auto-send and workflow policies for the Facilitator agent."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 440,
+    "symbol": "ingest_vendor_performance_record",
+    "kind": "FunctionDef",
+    "description": "Synchronous/async wrapper for MCP tool execution to ingest approved vendor performance record."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 504,
+    "symbol": "get_vendor_performance_history",
+    "kind": "FunctionDef",
+    "description": "Retrieve bounded historical vendor performance profile."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 521,
+    "symbol": "evaluate_vendor_options_tool",
+    "kind": "AsyncFunctionDef",
+    "description": "Execute governed, deterministic vendor options evaluation with Decimal scoring."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 548,
+    "symbol": "get_vendor_decision_record",
+    "kind": "FunctionDef",
+    "description": "Retrieve persisted historical vendor decision record without fresh LLM evaluation."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 569,
+    "symbol": "export_decision_trail",
+    "kind": "FunctionDef",
+    "description": "Export decision manifest with cryptographic signature and formula-safe CSV view."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/tools.py",
+    "line": 597,
+    "symbol": "verify_decision_manifest",
+    "kind": "FunctionDef",
+    "description": "Verify cryptographic signature, Merkle root, and replay calculations from input snapshot."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 87,
+    "symbol": "InstitutionalMemoryError",
+    "kind": "ClassDef",
+    "description": "Base exception for institutional memory operations."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 92,
+    "symbol": "InstitutionalMemoryValidationError",
+    "kind": "ClassDef",
+    "description": "Raised on invalid schema or input values."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 97,
+    "symbol": "InstitutionalMemoryAccessDeniedError",
+    "kind": "ClassDef",
+    "description": "Raised on unauthorized cross-subsidiary or restricted scope access."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 102,
+    "symbol": "InstitutionalMemoryPersistenceError",
+    "kind": "ClassDef",
+    "description": "Raised when repository write or readback fails."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 107,
+    "symbol": "sanitize_untrusted_narrative",
+    "kind": "FunctionDef",
+    "description": "Sanitize narrative text to prevent prompt injection and markup attacks."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 127,
+    "symbol": "compute_source_hash",
+    "kind": "FunctionDef",
+    "description": "Compute deterministic SHA-256 hash of raw source material."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 138,
+    "symbol": "ingest_institutional_record",
+    "kind": "AsyncFunctionDef",
+    "description": "Ingest an approved institutional record for vendor performance history."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+    "line": 347,
+    "symbol": "get_vendor_history",
+    "kind": "FunctionDef",
+    "description": "Retrieve historical vendor performance profile with scope filtering, gap analysis, and caveats."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 59,
+    "symbol": "DecisionServiceError",
+    "kind": "ClassDef",
+    "description": "Base exception for decision service."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 64,
+    "symbol": "DecisionPersistenceError",
+    "kind": "ClassDef",
+    "description": "Raised when decision persistence or readback verification fails."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 69,
+    "symbol": "_decimal_to_str",
+    "kind": "FunctionDef",
+    "description": "Helper to convert Decimals to floats/strings for JSON serialization."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 80,
+    "symbol": "_calculate_history_score_from_records",
+    "kind": "FunctionDef",
+    "description": "Calculate normalized 0-100 historical performance score from verified records."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 123,
+    "symbol": "generate_decision_id",
+    "kind": "FunctionDef",
+    "description": "Deterministic decision identifier based on use case, policy, and sorted candidates."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 130,
+    "symbol": "evaluate_vendor_options",
+    "kind": "AsyncFunctionDef",
+    "description": "Execute governed, deterministic vendor options evaluation."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+    "line": 563,
+    "symbol": "get_historical_decision",
+    "kind": "FunctionDef",
+    "description": "Retrieve persisted historical decision record without fresh LLM evaluation."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 77,
+    "symbol": "ArtifactAccessExpiredError",
+    "kind": "ClassDef",
+    "description": "Raised when an artifact link token has passed its expiration time."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 82,
+    "symbol": "ArtifactTokenInvalidError",
+    "kind": "ClassDef",
+    "description": "Raised when an artifact link token has an invalid format or signature."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 87,
+    "symbol": "check_export_authorization",
+    "kind": "FunctionDef",
+    "description": "Verify that caller holds at least one authorized audit export role."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 97,
+    "symbol": "check_audit_logging_liveness",
+    "kind": "FunctionDef",
+    "description": "Fail closed if audit logging or spooling service is experiencing an outage."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 105,
+    "symbol": "generate_artifact_token",
+    "kind": "FunctionDef",
+    "description": "Generate signed, time-bounded token for secure artifact retrieval."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 125,
+    "symbol": "resolve_artifact_token",
+    "kind": "FunctionDef",
+    "description": "Validate signed artifact token and confirm it has not expired."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 148,
+    "symbol": "sanitize_cell_for_csv",
+    "kind": "FunctionDef",
+    "description": "Neutralize spreadsheet formula injection (CWE-1236)."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 176,
+    "symbol": "generate_decision_csv",
+    "kind": "FunctionDef",
+    "description": "Generate formula-safe CSV view summarizing the decision audit trail."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 246,
+    "symbol": "verify_decision_manifest",
+    "kind": "FunctionDef",
+    "description": "Standalone verifier performing cryptographic, hash-chain, closure, and mathematical replay checks."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+    "line": 465,
+    "symbol": "export_decision_trail",
+    "kind": "FunctionDef",
+    "description": "Execute governed, authorized decision trail export."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 37,
+    "symbol": "DecisionAuditError",
+    "kind": "ClassDef",
+    "description": "Base exception for decision audit operations."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 42,
+    "symbol": "DecisionNotFoundError",
+    "kind": "ClassDef",
+    "description": "Raised when the specified vendor decision record cannot be found."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 47,
+    "symbol": "AuditLoggingOutageError",
+    "kind": "ClassDef",
+    "description": "Raised when an audit logging outage is simulated or active."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 52,
+    "symbol": "AuditVerificationError",
+    "kind": "ClassDef",
+    "description": "Raised when cryptographic verification or data integrity check fails."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 58,
+    "symbol": "DecisionManifest",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 87,
+    "symbol": "canonical_json_dumps",
+    "kind": "FunctionDef",
+    "description": "Deterministic, sorted JSON serialization with pure Decimal and ISO timestamp string formatting."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 101,
+    "symbol": "compute_record_hash",
+    "kind": "FunctionDef",
+    "description": "Compute canonical SHA-256 hash for a component record."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 107,
+    "symbol": "compute_manifest_root_hash",
+    "kind": "FunctionDef",
+    "description": "Compute Merkle/composite root SHA-256 hash over sorted record hashes."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 113,
+    "symbol": "get_audit_signing_key",
+    "kind": "FunctionDef",
+    "description": "Retrieve external signing key from environment or fallback test secret."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 130,
+    "symbol": "sign_root_hash",
+    "kind": "FunctionDef",
+    "description": "Cryptographically sign the manifest root hash using external key custody."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 154,
+    "symbol": "verify_signature",
+    "kind": "FunctionDef",
+    "description": "Verify cryptographic signature against root hash."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 166,
+    "symbol": "build_decision_manifest",
+    "kind": "FunctionDef",
+    "description": "Assemble all decision, policy, input, trace, and evidence components into a signed DecisionManifest."
+  },
+  {
+    "service": "ask-facilitator",
+    "file": "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+    "line": 320,
+    "symbol": "finalize_decision_evidence",
+    "kind": "FunctionDef",
+    "description": "Assemble manifest and lock the decision record as finalized and append-only."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/standing_authorization.py",
+    "line": 26,
+    "symbol": "StandingAuthorizationRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/standing_authorization.py",
+    "line": 46,
+    "symbol": "StandingAuthorizationStore",
+    "kind": "ClassDef",
+    "description": "Durable store for standing authorization policies."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/standing_authorization.py",
+    "line": 232,
+    "symbol": "get_standing_authorization_store",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "line": 39,
+    "symbol": "get_scoped_provider_client",
+    "kind": "FunctionDef",
+    "description": "Obtains a provider client appropriately scoped to the given mailbox owner."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "line": 61,
+    "symbol": "evaluate_and_dispatch_subscriptions",
+    "kind": "FunctionDef",
+    "description": "Evaluate all enabled subscriptions against the current time and calendar state."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "line": 249,
+    "symbol": "_dispatch_action_reminders",
+    "kind": "FunctionDef",
+    "description": "Send each approved owner's reminder once per task/deadline/window."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+    "line": 297,
+    "symbol": "run_worker_pass",
+    "kind": "FunctionDef",
+    "description": "Execute a single finite worker pass. Returns count of delivered items."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_recommendations.py",
+    "line": 47,
+    "symbol": "get_recommendation_engine",
+    "kind": "FunctionDef",
+    "description": "Get or create RecommendationEngine for tenant."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_recommendations.py",
+    "line": 60,
+    "symbol": "reset_recommendation_engines_for_testing",
+    "kind": "FunctionDef",
+    "description": "Clear cached singletons during unit tests."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_recommendations.py",
+    "line": 66,
+    "symbol": "evaluate_verified_kpi_snapshot",
+    "kind": "AsyncFunctionDef",
+    "description": "Internal operation: Evaluate verified KPI snapshot from S4 / Facilitator workload."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_recommendations.py",
+    "line": 305,
+    "symbol": "asdict_rec",
+    "kind": "FunctionDef",
+    "description": "Helper to convert RecommendationRecord to clean JSON serializable dictionary."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_recommendations.py",
+    "line": 335,
+    "symbol": "list_recommendations",
+    "kind": "AsyncFunctionDef",
+    "description": "Read operation: List active or historical recommendations with claims, sources, and confidence."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/subscription_service.py",
+    "line": 23,
+    "symbol": "SubscriptionService",
+    "kind": "ClassDef",
+    "description": "Thread-safe persistent store and lifecycle manager for AutomationSubscriptions."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/subscription_service.py",
+    "line": 511,
+    "symbol": "get_subscription_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/subscription_service.py",
+    "line": 518,
+    "symbol": "reset_subscription_service_for_testing",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/server.py",
+    "line": 135,
+    "symbol": "connector_spec",
+    "kind": "AsyncFunctionDef",
+    "description": "Serve the connector spec fetched by the Copilot Studio productivity plugin."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/server.py",
+    "line": 146,
+    "symbol": "health_check",
+    "kind": "AsyncFunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/server.py",
+    "line": 177,
+    "symbol": "handle_parent_handoff",
+    "kind": "AsyncFunctionDef",
+    "description": "Entry point for Copilot Studio Parent to Connected Productivity Agent calls."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/postgres_outbox_store.py",
+    "line": 27,
+    "symbol": "PostgresOutboxStore",
+    "kind": "ClassDef",
+    "description": "Multi-replica production transactional outbox backed by PostgreSQL."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 46,
+    "symbol": "ExtractedActionItem",
+    "kind": "ClassDef",
+    "description": "Action item extracted from transcript or notes with strict provenance tracking."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 84,
+    "symbol": "extract_actions_from_transcript_or_notes",
+    "kind": "FunctionDef",
+    "description": "Extract action items, named owner evidence, and deadline evidence from transcript or notes text."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 242,
+    "symbol": "resolve_action_owners",
+    "kind": "FunctionDef",
+    "description": "Resolve raw owner names against Microsoft 365 directory."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 290,
+    "symbol": "prepare_meeting_actions",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare meeting actions extraction preview and issue approval token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 470,
+    "symbol": "create_approved_meeting_actions",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Commit approved meeting actions to Microsoft Planner with atomic mapping persistence."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 657,
+    "symbol": "get_meeting_action_tracker",
+    "kind": "AsyncFunctionDef",
+    "description": "Live meeting action tracker reading directly from Microsoft Graph provider."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+    "line": 794,
+    "symbol": "evaluate_meeting_action_reminders",
+    "kind": "FunctionDef",
+    "description": "Evaluate active meeting actions against deadline rules for automatic follow-up dispatches."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 31,
+    "symbol": "ReadToolEnvelope",
+    "kind": "ClassDef",
+    "description": "Standardized output envelope for all Microsoft 365 and Work IQ read tools."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 50,
+    "symbol": "WritePreviewEnvelope",
+    "kind": "ClassDef",
+    "description": "Standardized output envelope for Stage A (Prepare) operations."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 64,
+    "symbol": "WriteResultEnvelope",
+    "kind": "ClassDef",
+    "description": "Standardized output envelope for Stage B (Execute Approved) operations."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 77,
+    "symbol": "EmailPreview",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 91,
+    "symbol": "MeetingPreview",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 109,
+    "symbol": "TeamsMessagePreview",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 123,
+    "symbol": "PlannerTaskPreview",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 141,
+    "symbol": "GetMailThreadParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 146,
+    "symbol": "GetPriorityMailParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 152,
+    "symbol": "GetMailFollowUpsParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 157,
+    "symbol": "PrepareEmailReplyParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 163,
+    "symbol": "GetCalendarEventsParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 169,
+    "symbol": "GetMeetingContextParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 173,
+    "symbol": "PrepareMeetingUpdateParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 181,
+    "symbol": "PrepareMeetingCancellationParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 186,
+    "symbol": "GetTeamsChannelContextParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 192,
+    "symbol": "GetTeamsChatContextParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 197,
+    "symbol": "GetTeamsFollowUpsParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 202,
+    "symbol": "PrepareTeamsChatSendParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 208,
+    "symbol": "PrepareTeamsChannelPostParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 215,
+    "symbol": "GetPlannerUserTasksParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 220,
+    "symbol": "GetPlannerPlanTasksParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 226,
+    "symbol": "PreparePlannerTaskCreateParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 235,
+    "symbol": "PreparePlannerTaskUpdateParameters",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 244,
+    "symbol": "HandoffRequest",
+    "kind": "ClassDef",
+    "description": "Parent Velora Agent to Connected Productivity Agent request contract."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/models.py",
+    "line": 260,
+    "symbol": "HandoffResponse",
+    "kind": "ClassDef",
+    "description": "Connected Productivity Agent to Parent Velora Agent response contract."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/schedule_engine.py",
+    "line": 22,
+    "symbol": "get_timezone_offset",
+    "kind": "FunctionDef",
+    "description": "Resolve standard timezones or default to UTC+4 (Asia/Dubai)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/schedule_engine.py",
+    "line": 32,
+    "symbol": "parse_schedule_time",
+    "kind": "FunctionDef",
+    "description": "Parse 'HH:MM' or simple cron 'M H * * *' into (hour, minute)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/schedule_engine.py",
+    "line": 56,
+    "symbol": "calculate_local_occurrence",
+    "kind": "FunctionDef",
+    "description": "Construct a timezone-aware occurrence datetime for a given calendar date."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/schedule_engine.py",
+    "line": 75,
+    "symbol": "is_subscription_due",
+    "kind": "FunctionDef",
+    "description": "Evaluate whether an automation subscription is due for execution."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "line": 27,
+    "symbol": "get_hmac_secret",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "line": 43,
+    "symbol": "compute_preview_checksum",
+    "kind": "FunctionDef",
+    "description": "Compute deterministic SHA-256 checksum of core preview dictionary, excluding volatile timestamp fields."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "line": 48,
+    "symbol": "compute_token_hash_for_dataverse",
+    "kind": "FunctionDef",
+    "description": "Compute secure HMAC-SHA256 hash of the approval token for audit storage."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "line": 56,
+    "symbol": "InvalidTokenError",
+    "kind": "ClassDef",
+    "description": "Raised when an approval confirmation token is invalid, expired, or tampered with."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "line": 61,
+    "symbol": "TokenManager",
+    "kind": "ClassDef",
+    "description": "Manages generation, validation, and integrity checking of short-lived approval tokens."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+    "line": 293,
+    "symbol": "get_token_manager",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/briefing_service.py",
+    "line": 42,
+    "symbol": "compute_content_hash",
+    "kind": "FunctionDef",
+    "description": "Compute deterministic SHA-256 hash of a briefing snapshot dictionary."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/briefing_service.py",
+    "line": 95,
+    "symbol": "BriefingService",
+    "kind": "ClassDef",
+    "description": "High-assurance briefing synthesis engine for Velora One."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/briefing_service.py",
+    "line": 788,
+    "symbol": "get_briefing_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 31,
+    "symbol": "ConcurrencyConflictError",
+    "kind": "ClassDef",
+    "description": "Raised when an update fails due to version/optimistic concurrency conflict."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 35,
+    "symbol": "AccessDeniedError",
+    "kind": "ClassDef",
+    "description": "Raised when cross-tenant access or unauthorized modification is detected."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 39,
+    "symbol": "FinalizedEvidenceMutationError",
+    "kind": "ClassDef",
+    "description": "Raised when an application role or unauthorized caller attempts to update or delete finalized decision evidence."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 44,
+    "symbol": "SourceCatalogRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 62,
+    "symbol": "KPIDefinitionRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 78,
+    "symbol": "KPIRuleRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 108,
+    "symbol": "KPISnapshotRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 127,
+    "symbol": "RecommendationEntityRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 152,
+    "symbol": "RecommendationFeedbackRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 166,
+    "symbol": "InstitutionalRecordEntity",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 184,
+    "symbol": "VendorPerformanceHistoryRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 214,
+    "symbol": "DecisionEvidenceRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 232,
+    "symbol": "PeerBenchmarkRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 250,
+    "symbol": "ProposalEvaluationRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 270,
+    "symbol": "VendorDecisionRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 297,
+    "symbol": "MeetingActionMappingRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 321,
+    "symbol": "SqliteBusinessRepository",
+    "kind": "ClassDef",
+    "description": "ACID SQLite implementation of Business Repository for local/test execution."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2119,
+    "symbol": "SourceCatalogRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2164,
+    "symbol": "KpiDefinitionRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2191,
+    "symbol": "KpiRecommendationRuleRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2238,
+    "symbol": "KpiSnapshotRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2243,
+    "symbol": "RecommendationRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2248,
+    "symbol": "RecommendationFeedbackRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2265,
+    "symbol": "DecisionEvidenceRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2293,
+    "symbol": "InstitutionalRecordRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2322,
+    "symbol": "ProposalEvaluationRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2327,
+    "symbol": "PeerBenchmarkRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2332,
+    "symbol": "VendorHistoryRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2349,
+    "symbol": "VendorDecisionRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2369,
+    "symbol": "MeetingActionRepository",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2396,
+    "symbol": "get_business_repository",
+    "kind": "FunctionDef",
+    "description": "Factory returning SqliteBusinessRepository or PostgresBusinessRepository."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/business_repository.py",
+    "line": 2411,
+    "symbol": "reset_business_repository_for_testing",
+    "kind": "FunctionDef",
+    "description": "Reset global business repo cache for testing isolation."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 95,
+    "symbol": "AuditCommitStatus",
+    "kind": "ClassDef",
+    "description": "Explicit result contract for audit persistence (Defect 5)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 103,
+    "symbol": "sanitize_email",
+    "kind": "FunctionDef",
+    "description": "Normalize email for consistent identity indexing and partitioning."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 108,
+    "symbol": "compute_content_hash",
+    "kind": "FunctionDef",
+    "description": "Compute deterministic SHA-256 hash for payload reconciliation and deduplication."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 113,
+    "symbol": "compute_approval_token_hash",
+    "kind": "FunctionDef",
+    "description": "Compute HMAC-SHA256 hash of approval token so raw secrets are never persisted."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 120,
+    "symbol": "DataverseAuditRecord",
+    "kind": "ClassDef",
+    "description": "Strongly-typed wrapper for the full `cre2f_veloraagentauditlog` schema."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 405,
+    "symbol": "DataverseClient",
+    "kind": "ClassDef",
+    "description": "Production Dataverse client with fail-closed write semantics and in-memory fallback."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/dataverse_audit.py",
+    "line": 886,
+    "symbol": "get_dataverse_client",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 38,
+    "symbol": "RuleState",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 46,
+    "symbol": "Comparator",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 54,
+    "symbol": "RecommendationStatus",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 61,
+    "symbol": "DeliveryStatus",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 71,
+    "symbol": "StaleWorkerError",
+    "kind": "ClassDef",
+    "description": "Raised when a worker attempts a delivery transition with an expired lease or stale version."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 77,
+    "symbol": "KPIRecommendationRule",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 104,
+    "symbol": "KPISnapshot",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 120,
+    "symbol": "RecommendationRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 148,
+    "symbol": "NotificationDeliveryRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 249,
+    "symbol": "DurableOutboxStore",
+    "kind": "ClassDef",
+    "description": "ACID SQLite and file-backed durable outbox store ensuring zero message loss and multi-replica safety."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 1056,
+    "symbol": "RecommendationEngine",
+    "kind": "ClassDef",
+    "description": "Operational scanner evaluating rules deterministically with deduplication, rule governance, and outbox dispatch."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py",
+    "line": 1515,
+    "symbol": "get_outbox_store",
+    "kind": "FunctionDef",
+    "description": "Factory returning PostgreSQL outbox in production or SQLite DurableOutboxStore in development/test."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 36,
+    "symbol": "AccessDeniedError",
+    "kind": "ClassDef",
+    "description": "Raised when an operation is accessed or mutated by a non-matching user or tenant."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 41,
+    "symbol": "ConcurrencyConflictError",
+    "kind": "ClassDef",
+    "description": "Raised when an operation suffers a concurrent modification or claim conflict."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 46,
+    "symbol": "InvalidTokenError",
+    "kind": "ClassDef",
+    "description": "Raised when an approval token or hash does not match the stored operation authorization."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 51,
+    "symbol": "OperationState",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 122,
+    "symbol": "normalize_operation_type",
+    "kind": "FunctionDef",
+    "description": "Explicit allowed mapping for operations. Rejects unknown operations."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 134,
+    "symbol": "compute_payload_checksum",
+    "kind": "FunctionDef",
+    "description": "Deterministic SHA-256 checksum of preview payload, excluding volatile timestamp/tracking fields."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 143,
+    "symbol": "OperationRecord",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 168,
+    "symbol": "SqliteOperationStore",
+    "kind": "ClassDef",
+    "description": "Single-host development operation store backed by SQLite with WAL mode."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 634,
+    "symbol": "PostgresOperationStore",
+    "kind": "ClassDef",
+    "description": "Network transactional store backed by PostgreSQL / Azure Database for PostgreSQL (WP04)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+    "line": 1100,
+    "symbol": "get_operation_store",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 30,
+    "symbol": "_get_write_actions_enabled",
+    "kind": "FunctionDef",
+    "description": "Emergency write switch from environment variable (Section 2.3)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 35,
+    "symbol": "_format_write_result",
+    "kind": "FunctionDef",
+    "description": "Ensure truthful propagation of simulation receipts through every write layer."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 55,
+    "symbol": "_execute_governed_stage_b",
+    "kind": "AsyncFunctionDef",
+    "description": "Governed atomic Stage B execution implementing full W03/W04 lifecycle."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 298,
+    "symbol": "prepare_email",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Validate email parameters, resolve recipients, and generate executive preview and approval token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 394,
+    "symbol": "send_approved_email",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Validate approval token, fail-closed audit check, atomic claim, and execute approved email dispatch."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 434,
+    "symbol": "prepare_email_reply",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare a reply to an existing email thread."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 539,
+    "symbol": "send_approved_email_reply",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Dispatch approved reply."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 560,
+    "symbol": "prepare_end_of_day_wrapup_email",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Compile end-of-day wrap-up email and issue confirmation token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 605,
+    "symbol": "prepare_meeting_creation",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare meeting creation preview, check conflicts, and issue approval token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 734,
+    "symbol": "create_approved_meeting",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Validate token, fail-closed audit check, atomic claim, and create approved meeting."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 776,
+    "symbol": "prepare_meeting_update",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare updates to an existing calendar event."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 855,
+    "symbol": "update_approved_meeting",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Execute approved meeting updates with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 886,
+    "symbol": "prepare_meeting_cancellation",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare cancellation for an existing calendar meeting with heightened confirmation."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 963,
+    "symbol": "cancel_approved_meeting",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Execute approved meeting cancellation with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 998,
+    "symbol": "prepare_teams_chat_message",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare preview for sending a Teams direct chat message."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1059,
+    "symbol": "send_approved_teams_chat_message",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Dispatch approved Teams direct chat message with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1095,
+    "symbol": "prepare_teams_channel_post",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare preview for posting to a Teams Channel with governance and destination controls."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1169,
+    "symbol": "send_approved_teams_channel_post",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Dispatch approved Teams channel post with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1210,
+    "symbol": "prepare_planner_task",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare Planner task creation preview, validate plan allowlist, and issue approval token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1291,
+    "symbol": "create_approved_planner_task",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Create approved Planner task with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1336,
+    "symbol": "prepare_planner_task_update",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare update to an existing Planner task."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1411,
+    "symbol": "update_approved_planner_task",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Execute approved Planner task update with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1442,
+    "symbol": "prepare_planner_completion",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare completion preview for a Planner task (requires explicit executive confirmation)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1515,
+    "symbol": "complete_approved_planner_task",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Mark approved Planner task complete with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1550,
+    "symbol": "prepare_daily_briefing_email",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare executive daily briefing HTML email preview and issue cryptographic approval token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1619,
+    "symbol": "send_approved_daily_briefing_email",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Execute verified Daily Briefing email dispatch with fail-closed audit and atomic claim."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1668,
+    "symbol": "send_daily_briefing_email",
+    "kind": "AsyncFunctionDef",
+    "description": "Execute complete executive daily briefing compilation and email delivery with fail-closed audit."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1708,
+    "symbol": "prepare_automation_subscription",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Prepare recurring automation subscription in DRAFT state and issue cryptographic approval token."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1799,
+    "symbol": "confirm_automation_subscription",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Confirm and activate automation subscription with cryptographic token validation."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1840,
+    "symbol": "revoke_automation_subscription",
+    "kind": "AsyncFunctionDef",
+    "description": "Revoke / disable an automation subscription. Preserves execution history."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1879,
+    "symbol": "prepare_meeting_actions",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage A: Extract meeting action items, resolve directory owners, and prepare approval preview envelope."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+    "line": 1911,
+    "symbol": "create_approved_meeting_actions",
+    "kind": "AsyncFunctionDef",
+    "description": "Stage B: Commit approved meeting actions to Microsoft Planner with atomic mapping persistence."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/confidence_policy.py",
+    "line": 29,
+    "symbol": "parse_iso_timestamp",
+    "kind": "FunctionDef",
+    "description": "Safely parse ISO timestamp with timezone support."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/confidence_policy.py",
+    "line": 44,
+    "symbol": "evaluate_confidence",
+    "kind": "FunctionDef",
+    "description": "Pure, clock-injected deterministic confidence assessment v1."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/confidence_policy.py",
+    "line": 200,
+    "symbol": "derive_composite_confidence",
+    "kind": "FunctionDef",
+    "description": "Derive composite decision confidence applying the weakest-link principle."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 51,
+    "symbol": "FeedbackValidationError",
+    "kind": "ClassDef",
+    "description": "Raised when feedback input fails semantic validation."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 56,
+    "symbol": "FeedbackAccessDeniedError",
+    "kind": "ClassDef",
+    "description": "Raised when feedback is submitted across tenant boundaries or with forged identity."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 61,
+    "symbol": "FeedbackNotFoundError",
+    "kind": "ClassDef",
+    "description": "Raised when the target recommendation does not exist."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 66,
+    "symbol": "FeedbackPersistenceError",
+    "kind": "ClassDef",
+    "description": "Raised when persistence or readback verification fails."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 71,
+    "symbol": "_compute_rec_state_hash",
+    "kind": "FunctionDef",
+    "description": "Compute hash of recommendation content to verify immutability."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 89,
+    "symbol": "record_recommendation_feedback",
+    "kind": "AsyncFunctionDef",
+    "description": "Record verified per-recommendation feedback with strict isolation and immutability."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 360,
+    "symbol": "get_recommendation_feedback",
+    "kind": "FunctionDef",
+    "description": "Retrieve single feedback record by feedback_id and tenant_id."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 383,
+    "symbol": "list_feedback_for_recommendation",
+    "kind": "FunctionDef",
+    "description": "List all feedback recorded for a specific recommendation."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/feedback_service.py",
+    "line": 407,
+    "symbol": "get_rule_feedback_summary",
+    "kind": "FunctionDef",
+    "description": "Provide rule-level feedback aggregation statistics without automated model retuning."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 26,
+    "symbol": "_create_read_envelope",
+    "kind": "FunctionDef",
+    "description": "Helper to construct standardized output envelope (Section 5.4)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 64,
+    "symbol": "_handle_read_error",
+    "kind": "FunctionDef",
+    "description": "Map Graph client exceptions to (status, summary, warnings)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 81,
+    "symbol": "search_mail",
+    "kind": "AsyncFunctionDef",
+    "description": "Search the user's authorized Microsoft 365 mailbox for emails matching query criteria."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 153,
+    "symbol": "get_mail_thread",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve full conversation thread details for a specific email thread."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 203,
+    "symbol": "summarize_priority_mail",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve and summarize high-priority or executive inbox messages."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 329,
+    "symbol": "find_mail_follow_ups",
+    "kind": "AsyncFunctionDef",
+    "description": "Find emails flagged for follow-up or requiring pending responses."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 381,
+    "symbol": "list_calendar_events",
+    "kind": "AsyncFunctionDef",
+    "description": "List calendar events for the user within the specified date range."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 450,
+    "symbol": "get_meeting_details",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve detailed meeting information including organizer, attendees, and Teams link."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 499,
+    "symbol": "check_availability",
+    "kind": "AsyncFunctionDef",
+    "description": "Check availability and detect conflicts across proposed meeting participants."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 554,
+    "symbol": "get_meeting_context",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve pre-meeting or post-meeting contextual packet."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 660,
+    "symbol": "search_teams_messages",
+    "kind": "AsyncFunctionDef",
+    "description": "Search Microsoft Teams channels and chats for messages matching query."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 710,
+    "symbol": "get_channel_context",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve recent conversation context from a specific Teams channel."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 761,
+    "symbol": "get_chat_context",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve recent direct chat message context."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 811,
+    "symbol": "find_teams_follow_ups",
+    "kind": "AsyncFunctionDef",
+    "description": "Identify action items, mentions, or follow-ups directed to the user in Teams."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 863,
+    "symbol": "list_my_planner_tasks",
+    "kind": "AsyncFunctionDef",
+    "description": "List all Planner tasks assigned to the current authenticated executive."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 911,
+    "symbol": "list_plan_tasks",
+    "kind": "AsyncFunctionDef",
+    "description": "List tasks in a specific Planner basic plan."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 963,
+    "symbol": "get_planner_task",
+    "kind": "AsyncFunctionDef",
+    "description": "Get details for a single Planner task."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1012,
+    "symbol": "find_overdue_tasks",
+    "kind": "AsyncFunctionDef",
+    "description": "Find overdue Planner tasks across authorized plans."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1067,
+    "symbol": "get_daily_executive_briefing",
+    "kind": "AsyncFunctionDef",
+    "description": "Synthesize complete executive daily briefing covering calendar meetings, tasks to do, Teams chats, upcoming approvals, and urgent priorities."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1210,
+    "symbol": "plan_my_day",
+    "kind": "AsyncFunctionDef",
+    "description": "Combine live calendar events, overdue/due tasks, and urgent emails into an ordered chronological plan."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1275,
+    "symbol": "get_quick_action_checklist",
+    "kind": "AsyncFunctionDef",
+    "description": "Fetch live tasks, follow-ups, and upcoming meetings into a prioritized checklist with links."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1328,
+    "symbol": "get_executive_attention",
+    "kind": "AsyncFunctionDef",
+    "description": "Ranked attention items across inbox, calendar and meetings with contextual priority scores (Operation: GET_EXECUTIVE_ATTENTION)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1496,
+    "symbol": "get_pre_meeting_brief",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve synthesized Pre-Meeting Dossier Briefing for upcoming non-canceled meeting."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1552,
+    "symbol": "get_end_of_day_digest",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve synthesized End-of-Day Digest with ground truth task/meeting completions."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+    "line": 1606,
+    "symbol": "get_meeting_action_tracker",
+    "kind": "AsyncFunctionDef",
+    "description": "Retrieve live meeting action tracker with provider synchronization, percentComplete, and overdue status."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 32,
+    "symbol": "MissingFactorPolicy",
+    "kind": "ClassDef",
+    "description": "Handling of unobserved or missing optional factors."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 39,
+    "symbol": "TriageRubricPolicy",
+    "kind": "ClassDef",
+    "description": "Versioned attention scoring rubric policy configuration."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 94,
+    "symbol": "round_half_up",
+    "kind": "FunctionDef",
+    "description": "Deterministic round half up to nearest integer."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 127,
+    "symbol": "evaluate_sender_importance",
+    "kind": "FunctionDef",
+    "description": "Evaluate sender importance (0\u20135) from verified address or directory role."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 172,
+    "symbol": "evaluate_business_criticality",
+    "kind": "FunctionDef",
+    "description": "Evaluate business criticality (0\u20135) based on topic keywords and verified context."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 227,
+    "symbol": "extract_explicit_deadline",
+    "kind": "FunctionDef",
+    "description": "Extract authoritative or explicitly cited deadline."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 274,
+    "symbol": "_parse_date_string",
+    "kind": "FunctionDef",
+    "description": "Safely parse various date formats into timezone-aware datetime."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 310,
+    "symbol": "calculate_deadline_proximity",
+    "kind": "FunctionDef",
+    "description": "Evaluate deadline proximity factor (0\u20135)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 368,
+    "symbol": "evaluate_risk_severity",
+    "kind": "FunctionDef",
+    "description": "Evaluate risk severity (0\u20135) from observed risk terminology and criticality."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 409,
+    "symbol": "compute_priority_score",
+    "kind": "FunctionDef",
+    "description": "Compute deterministic priorityScore in range 0\u2013100 and factor contributions."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 455,
+    "symbol": "collapse_email_threads",
+    "kind": "FunctionDef",
+    "description": "Group mail items by threadId / conversationId."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 498,
+    "symbol": "normalize_and_score_item",
+    "kind": "FunctionDef",
+    "description": "Normalize a raw mail, calendar, or task item into an AttentionItem contract."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 608,
+    "symbol": "_generate_rationale_and_action",
+    "kind": "FunctionDef",
+    "description": "Generate deterministic, non-destructive rationale and proposed next action."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 661,
+    "symbol": "rank_attention_items",
+    "kind": "FunctionDef",
+    "description": "Sort attention items by totalScore desc, earlier known deadline, then stable itemId."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+    "line": 683,
+    "symbol": "score_candidates_pipeline",
+    "kind": "FunctionDef",
+    "description": "End-to-end CASE triage pipeline across all M365 input candidates."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+    "line": 36,
+    "symbol": "AuditReconciliationQueue",
+    "kind": "ClassDef",
+    "description": "Durable reconciliation queue for audit records that could not be committed immediately."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+    "line": 109,
+    "symbol": "ProductivityAuditService",
+    "kind": "ClassDef",
+    "description": "Provides high-level audit governance methods for Microsoft 365 reads and writes."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/audit_client.py",
+    "line": 317,
+    "symbol": "get_productivity_audit_service",
+    "kind": "FunctionDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 34,
+    "symbol": "M365ClientError",
+    "kind": "ClassDef",
+    "description": "Base error for M365 client operations."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 38,
+    "symbol": "AccessDeniedError",
+    "kind": "ClassDef",
+    "description": "Raised when access to a resource, foreign mailbox, or foreign plan is denied (HTTP 403)."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 44,
+    "symbol": "GraphRateLimitError",
+    "kind": "ClassDef",
+    "description": "Raised when Microsoft Graph returns HTTP 429 Too Many Requests."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 51,
+    "symbol": "GraphTimeoutError",
+    "kind": "ClassDef",
+    "description": "Raised when Microsoft Graph request times out."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 57,
+    "symbol": "GraphSourceUnavailableError",
+    "kind": "ClassDef",
+    "description": "Raised when an M365 source or configuration is unavailable."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 64,
+    "symbol": "get_local_midnight_boundaries",
+    "kind": "FunctionDef",
+    "description": "Calculate exact local midnight-to-midnight ISO-8601 boundaries with explicit timezone offset."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 468,
+    "symbol": "seed_test_m365_data",
+    "kind": "FunctionDef",
+    "description": "Reset the mutable in-memory test stores to initial state for deterministic test suites."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/m365_client.py",
+    "line": 493,
+    "symbol": "Microsoft365Client",
+    "kind": "ClassDef",
+    "description": "Enterprise Microsoft 365 Graph / Work IQ connector with real Graph integration and governed dual-mode execution."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 16,
+    "symbol": "ActorType",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 21,
+    "symbol": "ClaimKind",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 29,
+    "symbol": "ConfidenceLabel",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 36,
+    "symbol": "OperationStatus",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 44,
+    "symbol": "SubscriptionKind",
+    "kind": "ClassDef",
+    "description": ""
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 51,
+    "symbol": "decimal_serializer",
+    "kind": "FunctionDef",
+    "description": "Deterministic JSON serializer preserving exact Decimal financial precision."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 60,
+    "symbol": "ExecutionContext",
+    "kind": "ClassDef",
+    "description": "Authenticated context established from server-side verified tokens, never client body alone."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 73,
+    "symbol": "ConfidenceAssessment",
+    "kind": "ClassDef",
+    "description": "Conservative, deterministic confidence assessment v1 based on evidence factors, not LLM self-rating."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 87,
+    "symbol": "EvidenceSource",
+    "kind": "ClassDef",
+    "description": "Authoritative source record reference guaranteeing traceability to underlying ERP/M365 data."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 108,
+    "symbol": "MaterialClaim",
+    "kind": "ClassDef",
+    "description": "An individual structured claim with explicit attribution and confidence rating."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 137,
+    "symbol": "EvidenceEnvelope",
+    "kind": "ClassDef",
+    "description": "Comprehensive output envelope preserving claims, sources, warnings, and audit status across routes."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 157,
+    "symbol": "DecisionRecord",
+    "kind": "ClassDef",
+    "description": "Auditable multi-criteria decision record with recorded inputs, weights, and deterministic scoring."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 180,
+    "symbol": "AttentionItem",
+    "kind": "ClassDef",
+    "description": "Ranked attention item across inbox, calendar, and meetings with transparent factor contributions."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 198,
+    "symbol": "AutomationSubscription",
+    "kind": "ClassDef",
+    "description": "Governed recurring automation subscription with explicit approval, schedule, and scope."
+  },
+  {
+    "service": "ask-productivity",
+    "file": "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+    "line": 225,
+    "symbol": "DeliveryReceipt",
+    "kind": "ClassDef",
+    "description": "Truthful provider delivery receipt distinguishing provider acceptance from actual inbox delivery."
+  }
+]

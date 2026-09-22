@@ -1,0 +1,14 @@
+[
+  {
+    "file": "test_graph_read_contracts.py",
+    "exit_code": 0,
+    "setup": "Explicit MOCK_M365 and seed fixtures; network disabled",
+    "output": "..........                                                               [100%]\n10 passed in 0.53s\n"
+  },
+  {
+    "file": "test_handoff_contract.py",
+    "exit_code": 0,
+    "setup": "Explicit MOCK_M365 and seed fixtures; network disabled",
+    "output": "..                                                                       [100%]\n2 passed in 0.51s\n"
+  }
+]

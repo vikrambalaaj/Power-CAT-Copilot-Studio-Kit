@@ -1,0 +1,377 @@
+[
+  {
+    "operation": "CREATEAPPROVEDMEETING",
+    "canonical": "createapprovedmeeting",
+    "line": 423
+  },
+  {
+    "operation": "PLANMYDAY",
+    "canonical": "planmyday",
+    "line": 443
+  },
+  {
+    "operation": "QUICKACTIONCHECKLIST",
+    "canonical": "quickactionchecklist",
+    "line": 462
+  },
+  {
+    "operation": "CHECKLIST",
+    "canonical": "checklist",
+    "line": 462
+  },
+  {
+    "operation": "PREPAREENDOFDAYWRAPUPEMAIL",
+    "canonical": "prepareendofdaywrapupemail",
+    "line": 480
+  },
+  {
+    "operation": "WRAPUP_EMAIL",
+    "canonical": "wrapup_email",
+    "line": 480
+  },
+  {
+    "operation": "GETDAILYBRIEFING",
+    "canonical": "getdailybriefing",
+    "line": 501
+  },
+  {
+    "operation": "DAILY_BRIEFING",
+    "canonical": "daily_briefing",
+    "line": 501
+  },
+  {
+    "operation": "BRIEFING",
+    "canonical": "briefing",
+    "line": 501
+  },
+  {
+    "operation": "PREPAREDAILYBRIEFINGEMAIL",
+    "canonical": "preparedailybriefingemail",
+    "line": 519
+  },
+  {
+    "operation": "SENDAPPROVEDDAILYBRIEFINGEMAIL",
+    "canonical": "sendapproveddailybriefingemail",
+    "line": 539
+  },
+  {
+    "operation": "SENDDAILYBRIEFINGEMAIL",
+    "canonical": "senddailybriefingemail",
+    "line": 558
+  },
+  {
+    "operation": "GETPREMEETINGBRIEF",
+    "canonical": "getpremeetingbrief",
+    "line": 577
+  },
+  {
+    "operation": "PRE_MEETING_BRIEF",
+    "canonical": "pre_meeting_brief",
+    "line": 577
+  },
+  {
+    "operation": "GETENDOFDAYDIGEST",
+    "canonical": "getendofdaydigest",
+    "line": 598
+  },
+  {
+    "operation": "END_OF_DAY_DIGEST",
+    "canonical": "end_of_day_digest",
+    "line": 598
+  },
+  {
+    "operation": "EOD_DIGEST",
+    "canonical": "eod_digest",
+    "line": 598
+  },
+  {
+    "operation": "PREPAREAUTOMATIONSUBSCRIPTION",
+    "canonical": "prepareautomationsubscription",
+    "line": 618
+  },
+  {
+    "operation": "CONFIRMAUTOMATIONSUBSCRIPTION",
+    "canonical": "confirmautomationsubscription",
+    "line": 651
+  },
+  {
+    "operation": "REVOKEAUTOMATIONSUBSCRIPTION",
+    "canonical": "revokeautomationsubscription",
+    "line": 674
+  },
+  {
+    "operation": "EVALUATEVERIFIEDKPISNAPSHOT",
+    "canonical": "evaluateverifiedkpisnapshot",
+    "line": 695
+  },
+  {
+    "operation": "LISTRECOMMENDATIONS",
+    "canonical": "listrecommendations",
+    "line": 736
+  },
+  {
+    "operation": "RECORDRECOMMENDATIONFEEDBACK",
+    "canonical": "recordrecommendationfeedback",
+    "line": 762
+  },
+  {
+    "operation": "SUBMIT_RECOMMENDATION_FEEDBACK",
+    "canonical": "submit_recommendation_feedback",
+    "line": 762
+  },
+  {
+    "operation": "GETRULEFEEDBACKSUMMARY",
+    "canonical": "getrulefeedbacksummary",
+    "line": 798
+  },
+  {
+    "operation": "GETMAILTHREAD",
+    "canonical": "getmailthread",
+    "line": 812
+  },
+  {
+    "operation": "SUMMARIZEPRIORITYMAIL",
+    "canonical": "summarizeprioritymail",
+    "line": 830
+  },
+  {
+    "operation": "GETEXECUTIVEATTENTION",
+    "canonical": "getexecutiveattention",
+    "line": 852
+  },
+  {
+    "operation": "EXECUTIVE_ATTENTION",
+    "canonical": "executive_attention",
+    "line": 852
+  },
+  {
+    "operation": "ATTENTION",
+    "canonical": "attention",
+    "line": 852
+  },
+  {
+    "operation": "FINDMAILFOLLOWUPS",
+    "canonical": "findmailfollowups",
+    "line": 879
+  },
+  {
+    "operation": "PREPAREEMAILREPLY",
+    "canonical": "prepareemailreply",
+    "line": 896
+  },
+  {
+    "operation": "SENDAPPROVEDEMAILREPLY",
+    "canonical": "sendapprovedemailreply",
+    "line": 917
+  },
+  {
+    "operation": "LIST_EVENTS",
+    "canonical": "list_events",
+    "line": 937
+  },
+  {
+    "operation": "CALENDAR",
+    "canonical": "calendar",
+    "line": 937
+  },
+  {
+    "operation": "GETMEETINGDETAILS",
+    "canonical": "getmeetingdetails",
+    "line": 960
+  },
+  {
+    "operation": "CHECKAVAILABILITY",
+    "canonical": "checkavailability",
+    "line": 979
+  },
+  {
+    "operation": "GETMEETINGCONTEXT",
+    "canonical": "getmeetingcontext",
+    "line": 1001
+  },
+  {
+    "operation": "GETMEETINGACTIONTRACKER",
+    "canonical": "getmeetingactiontracker",
+    "line": 1020
+  },
+  {
+    "operation": "MEETING_ACTION_TRACKER",
+    "canonical": "meeting_action_tracker",
+    "line": 1020
+  },
+  {
+    "operation": "TRACKER",
+    "canonical": "tracker",
+    "line": 1020
+  },
+  {
+    "operation": "PREPAREMEETINGACTIONS",
+    "canonical": "preparemeetingactions",
+    "line": 1040
+  },
+  {
+    "operation": "CREATEAPPROVEDMEETINGACTIONS",
+    "canonical": "createapprovedmeetingactions",
+    "line": 1066
+  },
+  {
+    "operation": "CONFIRM_MEETING_ACTIONS",
+    "canonical": "confirm_meeting_actions",
+    "line": 1066
+  },
+  {
+    "operation": "PREPAREMEETINGUPDATE",
+    "canonical": "preparemeetingupdate",
+    "line": 1089
+  },
+  {
+    "operation": "UPDATEAPPROVEDMEETING",
+    "canonical": "updateapprovedmeeting",
+    "line": 1118
+  },
+  {
+    "operation": "PREPAREMEETINGCANCELLATION",
+    "canonical": "preparemeetingcancellation",
+    "line": 1138
+  },
+  {
+    "operation": "CANCELAPPROVEDMEETING",
+    "canonical": "cancelapprovedmeeting",
+    "line": 1159
+  },
+  {
+    "operation": "SEARCHTEAMS",
+    "canonical": "searchteams",
+    "line": 1179
+  },
+  {
+    "operation": "SEARCH_TEAMS",
+    "canonical": "search_teams",
+    "line": 1179
+  },
+  {
+    "operation": "GETCHANNELCONTEXT",
+    "canonical": "getchannelcontext",
+    "line": 1198
+  },
+  {
+    "operation": "GETCHATCONTEXT",
+    "canonical": "getchatcontext",
+    "line": 1218
+  },
+  {
+    "operation": "FINDTEAMSFOLLOWUPS",
+    "canonical": "findteamsfollowups",
+    "line": 1237
+  },
+  {
+    "operation": "PREPARETEAMSCHAT",
+    "canonical": "prepareteamschat",
+    "line": 1254
+  },
+  {
+    "operation": "SENDAPPROVEDTEAMSCHAT",
+    "canonical": "sendapprovedteamschat",
+    "line": 1275
+  },
+  {
+    "operation": "PREPARETEAMSCHANNELPOST",
+    "canonical": "prepareteamschannelpost",
+    "line": 1295
+  },
+  {
+    "operation": "SENDAPPROVEDTEAMSCHANNELPOST",
+    "canonical": "sendapprovedteamschannelpost",
+    "line": 1317
+  },
+  {
+    "operation": "LISTMYPLANNER",
+    "canonical": "listmyplanner",
+    "line": 1337
+  },
+  {
+    "operation": "PLANNER_TASKS",
+    "canonical": "planner_tasks",
+    "line": 1337
+  },
+  {
+    "operation": "TASKS",
+    "canonical": "tasks",
+    "line": 1337
+  },
+  {
+    "operation": "LISTPLANTASKS",
+    "canonical": "listplantasks",
+    "line": 1354
+  },
+  {
+    "operation": "GETPLANNER",
+    "canonical": "getplanner",
+    "line": 1374
+  },
+  {
+    "operation": "FINDOVERDUETASKS",
+    "canonical": "findoverduetasks",
+    "line": 1393
+  },
+  {
+    "operation": "OVERDUE_TASKS",
+    "canonical": "overdue_tasks",
+    "line": 1393
+  },
+  {
+    "operation": "PREPAREPLANNER",
+    "canonical": "prepareplanner",
+    "line": 1412
+  },
+  {
+    "operation": "CREATEAPPROVEDPLANNER",
+    "canonical": "createapprovedplanner",
+    "line": 1438
+  },
+  {
+    "operation": "PREPAREPLANNERUPDATE",
+    "canonical": "prepareplannerupdate",
+    "line": 1458
+  },
+  {
+    "operation": "UPDATEAPPROVEDPLANNER",
+    "canonical": "updateapprovedplanner",
+    "line": 1487
+  },
+  {
+    "operation": "PREPARE_PLANNER_COMPLETION",
+    "canonical": "prepare_planner_completion",
+    "line": 1507
+  },
+  {
+    "operation": "PREPAREPLANNERCOMPLETION",
+    "canonical": "prepareplannercompletion",
+    "line": 1507
+  },
+  {
+    "operation": "COMPLETE_APPROVED_PLANNER_TASK",
+    "canonical": "complete_approved_planner_task",
+    "line": 1527
+  },
+  {
+    "operation": "COMPLETEAPPROVEDPLANNER",
+    "canonical": "completeapprovedplanner",
+    "line": 1527
+  },
+  {
+    "operation": "GETMCPACCESSMATRIX",
+    "canonical": "getmcpaccessmatrix",
+    "line": 1547
+  },
+  {
+    "operation": "GET_ACCESS_MATRIX",
+    "canonical": "get_access_matrix",
+    "line": 1547
+  },
+  {
+    "operation": "MCP_ACCESS_MATRIX",
+    "canonical": "mcp_access_matrix",
+    "line": 1547
+  }
+]

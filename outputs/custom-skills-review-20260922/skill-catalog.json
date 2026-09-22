@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1.0",
+  "purpose": "Reviewable Velora One business skill specifications; no auto-install behavior",
+  "reviewedCommit": "4e5ffd29",
+  "skills": [
+    {
+      "id": "velora-workforce-assurance",
+      "title": "Workforce assurance",
+      "phase": 1,
+      "status": "Reuse aggregate tools; hold scoped attrition",
+      "tools": [
+        "sf__get_headcount",
+        "sf__get_joiners",
+        "sf__get_leavers",
+        "sf__get_joiners_leavers_trend",
+        "sf__get_workforce_demographics",
+        "sf__get_attrition"
+      ],
+      "files": [
+        "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py",
+        "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+        "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_server.py"
+      ]
+    },
+    {
+      "id": "velora-emiratisation-watch",
+      "title": "Emiratisation target watch",
+      "phase": 1,
+      "status": "Reuse KPI; new scenario calculation and monitoring wiring",
+      "tools": [
+        "sf__get_emiratisation_kpi",
+        "sf__get_headcount"
+      ],
+      "files": [
+        "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_client.py",
+        "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_settings.py",
+        "mcp-apps/ask-productivity/productivity_mcp/recommendation_engine.py"
+      ]
+    },
+    {
+      "id": "velora-cash-exposure",
+      "title": "Cash exposure and collections brief",
+      "phase": 1,
+      "status": "Reuse reports; recommendation bridge blocked",
+      "tools": [
+        "s4__get_receivables_aging",
+        "s4__get_payables_aging",
+        "s4__get_customer_master"
+      ],
+      "files": [
+        "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+        "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+        "mcp-apps/ask-s4hana/s4hana_mcp/contracts.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/finance_snapshot_service.py"
+      ]
+    },
+    {
+      "id": "velora-budget-control",
+      "title": "Budget consumption and movement explanation",
+      "phase": 1,
+      "status": "Reuse reports; recommendation mapping deliberately blocked",
+      "tools": [
+        "s4__get_budget_consumption",
+        "s4__get_budget_transfers",
+        "s4__get_cost_center_master"
+      ],
+      "files": [
+        "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+        "mcp-apps/ask-s4hana/s4hana_mcp/field_mappings.py",
+        "mcp-apps/ask-s4hana/s4hana_mcp/report_calculations.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/finance_snapshot_service.py"
+      ]
+    },
+    {
+      "id": "velora-executive-attention",
+      "title": "Executive attention and day plan",
+      "phase": 1,
+      "status": "Reuse triage; approvals and Teams coverage limited",
+      "tools": [
+        "GET_EXECUTIVE_ATTENTION",
+        "PLAN_MY_DAY",
+        "GET_DAILY_EXECUTIVE_BRIEFING",
+        "SEARCH_MAIL",
+        "LIST_CALENDAR_EVENTS",
+        "FIND_OVERDUE_TASKS"
+      ],
+      "files": [
+        "mcp-apps/ask-productivity/productivity_mcp/server.py",
+        "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+        "mcp-apps/ask-productivity/productivity_mcp/triage_engine.py",
+        "mcp-apps/ask-productivity/productivity_mcp/m365_client.py"
+      ]
+    },
+    {
+      "id": "velora-meeting-dossier",
+      "title": "Meeting preparation dossier",
+      "phase": 1,
+      "status": "Reuse productivity briefing path",
+      "tools": [
+        "LIST_CALENDAR_EVENTS",
+        "GET_MEETING_DETAILS",
+        "GET_MEETING_CONTEXT",
+        "GET_PRE_MEETING_BRIEF",
+        "SEARCH_MAIL",
+        "LIST_PLAN_TASKS"
+      ],
+      "files": [
+        "mcp-apps/ask-productivity/productivity_mcp/briefing_service.py",
+        "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+        "mcp-apps/ask-productivity/productivity_mcp/m365_client.py"
+      ]
+    },
+    {
+      "id": "velora-meeting-actions",
+      "title": "Meeting decisions to owned actions",
+      "phase": 2,
+      "status": "Reuse approval workflow; natural transcript extraction needs work",
+      "tools": [
+        "PREPARE_MEETING_ACTIONS",
+        "CREATE_APPROVED_MEETING_ACTIONS",
+        "GET_MEETING_ACTION_TRACKER"
+      ],
+      "files": [
+        "mcp-apps/ask-productivity/productivity_mcp/meeting_actions.py",
+        "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+        "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+        "mcp-apps/ask-productivity/productivity_mcp/server.py"
+      ]
+    },
+    {
+      "id": "velora-governed-correspondence",
+      "title": "Reviewed executive correspondence",
+      "phase": 2,
+      "status": "Reuse productivity prepare/execute; quarantine legacy send paths",
+      "tools": [
+        "PREPARE_EMAIL",
+        "SEND_APPROVED_EMAIL",
+        "PREPARE_EMAIL_REPLY",
+        "SEND_APPROVED_EMAIL_REPLY",
+        "PREPARE_MEETING_CREATION",
+        "CREATE_APPROVED_MEETING",
+        "PREPARE_TEAMS_CHAT_MESSAGE",
+        "SEND_APPROVED_TEAMS_CHAT_MESSAGE"
+      ],
+      "files": [
+        "mcp-apps/ask-productivity/productivity_mcp/tools_m365_writes.py",
+        "mcp-apps/ask-productivity/productivity_mcp/token_manager.py",
+        "mcp-apps/ask-productivity/productivity_mcp/operation_store.py",
+        "mcp-apps/ask-productivity/productivity_mcp/audit_client.py"
+      ]
+    },
+    {
+      "id": "velora-scheduled-briefings",
+      "title": "Subscribed briefings and action reminders",
+      "phase": 3,
+      "status": "Reuse subscription/worker code; deployment validation required",
+      "tools": [
+        "PREPARE_AUTOMATION_SUBSCRIPTION",
+        "CONFIRM_AUTOMATION_SUBSCRIPTION",
+        "REVOKE_AUTOMATION_SUBSCRIPTION"
+      ],
+      "files": [
+        "mcp-apps/ask-productivity/productivity_mcp/subscription_service.py",
+        "mcp-apps/ask-productivity/productivity_mcp/schedule_engine.py",
+        "mcp-apps/ask-productivity/productivity_mcp/worker.py",
+        "mcp-apps/ask-productivity/productivity_mcp/standing_authorization.py"
+      ]
+    },
+    {
+      "id": "velora-vendor-decision",
+      "title": "Evidence-backed vendor comparison",
+      "phase": 2,
+      "status": "Implemented backend; plugin exposure and policy validation required",
+      "tools": [
+        "get_vendor_performance_history",
+        "evaluate_vendor_options",
+        "get_vendor_decision_record"
+      ],
+      "files": [
+        "mcp-apps/ask-facilitator/facilitator_mcp/vendor_evaluation.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/decision_service.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/institutional_memory.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/tools.py"
+      ]
+    },
+    {
+      "id": "velora-decision-evidence",
+      "title": "Decision evidence retrieval and export",
+      "phase": 3,
+      "status": "Hold external/redacted export pending repair",
+      "tools": [
+        "get_vendor_decision_record",
+        "export_decision_trail",
+        "verify_decision_manifest"
+      ],
+      "files": [
+        "mcp-apps/ask-facilitator/facilitator_mcp/audit_export.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/decision_audit.py",
+        "mcp-apps/ask-facilitator/facilitator_mcp/server.py"
+      ]
+    },
+    {
+      "id": "velora-board-brief",
+      "title": "Cross-system executive board brief",
+      "phase": 2,
+      "status": "New orchestration over existing verified reads",
+      "tools": [
+        "sf__get_headcount",
+        "sf__get_emiratisation_kpi",
+        "s4__get_receivables_aging",
+        "s4__get_payables_aging",
+        "s4__get_budget_consumption",
+        "GET_MEETING_ACTION_TRACKER",
+        "LIST_RECOMMENDATIONS"
+      ],
+      "files": [
+        "mcp-apps/ask-productivity/productivity_mcp/evidence_contracts.py",
+        "mcp-apps/ask-productivity/productivity_mcp/confidence_policy.py",
+        "mcp-apps/ask-productivity/productivity_mcp/tools_m365_reads.py",
+        "mcp-apps/ask-s4hana/s4hana_mcp/tools.py",
+        "mcp-apps/ask-successfactors/successfactors_mcp/successfactors_tools.py"
+      ]
+    }
+  ]
+}
