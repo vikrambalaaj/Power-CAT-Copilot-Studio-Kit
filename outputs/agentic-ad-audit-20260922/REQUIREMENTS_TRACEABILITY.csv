@@ -1,97 +1,97 @@
 Requirement ID,Workbook row,Capability,Feature,Requirement text,Workbook evidence text,Test IDs,Execution status,Acceptance owner,Evidence / defect
 REQ-05,5,ENTERPRISE DATA QUERY,Connection to enterprise systems,"Agent should connect to enterprise systems like ERP, HR, Procurement, DMS, Data Lake etc.","1. Live demo: executive asks a cross system question (e.g. ""show me YTD
-spend vs. budget by division"") and receives a sourced answer.","CFG-02,QRY-03",Not run,Unassigned,
+spend vs. budget by division"") and receives a sourced answer.","CFG-02,QRY-03,CONF-01,CONF-02",Not run — published agent,Unassigned,
 REQ-06,6,ENTERPRISE DATA QUERY,Natural language querying,"Agent should translate executive questions into backend queries and return consolidated, permissioned, and sourced
 answer","2. List of connected systems per entity (ERP, HRMS, document store, etc.)
-along with their security matrix (if applicable).","QRY-01,QRY-02,QRY-04",Not run,Unassigned,
-REQ-07,7,ENTERPRISE DATA QUERY,Cross system querying,"Agent should have the capability to identify and connect with multiple systems, wherever required based on the nature of the query, to provide a correct / appropriate response ",,QRY-03,Not run,Unassigned,
-REQ-08,8,ENTERPRISE DATA QUERY,Source transparency,Source system should be consistently displayed against information returned by the agent,3. Access logs showing agent calling one or multiple data sources.,QRY-05,Not run,Unassigned,
-REQ-09,9,ENTERPRISE DATA QUERY,Permissions / Access,Agent controls access to data / information based on user persona,,"SEC-01,SEC-02,SEC-03,SEC-05",Not run,Unassigned,
-REQ-10,10,ENTERPRISE DATA QUERY,Output consistency,Materially similar requests should produce substantively consistent outputs irrespective of phrasing or timing,,"QRY-04,QRY-08",Not run,Unassigned,
-REQ-11,11,ENTERPRISE DATA QUERY,Audit logs,"Agent activity should be logged, including systems queried and sources accessed",,"TRC-01,OPS-04",Not run,Unassigned,
+along with their security matrix (if applicable).","QRY-01,QRY-02,QRY-04,CONF-01,CONF-02",Not run — published agent,Unassigned,
+REQ-07,7,ENTERPRISE DATA QUERY,Cross system querying,"Agent should have the capability to identify and connect with multiple systems, wherever required based on the nature of the query, to provide a correct / appropriate response ",,"QRY-03,CONF-02",Not run — published agent,Unassigned,
+REQ-08,8,ENTERPRISE DATA QUERY,Source transparency,Source system should be consistently displayed against information returned by the agent,3. Access logs showing agent calling one or multiple data sources.,"QRY-05,CONF-05",Not run — published agent,Unassigned,
+REQ-09,9,ENTERPRISE DATA QUERY,Permissions / Access,Agent controls access to data / information based on user persona,,"SEC-01,SEC-02,SEC-03,SEC-05,CONF-03",Not run — published agent,Unassigned,
+REQ-10,10,ENTERPRISE DATA QUERY,Output consistency,Materially similar requests should produce substantively consistent outputs irrespective of phrasing or timing,,"QRY-04,QRY-08,CONF-02",Not run — published agent,Unassigned,
+REQ-11,11,ENTERPRISE DATA QUERY,Audit logs,"Agent activity should be logged, including systems queried and sources accessed",,"TRC-01,OPS-04,CONF-05",Not run — published agent,Unassigned,
 REQ-12,12,PROACTIVE RECOMMENDATION ENGINE,Connection to internal and external data,"Agent continuously scans internal data (KPIs, finance,
 operations, HR) or external signals (markets, regulations,
 peer jurisdictions, media) in the background","1. Screenshot/Demo of the executive's
-daily proactive alerts feed.","REC-01,OPS-01",Not run,Unassigned,
+daily proactive alerts feed.","REC-01,OPS-01,",Not run — published agent,Unassigned,
 REQ-13,13,PROACTIVE RECOMMENDATION ENGINE,Automated recommendations,"Agent automatically identifies risks and opportunities and shares it with executive, without being asked","2. 30-day log of recommendations
 issued, categorized by type (risk /
-opportunity / benchmark).","REC-01,EVD-01",Not run,Unassigned,
+opportunity / benchmark).","REC-01,EVD-01,",Not run — published agent,Unassigned,
 REQ-14,14,PROACTIVE RECOMMENDATION ENGINE,Recommendation categorizations,"Recommendations should be appropriately categorized into risks / opportunities / benchmarks, based on its nature","3. Executive feedback rating (useful / not
 useful) captured per alert (If
-available).","REC-02,EVD-01",Not run,Unassigned,
-REQ-15,15,PROACTIVE RECOMMENDATION ENGINE,Notification mechanism,"Agent should provide automated recommendations through a daily alerts feed, push notifications, or an end-of-day digest",,"REC-02,BRF-05",Not run,Unassigned,
-REQ-16,16,PROACTIVE RECOMMENDATION ENGINE,Feedback mechanism,Agent captures feedback from Executive on the relevance  / usefulness of each alert issued (capturing risk / opportunity / benchmark),,REC-02,Not run,Unassigned,
-REQ-17,17,PROACTIVE RECOMMENDATION ENGINE,Source transparency,Source system should be consistently displayed against information returned by the agent,,"QRY-05,REC-02",Not run,Unassigned,
-REQ-18,18,PROACTIVE RECOMMENDATION ENGINE,Audit logs,Time stamped comprehensive logs of recommendations issued by the agent should be maintained showcasing that the engine operates autonomously,,"EVD-01,TRC-01",Not run,Unassigned,
+available).","REC-02,EVD-01,",Not run — published agent,Unassigned,
+REQ-15,15,PROACTIVE RECOMMENDATION ENGINE,Notification mechanism,"Agent should provide automated recommendations through a daily alerts feed, push notifications, or an end-of-day digest",,"REC-02,BRF-05,",Not run — published agent,Unassigned,
+REQ-16,16,PROACTIVE RECOMMENDATION ENGINE,Feedback mechanism,Agent captures feedback from Executive on the relevance  / usefulness of each alert issued (capturing risk / opportunity / benchmark),,"REC-02,",Not run — published agent,Unassigned,
+REQ-17,17,PROACTIVE RECOMMENDATION ENGINE,Source transparency,Source system should be consistently displayed against information returned by the agent,,"QRY-05,REC-02,",Not run — published agent,Unassigned,
+REQ-18,18,PROACTIVE RECOMMENDATION ENGINE,Audit logs,Time stamped comprehensive logs of recommendations issued by the agent should be maintained showcasing that the engine operates autonomously,,"EVD-01,TRC-01,",Not run — published agent,Unassigned,
 REQ-19,19,EVALUATION ENGINE,Evaluation scope,"Agent ingests any proposal, strategy, business case,
 budget submission, or expenditure request","1. Sample output from multiple cases of
 repeated evaluations of test case
 through logs to show the capability
-and consistency of the engine",EVA-01,Not run,Unassigned,
+and consistency of the engine","EVA-01,",Not run — published agent,Unassigned,
 REQ-20,20,EVALUATION ENGINE,Evaluation framework,"Agent produces a structured evaluation against the following criteria:
 a. strategic priorities
 b. fiscal impact
 c. peer benchmarks
 d. historical precedent","2. 30-day log of interactions showing
 evidence of the evaluation engine
-being utilized",EVA-03,Not run,Unassigned,
+being utilized","EVA-03,CONF-02",Not run — published agent,Unassigned,
 REQ-21,21,EVALUATION ENGINE,Output structure,"Output should include the following for each evaluation:
 a. alignment score
 b. financial impact
 c. comparable cases
 d. identified risks
-e. open questions for the executive to probe",,EVA-03,Not run,Unassigned,
-REQ-22,22,EVALUATION ENGINE,Output consistency,Output produced by the agent should be consistent every time,,EVA-04,Not run,Unassigned,
-REQ-23,23,EVALUATION ENGINE,Confidence level,Agent shows a confidence level at the front end (for the executive to view) for evaluations and data points,,"EVA-02,EVA-05,TRC-06",Not run,Unassigned,
-REQ-24,24,EVALUATION ENGINE,Audit logs,Time stamped comprehensive logs to showcase working of the evaluation engine should be maintained,,"TRC-01,EVD-02",Not run,Unassigned,
+e. open questions for the executive to probe",,"EVA-03,CONF-05",Not run — published agent,Unassigned,
+REQ-22,22,EVALUATION ENGINE,Output consistency,Output produced by the agent should be consistent every time,,"EVA-04,CONF-02",Not run — published agent,Unassigned,
+REQ-23,23,EVALUATION ENGINE,Confidence level,Agent shows a confidence level at the front end (for the executive to view) for evaluations and data points,,"EVA-02,EVA-05,TRC-06,CONF-01,CONF-02,CONF-03,CONF-05",Not run — published agent,Unassigned,
+REQ-24,24,EVALUATION ENGINE,Audit logs,Time stamped comprehensive logs to showcase working of the evaluation engine should be maintained,,"TRC-01,EVD-02,CONF-05",Not run — published agent,Unassigned,
 REQ-25,25,BRIEFING AND SYNTHESIS,Sync with Executive's emails and other platforms,"Agent reads the executive's calendar, inbox, or relevant
 files","1. Sample pre-meeting brief and end-of day
-digest","BRF-01,BRF-02",Not run,Unassigned,
+digest","BRF-01,BRF-02,",Not run — published agent,Unassigned,
 REQ-26,26,BRIEFING AND SYNTHESIS,Automated briefs,"Agent automatically produces pre-meeting briefs,
 end-of-day digests, or a triaged inbox view ranking what
 needs attention","2. Logs confirming automated
 generation and delivery timing (e.g.,
 brief attached the night before, digest
-delivered at end of day)","BRF-02,BRF-03,AUT-01",Not run,Unassigned,
+delivered at end of day)","BRF-02,BRF-03,AUT-01,",Not run — published agent,Unassigned,
 REQ-27,27,BRIEFING AND SYNTHESIS,Automated delivery of briefs,"Briefs can be attached to every calendar invite the
-night before or digests landing at the end of each day",,"BRF-03,MTG-01,AUT-01",Not run,Unassigned,
-REQ-28,28,BRIEFING AND SYNTHESIS,Source transparency,"Briefs should contain references to underlying emails, meetings or documents where applicable",,"MTG-01,QRY-05",Not run,Unassigned,
-REQ-29,29,BRIEFING AND SYNTHESIS,Audit logs,"Time stamped comprehensive logs to showcase automated generation and delivery of briefs, including delivery timing should be maintained",,"BRF-03,TRC-01",Not run,Unassigned,
+night before or digests landing at the end of each day",,"BRF-03,MTG-01,AUT-01,",Not run — published agent,Unassigned,
+REQ-28,28,BRIEFING AND SYNTHESIS,Source transparency,"Briefs should contain references to underlying emails, meetings or documents where applicable",,"MTG-01,QRY-05,",Not run — published agent,Unassigned,
+REQ-29,29,BRIEFING AND SYNTHESIS,Audit logs,"Time stamped comprehensive logs to showcase automated generation and delivery of briefs, including delivery timing should be maintained",,"BRF-03,TRC-01,",Not run — published agent,Unassigned,
 REQ-30,30,AGENT CREATION,Natural language interface,"Through a simple natural-language interface, the
-executive describes a recurring task to the agent",1. Live or recorded demo: executive describes a task in natural language; sub-agent is created and deployed.,AGT-01,Not run,Unassigned,
+executive describes a recurring task to the agent",1. Live or recorded demo: executive describes a task in natural language; sub-agent is created and deployed.,"AGT-01,",Not run — published agent,Unassigned,
 REQ-31,31,AGENT CREATION,Sub-agent creation,"Agent builds, deploys, and maintains a sub-agent to handle it based on the natural language request (non-technical).
-No code, no IT ticket, no procurement cycle.",2. Logs showing agents created based on a user’s request.,AGT-01,Not run,Unassigned,
-REQ-32,32,AGENT CREATION,Autonomous working of sub-agent,Sub-agents run autonomously on schedule or trigger to complete the Executive's tasks,,AGT-02,Not run,Unassigned,
-REQ-33,33,AGENT CREATION,Control over sub-agents' lifecycle,"Executive can edit, pause, or retire sub-agents at any time with a simple interface",,AGT-03,Not run,Unassigned,
-REQ-34,34,AGENT CREATION,Audit logs,Time stamped comprehensive logs showcasing sub-agents created based on executive's request should be maintained,,AGT-04,Not run,Unassigned,
-REQ-35,35,AGENT CREATION,Sub-agent logs,Logs showcasing successful runs of sub-agents,,"AGT-02,AGT-04",Not run,Unassigned,
-REQ-36,36,INSTITUTIONAL MEMORY,Memory build up,"Agent indexes every meeting, decision, document, and email the executive engages with, building a permanent, searchable record of context, rationale, and outcomes","1, Live or recorded demo: query retrieves historical information with full context and source documents.","MEM-01,MEM-02",Not run,Unassigned,
+No code, no IT ticket, no procurement cycle.",2. Logs showing agents created based on a user’s request.,"AGT-01,",Not run — published agent,Unassigned,
+REQ-32,32,AGENT CREATION,Autonomous working of sub-agent,Sub-agents run autonomously on schedule or trigger to complete the Executive's tasks,,"AGT-02,",Not run — published agent,Unassigned,
+REQ-33,33,AGENT CREATION,Control over sub-agents' lifecycle,"Executive can edit, pause, or retire sub-agents at any time with a simple interface",,"AGT-03,",Not run — published agent,Unassigned,
+REQ-34,34,AGENT CREATION,Audit logs,Time stamped comprehensive logs showcasing sub-agents created based on executive's request should be maintained,,"AGT-04,",Not run — published agent,Unassigned,
+REQ-35,35,AGENT CREATION,Sub-agent logs,Logs showcasing successful runs of sub-agents,,"AGT-02,AGT-04,",Not run — published agent,Unassigned,
+REQ-36,36,INSTITUTIONAL MEMORY,Memory build up,"Agent indexes every meeting, decision, document, and email the executive engages with, building a permanent, searchable record of context, rationale, and outcomes","1, Live or recorded demo: query retrieves historical information with full context and source documents.","MEM-01,MEM-02,",Not run — published agent,Unassigned,
 REQ-37,37,INSTITUTIONAL MEMORY,Use of institutional memory,"Agent leverages institutional memory and provides answers with original context, participants, and supporting documents","2. Logs showing traces where historical information was retrieved and considered in the thinking process of
-the agent.","MEM-01,MEM-02",Not run,Unassigned,
-REQ-38,38,INSTITUTIONAL MEMORY,Source transparency,Original source documents should be provided by agent,,"MEM-01,QRY-05",Not run,Unassigned,
-REQ-39,39,INSTITUTIONAL MEMORY,Audit logs,Timestamped comprehensive logs should be maintained to showcase how the agent used institutional memory in its thinking process,,"MEM-02,TRC-01",Not run,Unassigned,
-REQ-40,40,MEETING INTELLIGENCE,Meeting attendance (virtual),Agent automatically joins virtual meetings,"1. Sample of either auto-generated minutes from human input, meeting transcription or live action tracker.",MTG-04,Not run,Unassigned,
+the agent.","MEM-01,MEM-02,",Not run — published agent,Unassigned,
+REQ-38,38,INSTITUTIONAL MEMORY,Source transparency,Original source documents should be provided by agent,,"MEM-01,QRY-05,",Not run — published agent,Unassigned,
+REQ-39,39,INSTITUTIONAL MEMORY,Audit logs,Timestamped comprehensive logs should be maintained to showcase how the agent used institutional memory in its thinking process,,"MEM-02,TRC-01,",Not run — published agent,Unassigned,
+REQ-40,40,MEETING INTELLIGENCE,Meeting attendance (virtual),Agent automatically joins virtual meetings,"1. Sample of either auto-generated minutes from human input, meeting transcription or live action tracker.","MTG-04,",Not run — published agent,Unassigned,
 REQ-41,41,MEETING INTELLIGENCE,Meeting attendance (in-person),Agent automatically joins in-person meetings,"2. Live or recorded demo showing either a meeting being transcribed and the minutes or the agent utilizing the
-recorded minutes of a meeting to generate the summary and share it with participants.",MTG-04,Not run,Unassigned,
-REQ-42,42,MEETING INTELLIGENCE,Generates & circulates minutes,Agent produces and circulates accurate minutes including decisions and action items with named owners and deadlines,,MTG-02,Not run,Unassigned,
-REQ-43,43,MEETING INTELLIGENCE,Autonomous follow up,Agent follows up autonomously until each item closes (owners can receive nudges as deadlines approach),,"MTG-03,AUT-01",Not run,Unassigned,
-REQ-44,44,MEETING INTELLIGENCE,Live action tracker,Agent produces live tracker of what's outstanding across all meetings,,MTG-03,Not run,Unassigned,
+recorded minutes of a meeting to generate the summary and share it with participants.","MTG-04,",Not run — published agent,Unassigned,
+REQ-42,42,MEETING INTELLIGENCE,Generates & circulates minutes,Agent produces and circulates accurate minutes including decisions and action items with named owners and deadlines,,"MTG-02,",Not run — published agent,Unassigned,
+REQ-43,43,MEETING INTELLIGENCE,Autonomous follow up,Agent follows up autonomously until each item closes (owners can receive nudges as deadlines approach),,"MTG-03,AUT-01,",Not run — published agent,Unassigned,
+REQ-44,44,MEETING INTELLIGENCE,Live action tracker,Agent produces live tracker of what's outstanding across all meetings,,"MTG-03,",Not run — published agent,Unassigned,
 REQ-45,45,PEER BENCHMARKING,Internal and external data connectivity,"Agent pulls comparable data from peer entities, peer
-jurisdictions, or international benchmark sources based on the KPIs defined for comparison",1. Sample benchmark query comparing entity KPI against peers or industry standards.,"BEN-01,CFG-02",Not run,Unassigned,
-REQ-46,46,PEER BENCHMARKING,Comparison with peers,Agent presents comparisons with peers based on the KPIs aligned with the Executive,2. List of benchmark data sources integrated (domestic and international).,BEN-01,Not run,Unassigned,
-REQ-47,47,PEER BENCHMARKING,Source transparency,"Data source should be consistently shown to the executive at the front end, for each data point",,"BEN-01,QRY-05",Not run,Unassigned,
-REQ-48,48,PEER BENCHMARKING,Confidence level,Agent provides confidence level to each data point based on a defined framework,,"BEN-01,EVA-02",Not run,Unassigned,
-REQ-49,49,PEER BENCHMARKING,Delivery mode,Benchmarks can be automated or on demand,,"BEN-02,AUT-01",Not run,Unassigned,
-REQ-50,50,PEER BENCHMARKING,Output consistency,Facts of the benchmarks / comparisons should be the same for the same KPI & period,,"BEN-02,QRY-04",Not run,Unassigned,
+jurisdictions, or international benchmark sources based on the KPIs defined for comparison",1. Sample benchmark query comparing entity KPI against peers or industry standards.,"BEN-01,CFG-02,",Not run — published agent,Unassigned,
+REQ-46,46,PEER BENCHMARKING,Comparison with peers,Agent presents comparisons with peers based on the KPIs aligned with the Executive,2. List of benchmark data sources integrated (domestic and international).,"BEN-01,",Not run — published agent,Unassigned,
+REQ-47,47,PEER BENCHMARKING,Source transparency,"Data source should be consistently shown to the executive at the front end, for each data point",,"BEN-01,QRY-05,CONF-05",Not run — published agent,Unassigned,
+REQ-48,48,PEER BENCHMARKING,Confidence level,Agent provides confidence level to each data point based on a defined framework,,"BEN-01,EVA-02,CONF-05",Not run — published agent,Unassigned,
+REQ-49,49,PEER BENCHMARKING,Delivery mode,Benchmarks can be automated or on demand,,"BEN-02,AUT-01,",Not run — published agent,Unassigned,
+REQ-50,50,PEER BENCHMARKING,Output consistency,Facts of the benchmarks / comparisons should be the same for the same KPI & period,,"BEN-02,QRY-04,CONF-05",Not run — published agent,Unassigned,
 REQ-51,51,DECISION TRACEABILITY,Cross-capability application,"This capability applies to Proactive Recommendation Engine, Evaluation Engine and Peer Benchmarking. It applies to decisions / recommendations / evaluations performed by the agent.","1. Sample recommendation with expandable reasoning, sources, and confidence view in a log export format
-covering a sample period.","TRC-01,TRC-05",Not run,Unassigned,
-REQ-52,52,DECISION TRACEABILITY,Expandable reasoning chain,Agents' output should be accompanied by reasoning chain in non-technical & easy to understand language i.e. rationale why a decision was taken. Executive should have the option to expand an answer to see why it was given,2. Logs showing traces where a decision was requested/done accompanied by its reasoning chain.,"TRC-05,TRC-06",Not run,Unassigned,
-REQ-53,53,DECISION TRACEABILITY,Source transparency,"Data source should be consistently shown to the executive at the front end, for each data point",3. Live or recorded demo showing the agent’s capability to reason and produce either a recommendation or evaluation of a specific user’s request.,"TRC-01,QRY-05",Not run,Unassigned,
-REQ-54,54,DECISION TRACEABILITY,Confidence level,Agent provides confidence level to each data point based on a defined framework,,"EVA-02,TRC-06",Not run,Unassigned,
+covering a sample period.","TRC-01,TRC-05,",Not run — published agent,Unassigned,
+REQ-52,52,DECISION TRACEABILITY,Expandable reasoning chain,Agents' output should be accompanied by reasoning chain in non-technical & easy to understand language i.e. rationale why a decision was taken. Executive should have the option to expand an answer to see why it was given,2. Logs showing traces where a decision was requested/done accompanied by its reasoning chain.,"TRC-05,TRC-06,CONF-05",Not run — published agent,Unassigned,
+REQ-53,53,DECISION TRACEABILITY,Source transparency,"Data source should be consistently shown to the executive at the front end, for each data point",3. Live or recorded demo showing the agent’s capability to reason and produce either a recommendation or evaluation of a specific user’s request.,"TRC-01,QRY-05,CONF-05",Not run — published agent,Unassigned,
+REQ-54,54,DECISION TRACEABILITY,Confidence level,Agent provides confidence level to each data point based on a defined framework,,"EVA-02,TRC-06,CONF-05",Not run — published agent,Unassigned,
 REQ-55,55,DECISION TRACEABILITY,Audit trail and decision metadata,"Complete audit trial should be logged in a way that decisions can be reconstructed by auditors. Logs should include the following aspects:
 a. identity: user identity also including agents & its versions where applicable (user id, user role, timestamp) and unique decision ID
 b. provenance: which data sources were used to generate the output
 c. attribution: which person, model, source, or system contributed to the decision (ERP, SharePoint, Agent, User etc.)
 d. rationale: why a particular recommendation / decision was provided
-e. exportable: logs should be exportable",,"TRC-01,SEC-04",Not run,Unassigned,
-REQ-56,56,DECISION TRACEABILITY,Integrity of audit logs,Logs should be tamper proof,,"TRC-02,TRC-03,OPS-06",Not run,Unassigned,
+e. exportable: logs should be exportable",,"TRC-01,SEC-04,",Not run — published agent,Unassigned,
+REQ-56,56,DECISION TRACEABILITY,Integrity of audit logs,Logs should be tamper proof,,"TRC-02,TRC-03,OPS-06,",Not run — published agent,Unassigned,
