@@ -15,10 +15,10 @@ def test_foreign_company_rejected_without_caller_scope_header(monkeypatch):
         assert 'entitlement' in rpc.json()['error']['message']
 
 
-@pytest.mark.asyncio
-async def test_native_tool_blocks_company_before_provider():
+def test_native_tool_blocks_company_before_provider():
+    import asyncio
     async def handler(company_code='1000'): return 'ok'
     wrapped = server._company_scoped_handler(handler)
     with pytest.raises(PermissionError):
-        await wrapped(company_code='9999')
-    assert await wrapped() == 'ok'
+        asyncio.run(wrapped(company_code='9999'))
+    assert asyncio.run(wrapped()) == 'ok'

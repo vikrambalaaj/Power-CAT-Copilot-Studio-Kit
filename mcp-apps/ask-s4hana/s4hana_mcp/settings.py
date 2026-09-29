@@ -26,12 +26,12 @@ class Settings(BaseSettings):
     s4_ar_entity: str = "ARageingData"
     s4_ap_entity: str = "APageingData"
     s4_budget_transfer_entity: str = "BudgetTransfer"
-    s4_budget_consumption_entity: str = "BudgetConsumSummary"
+    s4_budget_consumption_entity: str = "BudgetConsumData"
     s4_pl_entity: str = "GLDetails"
 
     # Legacy / Master Data entity configuration
     s4_budget_api_url: str = ""
-    s4_budget_entity: str = "BudgetConsumSummary"
+    s4_budget_entity: str = "BudgetConsumData"
     s4_customer_api_url: str = ""
     s4_customer_entity: str = "CustomerMaster"
     s4_costcenter_api_url: str = ""
@@ -42,9 +42,9 @@ class Settings(BaseSettings):
     # Environment & Governance settings
     s4_environment_label: str = "Production"
     s4_report_timezone: str = "Asia/Dubai"
-    s4_report_max_rows: int = 1000
-    s4_report_max_pages: int = 50
-    s4_total_timeout_seconds: float = 60.0
+    s4_report_max_rows: int = 35000
+    s4_report_max_pages: int = 400
+    s4_total_timeout_seconds: float = 120.0
 
     port: int = 8083
     s4_allowed_company_codes: str = "1000"

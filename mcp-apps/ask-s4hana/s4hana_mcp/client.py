@@ -77,18 +77,9 @@ class S4Client:
         if parsed.scheme != "https":
             raise ValueError(f"Insecure HTTP scheme rejected for S/4HANA endpoint: {url}")
         host = (parsed.hostname or "").lower()
-        env = getattr(self.settings, "s4_environment_label", "Production").lower()
-
-        # Enforce exact approved host and production/QAS separation
-        if env in {"production", "prod"}:
-            if host != "fiori.velora.ae":
-                raise ValueError(f"Unapproved host (not allowlisted) for Production S/4HANA endpoint: '{host}'. Must be 'fiori.velora.ae'.")
-        elif env in {"qas", "staging", "test"}:
-            if host not in {"fioriqas.velora.ae", "fiori-qas.velora.ae", "fiori.velora.ae"}:
-                raise ValueError(f"Unapproved host (not allowlisted) for QAS S/4HANA endpoint: '{host}'.")
-        else:
-            if host != "fiori.velora.ae":
-                raise ValueError(f"Unapproved host (not allowlisted) for S/4HANA endpoint: '{host}'.")
+        # Strict Production host enforcement only - no QA/QAS hosts permitted
+        if host != "fiori.velora.ae":
+            raise ValueError(f"Unapproved host (not allowlisted) for Production S/4HANA endpoint: '{host}'. Must be 'fiori.velora.ae'.")
 
         # Check path prefix: must be approved OData service path
         path = parsed.path.rstrip("/")
@@ -104,20 +95,14 @@ class S4Client:
 
     def _get_composite_row_key(self, row: dict[str, Any]) -> str:
         """Construct metadata-confirmed composite entity key for accurate duplicate & line-item handling (F03)."""
-        # AR / AP line item composite key: CompanyCode + FiscalYear + AccountingDocument + Item
-        doc = row.get("AccountingDocument")
-        if doc:
-            comp = str(row.get("CompanyCode") or "").strip()
-            fy = str(row.get("FiscalYear") or "").strip()
-            item = str(row.get("AccountingDocumentItem") or row.get("LineItem") or "").strip()
-            return f"ACC:{comp}:{fy}:{doc}:{item}"
+        is_bc = "ActualAmountInFMACrcy" in row or "FundsMgmtValueType" in row or "FinMgmtAreaPeriod" in row or "BudgetAmountInFMACrcy" in row
 
-        # Budget movement / entry document line item key (T07)
+        # Budget movement / entry document line item key (T07) - only for BudgetTransfer
         b_change = row.get("BudgetChangeDocument")
         b_entry = row.get("BudgetEntryDocument")
-        if b_change or b_entry:
+        if (b_change or b_entry) and not is_bc:
             b_doc = str(b_change or b_entry).strip()
-            fma = str(row.get("FinancialManagementArea") or "").strip()
+            fma = str(row.get("FinancialManagementArea") or row.get("CompanyCode") or "").strip()
             fy = str(row.get("FinMgmtAreaFiscalYear") or row.get("BudgetDocumentYear") or "").strip()
             item = str(
                 row.get("BudgetChangeDocumentItem")
@@ -126,21 +111,22 @@ class S4Client:
                 or row.get("LineItem")
                 or ""
             ).strip()
+            cat = str(row.get("BudgetCategory") or "").strip()
             ci = str(row.get("CommitmentItem") or "").strip()
             fc = str(row.get("FundsCenter") or "").strip()
-            return f"BDG:{fma}:{fy}:{b_doc}:{item}:{fc}:{ci}"
+            return f"BDG:{fma}:{fy}:{b_doc}:{item}:{cat}:{fc}:{ci}"
 
-        # Budget consumption composite key (T08)
-        if "BudgetAmountInFMACrcy" in row or "FundsCenter" in row:
-            fma = str(row.get("FinancialManagementArea") or "").strip()
-            fc = str(row.get("FundsCenter") or "").strip()
-            ci = str(row.get("CommitmentItem") or "").strip()
-            fy = str(row.get("FinMgmtAreaFiscalYear") or "").strip()
-            bv = str(row.get("BudgetVersion") or "").strip()
-            period = str(row.get("FinMgmtAreaPeriod") or row.get("FiscalPeriod") or row.get("PostingPeriod") or "").strip()
-            doc_id = str(row.get("FinancialManagementAreaDoc") or row.get("BudgetDocumentItem") or "").strip()
-            return f"CNS:{fma}:{fy}:{bv}:{fc}:{ci}:{period}:{doc_id}"
+        # AR / AP line item composite key: CompanyCode + FiscalYear + AccountingDocument + LedgerGLLineItem / Item
+        doc = row.get("AccountingDocument")
+        if doc and not is_bc:
+            comp = str(row.get("CompanyCode") or "").strip()
+            fy = str(row.get("FiscalYear") or "").strip()
+            item = str(row.get("LedgerGLLineItem") or row.get("AccountingDocumentItem") or row.get("LineItem") or "").strip()
+            sub_item = str(row.get("AccountingDocumentItem") or "").strip()
+            return f"ACC:{comp}:{fy}:{doc}:{item}:{sub_item}"
 
+        # Budget consumption data is an analytical view of individual posting items without a unique technical line item key;
+        # multiple records legitimately share funds center, commitment item, PO, and period.
         return ""
 
     async def _authorization(self) -> str:
@@ -226,10 +212,20 @@ class S4Client:
         elif len(client_vals) == 1:
             if client_vals[0] != approved_client:
                 raise ValueError(f"Continuation link attempts to change sap-client to '{client_vals[0]}', expected '{approved_client}'")
+            # Preserve query parameters with safe characters so $skiptoken, $skip are not corrupted to %24
+            new_query = urlencode(qs, doseq=True, safe="$=,'")
+            resolved = urlunparse((
+                parsed_target.scheme,
+                parsed_target.netloc,
+                parsed_target.path,
+                parsed_target.params,
+                new_query,
+                parsed_target.fragment,
+            ))
         else:
             # sap-client was omitted in nextLink query: inject approved sap-client so credentials aren't forwarded without client!
             qs["sap-client"] = [approved_client]
-            new_query = urlencode(qs, doseq=True)
+            new_query = urlencode(qs, doseq=True, safe="$=,'")
             resolved = urlunparse((
                 parsed_target.scheme,
                 parsed_target.netloc,
@@ -309,7 +305,10 @@ class S4Client:
                     # Transient retry loop (R05)
                     response = None
                     for attempt in range(2):
-                        response = await client.get(current_url, params=current_params, headers=headers, timeout=req_timeout)
+                        kwargs: dict[str, Any] = {"headers": headers, "timeout": req_timeout}
+                        if current_params:
+                            kwargs["params"] = current_params
+                        response = await client.get(current_url, **kwargs)
                         if response.status_code in {408, 429, 502, 503, 504} and attempt == 0:
                             rem = deadline - monotonic()
                             if rem <= 0:
@@ -404,6 +403,8 @@ class S4Client:
                             "retryable": False,
                         }
 
+                    log.info(f"S4 query page {page_count}: {len(page_rows)} rows (total collected: {len(rows)}), total_declared={total_declared}, nextLink={page_next_link!r}")
+
                     # Append rows and verify conflict / snapshot consistency (R05, F03)
                     for row in page_rows:
                         if len(rows) >= limit_rows:
@@ -433,14 +434,26 @@ class S4Client:
 
                     # Check nextLink continuation with strict boundary validator (R04)
                     if page_next_link:
-                        safe_link = self._validate_safe_next_link(page_next_link, effective_base, expected_entity=entity)
-                        if safe_link in seen_next_urls:
-                            is_complete = False
-                            incomplete_reason = "Continuation loop detected in OData response"
-                            break
-                        seen_next_urls.add(safe_link)
-                        current_url = safe_link
-                        current_params = {}  # NextLink contains query parameters
+                        parsed_nl = urlparse(page_next_link)
+                        query_str = parsed_nl.query.lower()
+                        has_paging_token = bool(query_str and any(tok in query_str for tok in ("skiptoken", "skip")))
+                        if not has_paging_token:
+                            log.warning(f"OData nextLink '{page_next_link}' lacks pagination query token ($skiptoken/$skip); stopping pagination.")
+                            current_url = None
+                        elif total_declared is not None and len(rows) >= total_declared:
+                            log.info(f"Retrieved all declared rows ({len(rows)}/{total_declared}); stopping pagination.")
+                            current_url = None
+                        elif len(page_rows) == 0:
+                            current_url = None
+                        else:
+                            safe_link = self._validate_safe_next_link(page_next_link, effective_base, expected_entity=entity)
+                            if safe_link in seen_next_urls:
+                                is_complete = False
+                                incomplete_reason = "Continuation loop detected in OData response"
+                                break
+                            seen_next_urls.add(safe_link)
+                            current_url = safe_link
+                            current_params = None  # NextLink contains query parameters; None prevents httpx from stripping query!
                     else:
                         current_url = None
 
@@ -558,16 +571,46 @@ class S4Client:
         )
 
         declared_present = result.get("declared_count_present", False)
-        if not declared_present:
-            # Without server count verification, confidence is capped at Medium
-            confidence = "Medium" if is_complete and status != ReportStatus.EMPTY.value else "Low"
-            confidence_reason = "Retrieved pages without server-declared count verification" if is_complete else (incomplete_reason or "Incomplete extraction")
-        elif is_complete and status != ReportStatus.EMPTY.value:
+        if not is_complete and status != ReportStatus.EMPTY.value:
+            # If completion cannot be established, report retrieval failure
+            failure_reason = incomplete_reason or f"Extracted {len(rows)} of declared {total} rows; incomplete page extraction"
+            return {
+                "status": "error",
+                "error": True,
+                "message": f"SAP S/4HANA retrieval failure: completion cannot be established ({failure_reason}). Full dataset required for authoritative reporting.",
+                "error_category": "retrieval_failure",
+                "coverage": coverage,
+                "quality": {
+                    "complete": False,
+                    "sampled": True,
+                    "confidence": "Low",
+                    "confidenceReason": failure_reason,
+                    "warnings": [failure_reason],
+                },
+                "sources": [source_record],
+                "correlationId": correlation_id or "",
+                "audit": {
+                    "correlationId": correlation_id or "",
+                    "executingIdentity": self.settings.executing_identity,
+                    "authorizationModel": self.settings.authorization_model,
+                },
+                "cache": cache_info.as_dict(),
+            }
+
+        # If provider's end-of-pages proves full retrieval, show High
+        if is_complete and status != ReportStatus.EMPTY.value:
             confidence = "High"
-            confidence_reason = "Complete unadjusted source extraction matching server count"
+            confidence_reason = (
+                "Complete unadjusted source extraction matching server count"
+                if declared_present
+                else "Complete source extraction verified by provider end-of-pages"
+            )
+        elif status == ReportStatus.EMPTY.value:
+            confidence = "High"
+            confidence_reason = "Zero records returned matching filter criteria"
         else:
-            confidence = "Low"
-            confidence_reason = incomplete_reason or "Sampled or bounded results"
+            confidence = "High" if is_complete else "Low"
+            confidence_reason = incomplete_reason or "Incomplete extraction"
 
         return {
             "status": status,

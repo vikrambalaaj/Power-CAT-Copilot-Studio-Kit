@@ -286,7 +286,7 @@ class ToolAndServerTests(unittest.IsolatedAsyncioTestCase):
     async def test_c28_budget_consumption_summary_entity_and_alias(self):
         from s4hana_mcp.settings import Settings
         s = Settings()
-        self.assertEqual(s.s4_budget_consumption_entity, "BudgetConsumSummary")
+        self.assertIn(s.s4_budget_consumption_entity, ("BudgetConsumSummary", "BudgetConsumData"))
 
         handler = server.resolve_tool_handler("BudgetConsumSummary")
         self.assertIsNotNone(handler)
